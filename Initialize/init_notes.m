@@ -6,7 +6,7 @@ function notes = init_notes(filename, read_path)
     all_vars = {
         'date'
         'timestamp'
-        't'
+        'time_elapsed'
         'experimentPartNo'
         'experimentSubpart'
         'event'
@@ -28,7 +28,7 @@ function notes = init_notes(filename, read_path)
     % Defines what kind variables for each column, used for parsing
     % NOTE: If object-oriented, then should implement check for valid names
     num_cols = {
-        't'
+        'time_elapsed'
         'afferentPressure'
         'efferentPressure'
         'flow'
@@ -63,6 +63,8 @@ function notes = init_notes(filename, read_path)
     % Range to read (as named in the Excel file, c.f. Excel's 'name manager')
     notes_sheet_name = 'Notes';
     notes_range_name = 'Notes';
+    notes_header_name = 'Header';
+    
     
     experiment_info_sheet_name = 'Experiment';
     info_range_names = {
@@ -77,15 +79,38 @@ function notes = init_notes(filename, read_path)
     %% Initialize notes
     
     filepath = fullfile(read_path,filename);
-    notes = readtable(filepath,'Sheet',notes_sheet_name,'Range',notes_range_name);
     
-    notes = standardizeMissing(notes, missing_value_repr);
+    notes = readtable(filepath,...
+        'Sheet',notes_sheet_name,...
+        'Range',notes_range_name,...
+        'ReadVariableNames',false,...
+        'basic', true); 
+    header_lines = readtable(filepath,...
+        'Sheet',notes_sheet_name,...
+        'Range',notes_header_name,...
+        'ReadVariableNames',false,...
+        'basic', true);  
+    for i=1:numel(info_range_names)
+        info.(info_range_names{i}) = readtable(filepath,...
+            'Sheet',experiment_info_sheet_name,...
+            'Range',info_range_names{i},...
+            'ReadVariableNames',false,...
+            'basic', true);
+    end
+    protocol = readtable(filepath,...
+        'Sheet',protocol_sheet_name,...
+        'ReadVariableNames',false);
     
     % Update and add variable metadata
-    notes.Properties.VariableNames = all_vars;
+    notes = standardizeMissing(notes, missing_value_repr);
     notes = addprop(notes,{'ControlledParam','MeassuredParam'},{'variable','variable'});
     notes.Properties.CustomProperties.ControlledParam = ismember(all_vars,controlled_vars);
     notes.Properties.CustomProperties.MeassuredParam = ismember(all_vars,meassured_vars);
+    notes.Properties.UserData.info = info;
+    notes.Properties.UserData.protocol = protocol;
+    notes.Properties.VariableNames = all_vars; % header_lines{1,:}
+    notes.Properties.VariableUnits = erase(header_lines{2,:},{'(',')'});
+    notes.Properties.VariableDescriptions = header_lines{2,:};
     
     % Metadata used for populating non-matched rows when syncing
     notes.Properties.VariableContinuity(cat_cols) = 'step';
@@ -95,7 +120,10 @@ function notes = init_notes(filename, read_path)
     notes.timestamp = datetime(notes.timestamp,...
         'ConvertFrom','datenum',...
         'TimeZone','Europe/Oslo');
-    notes.t = seconds(notes.t);
+    
+    % Store elapsed time as a Matlab duration vector
+    % TODO: Check and decide if this is necessary 
+    notes.time_elapsed = seconds(notes.time_elapsed);
     
     % Merge info from the date column into the timestamp before removing date column
     notes.timestamp.Day = notes.date.Day;
@@ -103,10 +131,10 @@ function notes = init_notes(filename, read_path)
     notes.timestamp.Year = notes.date.Year;
     
     % Derive the time column that was not in use when making the notes
-    if all(isnan(notes.t))
-        notes.t = seconds(notes.timestamp - notes.timestamp(1));
+    if all(isnan(notes.time_elapsed))
+        notes.time_elapsed = seconds(notes.timestamp - notes.timestamp(1));
     elseif all(isnat(notes.timestamp))
-        notes.timestamp = datetime(notes.t,'ConvertFrom','epochtime',...
+        notes.timestamp = datetime(notes.time_elapsed,'ConvertFrom','epochtime',...
             'Epoch',notes.date(1));
     end
     
@@ -119,24 +147,6 @@ function notes = init_notes(filename, read_path)
             notes.(all_vars{j}) = str2double(strrep(string(notes{:,j}),'-',''));
         end
     end
-    
-    %% Initialize user data
-    % Store experiment info and protocol text, as written in separate tabs in
-    % the Excel file.
-    
-    % Read separate info from named parts in Excel
-    notes.Properties.UserData.info = struct;
-    for i=1:numel(info_range_names)
-        notes.Properties.UserData.info.(info_range_names{i}) = readtable(filepath,...
-            'Sheet',experiment_info_sheet_name,...
-            'Range',info_range_names{i},...
-            'ReadVariableNames',false);
-    end
-    
-    % Read protocol as text as a whole (no named parts)
-    notes.Properties.UserData.protocol = readtable(filepath,...
-        'Sheet',protocol_sheet_name,...
-        'ReadVariableNames',false);
     
     
     %% Add/remove columns and convert to timetable
@@ -195,6 +205,6 @@ function notes = add_event_range(notes)
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
     notes.note_row = (1:height(notes))'+n_header_lines';
-    notes = movevars(notes, 'note_row', 'Before', 't');
+    notes = movevars(notes, 'note_row', 'Before', 'time_elapsed');
     notes.Properties.VariableContinuity('note_row') = 'step';
     

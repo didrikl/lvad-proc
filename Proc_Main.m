@@ -44,12 +44,7 @@ signal = retime(signal,'regular','linear','SampleRate',fs);
 % Init notes, then signal and notes fusion (after resampling)
 notes = init_notes(notes_filename,notes_read_path);
 data = merge_signal_and_notes(signal,notes);
-
-% Clip to timerange of notes (experiement start to end)
-last_note_ind = find(notes.experimentSubpart~='Experiment end',1,'last');
-range = timerange(notes.timestamp(1),timestamp(last_note_ind));
-data = data(range,:);
-data.Properties.SampleRate = fs;
+data = clip_to_experiment(data, notes, fs);
 
 
 %% Pre-process new variables
