@@ -10,6 +10,7 @@ clear Save_Table Save_Figure
 %% Information
 
 warning('off','MATLAB:table:ModifiedAndSavedVarnames')
+warning('off','MATLAB:HandleGraphics:ObsoletedProperty:JavaFrame')
 %warning('off','verbose')
 %warning('off','backtrace')
 
