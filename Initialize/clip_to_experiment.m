@@ -5,7 +5,7 @@ function data = clip_to_experiment(data, notes, fs)
     % The start will always correspond to the first note row.
 
     last_note_ind = find(notes.experimentSubpart~='Experiment end',1,'last');
-    range = timerange(notes.timestamp(1),timestamp(last_note_ind));
+    range = timerange(notes.timestamp(1),notes.timestamp(last_note_ind));
     data = data(range,:);
     
     % When cutting the edges, the sample rate is still valid, but it must be

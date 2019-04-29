@@ -7,7 +7,7 @@ addpath(genpath('.'))
 % import Initialize.*
 % import Calculate.*
 % import Analyze.*
-import Tools.*
+% import Tools.*
 
 % Settings for Matlab 
 init_matlab
@@ -38,7 +38,7 @@ signal = make_signal_timetable(signal, include_t);
 fs = 520;
 
 % Resample to even sampling, before adding categorical data and more from notes
-signal = retime(signal,'regular','linear','SampleRate',fs);
+signal = retime(signal,'regular','spline','SampleRate',fs);
 
 % Init notes, then signal and notes fusion (after resampling)
 notes = init_notes(notes_filename,notes_read_path);
@@ -61,22 +61,13 @@ data.movstd = calc_moving(@dsp.MovingStandardDeviation, data.acc_length, win_len
 
 
 %% Continuous wavelet transform
+% TODO: Sync to start of pumpthombosis and make equal time windows
 
-% for i=['2']
-%     parts.(['part',i]) = data(data.experimentPartNo==i,:);
-%     cwt(parts.(['part',i]).acc_length)
-% end
-
-part = data(data.note_row==24 | data.note_row==25,:);
-cwt_part = cwt(part.acc_length,part.Properties.SampleRate);
-
-
-%%
-% FFT for each intervention windows
-%data.event=='Thrombus injection';
-
-
-
+part = data(data.note_row==30,:);
+cwt(part.acc_length,part.Properties.SampleRate);
+figure
+part = data(data.note_row==31,:);
+cwt(part.acc_length,part.Properties.SampleRate);
 
 %% Estimate the spectrum using the short-time Fourier transform
 % Divide the signal into sections of a given length
@@ -91,12 +82,11 @@ spectrogram(data.acc_length,window,n_overlap_samp,n_fft,fs,'yaxis');
 
 
 %% Make RPM order map
+% Compare the pre and post intervention baselines with Matlab's build-in 
+% RPM order plots. Detrending is applied, so that the DC component is attenuated
 
+make_rpm_order_map(data)
 
-order_res = 0.2;
-rpm = str2double(string(data.pumpSpeed));
-rpmordermap(data.acc_length,520,rpm,order_res, ...
-    'Amplitude','peak','OverlapPercent',80,'Window',{'chebwin',80})
 
 %%
 
@@ -106,7 +96,7 @@ injection_notes = notes(notes.event=='Thrombus injection',:);
 iv_speed_ranges = notes.event_range(notes.event=='Pump speed change');
 n_injection = height(injection_notes);
 
-close all
+%close all
 %hold on
 for i=1:n_injection
     iv_row = injection_notes.note_row;
@@ -114,13 +104,13 @@ for i=1:n_injection
     plot_time = seconds(plot_data.timestamp-plot_data.timestamp(1));
     
     % Find where the mean of x changes most significantly.
-    pivot_ind = findchangepts(rmmissing(plot_data.mov520rms_sum),...
+    pivot_ind = findchangepts(rmmissing(plot_data.movrms),...
         'MaxNumChanges',1 ...
         ...'MinThreshold',1 ...
         );
     %TODO: Linear fit after pivot_ind
     
-    plot(plot_time,plot_data.mov520rms_sum,'DisplayName','Acc')   
+    plot(plot_time,plot_data.movrms,'DisplayName','Acc')   
     for j=1:numel(pivot_ind)
          pivot_time = plot_time(pivot_ind(j));
          h_drw(j) = drawline('Position',[pivot_time,0;pivot_time,2],...
@@ -129,7 +119,7 @@ for i=1:n_injection
              'LineWidth',1.5...
              );
     end
-    filename = sprintf('Mov520rms_sum - Thrombus injection %d of %d - Volume %s',...
+    filename = sprintf('Moving RMS of x,y,z length - Thrombus injection %d of %d - Volume %s',...
         i,n_injection,char(injection_notes.thrombusVolume(i)));
     title(strrep(filename,'_','\_'));
     
@@ -138,7 +128,7 @@ for i=1:n_injection
     
     %set(gcf, 'Position', get(0,'Screensize'));
     %Save_Figure(save_path, title_str, 300)
-    %pause
+    pause
     
 end
 hold off
