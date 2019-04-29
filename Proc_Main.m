@@ -15,15 +15,13 @@ init_matlab
 
 %% Initilize signal
 
-read_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data\Recorded\Surface';
-save_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data\';
-filename = 'monitor-20181207-154327.txt';
-notes_read_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data\Notes';
-notes_filename = 'IV_LVAD_CARDIACCS_1 - Experiment notes - Rev 2.xlsx';
-
+rec_file = 'monitor-20181207-154327.txt';
+notes_file = 'IV_LVAD_CARDIACCS_1 - Experiment notes - Rev 2.xlsx';
+    
 include_adc = false;
 include_t = false;
 
+[read_path, save_path] = init_paths;
 raw = read_raw(filename,read_path);
 %raw= read_raw_parfor(filename,read_path);
 signal = parse(raw, include_adc); % move to pre-processing??
@@ -35,10 +33,7 @@ signal = make_signal_timetable(signal, include_t);
 % * Initialize notes
 % * Clip to signal to notes range
 
-fs = 520;
-
-% Resample to even sampling, before adding categorical data and more from notes
-signal = retime(signal,'regular','spline','SampleRate',fs);
+signal = resample_signal(signal);
 
 % Init notes, then signal and notes fusion (after resampling)
 notes = init_notes(notes_filename,notes_read_path);
@@ -53,7 +48,7 @@ data = clip_to_experiment(data, notes, fs);
 data.acc_length = rms(data.acc,2); % same as acc_length = sqrt(mean(acc.^2,2))
     
 % Moving RMS, variance and standard deviation for 3 comp. length
-win_length = 520;
+win_length = data.Properties.SampleRate;
 data.movrms = calc_moving(@dsp.MovingRMS, data.acc_length, win_length);
 data.movvar = calc_moving(@dsp.MovingVariance, data.acc_length, win_length);
 data.movstd = calc_moving(@dsp.MovingStandardDeviation, data.acc_length, win_length);
