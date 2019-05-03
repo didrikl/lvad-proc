@@ -11,8 +11,8 @@ clear Save_Table Save_Figure
 
 warning('off','MATLAB:table:ModifiedAndSavedVarnames')
 warning('off','MATLAB:HandleGraphics:ObsoletedProperty:JavaFrame')
-%warning('off','verbose')
-%warning('off','backtrace')
+warning('off','verbose')
+warning('off','backtrace')
 
 
 %% Plotting

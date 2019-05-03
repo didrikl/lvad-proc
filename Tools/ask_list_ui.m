@@ -1,4 +1,4 @@
-function selection = Ask_List_GUI(options, question, default, indent, ~)
+function selection = ask_list_ui(options, question, default, indent)
 	% User-input menu, that enumerates the options and let the user select a option
 	% number. It user does not select a proper number, then the menu is re-displayed
 	% with a message about wrong input. The option selection number is returned.
@@ -17,10 +17,6 @@ function selection = Ask_List_GUI(options, question, default, indent, ~)
 	%                       option.
 	%   indent (string):    String formatting to given extra indentation for the
 	%                       menu, e.g. '\t\t'
-	%
-	% If a global variable named CHOOSE_ALWAYS_DEFAULT_IN_OPTION_LIST is defined as
-	% true, then the default options is always selected, and thus no user-input from
-	% the menu display is possible. This is suitable for e.g. batch processing.
 	%
 	% See also Ask_List
 	
@@ -41,6 +37,7 @@ function selection = Ask_List_GUI(options, question, default, indent, ~)
 	
 	if ~isa(options,'cell'), options = {options}; end
 	if isa(default,'char'), default = str2double(default); end
+    if isstring(options), options = char(options); end
 	
     n_opt_char = max(cellfun(@length,options));
     n_opt = length(options);

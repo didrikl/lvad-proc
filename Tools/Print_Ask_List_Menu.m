@@ -6,7 +6,8 @@ function Print_Ask_List_Menu(options, indent, question, default)
 	% mode and multiline print, and thus a conversion to regular string is
 	% neccessary.
 	if iscell(question), question = strjoin(question,[indent,'\n']); end
-	
+	if isstring(options), options = char(options); end
+    
 	n_option = length(options);
 	M = zeros(n_option,1);
 	for i=1:n_option, M(i) = length(options{i}); end
@@ -17,7 +18,7 @@ function Print_Ask_List_Menu(options, indent, question, default)
 	for i=1:n_option
 		num_width = floor(log10(i));
 		num_str = ['\n',indent,'[',num2str(i),']',repmat(' ',(max_num_width-num_width))];
-		fprintf([num_str,' ',options{i}]);
+        fprintf([num_str,' ',options{i}]);
 		space = repmat(' ',1,M_max-M(i)+1);
 		if i==default, fprintf([space,'{default <enter>}']); end
     end

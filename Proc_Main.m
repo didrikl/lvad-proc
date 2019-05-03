@@ -15,17 +15,15 @@ init_matlab
 
 %% Initilize signal
 
-rec_file = 'monitor-20181207-154327.txt';
-notes_file = 'IV_LVAD_CARDIACCS_1 - Experiment notes - Rev 2.xlsx';
-    
-include_adc = false;
-include_t = false;
+cardiaccs_file = fullfile('Surface','monitor-20181207-154327.txt');
+powerlab_file = fullfile('PowerLab','test.mat');
+notes_file = fullfile('Notes','IV_LVAD_CARDIACCS_1 - Notes - Rev 2.xlsx');
+experiment_subdir = 'IV_LVAD_CARDIACCS_1';
+[read_path, save_path] = init_paths(experiment_subdir);
 
-[read_path, save_path] = init_paths;
-raw = read_raw(filename,read_path);
-%raw= read_raw_parfor(filename,read_path);
-signal = parse(raw, include_adc); % move to pre-processing??
-signal = make_signal_timetable(signal, include_t);
+signal = init_cardiaccs_raw_txtfile(cardiaccs_file,read_path);
+p_signal = init_powerlab_raw_matfile(powerlab_file,read_path);
+notes = init_notes_xlsfile(notes_file,read_path);
 
 
 %% Pre-process signal
@@ -36,7 +34,6 @@ signal = make_signal_timetable(signal, include_t);
 signal = resample_signal(signal);
 
 % Init notes, then signal and notes fusion (after resampling)
-notes = init_notes(notes_filename,notes_read_path);
 data = merge_signal_and_notes(signal,notes);
 data = clip_to_experiment(data, notes, fs);
 
@@ -48,7 +45,7 @@ data = clip_to_experiment(data, notes, fs);
 data.acc_length = rms(data.acc,2); % same as acc_length = sqrt(mean(acc.^2,2))
     
 % Moving RMS, variance and standard deviation for 3 comp. length
-win_length = data.Properties.SampleRate;
+win_length = 1*data.Properties.SampleRate;
 data.movrms = calc_moving(@dsp.MovingRMS, data.acc_length, win_length);
 data.movvar = calc_moving(@dsp.MovingVariance, data.acc_length, win_length);
 data.movstd = calc_moving(@dsp.MovingStandardDeviation, data.acc_length, win_length);
@@ -56,14 +53,6 @@ data.movstd = calc_moving(@dsp.MovingStandardDeviation, data.acc_length, win_len
 
 
 %% Continuous wavelet transform
-% TODO: Sync to start of pumpthombosis and make equal time windows
-
-part = data(data.note_row==30,:);
-cwt(part.acc_length,part.Properties.SampleRate);
-figure
-part = data(data.note_row==31,:);
-cwt(part.acc_length,part.Properties.SampleRate);
-
 %% Estimate the spectrum using the short-time Fourier transform
 % Divide the signal into sections of a given length
 % Windowed with a Hamming window. 
@@ -73,6 +62,7 @@ cwt(part.acc_length,part.Properties.SampleRate);
 window = 500;
 n_overlap_samp = 80;
 n_fft = fs/2; % "freq eval resolution"
+
 spectrogram(data.acc_length,window,n_overlap_samp,n_fft,fs,'yaxis');
 
 
@@ -82,54 +72,6 @@ spectrogram(data.acc_length,window,n_overlap_samp,n_fft,fs,'yaxis');
 
 make_rpm_order_map(data)
 
-
-%%
-
-% Detect when the thrombus enters the system from the data, after start of
-% noted intervention window, no classification, just a guestimate
-injection_notes = notes(notes.event=='Thrombus injection',:);
-iv_speed_ranges = notes.event_range(notes.event=='Pump speed change');
-n_injection = height(injection_notes);
-
-%close all
-%hold on
-for i=1:n_injection
-    iv_row = injection_notes.note_row;
-    plot_data = data(injection_notes.event_range{i},:);    
-    plot_time = seconds(plot_data.timestamp-plot_data.timestamp(1));
-    
-    % Find where the mean of x changes most significantly.
-    pivot_ind = findchangepts(rmmissing(plot_data.movrms),...
-        'MaxNumChanges',1 ...
-        ...'MinThreshold',1 ...
-        );
-    %TODO: Linear fit after pivot_ind
-    
-    plot(plot_time,plot_data.movrms,'DisplayName','Acc')   
-    for j=1:numel(pivot_ind)
-         pivot_time = plot_time(pivot_ind(j));
-         h_drw(j) = drawline('Position',[pivot_time,0;pivot_time,2],...
-             'Color',[0.6350, 0.0780, 0.1840],...
-             'Label','Abrupt change',...
-             'LineWidth',1.5...
-             );
-    end
-    filename = sprintf('Moving RMS of x,y,z length - Thrombus injection %d of %d - Volume %s',...
-        i,n_injection,char(injection_notes.thrombusVolume(i)));
-    title(strrep(filename,'_','\_'));
-    
-    % TODO: Fixed axis for all plots
-    % TODO: Use time for set pivot ind, to define and sync intervals
-    
-    %set(gcf, 'Position', get(0,'Screensize'));
-    %Save_Figure(save_path, title_str, 300)
-    pause
-    
-end
-hold off
-h_leg = legend;
-(string(notes.thrombusVolume(notes.event=='Thrombus injection')));
-get(h_leg)
 
 
 %%

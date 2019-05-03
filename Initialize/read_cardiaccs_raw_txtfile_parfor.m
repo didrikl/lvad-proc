@@ -1,4 +1,4 @@
-function raw = read_raw_parfor(filename,read_path)
+function raw = read_cardiaccs_raw_txtfile_parfor(filename,read_path)
 
 if nargin==1, read_path = ''; end
 filepath = fullfile(read_path,filename);
@@ -66,22 +66,6 @@ end
 raw = table(raw_frame, raw_t, raw_adcscale, raw_accscale, raw_adc, raw_acc,...
     'VariableNames',{'frame','t','adcscale','accscale','adc','acc'});
 
-raw.Properties.VariableDescriptions{'t'} = 'The Current Unix Timestamp';
-raw.Properties.VariableDescriptions{'adc'} = 'External analog input';
-raw.Properties.VariableDescriptions{'adcscale'} = 'Scaling factor for physical scale in voltage (mV)';
-raw.Properties.VariableDescriptions{'acc'} = 'Acceleration';
-raw.Properties.VariableDescriptions{'accscale'} = 'Scaling factor for gravitational scale (g)';
-
-raw.Properties.VariableUnits{'t'} = 'sec';
-raw.Properties.VariableUnits{'adc'} = 'AU';
-raw.Properties.VariableUnits{'acc'} = 'AU';
-raw.Properties.VariableUnits{'adcscale'} = 'mV';
-raw.Properties.VariableUnits{'accscale'} = 'g';
-
-raw.Properties.UserData.read_date = datetime('now');
-raw.Properties.UserData.filename = filename;
-raw.Properties.UserData.filepath = filepath;
-raw.Properties.UserData.source_code = mfilename('fullpath');
-
-
+raw = add_cardiaccs_raw_variable_properties(raw);
+raw.Properties.UserData = make_init_userdata(filename,read_path);
 

@@ -1,4 +1,4 @@
-function raw = read_raw(filename,read_path)
+function raw = read_cardiaccs_raw_txtfile(filename,read_path)
 
 if nargin==1, read_path = ''; end
 filepath = fullfile(read_path,filename);
@@ -17,13 +17,12 @@ n_lines_approx = round(1.05*lines_per_kb*filesize_in_kb);
 n_lines_approx = n_lines_approx - n_skipped_rows;
 raw = cell(n_lines_approx,5);
 
-% The no of lines read in bulk before updating waitbar. It may also be used if
-% parallellization is used
-bulk_step = 20000;
-
 end_of_file = false;
 h_wait = waitbar(0,'Reading raw data');
 
+% Splitting up the reading into bulks, so that we may have a farily adquate
+% progress waitbar. The bulk size can be adjusted in the bulk_step parameter.
+bulk_step = 20000;
 for j=1:bulk_step:n_lines_approx
     
     % Stop if end of file was detected within the current bulk of rows below
@@ -73,23 +72,9 @@ raw(overshooting_inds,:) = [];
 raw = cell2table(raw,...
     'VariableNames',{'frame','t','adcscale','accscale','adc','acc'});
 
-% Preset properties
-raw.Properties.VariableDescriptions{'t'} = 'The Current Unix Timestamp';
-raw.Properties.VariableDescriptions{'adc'} = 'External analog input';
-raw.Properties.VariableDescriptions{'adcscale'} = 'Scaling factor for physical scale in voltage (mV)';
-raw.Properties.VariableDescriptions{'acc'} = 'Acceleration';
-raw.Properties.VariableDescriptions{'accscale'} = 'Scaling factor for gravitational scale (g)';
-raw.Properties.VariableUnits{'t'} = 'sec';
-raw.Properties.VariableUnits{'adc'} = 'AU';
-raw.Properties.VariableUnits{'acc'} = 'AU';
-raw.Properties.VariableUnits{'adcscale'} = 'mV';
-raw.Properties.VariableUnits{'accscale'} = 'g';
-
-% Userdata to store freely formated info/data
-raw.Properties.UserData.read_date = datetime('now');
-raw.Properties.UserData.filename = filename;
-raw.Properties.UserData.filepath = filepath;
-raw.Properties.UserData.source_code = mfilename('fullpath');
+% Add info for built-in table properties
+raw = add_cardiaccs_raw_variable_properties(raw);
+raw.Properties.UserData = make_init_userdata(filename,read_path);
 
 close(h_wait)
 
