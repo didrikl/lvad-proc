@@ -1,15 +1,26 @@
 function signal = init_powerlab_raw_matfile(filename,read_path)
+    % INIT_POWERLAB_RAW_MATFILE
+    % Read and parse data exported as mat file from PowerLab's LabChart
+    % program.
+    %
+    % Convert from one single array of data to a (2-D) to a matlab timetable.
+    % Additional metadata is parsed and stored with the timetable properties.
+    %
+    % Usage:
+    %     timetable(filename,read_path), where read_path is optional.
+    %
+    % See also timetable
     
     if nargin==1
+        % Default reading path. (Could also e.g. be set by user.) 
         read_path = '';
     end
     
+    % Default viewing format of timestamps (not very important)
     timestamp_fmt = 'dd-MMM-uuuu HH:mm:ss.SSS';
     
-    filepath = fullfile(read_path,filename);
-    
     % Read data with variable organized and accessible in a struct d
-    raw = load('-mat', filepath);
+    raw = load('-mat', fullfile(read_path,filename));
     
     % Parse raw metadata that are needed
     [n_vars,n_intervals] = size(raw.datastart);
@@ -19,7 +30,9 @@ function signal = init_powerlab_raw_matfile(filename,read_path)
     interv_start_timestamps = datetime(raw.blocktimes,...
         'ConvertFrom','datenum',...
         'Format',timestamp_fmt);
-    
+    % TODO: Implement storing of comments/flags
+    % NOTE: Must figure out how PowerLab stores comments/flags
+
     wait_complete = sum(sum(interv_lengths));
     wait_progress = 0;
     h_wait = waitbar(wait_progress,'Reading raw data');    
@@ -67,7 +80,8 @@ function signal = init_powerlab_raw_matfile(filename,read_path)
         end
 
     end
-   
+    
+    % Variable metadata
     signal.Properties.VariableUnits = col_unit;
     signal.Properties.VariableDescriptions = cellstr(raw.titles);
     
@@ -143,6 +157,5 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
             col_units(j) = unittext(var_unit_no);
        
         end
-
-        
+    
     end

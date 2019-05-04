@@ -1,5 +1,5 @@
 function [path, filename, overwrite_all, ignore_all] = ...
-        Save_Destination_Check(path, filename, overwrite_all, ignore_all)
+        save_destination_check(path, filename, overwrite_all, ignore_all)
     % Checks and initialize destination for saving, with user interaction and
     % printed information the command line window.
     % 

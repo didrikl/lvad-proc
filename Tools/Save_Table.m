@@ -1,5 +1,11 @@
-function [path, filename] = Save_Table(data, filename, path, varargin)
-    % Write Matlab table to text files, using writetable.
+function [path, filename] = save_table(data, filename, path, varargin)
+    % SAVE_TABLE
+    % Write Matlab table to text files, using writetable, with convenient 
+    % user interactions.
+    % 
+    % Usage: 
+    %     save_table(data, filename, path, varargin), where varargin is used for
+    %     additional parameter options for writetable.
     %
     % Check if there is already an exsisting file with the same filename in 
     % the saving directory path. If there is an exsisting file, then let the
@@ -8,7 +14,9 @@ function [path, filename] = Save_Table(data, filename, path, varargin)
     % remember choices goverening future action, in case there is an existing
     % file.
     %
-    % See also writetable, Save_Destination_Check
+    % See also writetable, save_destination_check, timetable2table
+    
+    % TODO: Test support for filename given as string?
     
     fprintf('\nSaving data as ASCII tables\n')
     
@@ -32,7 +40,7 @@ function [path, filename] = Save_Table(data, filename, path, varargin)
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do.
     [path, filename, overwrite_existing, ignore_saving_for_existing] = ...
-        Save_Destination_Check(path, filename, overwrite_existing, ...
+        save_destination_check(path, filename, overwrite_existing, ...
         ignore_saving_for_existing);
     
     % Saving time tables is not supported, but will not make any difference
