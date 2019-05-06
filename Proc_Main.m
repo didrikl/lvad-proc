@@ -22,16 +22,12 @@ notes_filename = fullfile('Notes','IV_LVAD_CARDIACCS_1 - Notes - Rev 2.xlsx');
 experiment_subdir = 'IV_LVAD_CARDIACCS_1';
 [read_path, save_path] = init_paths(experiment_subdir);
 
-signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
+%signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
+%save_table('signal.mat', save_path, signal, 'matlab');
+signal = init_signal_file('signal.mat', save_path);
 p_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
 notes = init_notes_xlsfile(notes_filename,read_path);
 
-save_table('signal.mat', save_path, signal, 'matlab');
-
-
-%% Initialize saved signal file
-
-signal = init_signal_file('signal.mat', save_path);
 
 
 %% Pre-process signal
@@ -39,14 +35,11 @@ signal = init_signal_file('signal.mat', save_path);
 % * Add note columns that have given VariableContinuity properties
 % * Clip to signal to notes range
 
-signal = pre_process_signal(notes, signal);
-signal_parts = split_into_experiment_parts(signal,notes);
+signal = resample_signal(signal);
 
-
-
-
-%% Pre-process new variables
-% Pre-calculate in batch new variables for the whole time range. 
+% Init notes, then signal and notes fusion (after resampling)
+signal = merge_signal_and_notes(signal,notes);
+signal = clip_to_experiment(signal,notes);
 
 % Vector length
 signal.acc_length = rms(signal.acc,2); % same as acc_length = sqrt(mean(acc.^2,2))
@@ -56,6 +49,9 @@ win_length = 1*signal.Properties.SampleRate;
 signal.movrms = calc_moving(@dsp.MovingRMS, signal.acc_length, win_length);
 signal.movvar = calc_moving(@dsp.MovingVariance, signal.acc_length, win_length);
 signal.movstd = calc_moving(@dsp.MovingStandardDeviation, signal.acc_length, win_length);
+
+% After new variable have been calculated, then split the prepared data
+signal_parts = split_into_experiment_parts(signal,notes);
 
 
 %% Continuous wavelet transform
@@ -79,7 +75,9 @@ spectrogram(signal.acc_length,window,n_overlap_samp,n_fft,fs,'yaxis');
 % Compare the pre and post intervention baselines with Matlab's build-in 
 % RPM order plots. Detrending is applied, so that the DC component is attenuated
 
-make_rpm_order_map(signal)
+make_rpm_order_map(signal_parts.part1)
+make_rpm_order_map(signal_parts.part2)
+make_rpm_order_map(signal_parts.part3)
 
 
 %%

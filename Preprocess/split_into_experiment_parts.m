@@ -11,6 +11,7 @@ function signal_parts = split_into_experiment_parts(signal,notes)
     parts = string(unique(notes.experimentPartNo));
     parts = parts(isfinite(str2double(parts)));
         
+    % Extract and store each experiement part gathered into one struct
     signal_parts = struct;
     for i=1:numel(parts)
         no = char(parts(i));
@@ -18,4 +19,3 @@ function signal_parts = split_into_experiment_parts(signal,notes)
         signal_parts.(fieldname) = signal(signal.experimentPartNo==no,:);
     end
     
-

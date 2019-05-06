@@ -6,7 +6,6 @@ function movvar = calc_moving(mov_fun, signal_vec, win_length)
 %     end
     
     % Requirement check for resampling to equal time steps?!
-    
     MovObj = mov_fun(win_length);   
     
     % Error is not a moving calculation object was initialized by the provided

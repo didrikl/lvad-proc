@@ -31,7 +31,8 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
     
     % If inputs are given as strings, then parse to char for compability
     % TODO: Test support for filename given as string?
-    [filename, save_path, varargin{:}] = convertStringsToChars(filename, save_path, varargin{:});
+    [filename, save_path, varargin{:}] = convertStringsToChars(...
+        filename, save_path, varargin{:});
 
     % Input validations
     if not(any(strcmpi(filetype,{'matlab','text','spreadsheet'})))
