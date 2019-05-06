@@ -1,5 +1,6 @@
 function [path, filename, overwrite_all, ignore_all] = ...
         save_destination_check(path, filename, overwrite_all, ignore_all)
+    % save_destination_check
     % Checks and initialize destination for saving, with user interaction and
     % printed information the command line window.
     % 
@@ -18,6 +19,8 @@ function [path, filename, overwrite_all, ignore_all] = ...
     %   For the Overwrite all and Ignore all options to work in practice, the
     %   output variables overwrite_all and ignore_all must be declared as a 
     %   persistent variables in the calling code.
+    %
+    % See also uiputfile, save_table, save_figure
 
     
     % Check existence of saving directory and create new if not existing
@@ -47,9 +50,9 @@ function [path, filename, overwrite_all, ignore_all] = ...
             
             % Display warning and open user interaction menu
             user_opts = {'Overwrite','Overwrite all','Save to other...','Ignore all'};
-            message = sprintf(['File already exist: ',filename]);
+            message = sprintf(['File already exist: ',strrep(filename,'\','\\')]);
             warning(message);
-            response = Ask_List_GUI(user_opts, message);
+            response = ask_list_ui(user_opts, message);
         
             if response==1
                 overwrite=true;
@@ -67,7 +70,7 @@ function [path, filename, overwrite_all, ignore_all] = ...
             % Open build-in browser for saving, giving full flexibility for filepath
             if response==3
                 [new_filename,new_path] = uiputfile(...
-                    fullfile(path,filename),'Save average as');
+                    fullfile(path,filename),'Save as');
                 
                 new_filename_selected = strcmp(new_filename, filename);
                 new_path_selected = strcmp(new_path, path);

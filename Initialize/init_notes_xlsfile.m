@@ -178,6 +178,12 @@ function notes = add_event_range(notes)
         ii = event_inds(i);
         event_stop_ind = ii+1;
         
+        % Include steady state as part of the preceeding event/intervention
+        while contains(string(notes.experimentSubpart(event_stop_ind)),...
+            {'steady-state','steady state'}) && event_stop_ind<n_notes
+            event_stop_ind = event_stop_ind+1;
+        end
+                
         % Handle events that will run i parallell
         event = string(notes.event(ii));
         if contains(event,'start','IgnoreCase',true)
@@ -194,11 +200,13 @@ function notes = add_event_range(notes)
             
         end
         
-        % Make
+        % Make the timerange
         if ii<n_notes
-            notes.event_range{ii} = timerange(...
-                notes.timestamp(ii), notes.timestamp(event_stop_ind),'open');
+            end_time = notes.timestamp(event_stop_ind);
+        else
+            end_time = datetime(inf,'ConvertFrom','datenum','TimeZone','Etc/UTC');
         end
+        notes.event_range{ii} = timerange(notes.timestamp(ii),end_time,'open');
         
     end
     
