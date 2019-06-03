@@ -48,7 +48,7 @@ signal = merge_signal_and_notes(signal,notes);
 signal = clip_to_experiment(signal,notes);
 
 % Vector length
-signal.acc_length = sqrt(mean(signal.acc.^2,2));
+signal.acc_length = sqrt(sum(signal.acc.^2,2));
     
 % Moving RMS, variance and standard deviation for 3 comp. length
 signal = calc_moving(signal);

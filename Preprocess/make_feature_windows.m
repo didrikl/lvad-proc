@@ -1,8 +1,12 @@
 function features = make_feature_windows(signal, features)
     
     pivot_y_varname = 'movrms';
-    y_varnames = {'movrms','acc_length'};
-    yy_varnames = {'movstd',''};
+    y_varnames =  { 'acc_length','movrms' };
+    yy_varnames = {
+        '',          'movstd' };
+    ylims = {[0.75,1.5],[0.56, 0.7]};
+    yylims = {[],[0.01,0.02]};
+    
     
     event_type = 'Thrombus injection';
     
@@ -18,6 +22,7 @@ function features = make_feature_windows(signal, features)
         
         t_dur = iv_signal.timestamp-iv_signal.timestamp(1);
         t_dur.Format = 'mm:ss';
+        %t = t_dur;
         t = seconds(t_dur);
         
         clf
@@ -28,28 +33,35 @@ function features = make_feature_windows(signal, features)
             h_subax(j) = subplot(n_subplots,1,j);
             
             
-            plot(t,iv_signal.(y_varnames{j}))
-            
-            h_xxax = axes('Position',h_subax(j).Position,...
-                'XAxisLocation','top',...
-                'Color','none');
-            h_xxax.YAxis.Visible = 'off';
-            
-            
+            plot(t,iv_signal.(y_varnames{j}),'Clipping','off')
+            h_subax(j).YLim = ylims{j};
+                    
             if j==1
                 h_subax(j).XAxisLocation = 'top';
+                %h_subax(j).YAxis.TickLabels{1} = '';
+                
             elseif j<n_subplots
                 h_subax(j).XAxis.Visible = 'off';
+                
             else
+                h_subax(j).Position(4) = h_subax(j).Position(4)*1.25;
+                h_zoomscr = scrollplot;
+                h_zoomscr.Position(2) = h_zoomscr.Position(2)-0.005;
+                
             end
             
             
-            h_subax(j,1).XGrid = 'on';
+            h_subax(j).XGrid = 'on';
+            h_subax(j).XAxis.TickDirection = 'both';
+            %h_subax(j).YAxis.TickDirection = 'both';
+            h_subax(j).YAxis.TickLength = [0.01,0];
+            h_subax(j).XAxis.TickLength = [0.005,0];
             
             if not(isempty(yy_varnames{j}))
                 yyaxis right
                 yy = iv_signal.(yy_varnames{j});
                 plot(t,yy)
+                h_subax(j).YLim = yylims{j};
             end
             
             legend(y_varnames{j},yy_varnames{j},'Orientation','horizontal')
@@ -80,6 +92,7 @@ function features = make_feature_windows(signal, features)
         xlabel(h_subax(end,1),'Time (sec)')
         
         
+        
         %         subplot(2,1,1)
         %
         %
@@ -90,8 +103,9 @@ function features = make_feature_windows(signal, features)
         % TODO: Find harmonic max values (also before and after abrupt change)
         
         
-        
+        %break
         pause
+        
     end
     
     
