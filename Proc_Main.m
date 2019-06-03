@@ -13,19 +13,25 @@ addpath(genpath('.'))
 init_matlab
 
 
-%% Initilize raw signal files
+%% Initilize raw signal files and notes from disc
 
+% User inputs
 cardiaccs_filename = fullfile('Surface','monitor-20181207-154327.txt');
 powerlab_filename = fullfile('PowerLab','test.mat');
 notes_filename = fullfile('Notes','IV_LVAD_CARDIACCS_1 - Notes - Rev 2.xlsx');
-
 experiment_subdir = 'IV_LVAD_CARDIACCS_1';
 [read_path, save_path] = init_paths(experiment_subdir);
 
-%signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
-%save_table('signal.mat', save_path, signal, 'matlab');
-signal = init_signal_file('signal.mat', save_path);
-p_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
+% Read text file and save the initialized as binary file
+signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
+save_table('signal.mat', save_path, signal, 'matlab');
+
+% Read mat files
+%signal = init_signal_file('signal.mat', save_path);
+%signal = init_signal_file('signal_preproc.mat', save_path);
+%p_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
+
+% Read notes from Excel file and 
 notes = init_notes_xlsfile(notes_filename,read_path);
 
 
@@ -42,77 +48,47 @@ signal = merge_signal_and_notes(signal,notes);
 signal = clip_to_experiment(signal,notes);
 
 % Vector length
-signal.acc_length = rms(signal.acc,2); % same as acc_length = sqrt(mean(acc.^2,2))
+signal.acc_length = sqrt(mean(signal.acc.^2,2));
     
 % Moving RMS, variance and standard deviation for 3 comp. length
-win_length = 1*signal.Properties.SampleRate;
-signal.movrms = calc_moving(@dsp.MovingRMS, signal.acc_length, win_length);
-signal.movvar = calc_moving(@dsp.MovingVariance, signal.acc_length, win_length);
-signal.movstd = calc_moving(@dsp.MovingStandardDeviation, signal.acc_length, win_length);
+signal = calc_moving(signal);
 
 % After new variable have been calculated, then split the prepared data
 signal_parts = split_into_experiment_parts(signal,notes);
+signal_parts.part2_iv = signal_parts.part2(signal_parts.part2.event~='Baseline',:);
+
+features = extract_features_from_notes(notes);
+
+save_table('signal_preproc.mat', save_path, signal, 'matlab');
 
 
 %% Continuous wavelet transform
 
 
 
+
 %% Estimate the spectrum using the short-time Fourier transform
-% Divide the signal into sections of a given length
-% Windowed with a Hamming window. 
-% Specify 80 samples of overlap between adjoining sections
-% Evaluate the spectrum at fs/2+1 frequencies.
 
-window = 500;
-n_overlap_samp = 80;
-n_fft = fs/2; % "freq eval resolution"
-
-spectrogram(signal.acc_length,window,n_overlap_samp,n_fft,fs,'yaxis');
+%make_spectrogram(signal_parts.part2_iv,'acc_length')
 
 
-%% Make RPM order map
-% Compare the pre and post intervention baselines with Matlab's build-in 
-% RPM order plots. Detrending is applied, so that the DC component is attenuated
+%% Make time domain plots
+
+make_time_plots(signal_parts.part2_iv,'acc_length')
+
+
+%% Calc FFT
+% Remove the static effect of gravity in the in vitro setup?
+%   - no need for acc_length
+%   - perhaps requiured when looking at a 2-D plane
+% Adjust time to comparable intervention windows
+
+make_fft_plots(signal_parts.part2)
+
+
+%% Make RPM order maps
 
 make_rpm_order_map(signal_parts.part1)
 make_rpm_order_map(signal_parts.part2)
 make_rpm_order_map(signal_parts.part3)
-
-
-%%
-figure
-hold on
-%signal.t.Format = 'SS';
-for i=1:numel(iv_injection_ranges)
-    plot_data = signal(iv_injection_ranges{i},:);
-    plot_time = plot_data.t - plot_data.t(2);
-    h_plt = plot(plot_time,sum(plot_data.movrms,2));
-    %h_plt.Color(4) = 0.2;
-end
-
-h_ax = gca;
-h_ax.YLim(1) = 0;
-
-hold off
-h_leg = legend(string(notes.thrombusVolume(notes.event=='Thrombus injection')));
-get(h_leg)
-
-
-%% Clip data into parts
-
-
-% Remove non-experiement recording (NB: clipping after calculations is okay, but
-% clipped parts prior to calculations must be kept separate in the calculations)
-
-parts.all = signal(not(isundefined(signal.experimentSubpart)),:);
-parts.part1 = signal(signal.experimentPartNo=='1',:);
-parts.part2 = signal(signal.experimentPartNo=='2',:);
-parts.part3 = signal(signal.experimentPartNo=='3',:);
-
-parts.pause = signal(signal.experimentSubpart=='Pause',:);
-pause_start_ind = find(notes.experimentSubpart=='Pause');
-pause_end_ind = pause_start_ind+1;
-pause_interv = [notes.timestamp(pause_start_ind),notes.timestamp(pause_end_ind)];
-
 

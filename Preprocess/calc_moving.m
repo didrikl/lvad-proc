@@ -1,17 +1,24 @@
-function movvar = calc_moving(mov_fun, signal_vec, win_length)
-    % Calc moving variance along the time
+function signal = calc_moving(signal)
+    % CALC_MOVING
+    %   
+    %
+    % See also dsp
+    %
+
+    var = 'acc_length';
+    signal_vec = signal.(var);
+    win_length = 1*signal.Properties.SampleRate;
     
-%     if nargin==1
-%         win_length = 125;
-%     end
     
-    % Requirement check for resampling to equal time steps?!
-    MovObj = mov_fun(win_length);   
+    MovRMSObj = dsp.MovingRMS(win_length);   
+    signal.movrms = MovRMSObj(signal_vec);
+    signal.movrms(1:win_length) = nan;
+
+    MovVarObj = dsp.MovingVariance(win_length);   
+    signal.movvar = MovVarObj(signal_vec);
+    signal.movvar(1:win_length) = nan;
+
+    MovSTDObj = dsp.MovingStandardDeviation(win_length);   
+    signal.movstd = MovSTDObj(signal_vec);
+    signal.movstd(1:win_length) = nan;
     
-    % Error is not a moving calculation object was initialized by the provided
-    % function
-    assert(isa(MovObj,'dsp.private.AbstractMovingStatistic'))
-    
-    movvar = MovObj(signal_vec);
-    movvar(1:win_length) = nan;
-       

@@ -1,5 +1,7 @@
-function notes = init_notes(filename, read_path)
+function notes = init_notes_xlsfile(filename, read_path)
     if nargin==1, read_path = ''; end
+    
+    % TODO: Split this function into init and pre-proc functions??
     
     %% Input file format settings
     
@@ -33,16 +35,37 @@ function notes = init_notes(filename, read_path)
         'efferentPressure'
         'flow'
         'power'
+        ...'thrombusVolume'
+        'speedChangeRate'
+        'pumpSpeed'
         }';
     cat_cols = {
         'experimentPartNo'
         'experimentSubpart'
         'event'
         'thrombusVolume'
-        'speedChangeRate'
+        ...'speedChangeRate'
         'dose'
-        'pumpSpeed'
+        ...'pumpSpeed'
         }';
+    
+    % Continuity definitions, e.g. used for populating non-matched rows when 
+    % doing syncing/data fusion
+    event_vars = {
+        'event'
+        'thrombusVolume'
+        'dose'
+        'afferentPressure'
+        'efferentPressure'
+        'flow'
+        'power'
+    };
+    step_vars = {
+        'experimentPartNo'
+        'experimentSubpart'
+        'speedChangeRate'
+        'pumpSpeed'    
+    };
     
     % Which variables are controlled or meassured, used for analysis
     controlled_vars = {    
@@ -58,7 +81,7 @@ function notes = init_notes(filename, read_path)
         'power'
         };
     
-    missing_value_repr = {''};
+    missing_value_repr = {'','-'};
     
     % Range to read (as named in the Excel file, c.f. Excel's 'name manager')
     notes_sheet_name = 'Notes';
@@ -112,9 +135,9 @@ function notes = init_notes(filename, read_path)
     notes.Properties.VariableUnits = erase(header_lines{2,:},{'(',')'});
     notes.Properties.VariableDescriptions = header_lines{2,:};
     
-    % Metadata used for populating non-matched rows when syncing
-    notes.Properties.VariableContinuity(cat_cols) = 'step';
-    notes.Properties.VariableContinuity(meassured_vars) = 'event';
+    % Metadata used for populating non-matched rows when syncing/data fusion
+    notes.Properties.VariableContinuity(step_vars) = 'step';
+    notes.Properties.VariableContinuity(event_vars) = 'event';
     
     % Change the time representation, similar to the parsing of recorded data
     notes.timestamp = datetime(notes.timestamp,...
@@ -170,7 +193,7 @@ function notes = add_event_range(notes)
     
     n_notes = height(notes);
     notes.event_range = cell(n_notes,1);
-    event_inds = find(notes.event~='-');
+    event_inds = find(notes.event~='-' & not(ismissing(notes.event)));
     
     for i=1:numel(event_inds)
         

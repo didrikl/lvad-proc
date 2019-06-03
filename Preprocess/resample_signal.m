@@ -9,5 +9,5 @@ function signal = resample_signal(signal)
 
     % Resample to even sampling, before adding categorical data and more from notes
     % TODO: Implement a check/support for signal containing non-numeric columns
-    signal = retime(signal,'regular',method,...
+    signal = retime(signal,'regular',resample_method,...
         'SampleRate',fs);

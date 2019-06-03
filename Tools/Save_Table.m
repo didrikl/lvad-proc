@@ -27,7 +27,8 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
     % possiblity to be baked into the filename. This help to avoid unintendent
     % saving in current working directory.
     
-    fprintf('\nSaving data as ASCII tables\n')
+    % Name of the table as it exist in memory
+    tabname = inputname(3);
     
     % If inputs are given as strings, then parse to char for compability
     % TODO: Test support for filename given as string?
@@ -45,6 +46,9 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
     elseif ~isa(data,'table')
         error('Third input argument is not a table or timetable');
     end
+    
+    
+    fprintf('\nSaving the table %s to disc\n',tabname)
     
     % Initialize persistent boolean switches for saving
     persistent overwrite_existing
@@ -93,7 +97,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
             case 'matlab'
                 
                 eval([inputname(3),'=data;']);
-                save(filepath,inputname(3), varargin{:});
+                save(filepath,tabname, varargin{:});
                 
             case {'text','spreadsheet'}
                 

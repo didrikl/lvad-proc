@@ -51,3 +51,27 @@ plot(data_clip.timestamp, data_clip.thrombusVolume,'clipping','on')
 % h_ax(1).XLim = [parts.timestamp(1),parts.timestamp(end)];
 % 
 
+
+
+%%
+figure
+hold on
+%signal.t.Format = 'SS';
+for i=1:numel(iv_injection_ranges)
+    plot_data = signal(iv_injection_ranges{i},:);
+    plot_time = plot_data.t - plot_data.t(2);
+    h_plt = plot(plot_time,sum(plot_data.movrms,2));
+    %h_plt.Color(4) = 0.2;
+end
+
+h_ax = gca;
+h_ax.YLim(1) = 0;
+
+hold off
+h_leg = legend(string(notes.thrombusVolume(notes.event=='Thrombus injection')));
+get(h_leg)
+
+
+
+
+

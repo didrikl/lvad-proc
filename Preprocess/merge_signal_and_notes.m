@@ -1,5 +1,5 @@
 function data = merge_signal_and_notes(signal,notes)
-    signal.Properties.SampleRate
+
     % Ignore columns not in use when merging
     notes(:,all(ismissing(notes))) = [];
     
