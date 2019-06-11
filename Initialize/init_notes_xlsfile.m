@@ -185,16 +185,27 @@ function notes = init_notes_xlsfile(filename, read_path)
     
     
 function notes = add_event_range(notes)
-    % Add time ranges for how long the event is running. Rule of thumb is that
-    % is run until next noted event in the notes. Exceptions are made for events 
-    % with the key word 'start', which is presumed to be running in parallell 
-    % until end of experiement or until a similar pairing counterpart event 
-    % having the key word 'end' instead of 'start'.
+    % Add info about how long the events are running. Two new columns are made,
+    % one column for event end time and one column with subscripts for timerange 
+    % extractions in timetables.
+    %
+    % The rule of thumb is that is run until next noted event in the notes.
+    % Exceptions are made for events with the key word 'start', which is
+    % presumed to be running in parallell until end of experiement or until a
+    % similar pairing counterpart event having the key word 'end' instead of
+    % 'start'.
     
     n_notes = height(notes);
-    notes.event_range = cell(n_notes,1);
-    event_inds = find(notes.event~='-' & not(ismissing(notes.event)));
     
+    % Timestamp for when event is considered to be finished. Having this column
+    % allows for parallell events running.
+    notes.event_end = cell(n_notes,1);
+    
+    % Subscripts to extract ranges in timetables, just for convenience. It can
+    % be also used to quickly view the timerange, but has no other usage. 
+    notes.event_timerange = cell(n_notes,1);
+    
+    event_inds = find(notes.event~='-' & not(ismissing(notes.event)));
     for i=1:numel(event_inds)
         
         % Applying the rule of thomb
@@ -229,13 +240,15 @@ function notes = add_event_range(notes)
         else
             end_time = datetime(inf,'ConvertFrom','datenum','TimeZone','Etc/UTC');
         end
-        notes.event_range{ii} = timerange(notes.timestamp(ii),end_time,'open');
+        notes.event_timerange{ii} = timerange(notes.timestamp(ii),end_time,'open');
+        notes.event_endTime(ii) = end_time;
+        
         
     end
     
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
-    notes.note_row = (1:height(notes))'+n_header_lines';
-    notes = movevars(notes, 'note_row', 'Before', 'time_elapsed');
-    notes.Properties.VariableContinuity('note_row') = 'step';
+    notes.noteRow = (1:height(notes))'+n_header_lines';
+    notes = movevars(notes, 'noteRow', 'Before', 'time_elapsed');
+    notes.Properties.VariableContinuity('noteRow') = 'step';
     

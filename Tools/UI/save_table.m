@@ -60,23 +60,27 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
         ignore_saving_for_existing = false;
     end
     
-    [~,~,ext] = fileparts(filename);
-    if not(ext)
-        switch lower(filetype)
-            case 'matlab'
-                filename = fullfile(filename,'.mat');
-            case 'text'
-                filename = fullfile(filename,'.csv');
-            case 'spreadsheet'
-                filename = fullfile(filename,'.xls');
-        end
+    [subfolder,filename,ext] = fileparts(filename);
+    if not(strcmpi(filetype,ext))
+        warning('Saving with new file extention according to given filetype');
     end
+    switch lower(filetype)
+        case 'matlab'
+            filename = [filename,'.mat'];
+        case 'text'
+            filename = [filename,'.txt'];
+        case 'csv'
+            filename = [filename,'.csv'];
+        case 'spreadsheet'
+            filename = [filename,'.xls'];
+    end
+    save_path = fullfile(save_path,subfolder);
     
     % Check if there is already an exsisting file with the same filename in
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do. 
     [save_path, filename, overwrite_existing, ignore_saving_for_existing] = ...
-        save_destination_check(save_path, filename, overwrite_existing, ...
+        Save_Destination_Check(save_path, filename, overwrite_existing, ...
         ignore_saving_for_existing);
     
     % If cancelled in user interaction, then just return without saving
@@ -98,6 +102,15 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
                 
                 eval([inputname(3),'=data;']);
                 save(filepath,tabname, varargin{:});
+            
+            case {'csv'}
+                
+                % Saving time tables is not supported in writetable,
+                % but will probably not make any difference
+                if istimetable(data)
+                    data = timetable2table(data);
+                end
+                writetable(data, filepath, 'FileType', 'text', 'Delimiter', 'comma', varargin{:})
                 
             case {'text','spreadsheet'}
                 
@@ -106,7 +119,6 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
                 if istimetable(data)
                     data = timetable2table(data);
                 end
-                
                 writetable(data, filepath, 'FileType', filetype, varargin{:})
                 
         end
@@ -118,7 +130,9 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
     catch ME
         
         if strcmp(ME.identifier,'MATLAB:table:write:FileOpenInAnotherProcess')
-            warning('No data saved. File is open with no write access.');
+            warning('No data saved. File is open in another process.');
+        elseif strcmp(ME.identifier,'MATLAB:table:write:FileOpenError')
+            warning('No data saved. Could not open/create file for saving.');
         else
             warning('No data saved. Something went wrong.')
             disp(ME)

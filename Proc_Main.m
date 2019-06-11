@@ -23,11 +23,11 @@ experiment_subdir = 'IV_LVAD_CARDIACCS_1';
 [read_path, save_path] = init_paths(experiment_subdir);
 
 % Read text file and save the initialized as binary file
-signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
-save_table('signal.mat', save_path, signal, 'matlab');
+%signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
+%save_table('signal.mat', save_path, signal, 'matlab');
 
 % Read mat files
-%signal = init_signal_file('signal.mat', save_path);
+signal = init_signal_file('signal.mat', save_path);
 %signal = init_signal_file('signal_preproc.mat', save_path);
 %p_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
 
@@ -74,7 +74,7 @@ save_table('signal_preproc.mat', save_path, signal, 'matlab');
 
 %% Make time domain plots
 
-make_time_plots(signal_parts.part2_iv,'acc_length')
+%make_time_plots(signal_parts.part2_iv,'acc_length')
 
 
 %% Calc FFT
