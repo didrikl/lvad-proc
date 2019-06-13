@@ -27,7 +27,7 @@ function feats = extract_features_from_notes(notes)
      
      %feats.event_noteRow = notes.noteRow(ss_rows);
      
-     % Precursor: The lest preceeding event that can be tied to the feature.
+     % Precursor: The last preceeding event that can be tied to the feature.
      feats.precursor = notes.event(ss_rows-1);     
      feats.precursor_noteRow = notes.noteRow(ss_rows-1);
      feats.precursor_startTime = notes.timestamp(ss_rows-1);
@@ -35,35 +35,46 @@ function feats = extract_features_from_notes(notes)
      feats.precursor_timerange = notes.event_timerange(ss_rows-1);
      
      % Check and add info of potential additional paralell precursors
-     feats.parPrecursor_noteRows = find_parallel_precursors(feats);
+     feats = add_parallel_precursor_info(feats,notes);
      
     
 end
 
 %%
 
-function noteRows = find_parallel_precursors(feats)
+function feats = add_parallel_precursor_info(feats,notes)
     % Look for though all preceeding events and look for additional parallel
     % events still running, by comparing the event end times with the last 
     % preceeding event end time.  
      
-    noteRows = cell(height(feats),1);
+    parPrecurNoteRows = cell(height(feats),1);
+    parPrecurEvent = cell(height(feats),1);
     
     % For the last preceeding event in each feature...
-    for pivot_ind=1:height(feats)
+    for pivot_feat_ind=1:height(feats)
         
         % Check if other preceeding events may be considered as precursors
         % to the current feature, in addition to the last preceeding event
-        par_Noterows = [];
-        for par_ind=1:pivot_ind-1
+        parPrecur_Noterows = [];
+        parPrecur = {};
+        pivot_note_ind = feats.precursor_noteRow(pivot_feat_ind)-3;
+        for par_ind=1:pivot_note_ind-1
                 
-          if feats.precursor_endTime(par_ind)>feats.precursor_startTime(pivot_ind)
-              par_Noterows(end+1) = feats.precursor_noteRow(par_ind);
+          if notes.event_endTime(par_ind)>feats.precursor_startTime(pivot_feat_ind)
+              parPrecur_Noterows(end+1) = notes.noteRow(par_ind);
+              parPrecur{end+1} = string(notes.event(par_ind));
           end
           
         end
-        noteRows{pivot_ind} = par_Noterows;
+        
+        parPrecurNoteRows{pivot_feat_ind} = parPrecur_Noterows;
+        parPrecurEvent{pivot_feat_ind} = string(parPrecur);
+        
     end
+    
+    feats.paralellPrecursor_noteRows = parPrecurNoteRows;
+    feats.paralellPrecursor = parPrecurEvent;
+    
 end
 
 
