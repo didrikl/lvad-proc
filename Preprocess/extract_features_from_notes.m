@@ -62,7 +62,7 @@ function feats = add_parallel_precursor_info(feats,notes)
                 
           if notes.event_endTime(par_ind)>feats.precursor_startTime(pivot_feat_ind)
               parPrecur_Noterows(end+1) = notes.noteRow(par_ind);
-              parPrecur{end+1} = string(notes.event(par_ind));
+              parPrecur{end+1} = strrep(string(notes.event(par_ind)),'start','end');
           end
           
         end
