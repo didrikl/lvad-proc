@@ -83,12 +83,12 @@ save_table('signal_preproc.mat', save_path, signal, 'matlab');
 %   - perhaps requiured when looking at a 2-D plane
 % Adjust time to comparable intervention windows
 
-make_fft_plots(signal_parts.part2)
+%make_fft_plots(signal_parts.part2)
 
 
 %% Make RPM order maps
 
-make_rpm_order_map(signal_parts.part1)
-make_rpm_order_map(signal_parts.part2)
-make_rpm_order_map(signal_parts.part3)
+% make_rpm_order_map(signal_parts.part1)
+% make_rpm_order_map(signal_parts.part2)
+% make_rpm_order_map(signal_parts.part3)
 

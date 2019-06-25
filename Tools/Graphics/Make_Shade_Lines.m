@@ -1,4 +1,4 @@
-function [h_shd, h_txt] = Make_Shade_Lines(shade, ax)
+function [h_shd, h_txt] = make_shade_lines(shade, ax)
     % Make shading down at the x-axis, with text
     % Take the struct shade as input, with the following fields
     %     shade.height = 1.5;

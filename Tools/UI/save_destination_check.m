@@ -1,19 +1,20 @@
 function [path, filename, overwrite_all, ignore_all] = ...
         save_destination_check(path, filename, overwrite_all, ignore_all)
-    % save_destination_check
-    % Checks and initialize destination for saving, with user interaction and
-    % printed information the command line window.
+    % SAVE_DESTINATION_CHECK
+    %   Checks and initialize destination for saving, with user interaction and
+    %   printed information the command line window.
     % 
-    % Check if directory exsists
-    % If saving directory does not exist: Create the directory
+    %   Check if directory exsists
+    %   If saving directory does not exist: Create the directory
     %
-    % If saving directory  exist: 
-    % - Check if file already exists in the directory
-    % - If filename exist, then the user is given the following options:
+    %   If saving directory  exist: 
+    %   - Check if file already exists in the directory
+    %   - If filename exist, then the user is given the following options:
     %
     %       Overwrite
     %       Overwrite all
-    %       Save to other...
+    %       Save to ...
+    %       Ignore
     %       Ignore all
     %
     %   For the Overwrite all and Ignore all options to work in practice, the
@@ -49,7 +50,7 @@ function [path, filename, overwrite_all, ignore_all] = ...
             ignore_all=false;
             
             % Display warning and open user interaction menu
-            user_opts = {'Overwrite','Overwrite all','Save to other...','Ignore all'};
+            user_opts = {'Overwrite','Overwrite all','Save to ...','Ignore','Ignore all'};
             message = sprintf(['File already exist: ',strrep(filename,'\','\\')]);
             warning(message);
             response = ask_list_ui(user_opts, message);
@@ -63,6 +64,8 @@ function [path, filename, overwrite_all, ignore_all] = ...
                 overwrite_all = true; 
                 overwrite = true;
             elseif response==4
+                filename = 0;
+            elseif response==5
                 ignore_all = true; 
                 filename = 0;
             end

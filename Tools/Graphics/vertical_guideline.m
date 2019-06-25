@@ -17,7 +17,7 @@ function hCur = vertical_guideline(h_axes)
     % Set up cursor text
     ax = gca;
     axes(h_axes(2));
-    h_t = text(1,-.28, '','units','normalized','HorizontalAlignment','right','FontSize', 8, 'Color',[0.1, 0.1, 0.1]);
+    text(1,-.28, '','units','normalized','HorizontalAlignment','right','FontSize', 8, 'Color',[0.1, 0.1, 0.1]);
     axes(ax);
     
     hCur = nan(1, length(h_axes));

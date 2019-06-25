@@ -357,10 +357,10 @@ function hScroll = addScrollPlot(hAx,axName)
     set(hScroll, limStr,lim+smallDelta*[-1.2,1.2]);
 
     % Help messages
-    msg = {'drag blue side-bars to zoom', 'drag central patch to pan'};
+    msg = {'',''};%{'side-bars adjust zoom', 'drag to pan'};
     xText = getCenterCoord(hScroll, 'x');
     yText = getCenterCoord(hScroll, 'y');
-    hText = text(xText,yText,msg, 'Color','r', 'Rotation',rotation, 'HorizontalAlignment','center', 'FontSize',9, 'FontWeight','bold', 'HitTest','off', 'tag','scrollHelp');  %#ok ret val used for debug
+    hText = text(xText,yText,msg, 'Color','r', 'Rotation',rotation, 'HorizontalAlignment','center', 'FontSize',6.5, 'FontWeight','bold', 'HitTest','off', 'tag','scrollHelp');  %#ok ret val used for debug
     hMenu = uicontextmenu;
     set(hScroll, 'UIContextMenu',hMenu);
     uimenu(hMenu, 'Label',msg{1}, 'Callback',@moveCursor, 'UserData',hBars(2));
