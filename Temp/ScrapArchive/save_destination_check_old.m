@@ -16,20 +16,17 @@ function [path, filename, overwrite_all, ignore_all] = ...
     %       Save to ...
     %       Ignore
     %       Ignore all
-    %       Abort
     %
-    %   For the 'Overwrite all' and 'Ignore all' options to work in practice,
-    %   the output variables overwrite_all and ignore_all must persist in
-    %   memory, e.g. declared as a persistent variables in the calling code.
+    %   For the Overwrite all and Ignore all options to work in practice, the
+    %   output variables overwrite_all and ignore_all must be declared as a 
+    %   persistent variables in the calling code.
     %
     % See also uiputfile, save_table, save_figure
 
     
     % Check existence of saving directory and create new if not existing
     if not(exist(path,'dir'))
-        fprintf(['\nDirectory for saving does not exist:\n',...
-            strrep(path,'\','\\')])
-        warning('Directory will be created.')
+        warning('Directory for saving does not exist and will be created.')
         mkdir(path);
     end
     
@@ -53,18 +50,9 @@ function [path, filename, overwrite_all, ignore_all] = ...
             ignore_all=false;
             
             % Display warning and open user interaction menu
-            message = sprintf([...
-                'File already exist:\n\t',...
-                strrep(filename,'\','\\')]);
-            user_opts = {
-                'Overwrite'
-                'Overwrite all'
-                'Save to ...'
-                'Ignore'
-                'Ignore all'
-                'Abort'
-                };
-            fprintf(['\n\n',message,'\n\t',strrep(path,'\','\\')])
+            user_opts = {'Overwrite','Overwrite all','Save to ...','Ignore','Ignore all'};
+            message = sprintf(['File already exist: ',strrep(filename,'\','\\')]);
+            warning(message);
             response = ask_list_ui(user_opts, message);
         
             if response==1
@@ -80,8 +68,6 @@ function [path, filename, overwrite_all, ignore_all] = ...
             elseif response==5
                 ignore_all = true; 
                 filename = 0;
-            elseif response==6
-                error('Aborted')
             end
             
             % Open build-in browser for saving, giving full flexibility for filepath

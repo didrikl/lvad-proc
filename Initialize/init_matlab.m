@@ -5,6 +5,8 @@ close all;
 
 % Clear function so that persistent variables defined within these are cleared
 clear Save_Table Save_Figure
+clear h_left_shade_sub1 h_left_shade_sub2 h_left_shade_zoom
+clear h_right_shade_sub1 h_right_shade_sub2 h_right_shade_zoom
 
 
 %% Information

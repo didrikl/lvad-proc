@@ -36,7 +36,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
         filename, save_path, varargin{:});
 
     % Input validations
-    if not(any(strcmpi(filetype,{'matlab','text','spreadsheet'})))
+    if not(any(strcmpi(filetype,{'matlab','text','csv','spreadsheet'})))
         warning(['Incorrect filetype is given. Type help save_table ',...
             'to see supported file types.'])
         return
@@ -123,7 +123,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
                 
         end
         
-        fprintf('\nFile saved: \n')
+        fprintf('\nTable saved: \n')
         fprintf(['\tName: ',strrep(filename,'\','\\'),'\n']);
         fprintf(['\tPath: ',strrep(save_path,'\','\\'),'\n'])
              

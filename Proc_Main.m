@@ -16,10 +16,14 @@ init_matlab
 %% Initilize raw signal files and notes from disc
 
 % User inputs
-cardiaccs_filename = fullfile('Surface','monitor-20181207-154327.txt');
-powerlab_filename = fullfile('PowerLab','test.mat');
-notes_filename = fullfile('Notes','IV_LVAD_CARDIACCS_1 - Notes - Rev 2.xlsx');
-experiment_subdir = 'IV_LVAD_CARDIACCS_1';
+cardiaccs1_filename = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
+cardiaccs2_filename = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
+notes_filename      = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
+powerlab_filename   = fullfile('PowerLab','test.mat');
+M3_filename         = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
+
+%experiment_subdir = fullfile('In Vitro 1 - HVAD - THROMBI SPEED IV');
+experiment_subdir = fullfile('In Vitro - PREPERATIONS');
 [read_path, save_path] = init_paths(experiment_subdir);
 
 % Read text file and save the initialized as binary file
@@ -27,13 +31,14 @@ experiment_subdir = 'IV_LVAD_CARDIACCS_1';
 %save_table('signal.mat', save_path, signal, 'matlab');
 
 % Read mat files
-signal = init_signal_file('signal.mat', save_path);
-%signal = init_signal_file('signal_preproc.mat', save_path);
+signal = init_signal_proc_matfile('signal.mat', save_path);
+%signal = init_signal_proc_matfile('signal_preproc.mat', save_path);
 %p_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
 
 % Read notes from Excel file and 
 notes = init_notes_xlsfile(notes_filename,read_path);
 
+ultrasound = init_m3_raw_textfile(M3_filename,read_path);
 
 
 %% Pre-process signal

@@ -55,9 +55,7 @@ function selection = ask_list_ui(options, question, default)
     width = max(width,width*n_opt_char/55);
     height = max(height,height*(numel(options)/7.2));
     
-    %listsize(1) = listsize(1)*ceil(n_opt_char/20);
-    %listsize(2) = listsize(2)*ceil(n_opt/9);
-    question = strrep(strrep(question,'\n',''),'\t','');  
+    question = {'';question;'';''};
     fprintf('\nUser input required in separate window...\n')   
     [selection, ~] = listdlg(...
         'PromptString',question,...
