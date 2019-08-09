@@ -1,4 +1,4 @@
-function signal = parse(raw, include_adc)
+function signal = parse_cardiaccs_raw(raw, include_adc)
     
     % Default is to exclude adc signal, assumed it is not in use/been recorded
     if nargin==1, include_adc= false; end

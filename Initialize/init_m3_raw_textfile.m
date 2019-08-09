@@ -1,29 +1,27 @@
-function signal = make_signal_timetable(signal, include_time_duration)
-   
+function signal = init_m3_raw_textfile(filename,read_path)
+
     timestamp_fmt = 'dd-MMM-uuuu HH:mm:ss.SSS';
     
-    % Default is to exclude t (to save memory, as it can readily be derived
-    % in a timetable)
-    if nargin==1, include_time_duration = false; end
-    
-    % Make other/more useful time representations
-    signal.timestamp = datetime(signal.t/1000,...
-        'ConvertFrom','posixtime',...
+    filepath = fullfile(read_path, filename);
+    signal = init_m3_raw_textfile_read(filepath);
+    signal.timestamp = datetime(signal{:,1},...
+        'InputFormat',"yyyy/MM/dd HH:mm:ss",...
         'Format',timestamp_fmt,...
         'TimeZone','Europe/Oslo');
     
-    if not(include_time_duration)
-        signal.t = [];
-    end
-        
     % Make timetable, and add properties metadata
-    signal = table2timetable(signal);
-        
+    signal = table2timetable(signal,'RowTimes','timestamp');
+    
+    signal = retime(signal,'regular','fillwithmissing','SampleRate',1);
+    
     % Metadata used for populating non-matched rows when syncing
     signal.Properties.VariableContinuity(:) = 'continuous';
     
     % Add metadata for picking out sensor-messured data, when analysing
+    signal.Properties.VariableUnits = {'L/min','uL/sec','','uL'};
     signal = addprop(signal,'MeassuredSignal','variable');
     signal.Properties.CustomProperties.MeassuredSignal(:) = true;
     
    
+    
+    

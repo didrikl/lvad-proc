@@ -27,18 +27,19 @@ experiment_subdir = fullfile('In Vitro - PREPERATIONS');
 [read_path, save_path] = init_paths(experiment_subdir);
 
 % Read text file and save the initialized as binary file
-%signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
-%save_table('signal.mat', save_path, signal, 'matlab');
+%acc_signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
+%save_table('acc_signal.mat', save_path, signal, 'matlab');
 
 % Read mat files
-signal = init_signal_proc_matfile('signal.mat', save_path);
-%signal = init_signal_proc_matfile('signal_preproc.mat', save_path);
-%p_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
+acc_signal = init_signal_proc_matfile('acc_signal.mat', save_path);
+%acc_signal = init_signal_proc_matfile('acc_signal_preproc.mat', save_path);
+%powerlab_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
 
-% Read notes from Excel file and 
+% Read experiment notes in Excel file template
 notes = init_notes_xlsfile(notes_filename,read_path);
 
-ultrasound = init_m3_raw_textfile(M3_filename,read_path);
+% Read meassured flow and emboli (volume and count) from M3 ultrasound
+ultrasound_signal = init_m3_raw_textfile(M3_filename,read_path);
 
 
 %% Pre-process signal
@@ -46,10 +47,10 @@ ultrasound = init_m3_raw_textfile(M3_filename,read_path);
 % * Add note columns that have given VariableContinuity properties
 % * Clip to signal to notes range
 
-signal = resample_signal(signal);
+acc_signal = resample_signal(acc_signal);
 
 % Init notes, then signal and notes fusion (after resampling)
-signal = merge_signal_and_notes(signal,notes);
+signal = merge_signal_and_notes(acc_signal,notes);
 signal = clip_to_experiment(signal,notes);
 
 % Vector length
@@ -64,7 +65,9 @@ signal_parts.part2_iv = signal_parts.part2(signal_parts.part2.event~='Baseline',
 
 features = extract_features_from_notes(notes);
 
-save_table('signal_preproc.mat', save_path, signal, 'matlab');
+%save_table('signal_preproc.mat', save_path, signal, 'matlab');
+
+features = make_feature_windows(signal, features)
 
 
 %% Continuous wavelet transform

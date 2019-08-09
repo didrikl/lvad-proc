@@ -1,13 +1,13 @@
 function [status,h_browser] = make_recursive_todo_report(base_path, show)
     % make_recursive_todo_report
-    % Run dofixrpt recursively by gathering reports in html for each
-    % directory into one report. Report will summaries all comment lines with
-    % the key words TODO, FIXME or NOTE. The report is displayed in 
+    %   Run dofixrpt recursively by gathering reports in html for each
+    %   directory into one report. Report will summaries all comment lines with
+    %   the key words TODO, FIXME or NOTE. The report is displayed in a browser.
     %
     % Usage:
-    %     [status,h_browser] = make_recursive_todo_report(base_path, show),
-    %     where show is an optional boolean parameter to control if the results
-    %     should be displayed in Matlab's build-in web browser
+    %   [status,h_browser] = make_recursive_todo_report(base_path, show),
+    %   where show is an optional boolean parameter to control if the results
+    %   should be displayed in Matlab's build-in web browser
     % 
     % See also dofixrpt, web
     
@@ -25,7 +25,7 @@ function [status,h_browser] = make_recursive_todo_report(base_path, show)
     
     results_for_browser = [];
     for i=1:numel(folders)
-       results = dofixrpt(folders{i},'dir');
+        results = dofixrpt(folders{i},'dir');
        results_for_browser = [results_for_browser, results]; %#ok<AGROW>
     end
 

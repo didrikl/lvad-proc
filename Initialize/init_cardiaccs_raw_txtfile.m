@@ -9,4 +9,5 @@ function [signal,raw] = init_cardiaccs_raw_txtfile(rec_file,read_path)
     % Let time be represented as datetime (timestamp) and convert to timetable
     % where the timestamp is not a variable, but an internal row id. Timetable
     % have built-in methods for signal processing
+    % NOTE: Move this into parse_cardiaccs_raw .m-file?
     signal = make_signal_timetable(signal);

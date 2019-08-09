@@ -1,39 +1,44 @@
 function feats = make_feature_windows(signal, feats)
+    % make_feature_windows
+    %   Quality control mainly used to check when thrombus enters LVAD (not to
+    %   analyse features or to find features).
     
+    % Definitios to allow user to search though more data
     lead_expansion = 30;
     trail_expansion = 30;
     
-    event_type = {'Thrombus injection'};
+    % Event type for window quality control (qc)
+    qc_event_type = {'Thrombus injection'};
     
     sub1_y_varname =  'acc_length';
     sub2_y_varname = 'movrms';
     sub2_yy_varname = 'movstd';
     pivot_y_varnames = {'movstd','movrms'};
     
-    
     % More specified window for the feature, to be adjusted in quality control.
     % Start with using the window to be equal to the precursor window
-    feats.lead_win_startTime = feats.precursor_startTime-seconds(lead_expansion);
-    feats.lead_win_endTime = feats.precursor_startTime;
-    feats.trail_win_startTime = feats.precursor_startTime;
-    feats.trail_win_endTime = feats.precursor_endTime+seconds(trail_expansion); 
+    feats.leadWinStart_timestamp = feats.precursor_startTime-seconds(lead_expansion);
+    feats.leadTrailSplit_timestamp = feats.precursor_startTime;
+    feats.trailWinEnd_timestamp = feats.precursor_endTime+seconds(trail_expansion); 
     
     % Clip trail window if it goes into the next intervention window
     feats.trail_win_endTime(1:end-1) = min(feats.trail_win_endTime(1:end-1),feats.precursor_startTime(2:end));
-    
-    event_feats = feats(contains(string(feats.precursor),event_type),:);
-    n_events = height(event_feats);
-    
+       
     %h_fig = gobjects(n_iv,1);
     close all
-    for i=1:n_events
+    qc_feat_inds = find(contains(string(feats.precursor),qc_event_type));
+    n_qc_feats = numel(qc_feat_inds);
+    for i=1:n_qc_feats
         
-        plot_range = timerange(event_feats.lead_win_startTime(i),event_feats.trail_win_endTime(i));
+        % Look up in feature table to find which data to plot
+        feat_ind = qc_feat_inds(i);
+        qc_event_feat = feats(feat_ind,:);
+        plot_range = timerange(qc_event_feat.lead_win_startTime,qc_event_feat.trail_win_endTime);
         plot_data = signal(plot_range,:);
         t = seconds(plot_data.timestamp-plot_data.timestamp(1));%feats.precursor_startTime(1))
         t = t-lead_expansion;
         
-        h_fig = figure; %clf
+        h_fig = figure('Position',[35.4,69,1226.4,679.2]); %clf
         
         % NOTE: 
         % * User MaxNumChanges=2 and take the first of these
@@ -46,58 +51,73 @@ function feats = make_feature_windows(signal, feats)
         %   intervention.
         % * Store automatic detection findings
         % * Store the manual quality control detection
-        max_no_changes = 2; % =2 take more time to run
-        mid_time = t(1)+0.5*t(end);
         
-        fprintf('\nSearching for abrupt signal changes\n\n');
-        for j=1:numel(pivot_y_varnames)
-            
-            t0_ind = find(t==0,1,'first');
-            iv_var = rmmissing(plot_data.(pivot_y_varnames{j})(t0_ind:end,:));
-            pivot_ind = findchangepts(iv_var,...
-                'MaxNumChanges',max_no_changes ); %'MinThreshold' );
-            
-            if isempty(pivot_ind)
-                pivot_ind = search_refined_abrupt_changes(iv_var);
-            end
-            
-            if not(isempty(pivot_ind))
-                abrupt_change_time = t(t0_ind+pivot_ind(1));       
-                fprintf('\nDetected for: %s\n\tWindow split time: %s\n',...
-                    pivot_y_varnames{j},num2str(abrupt_change_time))
-            else
-                fprintf('\nNo detected for %s\n\tWindow split time: Midpoint\n',...
-                    pivot_y_varnames{j})
-                abrupt_change_time = mid_time;
-            end
-        end
+        abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames);
+        
+%         max_no_changes = 2; % =2 take more time to run
+%         
+%         fprintf('\n\nSearching for abrupt signal changes\n');
+%         
+%         mid_time = t(1)+0.5*t(end);
+%         n_search_vars = numel(pivot_y_varnames);
+%         abrupt_change_time = nan(n_search_vars,1);
+%         
+%         for j=1:n_search_vars
+%             
+%             t0_ind = find(t==0,1,'first');
+%             iv_var = rmmissing(plot_data.(pivot_y_varnames{j})(t0_ind:end,:));
+%             pivot_ind = findchangepts(iv_var,...
+%                 'MaxNumChanges',max_no_changes ); %'MinThreshold' );
+%             
+%             if isempty(pivot_ind)
+%                 pivot_ind = search_refined_abrupt_changes(iv_var);
+%             end
+%             
+%             if not(isempty(pivot_ind))
+%                 abrupt_change_time(j) = t(t0_ind+pivot_ind(1));       
+%                 fprintf('\nSearching in %s\n\tDetection time: %s\n',...
+%                     pivot_y_varnames{j},num2str(abrupt_change_time(j)))
+%             else
+%                 fprintf('\nSearching in %s\n\tNo detection\n',...
+%                     pivot_y_varnames{j})                
+%             end
+%             
+%         end
+%         
+%         % Handling of no automatic detection. 
+%         % NOTE: Could alternatively also someway be rejected be user interaction.
+%         if all(isnan(abrupt_change_time))
+%             fprintf('\nNo change detections made. Window split is set at midtime')  
+%             abrupt_change_time = mid_time;
+%         else
+%             abrupt_change_time = min(abrupt_change_time);
+%         end
         
         % Make plots
         h_sub(1) = plot_in_upper_panel(t,plot_data,sub1_y_varname);
         h_sub(2) = plot_in_lower_panel(t,plot_data,sub2_y_varname,sub2_yy_varname);        
         
         % Add title
-        make_title(feats.precursor(i), event_feats, i, n_events)
+        make_annotations(h_sub, qc_event_feat, i, n_qc_feats);
         
         % Axis relation control
         h_sub(2).Position(4) = h_sub(1).Position(4)*1.18;
         linkaxes(h_sub,'x')
         h_zoom = make_zoom_panel(h_sub(2),abrupt_change_time,sub2_y_varname);
         
-        % Adding time label/annotation after zoom tool (which would reposition it)
-        xlabel(h_sub(2),'Time (sec)','Position',[0.5,-0.11,0]);
-        add_timestamp_textbox(feats.timestamp(i))
+        % Add dragable cursorbars, that defines lead and trail windows
+        cursors_handles.split = add_window_split_cursorbar(h_sub, h_zoom, abrupt_change_time);
+        cursors_handles.cutoff = add_cutoff_cursorbars(h_sub, h_zoom, 0, t(end)-trail_expansion);
     
-        % [ampl, phase] = make_fft_plots(iv_signal, qc_varname);
-        
-        % TODO: Find harmonic max values (also before and after abrupt change)
-        
-        cursors.abrupt_change = add_window_split_cursorbar(h_sub, h_zoom, abrupt_change_time);
-        cursors.cutoff = add_cutoff_cursorbars(h_sub, h_zoom, 0, t(end)-trail_expansion);
-    
-        %break
+        % Pause to allow for cursorbar adjustments by user
         pause
-        %cursors.abrupt_change.panel_1.Position(1)
+        
+        split_ind = find(t>=cursors_handles.split.panel_1.TopHandle.XData,1,'first');
+        start_ind = find(t>cursors_handles.cutoff.left_cutoff.panel_1.TopHandle.XData,1,'first');
+        end_ind = find(t>=cursors_handles.cutoff.right_cutoff.panel_1.TopHandle.XData,1,'first');
+        feats.leadWinStart_timestamp(feat_ind) = plot_data.timestamp(start_ind);
+        feats.leadTrailWinSplit_timestamp(feat_ind) = plot_data.timestamp(split_ind);
+        feats.trailWinEnd_timestamp(feat_ind) = plot_data.timestamp(end_ind);
         
         close(h_fig)
     end
@@ -130,7 +150,6 @@ function h_sub2 = plot_in_lower_panel(t,iv_signal,sub2_y_varname,sub2_yy_varname
     common_adjust_panel(h_sub2,t)
     
     axes(h_sub2)
-    %subplot(2,1,2);
     
     % Lower panel: Add ekstra plot with separate axis-scale on the right
     yyaxis right
@@ -145,21 +164,41 @@ function h_sub2 = plot_in_lower_panel(t,iv_signal,sub2_y_varname,sub2_yy_varname
             'AutoUpdate','off')       
 end
 
-function make_title(event_type, feat, event_no, n_event)
+function make_annotations(h_sub, qc_event_feat, qc_event_no, n_qc_events)
     
-    vol = feat.thrombusVolume(event_no);
-    rpm = string(feat.pumpSpeed(event_no));
-    suptitle(sprintf('Intervention: %s %d/%d - %s ml - %s RPM',...
-        event_type,event_no,n_event,vol,rpm))
+    event_type = string(qc_event_feat.precursor);
+    vol = qc_event_feat.thrombusVolume;
+    rpm = string(qc_event_feat.pumpSpeed);
     
+    h_tit = suptitle(sprintf('Signal plot: %s no. %d of %d, %s ml Volume and %s RPM',...
+        event_type,qc_event_no,n_qc_events,vol,rpm));
+    h_tit.FontWeight = 'bold';
+    h_tit.FontSize = 13;
+    
+    % Add extra info about the time axis, for user to look up info in notes
+    text_arr = {
+        'Time = 0'
+        '------------'
+        datestr(qc_event_feat.precursor_startTime)
+        "Start of "+event_type
+        };
+    text(gca,0,-0.33,text_arr,...
+        'Units','normalized',...
+        'FontSize',9);
+    
+    % Adding time label/annotation after zoom tool (which would reposition it)
+    xlabel(h_sub(2),'Time (sec)','Position',[0.5,-0.11,0]);
+    
+    % Adding an extra invisible axes that spans over the subplots, and will
+    % therefore have a superlabel for the y-axis. NB: add this after the text
+    % box with info, otherwise would the text box be invisible.
+    p1=get(h_sub(1),'position');
+    p2=get(h_sub(2),'position');
+    height=p1(2)+p1(4)-p2(2);
+    axes('position',[p2(1)-0.008*p2(3) p2(2) p2(3) height],'visible','off');
+    ylabel('Acceleration (g)','visible','on');
+  
 end 
-
-function add_timestamp_textbox(t0_timestamp)
-    
-    disp_t = datestr(t0_timestamp);
-    text(gca,0,-0.33,{'Time = 0';disp_t},'Units','normalized','FontSize',9);
-    
-end
 
 function common_adjust_panel(ax,t)
     
@@ -201,13 +240,14 @@ end
 
 function adjust_zoom_panel(h_zoom,h_sub2,sub2_y_varname)
     
-    legend(h_zoom,sub2_y_varname,...
+    h_zoom_leg = legend(h_zoom,sub2_y_varname,...
         'AutoUpdate','off',...
         'EdgeColor','none',...
         'FontSize',9,...
         'Color','none',...
         'Location','eastoutside');
-    %h_zoom_leg.Title.String = 'Zoom tool';   
+    h_zoom_leg.Title.String = 'Zoom variable';
+    h_zoom_leg.Title.FontSize = 8;   
     h_zoom.XTick = h_sub2.XTick;
     h_zoom_plt = findall(h_zoom,'Tag','scrollDataLine');
     h_zoom_plt.Color = [.67 .79 .87];
@@ -222,6 +262,49 @@ end
 % Functions to define feature windows
 % -----------------------------------
 
+function abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames)
+    
+    max_no_changes = 2; % =2 take more time to run
+    
+    fprintf('\n\nSearching for abrupt signal changes\n');
+    
+    mid_time = t(1)+0.5*t(end);
+    n_search_vars = numel(pivot_y_varnames);
+    abrupt_change_time = nan(n_search_vars,1);
+    
+    for j=1:n_search_vars
+        
+        t0_ind = find(t==0,1,'first');
+        iv_var = rmmissing(plot_data.(pivot_y_varnames{j})(t0_ind:end,:));
+        pivot_ind = findchangepts(iv_var,...
+            'MaxNumChanges',max_no_changes ); %'MinThreshold' );
+        
+        if isempty(pivot_ind)
+            pivot_ind = search_refined_abrupt_changes(iv_var);
+        end
+        
+        if not(isempty(pivot_ind))
+            abrupt_change_time(j) = t(t0_ind+pivot_ind(1));
+            fprintf('\nSearching in %s\n\tDetection time: %s\n',...
+                pivot_y_varnames{j},num2str(abrupt_change_time(j)))
+        else
+            fprintf('\nSearching in %s\n\tNo detection\n',...
+                pivot_y_varnames{j})
+        end
+        
+    end
+    
+    % Handling of no automatic detection.
+    % NOTE: Could alternatively also someway be rejected be user interaction.
+    if all(isnan(abrupt_change_time))
+        fprintf('\nNo change detections made. Window split is set at midtime')
+        abrupt_change_time = mid_time;
+    else
+        abrupt_change_time = min(abrupt_change_time);
+    end
+
+end
+        
 % function [abrupt_change_time, pivot_ind] = search_abrupt_changes(data, t, pivot_varnames)
 %     
 %     for j=1:numel(pivot_varnames)
@@ -318,8 +401,6 @@ function cursors = add_window_split_cursorbar(h_sub, h_zoom, pos)
     addlistener(h_cur2,'UpdateCursorBar', callback_fun);
     addlistener(h_cur1,'UpdateCursorBar', callback_fun);
     addlistener(h_curzoom,'UpdateCursorBar', callback_fun);
-%      h_curlab.Position(2) = h_cur1.THandle.YData-0.05*abs(...
-%          h_cur1.TopHandle.YData-h_cur1.BottomHandle.YData);
     
     % Save handles to struct container of cursor handles (can be object-oriented)
     cursors.panel_1 = h_cur1;
@@ -359,11 +440,11 @@ function cursors = add_cutoff_cursorbars(h_sub, h_zoom,win_start,win_end)
     cursors.right_cutoff.panel_2= h_cur2;
     cursors.right_cutoff.panel_zoom = h_curzoom;
     
-    callback_fun = @(~,~)move_from_init_pos_callback(...
-        h_cur1, h_curlab, win_end, 'end of win', h_sub, h_zoom);
-    addlistener(h_cur2,'UpdateCursorBar', callback_fun);
-    addlistener(h_cur1,'UpdateCursorBar', callback_fun);
-    addlistener(h_curzoom,'UpdateCursorBar', callback_fun);
+%     callback_fun = @(~,~)move_from_init_pos_callback(...
+%         h_cur1, h_curlab, win_end, 'end of win', h_sub, h_zoom);
+%     addlistener(h_cur2,'UpdateCursorBar', callback_fun);
+%     addlistener(h_cur1,'UpdateCursorBar', callback_fun);
+%     addlistener(h_curzoom,'UpdateCursorBar', callback_fun);
     
 end
 
@@ -384,15 +465,11 @@ function [h_cur1,h_cur2,h_curzoom,h_curlab] = add_panel_linked_cursors(...
     h_cur2 = cursorbar(gca,...
         'Location',pos,...
         'CursorLineWidth',width,...
-        ...'BottomMarker','+',...
-        ...'TopMarker','.',...
         'CursorLineColor',color);
    
     h_curzoom = cursorbar(h_zoom,...
         'Location',pos,...
         'CursorLineWidth',width,...
-        ...'BottomMarker','.',...
-        ...'TopMarker','.',...
         'CursorLineColor',color);
     
     % Add a label next to the upper panel cursorbar

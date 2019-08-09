@@ -1,4 +1,4 @@
-function signal = init_signal_file(filename, read_path, varargin)
+function signal = init_signal_proc_matfile(filename, read_path, varargin)
     % INIT_SIGNAL_FILE
     %   Read already initlized or processed signal from disc, stored as binary 
     %   .mat file, using Matlab's load function. User is ask for location the
@@ -8,7 +8,7 @@ function signal = init_signal_file(filename, read_path, varargin)
     %   signal = init_signal_file(filename, read_path, varargin), where
     %   varargin optional inputs in the function load
     %
-    % See also load, uigetfile
+    % See also load, uigetfile, save_table
     
     filepath = fullfile(read_path,filename);
     
@@ -17,11 +17,10 @@ function signal = init_signal_file(filename, read_path, varargin)
         fprintf('\nSelect file... ')
         [filename,read_path] = uigetfile('.mat','Select file to load',filepath);
         if filename
-            filepath = fullfile(read_path,filename);
-            fprintf('New file selected.')
+            filepath = fullfile(read_path,filename);           
         else
             fprintf('\n')
-            warning('No file selected.')
+            warning('\n\tNo file selected.\n')
             signal = [];
             return
         end
