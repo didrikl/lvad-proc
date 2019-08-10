@@ -2,17 +2,27 @@ function signal = parse_cardiaccs_raw(raw, include_adc)
     
     % Default is to exclude adc signal, assumed it is not in use/been recorded
     if nargin==1, include_adc= false; end
-    
-    % Assume constant scales
-    adc_scale = raw.adcscale{1};
-    acc_scale = raw.accscale{1};
-    
+        
     % Vectorized parsing of regular numric data (to be used in for-loop below)
     t_raw = str2doubleq(raw.t);
     
     % Calculate elapsed time between each row (repeat the last dt, instead of
     % using nan)
     dt_raw = [diff(t_raw);t_raw(end)-t_raw(end-1)];
+    
+    % Drop rows having same time value, except the last of these rows
+    % (the simple solution as apposed to calculating an average)
+    row_drop_ind = dt_raw==0;
+    n_row_drop = sum(row_drop_ind);
+    dt_raw(row_drop_ind) = [];
+    t_raw(row_drop_ind) = [];
+    raw(row_drop_ind,:) = [];
+    fprintf('\nDropped %d rows (%2.1g pst) with duplicate time values.\n',...
+        n_row_drop,n_row_drop/height(raw));
+    
+    % Assume constant scales
+    adc_scale = raw.adcscale{1};
+    acc_scale = raw.accscale{1};
     
     % Split acc into separate 3-tuple records
     acc_records = regexp(raw.acc,'(-?\d*,-?\d*,-?\d*)','tokens');
@@ -43,22 +53,38 @@ function signal = parse_cardiaccs_raw(raw, include_adc)
         signal.Properties.VariableUnits{'adc'} = 'mV';
     end
     
-    
 function [t,acc] = unfold(t_raw,dt_raw,acc_records)
 
     [n_records,end_inds,start_inds,n_rows] =  find_unfold_distr(acc_records);
        
     t = nan(n_rows,1);
     acc = cell(n_rows,1);
+    
+    tstep_vec = dt_raw./n_records;
+    
     for i=1:numel(t_raw)
         
         % New row indices for the "unfolded" data corresponding to raw data row i
         inds = start_inds(i):end_inds(i);
         
-        % Linear interpolation for t, until next row
+        % Local time step for linear interpolation for t, until next row
         tstep = dt_raw(i)/n_records(i);
-        t(inds) = t_raw(i) + (0:tstep:dt_raw(i)-tstep)';
-        
+        if tstep~=tstep_vec(i)
+            disp tull
+        end
+        try
+            t(inds) = t_raw(i) + (0:tstep_vec(i):dt_raw(i)-tstep_vec(i))';
+        catch me
+            n_records(i)
+            %disp(me.Message)
+            i
+            inds
+            t_raw(i)
+            tstep
+            dt_raw(i)
+            (0:tstep:dt_raw(i)-tstep)'
+            pause
+        end
         % One-by-one assignment of acc records over each index in inds
         acc(inds) = acc_records{i}';
         

@@ -1,3 +1,9 @@
+%% Path
+
+% Add all subdirectories from current path into Matlab path
+addpath(genpath('.')) 
+
+
 %% Memory
 
 % Close all figures

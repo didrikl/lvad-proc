@@ -1,7 +1,6 @@
 %% Initialze the processing environment and code
 
 % Add all subfolders to path. To be removed as it gives less control compared to importing packages
-addpath(genpath('.')) 
 
 % Use code in packages with subfolders prefixed with a '+'
 % import Initialize.*
@@ -16,30 +15,39 @@ init_matlab
 %% Initilize raw signal files and notes from disc
 
 % User inputs
-cardiaccs1_filename = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
-cardiaccs2_filename = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
+lvad_acc_filename   = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
+lead_acc_filename   = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
 notes_filename      = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
 powerlab_filename   = fullfile('PowerLab','test.mat');
-M3_filename         = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
+ultrasound_filename = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
 
 %experiment_subdir = fullfile('In Vitro 1 - HVAD - THROMBI SPEED IV');
 experiment_subdir = fullfile('In Vitro - PREPERATIONS');
 [read_path, save_path] = init_paths(experiment_subdir);
 
 % Read text file and save the initialized as binary file
-%acc_signal = init_cardiaccs_raw_txtfile(cardiaccs_filename,read_path);
-%save_table('acc_signal.mat', save_path, signal, 'matlab');
+%lvad_acc = init_cardiaccs_raw_txtfile(lvad_acc_filename,read_path);
+%lead_acc = init_cardiaccs_raw_txtfile(lead_acc_filename,read_path);
+
+lead_acc_raw = read_cardiaccs_raw_txtfile(lead_acc_filename,read_path);
+lead_acc = parse_cardiaccs_raw(lead_acc_raw);
+lead_acc = make_signal_timetable(lead_acc);
+
+
+% Save raw data as binary Matlab file
+%save_table('lvad_acc.mat', save_path, signal, 'matlab');
+save_table('lead_acc.mat', save_path, signal, 'matlab');
 
 % Read mat files
-acc_signal = init_signal_proc_matfile('acc_signal.mat', save_path);
-%acc_signal = init_signal_proc_matfile('acc_signal_preproc.mat', save_path);
-%powerlab_signal = init_powerlab_raw_matfile(powerlab_filename,read_path);
+%lvad_acc = init_signal_proc_matfile('lvad_acc.mat', save_path);
+%lead_acc = init_signal_proc_matfile('lead_acc.mat', save_path);
+%powerlab_signals = init_powerlab_raw_matfile(powerlab_filename,read_path);
 
 % Read experiment notes in Excel file template
-notes = init_notes_xlsfile(notes_filename,read_path);
+%notes = init_notes_xlsfile(notes_filename,read_path);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-ultrasound_signal = init_m3_raw_textfile(M3_filename,read_path);
+%ultrasound = init_m3_raw_textfile(ultrasound_filename,read_path);
 
 
 %% Pre-process signal
@@ -47,27 +55,30 @@ ultrasound_signal = init_m3_raw_textfile(M3_filename,read_path);
 % * Add note columns that have given VariableContinuity properties
 % * Clip to signal to notes range
 
-acc_signal = resample_signal(acc_signal);
+lvad_acc = resample_signal(lvad_acc);
+lead_acc = resample_signal(lead_acc);
+
+signals = merge_lvad_and_lead(lvad_acc,lead_acc);
 
 % Init notes, then signal and notes fusion (after resampling)
-signal = merge_signal_and_notes(acc_signal,notes);
-signal = clip_to_experiment(signal,notes);
+signals = merge_signal_and_notes(lvad_acc,notes);
+signals = clip_to_experiment(signals,notes);
 
 % Vector length
-signal.acc_length = sqrt(sum(signal.acc.^2,2));
+signals.acc_length = sqrt(sum(signals.acc.^2,2));
     
 % Moving RMS, variance and standard deviation for 3 comp. length
-signal = calc_moving(signal);
+signals = calc_moving(signals);
 
 % After new variable have been calculated, then split the prepared data
-signal_parts = split_into_experiment_parts(signal,notes);
+signal_parts = split_into_experiment_parts(signals,notes);
 signal_parts.part2_iv = signal_parts.part2(signal_parts.part2.event~='Baseline',:);
 
 features = extract_features_from_notes(notes);
 
 %save_table('signal_preproc.mat', save_path, signal, 'matlab');
 
-features = make_feature_windows(signal, features)
+features = make_feature_windows(signals, features)
 
 
 %% Continuous wavelet transform

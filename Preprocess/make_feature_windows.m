@@ -17,9 +17,9 @@ function feats = make_feature_windows(signal, feats)
     
     % More specified window for the feature, to be adjusted in quality control.
     % Start with using the window to be equal to the precursor window
-    feats.leadWinStart_timestamp = feats.precursor_startTime-seconds(lead_expansion);
-    feats.leadTrailSplit_timestamp = feats.precursor_startTime;
-    feats.trailWinEnd_timestamp = feats.precursor_endTime+seconds(trail_expansion); 
+    feats.leadWinStart = feats.precursor_startTime-seconds(lead_expansion);
+    feats.leadTrailSplit = feats.precursor_startTime;
+    feats.trailWinEnd = feats.precursor_endTime+seconds(trail_expansion); 
     
     % Clip trail window if it goes into the next intervention window
     feats.trail_win_endTime(1:end-1) = min(feats.trail_win_endTime(1:end-1),feats.precursor_startTime(2:end));
@@ -54,45 +54,6 @@ function feats = make_feature_windows(signal, feats)
         
         abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames);
         
-%         max_no_changes = 2; % =2 take more time to run
-%         
-%         fprintf('\n\nSearching for abrupt signal changes\n');
-%         
-%         mid_time = t(1)+0.5*t(end);
-%         n_search_vars = numel(pivot_y_varnames);
-%         abrupt_change_time = nan(n_search_vars,1);
-%         
-%         for j=1:n_search_vars
-%             
-%             t0_ind = find(t==0,1,'first');
-%             iv_var = rmmissing(plot_data.(pivot_y_varnames{j})(t0_ind:end,:));
-%             pivot_ind = findchangepts(iv_var,...
-%                 'MaxNumChanges',max_no_changes ); %'MinThreshold' );
-%             
-%             if isempty(pivot_ind)
-%                 pivot_ind = search_refined_abrupt_changes(iv_var);
-%             end
-%             
-%             if not(isempty(pivot_ind))
-%                 abrupt_change_time(j) = t(t0_ind+pivot_ind(1));       
-%                 fprintf('\nSearching in %s\n\tDetection time: %s\n',...
-%                     pivot_y_varnames{j},num2str(abrupt_change_time(j)))
-%             else
-%                 fprintf('\nSearching in %s\n\tNo detection\n',...
-%                     pivot_y_varnames{j})                
-%             end
-%             
-%         end
-%         
-%         % Handling of no automatic detection. 
-%         % NOTE: Could alternatively also someway be rejected be user interaction.
-%         if all(isnan(abrupt_change_time))
-%             fprintf('\nNo change detections made. Window split is set at midtime')  
-%             abrupt_change_time = mid_time;
-%         else
-%             abrupt_change_time = min(abrupt_change_time);
-%         end
-        
         % Make plots
         h_sub(1) = plot_in_upper_panel(t,plot_data,sub1_y_varname);
         h_sub(2) = plot_in_lower_panel(t,plot_data,sub2_y_varname,sub2_yy_varname);        
@@ -115,9 +76,9 @@ function feats = make_feature_windows(signal, feats)
         split_ind = find(t>=cursors_handles.split.panel_1.TopHandle.XData,1,'first');
         start_ind = find(t>cursors_handles.cutoff.left_cutoff.panel_1.TopHandle.XData,1,'first');
         end_ind = find(t>=cursors_handles.cutoff.right_cutoff.panel_1.TopHandle.XData,1,'first');
-        feats.leadWinStart_timestamp(feat_ind) = plot_data.timestamp(start_ind);
-        feats.leadTrailWinSplit_timestamp(feat_ind) = plot_data.timestamp(split_ind);
-        feats.trailWinEnd_timestamp(feat_ind) = plot_data.timestamp(end_ind);
+        feats.leadWinStart(feat_ind) = plot_data.timestamp(start_ind);
+        feats.leadTrailSplit(feat_ind) = plot_data.timestamp(split_ind);
+        feats.trailWinEnd(feat_ind) = plot_data.timestamp(end_ind);
         
         close(h_fig)
     end
