@@ -8,7 +8,7 @@ function signal = init_signal_proc_matfile(filename, read_path, varargin)
     %   signal = init_signal_file(filename, read_path, varargin), where
     %   varargin optional inputs in the function load
     %
-    % See also load, uigetfile, save_table
+    % See also load, save, save_table
     
     filepath = fullfile(read_path,filename);
     
@@ -32,12 +32,20 @@ function signal = init_signal_proc_matfile(filename, read_path, varargin)
     fprintf(['\tName: ',strrep(filename,'\','\\'),'\n'])
     fprintf(['\tPath: ',strrep(read_path,'\','\\'),'\n'])
  
-    if isfield('signal',signal)
-        warning(['File did not contain signal variable. A struct ',...
-            'containing the data is returned instead.'])
-    else
-        %assignin('caller','signal',data.signal);
-        signal = signal.signal;
-    end
+     fields = fieldnames(signal);
+     if numel(fields)~=1
+         warning(['File did not contain one unique field. A struct ',...
+             'containing the data is returned instead.']);        
+     elseif numel(fields)==1
+        signal = signal.(fields{1});
+     end
+       
+%     if not(isfield(signal,'signal'))
+%         warning(['File did not contain signal variable. A struct ',...
+%             'containing the data is returned instead.'])
+%     else
+%         %assignin('caller','signal',data.signal);
+%         signal = signal.signal;
+%     end
  
 end

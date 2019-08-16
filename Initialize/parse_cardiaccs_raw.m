@@ -10,15 +10,9 @@ function signal = parse_cardiaccs_raw(raw, include_adc)
     % using nan)
     dt_raw = [diff(t_raw);t_raw(end)-t_raw(end-1)];
     
-    % Drop rows having same time value, except the last of these rows
+    % Drop rows to avoid multiple time values
     % (the simple solution as apposed to calculating an average)
-    row_drop_ind = dt_raw==0;
-    n_row_drop = sum(row_drop_ind);
-    dt_raw(row_drop_ind) = [];
-    t_raw(row_drop_ind) = [];
-    raw(row_drop_ind,:) = [];
-    fprintf('\nDropped %d rows (%2.1g pst) with duplicate time values.\n',...
-        n_row_drop,n_row_drop/height(raw));
+    [dt_raw,t_raw,raw] = drop_duplicate_time_rows(dt_raw,t_raw,raw);
     
     % Assume constant scales
     adc_scale = raw.adcscale{1};
@@ -52,6 +46,19 @@ function signal = parse_cardiaccs_raw(raw, include_adc)
         signal.Properties.VariableDescriptions{'adc'} = 'ECG';
         signal.Properties.VariableUnits{'adc'} = 'mV';
     end
+
+function [dt_raw,t_raw,raw] = drop_duplicate_time_rows(dt_raw,t_raw,raw)
+    % Drop rows to avoid multiple time values, except for the last of each
+    % set of mulitple time rows.
+    
+    row_drop_ind = dt_raw==0;
+    n_row_drop = sum(row_drop_ind);
+    dt_raw(row_drop_ind) = [];
+    t_raw(row_drop_ind) = [];
+    raw(row_drop_ind,:) = [];
+    fprintf('\nDropped %d rows (%2.1g pst) with duplicate time values.\n',...
+        n_row_drop,n_row_drop/height(raw));
+    
     
 function [t,acc] = unfold(t_raw,dt_raw,acc_records)
 
@@ -68,23 +75,8 @@ function [t,acc] = unfold(t_raw,dt_raw,acc_records)
         inds = start_inds(i):end_inds(i);
         
         % Local time step for linear interpolation for t, until next row
-        tstep = dt_raw(i)/n_records(i);
-        if tstep~=tstep_vec(i)
-            disp tull
-        end
-        try
-            t(inds) = t_raw(i) + (0:tstep_vec(i):dt_raw(i)-tstep_vec(i))';
-        catch me
-            n_records(i)
-            %disp(me.Message)
-            i
-            inds
-            t_raw(i)
-            tstep
-            dt_raw(i)
-            (0:tstep:dt_raw(i)-tstep)'
-            pause
-        end
+        t(inds) = t_raw(i) + (0:tstep_vec(i):dt_raw(i)-tstep_vec(i))';
+        
         % One-by-one assignment of acc records over each index in inds
         acc(inds) = acc_records{i}';
         

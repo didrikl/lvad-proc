@@ -101,7 +101,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
             case 'matlab'
                 
                 eval([inputname(3),'=data;']);
-                save(filepath,tabname, varargin{:});
+                save(filepath,tabname,varargin{:});
             
             case {'csv'}
                 

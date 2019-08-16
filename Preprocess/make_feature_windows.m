@@ -1,4 +1,4 @@
-function feats = make_feature_windows(signal, feats)
+function feats = make_feature_windows(signal, feats, plot_vars)
     % make_feature_windows
     %   Quality control mainly used to check when thrombus enters LVAD (not to
     %   analyse features or to find features).
@@ -10,10 +10,10 @@ function feats = make_feature_windows(signal, feats)
     % Event type for window quality control (qc)
     qc_event_type = {'Thrombus injection'};
     
-    sub1_y_varname =  'acc_length';
-    sub2_y_varname = 'movrms';
-    sub2_yy_varname = 'movstd';
-    pivot_y_varnames = {'movstd','movrms'};
+    sub1_y_varname = {'acc_length_lvad_acc','acc_length_lead_acc'};
+    sub2_y_varname = 'movrms_lvad_acc';
+    sub2_yy_varname = 'movstd_lvad_acc';
+    pivot_y_varnames = {'movstd_lvad_acc','movrms_lvad_acc'};
     
     % More specified window for the feature, to be adjusted in quality control.
     % Start with using the window to be equal to the precursor window
@@ -22,7 +22,7 @@ function feats = make_feature_windows(signal, feats)
     feats.trailWinEnd = feats.precursor_endTime+seconds(trail_expansion); 
     
     % Clip trail window if it goes into the next intervention window
-    feats.trail_win_endTime(1:end-1) = min(feats.trail_win_endTime(1:end-1),feats.precursor_startTime(2:end));
+    feats.trailWinEnd(1:end-1) = min(feats.trailWinEnd(1:end-1),feats.precursor_startTime(2:end));
        
     %h_fig = gobjects(n_iv,1);
     close all
@@ -33,7 +33,7 @@ function feats = make_feature_windows(signal, feats)
         % Look up in feature table to find which data to plot
         feat_ind = qc_feat_inds(i);
         qc_event_feat = feats(feat_ind,:);
-        plot_range = timerange(qc_event_feat.lead_win_startTime,qc_event_feat.trail_win_endTime);
+        plot_range = timerange(qc_event_feat.leadTrailSplit,qc_event_feat.trailWinEnd);
         plot_data = signal(plot_range,:);
         t = seconds(plot_data.timestamp-plot_data.timestamp(1));%feats.precursor_startTime(1))
         t = t-lead_expansion;
@@ -41,19 +41,24 @@ function feats = make_feature_windows(signal, feats)
         h_fig = figure('Position',[35.4,69,1226.4,679.2]); %clf
         
         % NOTE: 
-        % * User MaxNumChanges=2 and take the first of these
-        % * Check for all pivot_y_varnames (instead of binary search?)
-        %   - Useful to check performance associated with the variable
-        %   - Take the fist of these to window split marker
         % * Check if the detection goes outside the feature window
         % * Implement a check that the trail_window does not go into next
         %   intervention, or let the window go all the way to the next
         %   intervention.
         % * Store automatic detection findings
-        % * Store the manual quality control detection
         
         abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames);
         
+        % Handling of no automatic detection.
+        if all(isnan(abrupt_change_time))
+            fprintf('\nNo change detections made. Window split is set at midtime')
+            win_split_time = mid_time;
+        else
+            win_split_time = min(abrupt_change_time);
+        end
+        
+        % TODO: FACTORIZE THE FOLLWING TO SEPARATE FUNCTION FILE
+        %*******************************************************
         % Make plots
         h_sub(1) = plot_in_upper_panel(t,plot_data,sub1_y_varname);
         h_sub(2) = plot_in_lower_panel(t,plot_data,sub2_y_varname,sub2_yy_varname);        
@@ -64,15 +69,17 @@ function feats = make_feature_windows(signal, feats)
         % Axis relation control
         h_sub(2).Position(4) = h_sub(1).Position(4)*1.18;
         linkaxes(h_sub,'x')
-        h_zoom = make_zoom_panel(h_sub(2),abrupt_change_time,sub2_y_varname);
+        h_zoom = make_zoom_panel(h_sub(2),win_split_time,sub2_y_varname);
+        %*********************************************************
         
         % Add dragable cursorbars, that defines lead and trail windows
-        cursors_handles.split = add_window_split_cursorbar(h_sub, h_zoom, abrupt_change_time);
+        cursors_handles.split = add_window_split_cursorbar(h_sub, h_zoom, win_split_time);
         cursors_handles.cutoff = add_cutoff_cursorbars(h_sub, h_zoom, 0, t(end)-trail_expansion);
     
         % Pause to allow for cursorbar adjustments by user
         pause
         
+        % Store quality controlled window definitions
         split_ind = find(t>=cursors_handles.split.panel_1.TopHandle.XData,1,'first');
         start_ind = find(t>cursors_handles.cutoff.left_cutoff.panel_1.TopHandle.XData,1,'first');
         end_ind = find(t>=cursors_handles.cutoff.right_cutoff.panel_1.TopHandle.XData,1,'first');
@@ -229,7 +236,6 @@ function abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames)
     
     fprintf('\n\nSearching for abrupt signal changes\n');
     
-    mid_time = t(1)+0.5*t(end);
     n_search_vars = numel(pivot_y_varnames);
     abrupt_change_time = nan(n_search_vars,1);
     
@@ -255,15 +261,6 @@ function abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames)
         
     end
     
-    % Handling of no automatic detection.
-    % NOTE: Could alternatively also someway be rejected be user interaction.
-    if all(isnan(abrupt_change_time))
-        fprintf('\nNo change detections made. Window split is set at midtime')
-        abrupt_change_time = mid_time;
-    else
-        abrupt_change_time = min(abrupt_change_time);
-    end
-
 end
         
 % function [abrupt_change_time, pivot_ind] = search_abrupt_changes(data, t, pivot_varnames)
@@ -338,7 +335,7 @@ function plot_init_pos(h_ax,flag_time,label,color)
         xline(h_ax,flag_time(k),...
             'LineStyle',':',...
             'Alpha',0.6,...
-            'LineWidth',1.3,...
+            'LineWidth',1.4,...
             'Label',label,...
             'LabelHorizontalAlignment','left',...
             'LabelVerticalAlignment','bottom',...

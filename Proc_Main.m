@@ -25,26 +25,19 @@ ultrasound_filename = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
 experiment_subdir = fullfile('In Vitro - PREPERATIONS');
 [read_path, save_path] = init_paths(experiment_subdir);
 
-% Read text file and save the initialized as binary file
+% Initialization of Cardiaccs text files (incl. saving to binary .mat file)
 %lvad_acc = init_cardiaccs_raw_txtfile(lvad_acc_filename,read_path);
 %lead_acc = init_cardiaccs_raw_txtfile(lead_acc_filename,read_path);
+%save_table('lvad_acc.mat', save_path, lvad_acc, 'matlab');
+%save_table('lead_acc.mat', save_path, lead_acc, 'matlab');
+lvad_acc = init_signal_proc_matfile('lvad_acc.mat', save_path);
+lead_acc = init_signal_proc_matfile('lead_acc.mat', save_path);
 
-lead_acc_raw = read_cardiaccs_raw_txtfile(lead_acc_filename,read_path);
-lead_acc = parse_cardiaccs_raw(lead_acc_raw);
-lead_acc = make_signal_timetable(lead_acc);
-
-
-% Save raw data as binary Matlab file
-%save_table('lvad_acc.mat', save_path, signal, 'matlab');
-save_table('lead_acc.mat', save_path, signal, 'matlab');
-
-% Read mat files
-%lvad_acc = init_signal_proc_matfile('lvad_acc.mat', save_path);
-%lead_acc = init_signal_proc_matfile('lead_acc.mat', save_path);
+% Initialization of Powerlab file(s)
 %powerlab_signals = init_powerlab_raw_matfile(powerlab_filename,read_path);
 
 % Read experiment notes in Excel file template
-%notes = init_notes_xlsfile(notes_filename,read_path);
+notes = init_notes_xlsfile(notes_filename,read_path);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
 %ultrasound = init_m3_raw_textfile(ultrasound_filename,read_path);
@@ -58,7 +51,43 @@ save_table('lead_acc.mat', save_path, signal, 'matlab');
 lvad_acc = resample_signal(lvad_acc);
 lead_acc = resample_signal(lead_acc);
 
-signals = merge_lvad_and_lead(lvad_acc,lead_acc);
+% Vector length
+lvad_acc.acc_length = sqrt(sum(lvad_acc.acc.^2,2));
+lead_acc.acc_length = sqrt(sum(lead_acc.acc.^2,2));
+    
+% Moving RMS, variance and standard deviation for 3 comp. length
+lvad_acc = calc_moving(lvad_acc);
+lead_acc = calc_moving(lead_acc);
+
+lead_acc = sync_acc(lead_acc, lvad_acc);
+
+% Init notes, then signal and notes fusion (after resampling and syncing)
+lvad_acc = merge_signal_and_notes(lvad_acc,notes);
+lead_acc = merge_signal_and_notes(lead_acc,notes);
+lead_acc.acc_length = sqrt(sum(lead_acc.acc.^2,2));
+lead_acc = calc_moving(lead_acc);
+
+lvad_acc = clip_to_experiment(lvad_acc,notes);
+lead_acc = clip_to_experiment(lead_acc,notes);
+
+
+lead_acc = lead_acc(:,1:5);
+acc = synchronize(lead_acc,lvad_acc,'regular','SampleRate',lvad_acc.Properties.SampleRate);
+
+% Look at RPM order plots as well: Should result in flat/stratified lines
+make_rpm_order_map(lvad_acc(lvad_acc.experimentPartNo=='1',:)) %
+make_rpm_order_map(lvad_acc(lvad_acc.experimentPartNo=='2',:)) %
+make_rpm_order_map(lvad_acc(lvad_acc.experimentPartNo=='3',:)) %
+pause
+make_rpm_order_map(lead_acc(lead_acc.experimentPartNo=='1',:)) %'Order Map for Driveline Accelerometer - RPM Changes Prior to Thrombi Injections'
+make_rpm_order_map(lead_acc(lead_acc.experimentPartNo=='2',:)) %
+make_rpm_order_map(lead_acc(lead_acc.experimentPartNo=='3',:)) %
+
+
+%%
+
+%signals = merge_lvad_and_lead(lvad_acc,lead_acc);
+%lead_signals = merge_signal_and_notes(lead_acc,notes);
 
 % Init notes, then signal and notes fusion (after resampling)
 signals = merge_signal_and_notes(lvad_acc,notes);
@@ -78,7 +107,7 @@ features = extract_features_from_notes(notes);
 
 %save_table('signal_preproc.mat', save_path, signal, 'matlab');
 
-features = make_feature_windows(signals, features)
+features = make_feature_windows(lead_acc, features)
 
 
 %% Continuous wavelet transform
