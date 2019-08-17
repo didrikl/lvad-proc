@@ -15,7 +15,7 @@ h_ax.YLim = [0.4, 0.8];
 h_ax.Position(2) = 0.9*h_ax.Position(2);
 h_ax.Position(4) = 1.25*h_ax.Position(4);
 yyaxis right
-plot(t,s.movstd)
+plot(t,s.movStd)
 legend({'Moving RMS','Moving Std.'})
 h_ax = gca;
 h_ax.YLim = [0.005, 0.045];

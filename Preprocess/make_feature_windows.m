@@ -10,10 +10,15 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     % Event type for window quality control (qc)
     qc_event_type = {'Thrombus injection'};
     
-    sub1_y_varname = {'acc_length_lvad_acc','acc_length_lead_acc'};
-    sub2_y_varname = 'movrms_lvad_acc';
-    sub2_yy_varname = 'movstd_lvad_acc';
-    pivot_y_varnames = {'movstd_lvad_acc','movrms_lvad_acc'};
+    sub1_y_var = {'accNorm_lvad_signal','accNorm_lead_signal'};
+    sub1_yy_var = {};
+    
+    sub2_y_var = {'movRMS_accNorm_lvad_signal','movRMS_accNorm_lead_signal'};
+    sub2_yy_var = {'movStd_accNorm_lvad_signal','movStd_accNorm_lead_signal'};
+    
+    pivot_y_varnames = {'movStd_accNorm_lvad_signal','movRMS_accNorm_lvad_signal'};
+    
+    % TODO: Check if variable names exist...
     
     % More specified window for the feature, to be adjusted in quality control.
     % Start with using the window to be equal to the precursor window
@@ -60,8 +65,13 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         % TODO: FACTORIZE THE FOLLWING TO SEPARATE FUNCTION FILE
         %*******************************************************
         % Make plots
-        h_sub(1) = plot_in_upper_panel(t,plot_data,sub1_y_varname);
-        h_sub(2) = plot_in_lower_panel(t,plot_data,sub2_y_varname,sub2_yy_varname);        
+        if not(iscell(sub1_y_var)), sub1_y_var = {sub1_y_var}; end
+        if not(iscell(sub1_yy_var)), sub1_yy_var = {sub1_yy_var}; end
+        if not(iscell(sub2_y_var)), sub2_y_var = {sub2_y_var}; end
+        if not(iscell(sub2_yy_var)), sub2_yy_var = {sub2_yy_var}; end
+        
+        h_sub(1) = plot_in_upper_panel(t,plot_data,sub1_y_var);
+        h_sub(2) = plot_in_lower_panel(t,plot_data,sub2_y_var,sub2_yy_var);        
         
         % Add title
         make_annotations(h_sub, qc_event_feat, i, n_qc_feats);
@@ -69,7 +79,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         % Axis relation control
         h_sub(2).Position(4) = h_sub(1).Position(4)*1.18;
         linkaxes(h_sub,'x')
-        h_zoom = make_zoom_panel(h_sub(2),win_split_time,sub2_y_varname);
+        h_zoom = make_zoom_panel(h_sub(2),win_split_time,sub2_y_var);
         %*********************************************************
         
         % Add dragable cursorbars, that defines lead and trail windows
@@ -98,36 +108,76 @@ end
 
 function h_sub = plot_in_upper_panel(t,iv_signal,sub1_y_varname)
     
+    overlay_color_alpha = 0.5;
     sub1_ylim = [0.8,1.2];
     
     h_sub = subplot(2,1,1);
-    h_plt = plot(t,iv_signal.(sub1_y_varname));
+    
+    hold on
+    for i=1:numel(sub1_y_varname)
+        h_plt = plot(t,iv_signal.(sub1_y_varname{i}));
+        if i>1
+            h_plt.Color(4) = overlay_color_alpha;
+        end
+    end
+    
     common_adjust_panel(h_sub(1),t)
     h_sub(1).Position(4) = h_sub(1).Position(4)*1.18;
     h_sub(1).YLim = sub1_ylim;
     h_sub(1).XAxisLocation = 'top';
     set(h_sub(1),'YTick',h_sub(1).YTick(2:end));        
-    legend(h_plt,strrep({sub1_y_varname},'_','\_'),...
+    
+    if numel(sub1_y_varname)>1
+    
+    end
+    
+    legend(gca,strrep(sub1_y_varname,'_','\_'),...
             'Orientation','horizontal',...
             'AutoUpdate','off')       
 end
 
 function h_sub2 = plot_in_lower_panel(t,iv_signal,sub2_y_varname,sub2_yy_varname)
+    
+    overlay_color_alpha = 0.35;
+    yy_axis_shift_factor = 0.15;
+    
+    % Plot lines with y-axis to the left
     h_sub2 = subplot(2,1,2);
-    h_plt_y = plot(t,iv_signal.(sub2_y_varname),'Clipping','on');
+    h_sub2.ColorOrderIndex = 3;
+    
+    hold on
+    for i=1:numel(sub2_y_varname)
+        h_plt_y(i) = plot(t,iv_signal.(sub2_y_varname{i}),'Clipping','on');
+%         if i>1
+%             h_plt_y.Color(4) = overlay_color_alpha;
+%         end
+    end
+    
     common_adjust_panel(h_sub2,t)
     
-    axes(h_sub2)
-    
     % Lower panel: Add ekstra plot with separate axis-scale on the right
-    yyaxis right
-    h_plt_yy = plot(t,iv_signal.(sub2_yy_varname));
-    h_sub_yy = gca;
-    h_sub_yy.YLim = h_sub_yy.YLim+0.15*abs((h_sub_yy.YLim(2)-h_sub_yy.YLim(1)));
-    h_sub_yy.YLim(1) = min(h_sub_yy.YLim(1),min(iv_signal.(sub2_yy_varname)));
-    h_sub_yy.Box = 'off';
+    h_plt_yy = gobjects(numel(sub2_yy_varname));
+    if numel(sub2_yy_varname)>1
+        yyaxis right
+        
+        hold on
+        h_sub2.ColorOrderIndex = 3+numel(sub2_y_varname);
+        for i=1:numel(sub2_yy_varname)
+            h_plt_yy(i) = plot(t,iv_signal.(sub2_yy_varname{i}));
+            %         if i>1
+            %             h_plt_yy.Color(4) = overlay_color_alpha;
+            %         end
+        end
+        
+        h_sub_yy = gca;
+        h_sub_yy.YLim = h_sub_yy.YLim+yy_axis_shift_factor*abs((h_sub_yy.YLim(2)-h_sub_yy.YLim(1)));
+        h_sub_yy.YLim(1) = min(h_sub_yy.YLim(1),min(iv_signal.(sub2_yy_varname{1})));
+        h_sub_yy.Box = 'off';
+    end
     
-    legend([h_plt_y,h_plt_yy],strrep({sub2_y_varname,sub2_yy_varname},'_','\_'),...
+    strrep([sub2_y_varname,sub2_yy_varname],'_','\_')
+    [h_plt_y;h_plt_yy]
+    legend([h_plt_y;h_plt_yy],strrep([sub2_y_varname,sub2_yy_varname],'_','\_'),...
             'Orientation','horizontal',...
             'AutoUpdate','off')       
 end
@@ -204,11 +254,12 @@ function h_zoom = make_zoom_panel(h_sub,mid_pos,varname)
         'WindowSizeX',initial_zoom,...
         'MinX',mid_pos-0.5*initial_zoom);
     adjust_zoom_panel(h_zoom,h_sub,varname)
+
 end
 
 function adjust_zoom_panel(h_zoom,h_sub2,sub2_y_varname)
     
-    h_zoom_leg = legend(h_zoom,sub2_y_varname,...
+    h_zoom_leg = legend(h_zoom,strrep(sub2_y_varname,'_','\_'),...
         'AutoUpdate','off',...
         'EdgeColor','none',...
         'FontSize',9,...
@@ -217,8 +268,11 @@ function adjust_zoom_panel(h_zoom,h_sub2,sub2_y_varname)
     h_zoom_leg.Title.String = 'Zoom variable';
     h_zoom_leg.Title.FontSize = 8;   
     h_zoom.XTick = h_sub2.XTick;
-    h_zoom_plt = findall(h_zoom,'Tag','scrollDataLine');
-    h_zoom_plt.Color = [.67 .79 .87];
+    
+    % TODO: Set color equal to subplot-color?
+    % h_zoom_plt = findall(h_zoom,'Tag','scrollDataLine');
+    %h_zoom_plt.Color = [.67 .79 .87];
+    
     h_zoom_hlp = findall(h_zoom,'Tag','scrollHelp');
     h_zoom_hlp.Color = [.5 .5 .5];
     h_zoom.Position(1) = 0.2;
@@ -471,8 +525,9 @@ function right_cutoff_callback(h_cur,h_curlab,h_sub,h_zoom)
     h_curlab.Position(1) = h_cur.TopHandle.XData;
     
     % NOTE: Searching for objects may be sub-optimal (less efficient and less
-    % robust)
+    % robust).
     h_plot_line = findobj(h_sub(1),'Type','line');
+    if numel(h_plot_line)>1, h_plot_line = h_plot_line(1); end
     
     % Defining shade area. NB: For x axis, the shade can not overlay the
     % cursorbar due to technical difficulties with uistack, hence the addition.
@@ -510,6 +565,7 @@ function left_cutoff_callback(h_cur1,h_curlab,h_sub,h_zoom)
     h_curlab.Position(1) = h_cur1.TopHandle.XData;
     
     h_plot_line = findobj(h_sub(1),'Type','line');
+    if numel(h_plot_line)>1, h_plot_line = h_plot_line(1); end
     shade_xmin = h_plot_line.XData(1);
     shade_xmax = h_cur1.TopHandle.XData(1)-0.4;
    

@@ -22,11 +22,12 @@ function make_rpm_order_map(data)
     % 
     %
     
+    var = 'accNorm';
     order_res = 0.1;
     overlap_pst = 80; % 70 percent perhaps slightly better...?
     
     rpm = str2double(string(data.pumpSpeed));
-    x = detrend(data.acc_length);
+    x = detrend(data.(var));
     fs = data.Properties.SampleRate;
     
     rpmordermap(x,fs,rpm,order_res, ...

@@ -14,16 +14,16 @@ hold on
 for i=1:3
     data_part = parts.(['part',num2str(i)]);
     yyaxis left
-    plot(data_part.timestamp, data_part.movrms_sum)
+    plot(data_part.timestamp, data_part.movRMS_sum)
     yyaxis right
-    plot(data_part.timestamp, data_part.movstd_sum)
+    plot(data_part.timestamp, data_part.movStd_sum)
     h_ax(1).ColorOrderIndex = 1;
 end
 data_part = parts.pause;
 yyaxis left
-h_p1 = plot(data_part.timestamp, data_part.movrms_sum,'.');
+h_p1 = plot(data_part.timestamp, data_part.movRMS_sum,'.');
 yyaxis right
-h_p2 = plot(data_part.timestamp, data_part.movstd_sum,'.');
+h_p2 = plot(data_part.timestamp, data_part.movStd_sum,'.');
 hold off
 
 h_ax(2) = subplot(4,1,2);
@@ -60,7 +60,7 @@ hold on
 for i=1:numel(iv_injection_ranges)
     plot_data = signal(iv_injection_ranges{i},:);
     plot_time = plot_data.t - plot_data.t(2);
-    h_plt = plot(plot_time,sum(plot_data.movrms,2));
+    h_plt = plot(plot_time,sum(plot_data.movRMS,2));
     %h_plt.Color(4) = 0.2;
 end
 

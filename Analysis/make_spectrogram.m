@@ -41,7 +41,7 @@ function make_spectrogram(signal,varname)
 % Remove the static effect of gravity in the in vitro setup
 
 % (to speed up/more accuracy: mean(acc_vec(1:1000)), i.e. for a initial window only)
-vec = signal.acc_length;
+vec = signal.accNorm;
 vec_ = vec-movmean(vec,10000);
 plot(signal.timestamp,vec)
 

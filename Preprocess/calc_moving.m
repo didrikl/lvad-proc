@@ -1,4 +1,4 @@
-function signal = calc_moving(signal, statistic_types, var_name)
+function signal = calc_moving(signal, statistic_types, var)
     % CALC_MOVING
     %   
     %
@@ -6,34 +6,44 @@ function signal = calc_moving(signal, statistic_types, var_name)
     %
 
     if nargin < 2
-        statistic_types = {'rms','var','std'};
+        statistic_types = {'RMS','Var','Std'};
     end
     
     if nargin < 3
-        var_name = 'acc_length';
+        var = 'accNorm';
     end
     
-    signal_vec = signal.(var_name);
+    signal_vec = signal.(var);
     win_length = 1*signal.Properties.SampleRate;
     
-    if ismember('rms',statistic_types)
+    new_vars = "mov"+statistic_types+"_"+var;
+    
+    if any(strcmpi('RMS',statistic_types))
+        new_var = new_vars{strcmpi(statistic_types,'RMS')};
         MovRMSObj = dsp.MovingRMS(win_length);
-        signal.movrms = MovRMSObj(signal_vec);
-        signal.movrms(1:win_length) = nan;
-        
+        signal.(new_var) = MovRMSObj(signal_vec);
+        signal.(new_var)(1:win_length) = nan;
+        signal.Properties.VariableContinuity(new_var) = 'continuous';
+        signal.Properties.VariableDescriptions(new_var) = {sprintf(...
+            'Moving root-mean-sqaure\n\tWindow length: %s',win_length)};
     end
     
-    if ismember('var',statistic_types)
+    if any(strcmpi('Var',statistic_types))
+        new_var = new_vars{strcmpi(statistic_types,'Var')};
         MovVarObj = dsp.MovingVariance(win_length);
-        signal.movvar = MovVarObj(signal_vec);
-        signal.movvar(1:win_length) = nan;
+        signal.(new_var) = MovVarObj(signal_vec);
+        signal.(new_var)(1:win_length) = nan;
+        signal.Properties.VariableContinuity(new_var) = 'continuous';
+        signal.Properties.VariableDescriptions(new_var) = {sprintf(...
+            'Moving variance\n\tWindow length: %s',win_length)};    
     end
     
-    if ismember('std',statistic_types)
+    if any(strcmpi('Std',statistic_types))
+        new_var = new_vars{strcmpi(statistic_types,'Std')};
         MovSTDObj = dsp.MovingStandardDeviation(win_length);
-        signal.movstd = MovSTDObj(signal_vec);
-        signal.movstd(1:win_length) = nan;
+        signal.(new_var) = MovSTDObj(signal_vec);
+        signal.(new_var)(1:win_length) = nan;
+        signal.Properties.VariableContinuity(new_var) = 'continuous';
+        signal.Properties.VariableDescriptions(new_var) = {sprintf(...
+            'Moving standard deviation\n\tWindow length: %s',win_length)};    
     end
-    
-    signal.Properties.VariableContinuity{statistic_types} = true;
-    

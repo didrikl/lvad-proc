@@ -22,9 +22,9 @@ plot(t,s)
 legend({'x','y','z','length'})
 
 subplot(3,1,2)
-plot(t,signal.movrms)
+plot(t,signal.movRMS)
 yyaxis right
-plot(t,signal.movstd)
+plot(t,signal.movStd)
 legend({'Moving RMS','Moving Std.'})
 subplot(3,1,3)
 plot(t,signal.thrombusVolume,'LineWidth',2)%t,signal.pumpSpeed);
