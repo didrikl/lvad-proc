@@ -13,9 +13,10 @@ function signal = calc_moving(signal, statistic_types, var)
         var = 'accNorm';
     end
     
-    signal_vec = signal.(var);
-    win_length = 1*signal.Properties.SampleRate;
+    win_length_fs_factor = 1;
     
+    signal_vec = signal.(var);
+    win_length = win_length_fs_factor*signal.Properties.SampleRate;
     new_vars = "mov"+statistic_types+"_"+var;
     
     if any(strcmpi('RMS',statistic_types))

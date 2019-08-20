@@ -14,9 +14,10 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     sub1_yy_var = {};
     
     sub2_y_var = {'movRMS_accNorm_lvad_signal','movRMS_accNorm_lead_signal'};
-    sub2_yy_var = {'movStd_accNorm_lvad_signal','movStd_accNorm_lead_signal'};
+    sub2_yy_var = {};
+    %sub2_yy_var = {'movStd_accNorm_lvad_signal','movStd_accNorm_lead_signal'};
     
-    pivot_y_varnames = {'movStd_accNorm_lvad_signal','movRMS_accNorm_lvad_signal'};
+    search_var = {'movStd_accNorm_lvad_signal','movRMS_accNorm_lvad_signal'};
     
     % TODO: Check if variable names exist...
     
@@ -25,6 +26,8 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     feats.leadWinStart = feats.precursor_startTime-seconds(lead_expansion);
     feats.leadTrailSplit = feats.precursor_startTime;
     feats.trailWinEnd = feats.precursor_endTime+seconds(trail_expansion); 
+    feats.leadWin_timerange = cell(height(feats),1);
+    feats.trailWin_timerange = cell(height(feats),1);
     
     % Clip trail window if it goes into the next intervention window
     feats.trailWinEnd(1:end-1) = min(feats.trailWinEnd(1:end-1),feats.precursor_startTime(2:end));
@@ -40,19 +43,17 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         qc_event_feat = feats(feat_ind,:);
         plot_range = timerange(qc_event_feat.leadTrailSplit,qc_event_feat.trailWinEnd);
         plot_data = signal(plot_range,:);
+        search_range = timerange(feats.precursor_startTime(feat_ind),feats.precursor_endTime(feat_ind));
         t = seconds(plot_data.timestamp-plot_data.timestamp(1));%feats.precursor_startTime(1))
         t = t-lead_expansion;
         
         h_fig = figure('Position',[35.4,69,1226.4,679.2]); %clf
         
         % NOTE: 
-        % * Check if the detection goes outside the feature window
-        % * Implement a check that the trail_window does not go into next
-        %   intervention, or let the window go all the way to the next
-        %   intervention.
+        % * Let the window go all the way to the next intervention?
         % * Store automatic detection findings
         
-        abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames);
+        abrupt_change_time = find_abrupt_change(t,signal(search_range,:),search_var);
         
         % Handling of no automatic detection.
         if all(isnan(abrupt_change_time))
@@ -84,7 +85,8 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         
         % Add dragable cursorbars, that defines lead and trail windows
         cursors_handles.split = add_window_split_cursorbar(h_sub, h_zoom, win_split_time);
-        cursors_handles.cutoff = add_cutoff_cursorbars(h_sub, h_zoom, 0, t(end)-trail_expansion);
+        cursors_handles.cutoff = add_cutoff_cursorbars(h_sub, h_zoom, ...
+            -lead_expansion, t(end)-trail_expansion);
     
         % Pause to allow for cursorbar adjustments by user
         pause
@@ -97,6 +99,9 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         feats.leadTrailSplit(feat_ind) = plot_data.timestamp(split_ind);
         feats.trailWinEnd(feat_ind) = plot_data.timestamp(end_ind);
         
+        feats.leadWin_timerange{feat_ind} = timerange(feats.leadWinStart(feat_ind),feats.leadTrailSplit(feat_ind));
+        feats.trailWin_timerange{feat_ind} = timerange(feats.leadTrailSplit(feat_ind),feats.trailWinEnd(feat_ind));
+
         close(h_fig)
     end
     
@@ -108,7 +113,7 @@ end
 
 function h_sub = plot_in_upper_panel(t,iv_signal,sub1_y_varname)
     
-    overlay_color_alpha = 0.5;
+    overlay_color_alpha = 0.4;
     sub1_ylim = [0.8,1.2];
     
     h_sub = subplot(2,1,1);
@@ -132,81 +137,74 @@ function h_sub = plot_in_upper_panel(t,iv_signal,sub1_y_varname)
     end
     
     legend(gca,strrep(sub1_y_varname,'_','\_'),...
-            'Orientation','horizontal',...
+            ...'Orientation','horizontal',...
             'AutoUpdate','off')       
 end
 
 function h_sub2 = plot_in_lower_panel(t,iv_signal,sub2_y_varname,sub2_yy_varname)
     
-    overlay_color_alpha = 0.35;
-    yy_axis_shift_factor = 0.15;
+    % NOTE: Plot panels could be object oriented
+    
+    yy_axis_shift_factor = 0.20;
     
     % Plot lines with y-axis to the left
     h_sub2 = subplot(2,1,2);
-    h_sub2.ColorOrderIndex = 3;
+%    h_sub2.ColorOrderIndex = 3;
     
     hold on
     for i=1:numel(sub2_y_varname)
         h_plt_y(i) = plot(t,iv_signal.(sub2_y_varname{i}),'Clipping','on');
-%         if i>1
-%             h_plt_y.Color(4) = overlay_color_alpha;
-%         end
     end
     
     common_adjust_panel(h_sub2,t)
     
     % Lower panel: Add ekstra plot with separate axis-scale on the right
-    h_plt_yy = gobjects(numel(sub2_yy_varname));
-    if numel(sub2_yy_varname)>1
+    if numel(sub2_yy_varname)>0
         yyaxis right
-        
+        h_sub2_yy = gca;
         hold on
-        h_sub2.ColorOrderIndex = 3+numel(sub2_y_varname);
         for i=1:numel(sub2_yy_varname)
-            h_plt_yy(i) = plot(t,iv_signal.(sub2_yy_varname{i}));
+            h_plt_y(end+1) = plot(t,iv_signal.(sub2_yy_varname{i}));
             %         if i>1
             %             h_plt_yy.Color(4) = overlay_color_alpha;
             %         end
         end
         
-        h_sub_yy = gca;
-        h_sub_yy.YLim = h_sub_yy.YLim+yy_axis_shift_factor*abs((h_sub_yy.YLim(2)-h_sub_yy.YLim(1)));
-        h_sub_yy.YLim(1) = min(h_sub_yy.YLim(1),min(iv_signal.(sub2_yy_varname{1})));
-        h_sub_yy.Box = 'off';
+        
+        h_sub2_yy.YLim = h_sub2_yy.YLim+yy_axis_shift_factor*abs((h_sub2_yy.YLim(2)-h_sub2_yy.YLim(1)));
+        h_sub2_yy.YLim(1) = min(h_sub2_yy.YLim(1),min(iv_signal.(sub2_yy_varname{1})));
+        h_sub2_yy.Box = 'off';
     end
     
-    strrep([sub2_y_varname,sub2_yy_varname],'_','\_')
-    [h_plt_y;h_plt_yy]
-    legend([h_plt_y;h_plt_yy],strrep([sub2_y_varname,sub2_yy_varname],'_','\_'),...
-            'Orientation','horizontal',...
+    
+    legend(h_plt_y,strrep([sub2_y_varname,sub2_yy_varname],'_','\_'),...
+            ...'Orientation','horizontal',...
             'AutoUpdate','off')       
 end
 
 function make_annotations(h_sub, qc_event_feat, qc_event_no, n_qc_events)
+    % Adding time label/annotation after zoom tool (which would reposition it)
+    xlabel('Time (sec)','Position',[0.5,-0.11,0]);
     
     event_type = string(qc_event_feat.precursor);
     vol = qc_event_feat.thrombusVolume;
     rpm = string(qc_event_feat.pumpSpeed);
     
-    h_tit = suptitle(sprintf('Signal plot: %s no. %d of %d, %s ml Volume and %s RPM',...
+    h_tit = suptitle(sprintf('Signal for %s %d of %d: %s ml Thrombus at %s RPM',...
         event_type,qc_event_no,n_qc_events,vol,rpm));
     h_tit.FontWeight = 'bold';
-    h_tit.FontSize = 13;
+    h_tit.FontSize = 16;
     
     % Add extra info about the time axis, for user to look up info in notes
     text_arr = {
-        'Time = 0'
-        '------------'
+        '\bfTime = 0\rm'
         datestr(qc_event_feat.precursor_startTime)
-        "Start of "+event_type
+        "Intervention start in notes"%+event_type
         };
-    text(gca,0,-0.33,text_arr,...
+    text(gca,-0.005,-0.19,text_arr,...
         'Units','normalized',...
         'FontSize',9);
-    
-    % Adding time label/annotation after zoom tool (which would reposition it)
-    xlabel(h_sub(2),'Time (sec)','Position',[0.5,-0.11,0]);
-    
+        
     % Adding an extra invisible axes that spans over the subplots, and will
     % therefore have a superlabel for the y-axis. NB: add this after the text
     % box with info, otherwise would the text box be invisible.
@@ -215,7 +213,9 @@ function make_annotations(h_sub, qc_event_feat, qc_event_no, n_qc_events)
     height=p1(2)+p1(4)-p2(2);
     axes('position',[p2(1)-0.008*p2(3) p2(2) p2(3) height],'visible','off');
     ylabel('Acceleration (g)','visible','on');
-  
+    
+    
+    
 end 
 
 function common_adjust_panel(ax,t)
@@ -225,7 +225,8 @@ function common_adjust_panel(ax,t)
     ax.YAxis.TickLength = [0.005,0];
     ax.XGrid = 'on';
     ax.XMinorGrid = 'on';
-    ax.Box = 'off';   
+    ax.Box = 'off';
+    ax.FontSize = 11.5;
 
     % Stretch in y-dir
     %ax.Position(4) = ax.Position(4)*1.18;
@@ -252,7 +253,8 @@ function h_zoom = make_zoom_panel(h_sub,mid_pos,varname)
     
     h_zoom = scrollplot(h_sub,...
         'WindowSizeX',initial_zoom,...
-        'MinX',mid_pos-0.5*initial_zoom);
+        'MinX',0 ...'MinX',mid_pos-0.5*initial_zoom
+    );
     adjust_zoom_panel(h_zoom,h_sub,varname)
 
 end
@@ -316,30 +318,6 @@ function abrupt_change_time = find_abrupt_change(t,plot_data,pivot_y_varnames)
     end
     
 end
-        
-% function [abrupt_change_time, pivot_ind] = search_abrupt_changes(data, t, pivot_varnames)
-%     
-%     for j=1:numel(pivot_varnames)
-%         varname = pivot_varnames{j};
-%         var = rmmissing(data.(varname));
-%         pivot_ind = findchangepts(var,...
-%             'MaxNumChanges',1 ... 'MinThreshold',2 ...
-%             );
-%         if isempty(pivot_ind)
-%             pivot_ind = search_refined_abrupt_changes(var);
-%         end
-%         
-%         if pivot_ind
-%             abrupt_change_time = t(pivot_ind);
-%             fprintf('\nAbrupt change detected\n\tVariable: %s\n\tTime: %s\n',...
-%                 varname,num2str(abrupt_change_time))
-%             break
-%         else
-%             abrupt_change_time = t(1)+0.5*t(end);
-%         end        
-%     end
-% 
-% end
 
 function pivot_ind = search_refined_abrupt_changes(var, recur_no)
     
@@ -402,10 +380,10 @@ end
 
 function cursors = add_window_split_cursorbar(h_sub, h_zoom, pos)
     
-    color = [0.80,0.00,0.40];%[0.67,0.15,0.31];%[0.9 0.1 0.9];
+    color = [0.00,0.94,0.00];%[0.80,0.00,0.40];%[0.67,0.15,0.31];%[0.9 0.1 0.9];
     width = 2;
     label = ' Signal change ';
-    init_label = ' Automatic detection ';
+    init_label = '';%' Automatic detection ';
     [h_cur1,h_cur2,h_curzoom,h_curlab] = add_panel_linked_cursors(...
         h_sub,h_zoom,pos,label,width,color);
     callback_fun = @(~,~)move_from_init_pos_callback(...
@@ -427,8 +405,8 @@ function cursors = add_cutoff_cursorbars(h_sub, h_zoom,win_start,win_end)
     
     color = [0.3 0.3 0.3];
     width = 2;
-    left_label = 'window start';
-    end_label = 'window end';
+    left_label = 'Lead win. start';
+    end_label = 'Trail win. end';
     
     [h_cur1,h_cur2,h_curzoom,h_curlab] = add_panel_linked_cursors(h_sub,h_zoom,...
         win_start,left_label,width,color);

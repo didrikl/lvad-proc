@@ -69,9 +69,10 @@ lead_signal = merge_signal_and_notes(lead_signal,notes);
 lvad_signal = clip_to_experiment(lvad_signal,notes);
 lead_signal = clip_to_experiment(lead_signal,notes);
 
-
-lead_signal = lead_signal(:,1:5);
+% Merge LVAD and lead accelerometers
 acc = synchronize(lead_signal,lvad_signal,'regular','SampleRate',lvad_signal.Properties.SampleRate);
+
+%% Quality control
 
 % Look at RPM order plots as well: Should result in flat/stratified lines
 make_rpm_order_map(lvad_signal(lvad_signal.experimentPartNo=='1',:)) %
