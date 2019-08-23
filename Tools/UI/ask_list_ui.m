@@ -15,8 +15,6 @@ function selection = ask_list_ui(options, question, default)
 	%                       same as not having any default option. Thus e.g.
 	%                       default=-1 will is a way to say that there is no default
 	%                       option.
-	%
-	% See also Print_Ask_List_Menu
 	
     % TODO: Use varargin and input parsing for default and for selection mode
     
@@ -49,39 +47,36 @@ function selection = ask_list_ui(options, question, default)
     end
     
     % Set/adjust windows size
-    width = 220;
-    height = 100;
-    n_opt_char = max(cellfun(@length,options));
-    width = max(width,width*n_opt_char/55);
+    width = 240;
+    height = 110;
+    n_char = max(cellfun(@length,options));
+    n_char = max(n_char,max(cellfun(@length,strsplit(question))));
+    width = max(width,n_char*17);
     height = max(height,height*(numel(options)/7.2));
     
-    question = {'';question;'';''};
-    fprintf('\nUser input required in separate window...\n')   
+    disp(question);
+	fprintf('(User input required in popup window...)\n')   
     [selection, ~] = listdlg(...
-        'PromptString',question,...
+        'PromptString',{question;'';'';''},...
         'SelectionMode','single',...
         'OKString','Select',...
         'CancelString','Cancel',...
-        'ListString',options,...
+        'ListString',options,...;
         'ListSize',[width, height],...
         'InitialValue',init_val,...
         'Name','Input required');
     
     % Documenting user selection in command window
-    print_ask_list_menu(options, '', question)
-    fprintf('--> %d\n',selection)
+    print_ask_list_menu(options, default)
+    fprintf('\t--> %d\n',selection)
     
 end
 
-function print_ask_list_menu(options, indent, question, default)
+function print_ask_list_menu(options, default)
 	
-    if nargin<4, default=0; end
-    
-	% If question is given as cell, then it is likely it was contructed for GUI
-	% mode and multiline print, and thus a conversion to regular string is
-	% neccessary.
-	if iscell(question), question = strjoin(question,[indent,'\n']); end
-	if isstring(options), options = char(options); end
+    if isstring(options)
+        options = char(options); 
+    end
     
 	n_option = length(options);
 	M = zeros(n_option,1);
@@ -89,10 +84,9 @@ function print_ask_list_menu(options, indent, question, default)
 	M_max = max(M);
 	max_num_width = floor(log10(n_option));
 	
-    fprintf([indent,question]);
-	for i=1:n_option
+    for i=1:n_option
 		num_width = floor(log10(i));
-		num_str = ['\n',indent,'[',num2str(i),']',repmat(' ',(max_num_width-num_width))];
+		num_str = ['\n\t[',num2str(i),']',repmat(' ',(max_num_width-num_width))];
         fprintf([num_str,' ',options{i}]);
 		space = repmat(' ',1,M_max-M(i)+1);
 		if i==default, fprintf([space,'{default <enter>}']); end

@@ -1,4 +1,4 @@
-function feats = extract_features_from_notes(notes)
+function feats = init_features_from_notes(notes)
     % EXTRACT_FEATURES_FROM_NOTES
     %   Extract selected event features from notes.
     %   Features in all table cells should be populated with values.
@@ -20,27 +20,24 @@ function feats = extract_features_from_notes(notes)
      ss_vars = feats.Properties.CustomProperties.MeassuredParam;
      ss_varnames = feats.Properties.VariableNames(ss_vars);
      feats.Properties.VariableNames(ss_vars) = string(ss_varnames)+"_steadyState";
-     
-     
-     %% Store additional ID and reference columns
-     % (These columns are not feature-columns.)
-     
-     %feats.event_noteRow = notes.noteRow(ss_rows);
-     
+         
+     % Store additional ID and reference columns
+     % (These columns are not feature-columns.) 
      % Precursor: The last preceeding event that can be tied to the feature.
      feats.precursor = notes.event(ss_rows-1);     
      feats.precursor_noteRow = notes.noteRow(ss_rows-1);
      feats.precursor_startTime = notes.timestamp(ss_rows-1);
      feats.precursor_endTime = notes.event_endTime(ss_rows-1);
-     feats.precursor_timerange = notes.event_timerange(ss_rows-1);
+     feats.precursor_timerange = notes.event_timerange(ss_rows-1);    
+     feats.Properties.VariableDescriptions{'precursor'} = ...
+         'The (latest) preceeding event tied to the feature';
+     feats.Properties.VariableDescriptions{'precursor_noteRow'} = ...
+         'The precursor row-id in the notes file';
      
      % Check and add info of potential additional paralell precursors
-     feats = add_parallel_precursor_info(feats,notes);
-     
+     feats = add_parallel_precursor_info(feats,notes);    
     
 end
-
-%%
 
 function feats = add_parallel_precursor_info(feats,notes)
     % Look for though all preceeding events and look for additional parallel

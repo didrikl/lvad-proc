@@ -8,22 +8,21 @@
 % import Analyze.*
 % import Tools.*
 
-% Settings for Matlab 
+% Settings for Matlab
 init_matlab
 
 
 %% Initilize raw signal files and notes from disc
 
 % User inputs
-lvad_signal_filename   = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
-lead_signal_filename   = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
-notes_filename      = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
-powerlab_filename   = fullfile('PowerLab','test.mat');
-ultrasound_filename = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
+lvad_signal_filename = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
+lead_signal_filename = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
+notes_filename       = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
+powerlab_filename    = fullfile('PowerLab','test.mat');
+ultrasound_filename  = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
+experiment_subdir    = 'In Vitro - PREP ERATIONS';
 
-%experiment_subdir = fullfile('In Vitro 1 - HVAD - THROMBI SPEED IV');
-experiment_subdir = fullfile('In Vitro - PREPERATIONS');
-[read_path, save_path] = init_paths(experiment_subdir);
+[read_path, save_path] = init_io_paths(experiment_subdir);
 
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)
 %lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_filename,read_path);
@@ -42,6 +41,7 @@ notes = init_notes_xlsfile(notes_filename,read_path);
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
 %ultrasound = init_m3_raw_textfile(ultrasound_filename,read_path);
 
+features = init_features_from_notes(notes);
 
 %% Pre-process signal
 % * Resample signal
@@ -52,27 +52,35 @@ lvad_signal = resample_signal(lvad_signal);
 lead_signal = resample_signal(lead_signal);
 
 % Vector length
-lvad_signal.accNorm = sqrt(sum(lvad_signal.acc.^2,2));
-lead_signal.accNorm = sqrt(sum(lead_signal.acc.^2,2));
-    
-% Moving RMS, variance and standard deviation for 3 comp. length
-lvad_signal = calc_moving(lvad_signal);
-lead_signal = calc_moving(lead_signal);
+lvad_signal = calc_norm(lvad_signal, 'acc');
+lead_signal = calc_norm(lead_signal, 'acc');
 
-lead_signal = sync_acc(lead_signal, lvad_signal);
+% Moving RMS, variance and standard deviation for 3 comp. length
+lvad_signal = calc_moving(lvad_signal, 'acc');
+lead_signal = calc_moving(lead_signal, 'acc');
+
+% Merge LVAD and lead accelerometers
+lead_signal = sync_lead_with_lvad_acc(lead_signal, lvad_signal);
+signal = synchronize(lvad_signal,lead_signal,'regular','SampleRate',lvad_signal.Properties.SampleRate);
 
 % Init notes, then signal and notes fusion (after resampling and syncing)
 lvad_signal = merge_signal_and_notes(lvad_signal,notes);
 lead_signal = merge_signal_and_notes(lead_signal,notes);
-%lead_signal = calc_moving(lead_signal);
 
 lvad_signal = clip_to_experiment(lvad_signal,notes);
 lead_signal = clip_to_experiment(lead_signal,notes);
 
-% Merge LVAD and lead accelerometers
-acc = synchronize(lead_signal,lvad_signal,'regular','SampleRate',lvad_signal.Properties.SampleRate);
+% Manual assessment of each intervention segments
+features = make_feature_windows(lead_signal, features);
 
-%% Quality control
+%save_table('signal_preproc.mat', save_path, signal, 'matlab');
+
+
+%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Scripts to make use of initialized and preprocessed data
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Look at RPM order plots as well: Should result in flat/stratified lines
 make_rpm_order_map(lvad_signal(lvad_signal.experimentPartNo=='1',:)) %
@@ -83,34 +91,31 @@ make_rpm_order_map(lead_signal(lead_signal.experimentPartNo=='1',:)) %'Order Map
 make_rpm_order_map(lead_signal(lead_signal.experimentPartNo=='2',:)) %
 make_rpm_order_map(lead_signal(lead_signal.experimentPartNo=='3',:)) %
 
+%% Make average order spectrogram and extract relevant features
+
+Average_Order_Spectrum_For_Intervention_Segments
 
 %%
 
-%signals = merge_lvad_and_lead(lvad_signal,lead_signal);
-%lead_signals = merge_signal_and_notes(lead_signal,notes);
+figure
+hold on
+make_average_order_spectrum(lvad_signal(lvad_signal.experimentPartNo=='1',:));
+make_average_order_spectrum(lead_signal(lead_signal.experimentPartNo=='1',:));
+make_average_order_spectrum(lvad_signal(lvad_signal.experimentPartNo=='3',:));
+spec = make_average_order_spectrum(lead_signal(lead_signal.experimentPartNo=='3',:));
+legend({'LVAD, before injections','Driveline, before injections','LVAD, after injections','Driveline, after injections'})
+
+
+%%
 
 % Init notes, then signal and notes fusion (after resampling)
 signals = merge_signal_and_notes(lvad_signal,notes);
 signals = clip_to_experiment(signals,notes);
 
-% Vector length
-signals.accNorm = sqrt(sum(signals.acc.^2,2));
-    
-% Moving RMS, variance and standard deviation for 3 comp. length
-signals = calc_moving(signals);
-
 % After new variable have been calculated, then split the prepared data
 signal_parts = split_into_experiment_parts(signals,notes);
 signal_parts.part2_iv = signal_parts.part2(signal_parts.part2.event~='Baseline',:);
 
-features = extract_features_from_notes(notes);
-
-%save_table('signal_preproc.mat', save_path, signal, 'matlab');
-
-features = make_feature_windows(lead_signal, features)
-
-
-%% Continuous wavelet transform
 
 
 
@@ -133,10 +138,4 @@ features = make_feature_windows(lead_signal, features)
 
 %make_fft_plots(signal_parts.part2)
 
-
-%% Make RPM order maps
-
-% make_rpm_order_map(signal_parts.part1)
-% make_rpm_order_map(signal_parts.part2)
-% make_rpm_order_map(signal_parts.part3)
 

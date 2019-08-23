@@ -53,9 +53,6 @@ function [path, filename, overwrite_all, ignore_all] = ...
             ignore_all=false;
             
             % Display warning and open user interaction menu
-            message = sprintf([...
-                'File already exist:\n\t',...
-                strrep(filename,'\','\\')]);
             user_opts = {
                 'Overwrite'
                 'Overwrite all'
@@ -64,7 +61,8 @@ function [path, filename, overwrite_all, ignore_all] = ...
                 'Ignore all'
                 'Abort'
                 };
-            fprintf(['\n\n',message,'\n\t',strrep(path,'\','\\')])
+            
+            message = display_filename(filename,path,'\nOutput file already exist:','\t');
             response = ask_list_ui(user_opts, message);
         
             if response==1
@@ -112,9 +110,8 @@ function [path, filename, overwrite_all, ignore_all] = ...
         
         % Display info after user interaction
         if new_filename_selected || new_path_selected
-            fprintf('\nSaving to new destination.\n')
-        elseif overwrite            
-            fprintf('\nExisting file will be overwritten.\n');       
+            display_filename(new_filename,new_path,...
+                '\nSaving to new destination');
         elseif isnumeric(filename)
             fprintf('\nSaving will not be done.\n');   
         end

@@ -1,4 +1,4 @@
-function lead_signal = sync_acc(lead_signal, lvad_signal)
+function lead_signal = sync_lead_with_lvad_acc(lead_signal, lvad_signal)
     
     % Assume first that the clocks start at the same time, hence changing the
     % time stamps accordingly in acc2. This is useful in the case there the time
@@ -7,12 +7,12 @@ function lead_signal = sync_acc(lead_signal, lvad_signal)
     ts_start_diff = lead_signal.timestamp(1) - lvad_signal.timestamp(1);
     lead_signal.timestamp = lead_signal.timestamp - ts_start_diff;
     
-    % Calculate variables used for syncing
-%     lvad_signal.accNorm = sqrt(sum(lvad_signal.acc.^2,2));
-%     lead_signal.accNorm = sqrt(sum(lead_signal.acc.^2,2));
-%     lvad_signal = calc_moving(lvad_signal);
-%     lead_signal = calc_moving(lead_signal);
-    
+    % Calculate variables used for verifying the syncing
+    lvad_signal = calc_norm(lvad_signal);
+    lead_signal = calc_norm(lead_signal);
+    lvad_signal = calc_moving(lvad_signal);
+    lead_signal = calc_moving(lead_signal);
+   
     % Sync point found manually
     lvad_signal_sync_point = datetime('7-Dec-2018 17:24:12.865','InputFormat','dd-MMM-yyyy HH:mm:ss.SSS','Format','dd-MMM-uuuu HH:mm:ss.SSS');
     lead_signal_sync_point = datetime('7-Dec-2018 17:29:49.540','InputFormat','dd-MMM-yyyy HH:mm:ss.SSS','Format','dd-MMM-uuuu HH:mm:ss.SSS');

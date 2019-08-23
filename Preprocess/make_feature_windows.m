@@ -13,11 +13,11 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     sub1_y_var = {'accNorm_lvad_signal','accNorm_lead_signal'};
     sub1_yy_var = {};
     
-    sub2_y_var = {'movRMS_accNorm_lvad_signal','movRMS_accNorm_lead_signal'};
+    sub2_y_var = {'acc_movRMSNorm_lvad_signal','acc_movRMSNorm_lead_signal'};
     sub2_yy_var = {};
-    %sub2_yy_var = {'movStd_accNorm_lvad_signal','movStd_accNorm_lead_signal'};
+    %sub2_yy_var = {'acc_movStdNorm_lvad_signal','acc_movStdNorm_lead_signal'};
     
-    search_var = {'movStd_accNorm_lvad_signal','movRMS_accNorm_lvad_signal'};
+    search_var = {'acc_movStdNorm_lvad_signal','acc_movRMSNorm_lvad_signal'};
     
     % TODO: Check if variable names exist...
     
@@ -41,6 +41,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         % Look up in feature table to find which data to plot
         feat_ind = qc_feat_inds(i);
         qc_event_feat = feats(feat_ind,:);
+        
         plot_range = timerange(qc_event_feat.leadTrailSplit,qc_event_feat.trailWinEnd);
         plot_data = signal(plot_range,:);
         search_range = timerange(feats.precursor_startTime(feat_ind),feats.precursor_endTime(feat_ind));
