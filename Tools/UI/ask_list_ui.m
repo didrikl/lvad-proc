@@ -1,23 +1,25 @@
 function selection = ask_list_ui(options, question, default)
-	% User-input menu, that enumerates the options and let the user select a option
-	% number. It user does not select a proper number, then the menu is re-displayed
+	% User-input menu, that enumerates the options and let the user select a
+	% option number.
+    %
+    % If the user does not select a proper number, then the menu is re-displayed
 	% with a message about wrong input. The option selection number is returned.
+    % If the user hits the cancel buttom or just closes the question dialouge
+    % window, the selection number is set to false.
 	%
 	% Arguments:
-	%   options (cell arr): Text strings with the options written out
-	%   question (string):  Menu title/enquiry for the user-input needed (optional)
+	%   options (cell arr): Text strings with the options written out question
+	%   (string):  Menu title/enquiry for the user-input needed (optional)
 	%
 	% Option arguments:
 	%   default (num):      An option number equal to the given default, can be
-	%                       selected by just hitting enter (to give a better/more
-	%                       efficient user experience) If default number will not
-	%                       have a corresponding option number, then it will be the
-	%                       same as not having any default option. Thus e.g.
-	%                       default=-1 will is a way to say that there is no default
-	%                       option.
+	%                       selected by just hitting enter (to give a
+	%                       better/more efficient user experience) If default
+	%                       number will not have a corresponding option number,
+	%                       then it will be the same as not having any default
+	%                       option. Thus e.g. default=-1 will is a way to say
+	%                       that there is no default option.
 	
-    % TODO: Use varargin and input parsing for default and for selection mode
-    
     if nargin<3
         default = [];
         init_val = 1;
@@ -47,15 +49,15 @@ function selection = ask_list_ui(options, question, default)
     end
     
     % Set/adjust windows size
-    width = 240;
+    width = 200;
     height = 110;
     n_char = max(cellfun(@length,options));
     n_char = max(n_char,max(cellfun(@length,strsplit(question))));
-    width = max(width,n_char*17);
+    width = max(width,n_char*16);
     height = max(height,height*(numel(options)/7.2));
     
     disp(question);
-	fprintf('(User input required in popup window...)\n')   
+	fprintf('\t(User input required in popup window...)\n')   
     [selection, ~] = listdlg(...
         'PromptString',{question;'';'';''},...
         'SelectionMode','single',...
@@ -69,6 +71,10 @@ function selection = ask_list_ui(options, question, default)
     % Documenting user selection in command window
     print_ask_list_menu(options, default)
     fprintf('\t--> %d\n',selection)
+    if isempty(selection)
+        fprintf('\n\tCancelled\n')
+        selection = false;
+    end
     
 end
 

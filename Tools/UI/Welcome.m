@@ -1,4 +1,4 @@
-function void = Welcome(text)
+function welcome(text)
 %[ST,I] = dbstack(1);
 %code_files = ST.file;
 if not(isempty(text))

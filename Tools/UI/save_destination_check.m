@@ -27,9 +27,8 @@ function [path, filename, overwrite_all, ignore_all] = ...
     
     % Check existence of saving directory and create new if not existing
     if not(exist(path,'dir'))
-        fprintf(['\nDirectory for saving does not exist:\n',...
-            strrep(path,'\','\\')])
-        warning('Directory will be created.')
+        fprintf(['\nSaving directory does not exist:\n',strrep(path,'\','\\')])
+        fprintf('\nDirectory will be created.')
         mkdir(path);
     end
     

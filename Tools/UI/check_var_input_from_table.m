@@ -1,4 +1,4 @@
-function var_name = check_input_var(signal, var_name)
+function var_name = check_var_input_from_table(signal, var_name)
     
     if not(ismember(var_name,signal.Properties.VariableNames))
         msg = sprintf('Variable %s does not exist in signal',var_name);

@@ -1,4 +1,4 @@
-function spec = make_average_order_spectrum(data,varargin)
+function [spec,order,map] = make_average_order_spectrum(data,varargin)
     % MAKE_AVERAGE_ORDER_SPECTRUM
     %   Calculate to average values of each frequency order within a time-window
     %   using Matlab's build-in orderspectrum function. Detrending is applied, 
@@ -28,21 +28,6 @@ function spec = make_average_order_spectrum(data,varargin)
     fs = data.Properties.SampleRate;
     
     [map,order] = rpmordermap(x,fs,rpm,order_res);
-     
     spec = orderspectrum(map,order);
-    
-    focus_inds = order>0.5 & order<4.5;
-    
-    %plot(order(focus_inds), pow2db(spec(focus_inds)),varargin{:})
-    %ylabel('Order Power Amplitude (dB)')
-
-    plot(order(focus_inds), spec(focus_inds),varargin{:})
-    ylabel('Order RMS Amplitude')
-    %set(gca, 'YScale', 'log')
-     
-     xlabel('Order Number')
-     grid on
-     
-     datestr(data.timestamp(1))
      
 end

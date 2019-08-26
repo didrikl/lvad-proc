@@ -13,6 +13,8 @@ init_matlab
 
 
 %% Initilize raw signal files and notes from disc
+% Get data as it is stored on disc (with some processing to get the data
+% into timetables)
 
 % User inputs
 lvad_signal_filename = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
@@ -20,17 +22,17 @@ lead_signal_filename = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.tx
 notes_filename       = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
 powerlab_filename    = fullfile('PowerLab','test.mat');
 ultrasound_filename  = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
-experiment_subdir    = 'In Vitro - PREP ERATIONS';
+experiment_subdir    = 'In Vitro - PREPERATIONS';
 
 [read_path, save_path] = init_io_paths(experiment_subdir);
 
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)
-%lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_filename,read_path);
-%lead_signal = init_cardiaccs_raw_txtfile(lead_signal_filename,read_path);
-%save_table('lvad_signal.mat', save_path, lvad_signal, 'matlab');
-%save_table('lead_signal.mat', save_path, lead_signal, 'matlab');
-lvad_signal = init_signal_proc_matfile('lvad_signal.mat', save_path);
-lead_signal = init_signal_proc_matfile('lead_signal.mat', save_path);
+lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_filename,read_path);
+lead_signal = init_cardiaccs_raw_txtfile(lead_signal_filename,read_path);
+save_table('lvad_signal.mat', save_path, lvad_signal, 'matlab');
+save_table('lead_signal.mat', save_path, lead_signal, 'matlab');
+%lvad_signal = init_signal_proc_matfile('lvad_signal.mat', save_path);
+%lead_signal = init_signal_proc_matfile('lead_signal.mat', save_path);
 
 % Initialization of Powerlab file(s)
 %powerlab_signals = init_powerlab_raw_matfile(powerlab_filename,read_path);
@@ -43,13 +45,12 @@ notes = init_notes_xlsfile(notes_filename,read_path);
 
 features = init_features_from_notes(notes);
 
-%% Pre-process signal
-% * Resample signal
-% * Add note columns that have given VariableContinuity properties
-% * Clip to signal to notes range
 
-lvad_signal = resample_signal(lvad_signal);
-lead_signal = resample_signal(lead_signal);
+%% Pre-process signal
+% Changing signal and deriving new variables
+
+lvad_signal = resample_signal(lvad_signal, 520);
+lead_signal = resample_signal(lead_signal, 520);
 
 % Vector length
 lvad_signal = calc_norm(lvad_signal, 'acc');

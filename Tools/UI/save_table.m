@@ -37,18 +37,13 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
 
     % Input validations
     if not(any(strcmpi(filetype,{'matlab','text','csv','spreadsheet'})))
-        warning(['Incorrect filetype is given. Type help save_table ',...
+        error(['Incorrect filetype is given. Type help save_table ',...
             'to see supported file types.'])
-        return
-    end
-    if isa(data,'timetable')
-        warning('Timetables are converted to regular table before saving.');
-    elseif ~isa(data,'table')
+    elseif ~isa(data,'table') && ~isa(data,'timetable')
         error('Third input argument is not a table or timetable');
     end
     
-    
-    fprintf('\nSaving the table %s to disc\n',tabname)
+    fprintf('\nSaving table from workspace to disc: %s\n',tabname)
     
     % Initialize persistent boolean switches for saving
     persistent overwrite_existing
@@ -123,9 +118,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
                 
         end
         
-        fprintf('\nTable saved: \n')
-        fprintf(['\tName: ',strrep(filename,'\','\\'),'\n']);
-        fprintf(['\tPath: ',strrep(save_path,'\','\\'),'\n'])
+        display_filename(filename,save_path,'\nTable saved to file:');
              
     catch ME
         

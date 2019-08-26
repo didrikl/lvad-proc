@@ -1,4 +1,4 @@
-function void = Welcome_Module(text)
+function welcome_module(text)
 	if not(isempty(text))
 		str = sprintf(['\n ',text]);
 	else

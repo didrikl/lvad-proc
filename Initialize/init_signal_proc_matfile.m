@@ -11,9 +11,10 @@ function signal = init_signal_proc_matfile(filename, read_path, varargin)
     % See also load, save, save_table
     
     filepath = fullfile(read_path,filename);
+    display_filename(filename,read_path,'\nReading signal with loading .mat file');
     
     if not(exist(filepath,'file'))
-        warning('File does not exist.')
+        fprintf('\nFile does not exist.')
         fprintf('\nSelect file... ')
         [filename,read_path] = uigetfile('.mat','Select file to load',filepath);
         if filename
@@ -28,10 +29,7 @@ function signal = init_signal_proc_matfile(filename, read_path, varargin)
     
     % TODO: Test with load/saving structs/parts of file
     signal = load(filepath, varargin{:});
-    fprintf('\nFile loaded:\n');
-    fprintf(['\tName: ',strrep(filename,'\','\\'),'\n'])
-    fprintf(['\tPath: ',strrep(read_path,'\','\\'),'\n'])
- 
+    
      fields = fieldnames(signal);
      if numel(fields)~=1
          warning(['File did not contain one unique field. A struct ',...

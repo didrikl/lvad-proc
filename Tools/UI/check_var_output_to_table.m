@@ -1,4 +1,4 @@
-function output_varname = check_output_var(signal, output_varname)
+function output_varname = check_var_output_to_table(signal, output_varname)
     
     if ismember(output_varname,signal.Properties.VariableNames)
         msg = sprintf('Variable %s already exist in signal',output_varname);

@@ -1,22 +1,21 @@
-function data = Read_Tables(filenames, read_basepath)
+function data = read_tables(filenames, read_path)
     
     % Assume filenames contain full file paths if read_basepath is not given
     if nargin==1
-        read_basepath = '';
+        read_path = '';
     end
     
     % Read data into a cell array of tables
     n_files = numel(filenames);
     data = cell(n_files,2);
     
-    if not(exist(read_basepath,'dir'))
-        warning('Can not read file(s). Reading path does not exist')
-        return
-    end
+    display_filename(filenames,read_path,'Reading table(s) from file(s) to workspace')
+    read_path = check_path_existence(read_path);
+    if not(read_path), return; end
     
     for i=1:n_files
             
-        filepath = fullfile(read_basepath,filenames{i});
+        filepath = fullfile(read_path,filenames{i});
         if not(exist(filepath,'file'))
             warning(['Can not read file. File does not exist: ',filenames{i}])
             continue
