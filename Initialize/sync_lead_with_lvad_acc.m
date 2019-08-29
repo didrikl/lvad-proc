@@ -33,7 +33,7 @@ function lead_signal = sync_lead_with_lvad_acc(lead_signal, lvad_signal)
     
     % Verify visually also with movrms
     figure('Name','Moving RMS for LVAD accelerometer')
-    plot(lvad_signal.timestamp,lvad_signal.movRMS)
+    plot(lvad_signal.timestamp,lvad_signal.acc_movRMS)
     figure('Name','Moving RMS for driveline accelerometer')
-    plot(lead_signal.timestamp,lead_signal.movRMS)
+    plot(lead_signal.timestamp,lead_signal.acc_movRMS)
     

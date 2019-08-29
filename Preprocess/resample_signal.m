@@ -12,20 +12,46 @@ function signal = resample_signal(signal,fs)
     
     % Resample to even sampling, before adding categorical data and more from notes
     % TODO: Implement a check/support for signal containing non-numeric columns
-    resamp_cols = signal.Properties.VariableContinuity=='continuous';
-    vars_to_resample = signal.Properties.VariableNames(resamp_cols);
-    fprintf('\n\tVariable(s) to resample: %s\n',strjoin(vars_to_resample,', '))
+    meassued_cols = signal.Properties.CustomProperties.MeassuredSignal;
+    derived_cols = signal.Properties.VariableContinuity=='continuous' & not(meassued_cols);
+    notes_cols = not(signal.Properties.VariableContinuity=='continuous');
+        
+    resamp_varnames = signal.Properties.VariableNames(meassued_cols);
+    drop_varnames = {};
+    notes_varnames = signal.Properties.VariableNames(notes_cols);
     
-    drop_cols = not(resamp_cols);
-    if any(drop_cols)
-        vars_to_drop = signal.Properties.VariableNames(drop_cols);
-        fprintf('\tVariable(s) considered as notes: %s\n',strjoin(vars_to_drop,', '))
-        notes_from_signal = signal(:,vars_to_drop);
-        signal = retime(signal(:,vars_to_resample),...
-            'regular',resample_method,...
-            'SampleRate',fs);
-    
-        signal = merge_signal_and_notes(signal,notes_from_signal);
+    if any(derived_cols)
+        msg = sprintf('There are continous, but derived variables:\n\t%s',...
+            strjoin(signal.Properties.VariableNames(derived_cols),', '));
+        opts = {'Drop (delete) variables','Resample variables'};
+        response = ask_list_ui(opts,msg,1);
+        if response==2
+            resamp_varnames = signal.Properties.VariableNames(meassued_cols & derived_cols);
+        elseif response==1
+            drop_varnames = signal.Properties.VariableNames(derived_cols);
+        end
     end
     
+    fprintf('\n\tVariable(s) to re-sample: %s\n',strjoin(resamp_varnames,', '))
+    fprintf('\n\tVariable(s) to drop: %s\n',strjoin(drop_varnames,', '))
+    
+    % In case there are notes columns merged with signal, then these columns
+    % must be kept separately and then merged with signal after resampling
+    % NOTE: A better way is to merge with initialized notes table, which could
+    % e.g. be accessible with object orientation
+    if any(notes_cols)
+        fprintf('\tVariable(s) to re-merge: %s\n',strjoin(notes_varnames,', '))
+        notes_vars_in_signal = signal(:,notes_varnames);
+   end
+    
+    % Resampling
+    signal = retime(signal(:,resamp_varnames),...
+        'regular',resample_method,...
+        'SampleRate',fs);
+    
+    % Re-include notes info
+    if any(notes_cols)
+        signal = merge_signal_and_notes(signal,notes_vars_in_signal);
+    end
+        
     fprintf('\nResampling done.\n')

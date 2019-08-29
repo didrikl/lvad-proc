@@ -57,8 +57,11 @@ function signal = calc_moving(signal, input_varnames, statistic_types)
                         'Moving standard deviation\n\tWindow length: %s',win_length)};
         
             end
-                    
-            signal.(output_varname)(1:win_length) = nan;
+             
+            % Moving statistic samples before full window make less sence/can
+            % cause confusion, hence setting these sample values as nan
+            signal.(output_varname)(1:win_length,:) = nan;
+            
             signal.Properties.VariableContinuity(output_varname) = 'continuous';
         
         end

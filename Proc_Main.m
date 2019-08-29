@@ -27,12 +27,12 @@ experiment_subdir    = 'In Vitro - PREPERATIONS';
 [read_path, save_path] = init_io_paths(experiment_subdir);
 
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)
-lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_filename,read_path);
-lead_signal = init_cardiaccs_raw_txtfile(lead_signal_filename,read_path);
-save_table('lvad_signal.mat', save_path, lvad_signal, 'matlab');
-save_table('lead_signal.mat', save_path, lead_signal, 'matlab');
-%lvad_signal = init_signal_proc_matfile('lvad_signal.mat', save_path);
-%lead_signal = init_signal_proc_matfile('lead_signal.mat', save_path);
+% lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_filename,read_path);
+% lead_signal = init_cardiaccs_raw_txtfile(lead_signal_filename,read_path);
+% save_table('lvad_signal.mat', save_path, lvad_signal, 'matlab');
+% save_table('lead_signal.mat', save_path, lead_signal, 'matlab');
+lvad_signal = init_signal_proc_matfile('lvad_signal.mat', save_path);
+lead_signal = init_signal_proc_matfile('lead_signal.mat', save_path);
 
 % Initialization of Powerlab file(s)
 %powerlab_signals = init_powerlab_raw_matfile(powerlab_filename,read_path);
@@ -65,9 +65,11 @@ lead_signal = sync_lead_with_lvad_acc(lead_signal, lvad_signal);
 signal = synchronize(lvad_signal,lead_signal,'regular','SampleRate',lvad_signal.Properties.SampleRate);
 
 % Init notes, then signal and notes fusion (after resampling and syncing)
+signal = merge_signal_and_notes(signal,notes);
 lvad_signal = merge_signal_and_notes(lvad_signal,notes);
 lead_signal = merge_signal_and_notes(lead_signal,notes);
 
+signal = clip_to_experiment(signal,notes);
 lvad_signal = clip_to_experiment(lvad_signal,notes);
 lead_signal = clip_to_experiment(lead_signal,notes);
 
