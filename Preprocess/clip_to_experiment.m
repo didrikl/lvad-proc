@@ -9,7 +9,7 @@ function signal = clip_to_experiment(signal, notes)
     %   data = clip_to_experiment(data, notes)
     %
      
-    last_note_ind = find(notes.experimentSubpart~='Experiment end',1,'last');
+    last_note_ind = find(notes.intervType~='Experiment end',1,'last');
     range = timerange(notes.timestamp(1),notes.timestamp(last_note_ind));
     signal = signal(range,:);
     

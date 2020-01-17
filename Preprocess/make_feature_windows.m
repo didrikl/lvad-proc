@@ -13,11 +13,11 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     sub1_y_var = {'accNorm_lvad_signal','accNorm_lead_signal'};
     sub1_yy_var = {};
     
-    sub2_y_var = {'acc_movRMSNorm_lvad_signal','acc_movRMSNorm_lead_signal'};
+    sub2_y_var = {'accNorm_movRMS_lvad_signal','accNorm_movRMS_lead_signal'};
     sub2_yy_var = {};
     %sub2_yy_var = {'acc_movStdNorm_lvad_signal','acc_movStdNorm_lead_signal'};
     
-    search_var = {'acc_movStdNorm_lvad_signal','acc_movRMSNorm_lvad_signal'};
+    search_var = {'accNorm_movStd_lvad_signal','accNorm_movRMS_lvad_signal'};
     
     % TODO: Check if variable names exist...
     
@@ -137,9 +137,12 @@ function h_sub = plot_in_upper_panel(t,iv_signal,sub1_y_varname)
     
     end
     
-    legend(gca,strrep(sub1_y_varname,'_','\_'),...
+    legend(gca,{'Housing','Driveline'},...
             ...'Orientation','horizontal',...
             'AutoUpdate','off')       
+%         legend(gca,strrep(sub1_y_varname,'_','\_'),...
+%             ...'Orientation','horizontal',...
+%             'AutoUpdate','off')       
 end
 
 function h_sub2 = plot_in_lower_panel(t,iv_signal,sub2_y_varname,sub2_yy_varname)

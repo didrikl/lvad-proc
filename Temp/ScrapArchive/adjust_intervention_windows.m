@@ -44,7 +44,7 @@ plot(data_clip.timestamp, data_clip.thrombusVolume,'clipping','on')
 % yyaxis left
 % plot(parts.timestamp, parts.event_intervention,'.','MarkerSize',15)
 % yyaxis right
-% plot(parts.timestamp, parts.experimentSubpart,'.','MarkerSize',15)
+% plot(parts.timestamp, parts.intervType,'.','MarkerSize',15)
 % h_ax(2) = subplot(4,1,2);
 % 
 % linkaxes(h_ax,'x')

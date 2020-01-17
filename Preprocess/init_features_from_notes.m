@@ -12,7 +12,7 @@ function feats = init_features_from_notes(notes)
         (notes.Properties.CustomProperties.MeassuredParam & ...
         contains(string(notes.Properties.VariableContinuity),{'step','event'}));
 
-     ss_rows = find(contains(lower(string(notes.experimentSubpart)),'steady'));
+     ss_rows = find(contains(lower(string(notes.intervType)),'steady'));
      
      feats = timetable2table(notes(ss_rows,feature_cols));
      

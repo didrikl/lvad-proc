@@ -1,7 +1,7 @@
 function [read_path, save_path] = init_io_paths(experiment_subdir)
     
     % Static definitions for I/O directory structure
-    read_root = 'C:\Data';
+    read_root = 'C:\Data\IVS\Didrik';
     input_subdir = 'Recorded';
     output_subdir = 'Processed';
     

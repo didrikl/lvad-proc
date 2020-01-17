@@ -10,7 +10,7 @@ function notes = init_notes_xlsfile(filename, read_path)
         'timestamp'
         'time_elapsed'
         'experimentPartNo'
-        'experimentSubpart'
+        'intervType'
         'event'
         'thrombusVolume'
         'speedChangeRate'
@@ -41,7 +41,7 @@ function notes = init_notes_xlsfile(filename, read_path)
         }';
     cat_cols = {
         'experimentPartNo'
-        'experimentSubpart'
+        'intervType'
         'event'
         'thrombusVolume'
         ...'speedChangeRate'
@@ -62,7 +62,7 @@ function notes = init_notes_xlsfile(filename, read_path)
     };
     step_vars = {
         'experimentPartNo'
-        'experimentSubpart'
+        'intervType'
         'speedChangeRate'
         'pumpSpeed'    
     };
@@ -213,7 +213,7 @@ function notes = add_event_range(notes)
         event_stop_ind = ii+1;
         
         % Include steady state as part of the preceeding event/intervention
-        while contains(string(notes.experimentSubpart(event_stop_ind)),...
+        while contains(string(notes.intervType(event_stop_ind)),...
             {'steady-state','steady state'}) && event_stop_ind<n_notes
             event_stop_ind = event_stop_ind+1;
         end
