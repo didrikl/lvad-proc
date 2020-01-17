@@ -2,7 +2,7 @@ function [ampl, phase] = make_fft_plots(signal, varname)
 
 % (to speed up/more accuracy: mean(acc_vec(1:1000)), i.e. for a initial window only)
 s = signal.(varname);
-%t = signal.timestamp;
+%t = signal.time;
 
 %s = s-movmean(s,1000);
 s = detrend(s);

@@ -10,6 +10,6 @@ function signal = clip_to_experiment(signal, notes)
     %
      
     last_note_ind = find(notes.intervType~='Experiment end',1,'last');
-    range = timerange(notes.timestamp(1),notes.timestamp(last_note_ind));
+    range = timerange(notes.time(1),notes.time(last_note_ind));
     signal = signal(range,:);
     

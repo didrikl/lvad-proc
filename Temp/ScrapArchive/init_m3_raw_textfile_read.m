@@ -98,7 +98,7 @@ function signal = init_m3_raw_textfile_read(filename, startRow, endRow)
     
     %% Create output variable
     signal = table;
-    signal.timestamp = rawStringColumns(:, 1);
+    signal.time = rawStringColumns(:, 1);
     signal.flow = cell2mat(rawNumericColumns(:, 1));
     signal.emboliVolume = cell2mat(rawNumericColumns(:, 2));
     signal.emboliTotalCount = cell2mat(rawNumericColumns(:, 3));

@@ -4,7 +4,7 @@ function signal = init_m3_raw_textfile(filename,read_path)
     
     filepath = fullfile(read_path, filename);
     signal = init_m3_raw_textfile_read(filepath);
-    signal.timestamp = datetime(signal{:,1},...
+    signal.time = datetime(signal{:,1},...
         'InputFormat',"yyyy/MM/dd HH:mm:ss",...
         'Format',timestamp_fmt,...
         'TimeZone','Europe/Oslo');
@@ -94,7 +94,7 @@ function signal = init_m3_raw_textfile_read(filename)
     
     % Create output variable
     signal = table;
-    signal.timestamp = rawStringColumns(:, 1);
+    signal.time = rawStringColumns(:, 1);
     signal.flow = cell2mat(rawNumericColumns(:, 1));
     signal.emboliVolume = cell2mat(rawNumericColumns(:, 2));
     signal.emboliTotalCount = cell2mat(rawNumericColumns(:, 3));

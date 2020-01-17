@@ -1,7 +1,7 @@
 figure;
 
 s = signal_parts.part3;
-t = s.timestamp(:);
+t = s.time(:);
 varname = 'acc_length';
 var = s.(varname)(:);
 

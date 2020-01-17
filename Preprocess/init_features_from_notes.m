@@ -8,8 +8,8 @@ function feats = init_features_from_notes(notes)
     
     % Take out meassured (event) values from notes for each event
     feature_cols = ...
-        notes.Properties.CustomProperties.ControlledParam | ...
-        (notes.Properties.CustomProperties.MeassuredParam & ...
+        notes.Properties.CustomProperties.Controlled | ...
+        (notes.Properties.CustomProperties.Measured & ...
         contains(string(notes.Properties.VariableContinuity),{'step','event'}));
 
      ss_rows = find(contains(lower(string(notes.intervType)),'steady'));
@@ -17,7 +17,7 @@ function feats = init_features_from_notes(notes)
      feats = timetable2table(notes(ss_rows,feature_cols));
      
      % Rename meassured (point-wise manual reading) as steady-state values
-     ss_vars = feats.Properties.CustomProperties.MeassuredParam;
+     ss_vars = feats.Properties.CustomProperties.Measured;
      ss_varnames = feats.Properties.VariableNames(ss_vars);
      feats.Properties.VariableNames(ss_vars) = string(ss_varnames)+"_steadyState";
          
@@ -26,7 +26,7 @@ function feats = init_features_from_notes(notes)
      % Precursor: The last preceeding event that can be tied to the feature.
      feats.precursor = notes.event(ss_rows-1);     
      feats.precursor_noteRow = notes.noteRow(ss_rows-1);
-     feats.precursor_startTime = notes.timestamp(ss_rows-1);
+     feats.precursor_startTime = notes.time(ss_rows-1);
      feats.precursor_endTime = notes.event_endTime(ss_rows-1);
      feats.precursor_timerange = notes.event_timerange(ss_rows-1);    
      feats.Properties.VariableDescriptions{'precursor'} = ...
@@ -59,7 +59,7 @@ function feats = add_parallel_precursor_info(feats,notes)
                 
           if notes.event_endTime(par_ind)>feats.precursor_startTime(pivot_feat_ind)
               parPrecur_Noterows(end+1) = notes.noteRow(par_ind);
-              parPrecur{end+1} = strrep(string(notes.event(par_ind)),'start','end');
+              parPrecur{end+1} = strrep(string(notes.event(par_ind)),' start','');
           end
           
         end

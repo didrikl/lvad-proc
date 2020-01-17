@@ -14,41 +14,41 @@ hold on
 for i=1:3
     data_part = parts.(['part',num2str(i)]);
     yyaxis left
-    plot(data_part.timestamp, data_part.movRMS_sum)
+    plot(data_part.time, data_part.movRMS_sum)
     yyaxis right
-    plot(data_part.timestamp, data_part.movStd_sum)
+    plot(data_part.time, data_part.movStd_sum)
     h_ax(1).ColorOrderIndex = 1;
 end
 data_part = parts.pause;
 yyaxis left
-h_p1 = plot(data_part.timestamp, data_part.movRMS_sum,'.');
+h_p1 = plot(data_part.time, data_part.movRMS_sum,'.');
 yyaxis right
-h_p2 = plot(data_part.timestamp, data_part.movStd_sum,'.');
+h_p2 = plot(data_part.time, data_part.movStd_sum,'.');
 hold off
 
 h_ax(2) = subplot(4,1,2);
 yyaxis left
-plot(data_clip.timestamp, data_clip.pumpSpeed,'clipping','on')
+plot(data_clip.time, data_clip.pumpSpeed,'clipping','on')
 yyaxis right
-plot(data_clip.timestamp, data_clip.thrombusVolume,'clipping','on')
+plot(data_clip.time, data_clip.thrombusVolume,'clipping','on')
 % 
 % h_ax(3) = subplot(4,1,3);
-% scatter(notes.timestamp, notes.efferentPressure, 'filled')
+% scatter(notes.time, notes.efferentPressure, 'filled')
 % hold on 
-% scatter(notes.timestamp, notes.afferentPressure, 'filled')
+% scatter(notes.time, notes.afferentPressure, 'filled')
 % hold off
 % h_ax(3).YLim = [min(h_ax(3).YLim(1),-5),h_ax(3).YLim(2)*1.15];
 % legend({'Afferent','Efferent','Flow'})
 % 
 % h_ax(4) = subplot(4,1,4);
 % yyaxis left
-% plot(parts.timestamp, parts.event_intervention,'.','MarkerSize',15)
+% plot(parts.time, parts.event_intervention,'.','MarkerSize',15)
 % yyaxis right
-% plot(parts.timestamp, parts.intervType,'.','MarkerSize',15)
+% plot(parts.time, parts.intervType,'.','MarkerSize',15)
 % h_ax(2) = subplot(4,1,2);
 % 
 % linkaxes(h_ax,'x')
-% h_ax(1).XLim = [parts.timestamp(1),parts.timestamp(end)];
+% h_ax(1).XLim = [parts.time(1),parts.time(end)];
 % 
 
 

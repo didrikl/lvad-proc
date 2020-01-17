@@ -126,9 +126,9 @@ function notes = init_notes_xlsfile(filename, read_path)
     
     % Update and add variable metadata
     notes = standardizeMissing(notes, missing_value_repr);
-    notes = addprop(notes,{'ControlledParam','MeassuredParam'},{'variable','variable'});
-    notes.Properties.CustomProperties.ControlledParam = ismember(all_vars,controlled_vars);
-    notes.Properties.CustomProperties.MeassuredParam = ismember(all_vars,meassured_vars);
+    notes = addprop(notes,{'Controlled','Measured'},{'variable','variable'});
+    notes.Properties.CustomProperties.Controlled = ismember(all_vars,controlled_vars);
+    notes.Properties.CustomProperties.Measured = ismember(all_vars,meassured_vars);
     notes.Properties.UserData.info = info;
     notes.Properties.UserData.protocol = protocol;
     notes.Properties.VariableNames = all_vars; % header_lines{1,:}
@@ -140,7 +140,7 @@ function notes = init_notes_xlsfile(filename, read_path)
     notes.Properties.VariableContinuity(event_vars) = 'event';
     
     % Change the time representation, similar to the parsing of recorded data
-    notes.timestamp = datetime(notes.timestamp,...
+    notes.time = datetime(notes.time,...
         'ConvertFrom','datenum',...
         'TimeZone','Europe/Oslo');
     
@@ -149,15 +149,15 @@ function notes = init_notes_xlsfile(filename, read_path)
     notes.time_elapsed = seconds(notes.time_elapsed);
     
     % Merge info from the date column into the timestamp before removing date column
-    notes.timestamp.Day = notes.date.Day;
-    notes.timestamp.Month = notes.date.Month;
-    notes.timestamp.Year = notes.date.Year;
+    notes.time.Day = notes.date.Day;
+    notes.time.Month = notes.date.Month;
+    notes.time.Year = notes.date.Year;
     
     % Derive the time column that was not in use when making the notes
     if all(isnan(notes.time_elapsed))
-        notes.time_elapsed = seconds(notes.timestamp - notes.timestamp(1));
-    elseif all(isnat(notes.timestamp))
-        notes.timestamp = datetime(notes.time_elapsed,'ConvertFrom','epochtime',...
+        notes.time_elapsed = seconds(notes.time - notes.time(1));
+    elseif all(isnat(notes.time))
+        notes.time = datetime(notes.time_elapsed,'ConvertFrom','epochtime',...
             'Epoch',notes.date(1));
     end
     
@@ -236,11 +236,11 @@ function notes = add_event_range(notes)
         
         % Make the timerange
         if ii<n_notes
-            end_time = notes.timestamp(event_stop_ind);
+            end_time = notes.time(event_stop_ind);
         else
             end_time = datetime(inf,'ConvertFrom','datenum','TimeZone','Etc/UTC');
         end
-        notes.event_timerange{ii} = timerange(notes.timestamp(ii),end_time,'open');
+        notes.event_timerange{ii} = timerange(notes.time(ii),end_time,'open');
         notes.event_endTime(ii) = end_time;
         
         

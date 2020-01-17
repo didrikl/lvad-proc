@@ -57,7 +57,11 @@ function notes = init_notes_xlsfile_v3_2(filename, read_path)
 
     % TODO: For OO
     missing_value_repr = {'','-','NA','N/A'};
+    
+    % Columns to omit
+    varNames_unneeded = {'timestamp','date','event_duration'};
 
+    
     %% Read from Excel file
     
     % TODO: For OO...
@@ -153,7 +157,7 @@ function notes = init_notes_xlsfile_v3_2(filename, read_path)
     if all(isnan(notes.time_elapsed))
          notes.time_elapsed = seconds(notes.time - notes.time(1));
     elseif all(isnat(notes.time))
-         notes.timestamp = datetime(notes.time_elapsed,...
+         notes.time = datetime(notes.time_elapsed,...
              'ConvertFrom','epochtime',...
              'Epoch',notes.date(1));
     else
@@ -173,15 +177,21 @@ function notes = init_notes_xlsfile_v3_2(filename, read_path)
         end
     end
     
-    %% Add derived columns and remove unneeded columns
+    %% Add derived columns
     
     notes = add_event_range(notes);
     
     n_header_lines = 3;
     notes = add_note_row_id(notes, n_header_lines);
     
+    
+    %% Remove unneeded columns and finalize with converting to timetable
+    
     % Remove date columm, as this info is included in time
-    notes(:,{'timestamp','date'}) = [];
+    notes(:,varNames_unneeded) = [];
+    
+    % Remove columns that only has missing info (i.e. not in use)
+    notes(:,all(ismissing(notes))) = [];
     
     % Convert to timetable with timestamp as the time column
     notes = table2timetable(notes);
@@ -200,10 +210,6 @@ function notes = add_event_range(notes)
     % 'start'.
     
     n_notes = height(notes);
-    
-    % Timestamp for when event is considered to be finished. Having this column
-    % allows for parallell events running.
-    notes.event_end = cell(n_notes,1);
     
     % Subscripts to extract ranges in timetables, just for convenience. It can
     % be also used to quickly view the timerange, but has no other usage. 
@@ -233,19 +239,19 @@ function notes = add_event_range(notes)
             
             % No pairing event implies running until the end
             if isempty(event_stop_ind)
-                event_stop_ind = n_notes;
+                event_stop_ind = find(notes.time>notes.time(ii),1,'last');
+                warning(sprintf('The parallell running event %s was not ended.',event))
             end
             
         end
         
         % Make the timerange
         if ii<n_notes
-            end_time = notes.timestamp(event_stop_ind);
+            end_time = notes.time(event_stop_ind);
         else
             end_time = datetime(inf,'ConvertFrom','datenum','TimeZone','Etc/UTC');
         end
-        end_time
-        notes.event_timerange{ii} = timerange(notes.timestamp(ii),end_time,'open')
+        notes.event_timerange{ii} = timerange(notes.time(ii),end_time,'open');
         notes.event_endTime(ii) = end_time;
         
         

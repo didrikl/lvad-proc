@@ -31,7 +31,7 @@ for i=1:n_qc_feats
         'trailing win., LVAD, trailing win., Driveline'},...
         'FontSize',12,...
         'Location','northeastoutside')
-    text(-0.1,-0.1,datestr(features.timestamp(feat_ind)),'Units','normalized')
+    text(-0.1,-0.1,datestr(features.time(feat_ind)),'Units','normalized')
     
     % -----------------------
     

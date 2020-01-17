@@ -17,7 +17,10 @@ init_matlab
 % into timetables)
 
 % User inputs
-notes_filepath       = fullfile('C:\Data\IVS\Didrik\Temp\Noted','IVX_SeqX - Notes v3.2.xlsm');
+powerlab_subdir = 'PowerLab';
+spectrum_subdir = 'Spectrum';
+
+notes_filepath       = fullfile('C:\Data\IVS\Didrik\IV2_Seq2 - Water simulated HVAD thrombosis - Pre-pump\Noted\','IV2_Seq2 - Notes v3.4.xlsm');
 powerlab_filename    = fullfile('PowerLab','IV2_Seq2 - B3.mat');
 ultrasound_filename  = fullfile('Spectrum','IV2_Seq2.wrf');
 
@@ -28,7 +31,7 @@ experiment_subdir    = 'Temp';
 powerlab_signals = init_powerlab_raw_matfile(powerlab_filename,read_path);
 
 % Read experiment notes in Excel file template
-notes = init_notes_xlsfile(notes_filepath);
+notes = init_notes_xlsfile_v3_2(notes_filepath);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
 %ultrasound = init_m3_raw_textfile(ultrasound_filename,read_path);

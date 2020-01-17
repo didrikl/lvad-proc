@@ -45,7 +45,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         plot_range = timerange(qc_event_feat.leadTrailSplit,qc_event_feat.trailWinEnd);
         plot_data = signal(plot_range,:);
         search_range = timerange(feats.precursor_startTime(feat_ind),feats.precursor_endTime(feat_ind));
-        t = seconds(plot_data.timestamp-plot_data.timestamp(1));%feats.precursor_startTime(1))
+        t = seconds(plot_data.time-plot_data.time(1));%feats.precursor_startTime(1))
         t = t-lead_expansion;
         
         h_fig = figure('Position',[35.4,69,1226.4,679.2]); %clf
@@ -96,9 +96,9 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         split_ind = find(t>=cursors_handles.split.panel_1.TopHandle.XData,1,'first');
         start_ind = find(t>cursors_handles.cutoff.left_cutoff.panel_1.TopHandle.XData,1,'first');
         end_ind = find(t>=cursors_handles.cutoff.right_cutoff.panel_1.TopHandle.XData,1,'first');
-        feats.leadWinStart(feat_ind) = plot_data.timestamp(start_ind);
-        feats.leadTrailSplit(feat_ind) = plot_data.timestamp(split_ind);
-        feats.trailWinEnd(feat_ind) = plot_data.timestamp(end_ind);
+        feats.leadWinStart(feat_ind) = plot_data.time(start_ind);
+        feats.leadTrailSplit(feat_ind) = plot_data.time(split_ind);
+        feats.trailWinEnd(feat_ind) = plot_data.time(end_ind);
         
         feats.leadWin_timerange{feat_ind} = timerange(feats.leadWinStart(feat_ind),feats.leadTrailSplit(feat_ind));
         feats.trailWin_timerange{feat_ind} = timerange(feats.leadTrailSplit(feat_ind),feats.trailWinEnd(feat_ind));

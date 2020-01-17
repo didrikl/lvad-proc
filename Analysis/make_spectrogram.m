@@ -43,7 +43,7 @@ function make_spectrogram(signal,varname)
 % (to speed up/more accuracy: mean(acc_vec(1:1000)), i.e. for a initial window only)
 vec = signal.accNorm;
 vec_ = vec-movmean(vec,10000);
-plot(signal.timestamp,vec)
+plot(signal.time,vec)
 
 
 

@@ -11,7 +11,7 @@ function find_abruptchange_window(signal,notes)
     for i=1:n_injection
         iv_row = injection_notes.note_row;
         plot_data = signal(injection_notes.event_range{i},:);
-        plot_time = seconds(plot_data.timestamp-plot_data.timestamp(1));
+        plot_time = seconds(plot_data.time-plot_data.time(1));
         
         % Find where the mean of x changes most significantly.
         pivot_ind = findchangepts(rmmissing(plot_data.movRMS),...
