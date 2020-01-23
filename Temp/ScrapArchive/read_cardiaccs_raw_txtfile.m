@@ -1,15 +1,15 @@
-function raw = read_cardiaccs_raw_txtfile(filename,read_path)
+function raw = read_cardiaccs_raw_txtfile(fileName,read_path)
 
 if nargin==1, read_path = ''; end
-filepath = fullfile(read_path,filename);
+filePath = fullfile(read_path,fileName);
 
 % Open file and go to first line with a status="ok" record
-fid = fopen(filepath, 'r');
+fid = fopen(filePath, 'r');
 [row, n_skipped_rows] = spool_to_status_ok(fid);
 
 % Estimate of no. lines per file size in kb, pluss 5 percent
 lines_per_kb = 1274174 / 246143;
-s = dir(filepath);         
+s = dir(filePath);         
 filesize_in_kb = s.bytes/1024;
 n_lines_approx = round(1.05*lines_per_kb*filesize_in_kb);
 
@@ -74,7 +74,7 @@ raw = cell2table(raw,...
 
 % Add info for built-in table properties
 raw = add_cardiaccs_raw_variable_properties(raw);
-raw.Properties.UserData = make_init_userdata(filename,read_path);
+raw.Properties.UserData = make_init_userdata(fileName,read_path);
 
 close(h_wait)
 

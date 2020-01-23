@@ -27,7 +27,7 @@ yyaxis right
 plot(t,signal.movStd)
 legend({'Moving RMS','Moving Std.'})
 subplot(3,1,3)
-plot(t,signal.thrombusVolume,'LineWidth',2)%t,signal.pumpSpeed);
+plot(t,signal.thrombusVol,'LineWidth',2)%t,signal.pumpSpeed);
 h = gca;
 h.YLim = h.YLim*1.1;
 yyaxis right

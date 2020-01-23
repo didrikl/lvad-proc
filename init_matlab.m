@@ -19,7 +19,7 @@ clear h_right_shade_sub1 h_right_shade_sub2 h_right_shade_zoom
 
 warning('off','MATLAB:table:ModifiedAndSavedVarnames')
 warning('off','MATLAB:HandleGraphics:ObsoletedProperty:JavaFrame')
-warning('on','verbose')
+warning('off','verbose')
 warning('off','backtrace')
 
 

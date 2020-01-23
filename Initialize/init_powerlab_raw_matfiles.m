@@ -1,4 +1,4 @@
-function T = init_powerlab_raw_matfile(fileNames,raw_Basepath,notes)
+function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
     % as mat file from PowerLab's LabChart program.
@@ -16,7 +16,6 @@ function T = init_powerlab_raw_matfile(fileNames,raw_Basepath,notes)
     
     % Default viewing format of timestamps (not very important)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSS';
-    sampleRate = 520;
     
     var_map = {
         ...   
@@ -39,57 +38,24 @@ function T = init_powerlab_raw_matfile(fileNames,raw_Basepath,notes)
 
     % Initialization of Powerlab block file(s)
     B = cell(numel(fileNames),1);
-    B_userdata = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         
         B{i} = read_signal_block(filePaths{i},timestampFmt);
         B{i} = map_varnames(B{i}, var_map(:,1), var_map(:,2));
         B{i}.Properties.DimensionNames{1} = 'time'; 
-    
-        % Metadata used for populating non-matched rows when syncing
-        B{i}.Properties.VariableContinuity(:) = 'continuous';
-        
-        %
-        % TODO: Move to preproc function, to avoid reading every time
-        % -----------------------------------------------------------
-        B{i} = resample_signal(B{i}, sampleRate);
         
         B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
         B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
         B{i} = spatial_comp_as_vector(B{i},{'gyrA_x','gyrA_y','gyrA_z'},'gyrA');
         B{i} = spatial_comp_as_vector(B{i},{'gyrB_x','gyrB_y','gyrB_z'},'gyrB');
-
-        notes_block = notes(notes.time>=B{i}.time(1) & notes.time<=B{i}.time(end),:);
-        notes_block = notes_block(not(isnat(notes_block.time)),:);
-        %notes_block = notes_block(find(notes.event~='Pause'),1,'first')
-        B{i} = merge_signal_and_notes(B{i},notes_block);
         
-        % Vector length
-        B{i} = calc_norm(B{i}, 'accA'); 
+        % Metadata used for populating non-matched rows when syncing
+        B{i} = addprop(B{i},'Measured','variable');
+        B{i}.Properties.CustomProperties.Measured(:) = true;
+        B{i}.Properties.VariableContinuity(:) = 'continuous';
         
-        % Moving RMS, variance and standard deviation for 3 comp. length
-        B{i} = calc_moving(B{i}, 'accA_norm'); 
-        
-        B_userdata{i} = B{i}.Properties.UserData;
-        
-        
-    end
-
-    T = merge_table_blocks(B);
-    
-    T.Properties.UserData.sampleRate = sampleRate;
-    
-    % -----------------------------------------------------------
-        
-function T = spatial_comp_as_vector(T,compVarNames,newVarName)
-    compVars = ismember(compVarNames,T.Properties.VariableNames);
-    if any(not(compVars))
-        str = sprintf("\n\t"+string(join(compVarNames(not(compVars)),', ')));
-        warning(sprintf('\nSpatial components missing: ')+str)
-    end
-    
-    T = mergevars(T,compVarNames(compVars),'NewVariableName',newVarName);
-    
+       
+    end    
     
 function T_block = read_signal_block(filePath,timestamp_fmt)    
     
@@ -165,10 +131,6 @@ function T_block = read_signal_block(filePath,timestamp_fmt)
     % which units and descriptions are stored in userdata cell array.
     T_block.Properties.VariableUnits = col_unit;
     T_block.Properties.VariableDescriptions = cellstr(raw.titles);
-    
-    % Add metadata for picking out sensor-messured data, when analysing
-    T_block = addprop(T_block,'Measured','variable');
-    T_block.Properties.CustomProperties.Measured(:) = true;
         
     % Store various/unstructured info (start with initializing standard info)
     T_block.Properties.UserData = make_init_userdata(filePath);

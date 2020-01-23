@@ -1,16 +1,16 @@
 function data = merge_signal_and_notes(signal,notes)
 
-    fprintf('\nMerging signal with notes:\n')
+    fprintf('\nMerging signal with notes:')
     
     [fs,signal] = check_sampling_frequency(signal);
     if isnan(fs), return; end
             
     % Ignore columns not in use when merging
-    notes(:,all(ismissing(notes))) = [];
+    %notes(:,all(ismissing(notes))) = [];
     
     % Merge only data with specified variable continuity (which is used for
     % filling empty entries in non-matching rows when syncing).
-    notes_drop_cols = notes.Properties.VariableContinuity=='unset';
+    notes_drop_cols = ismember(notes.Properties.VariableContinuity,{'unset','event'});
     notes_merge_cols = not(notes_drop_cols);
     notes_drop_varnames = notes.Properties.VariableNames(notes_drop_cols);
     notes_merge_varnames = notes.Properties.VariableNames(notes_merge_cols);
@@ -33,10 +33,10 @@ function data = merge_signal_and_notes(signal,notes)
     
     notes = notes(:,notes_merge_varnames);
         %notes.Properties.VariableContinuity=='step'));
-    data = synchronize(signal,notes,...
-        'regular','SampleRate',fs);
+    data = synchronize(signal,notes,'regular',...
+        'SampleRate',fs);
     
-    fprintf('\nMerging signal with notes done.\n')
+    fprintf('Done.\n')
     
     % After syncing and filling (according to given variable continuity), then
     % treat the not applicable placeholder as missing/undefined

@@ -29,9 +29,9 @@ function find_abruptchange_window(signal,notes)
                 'LineWidth',1.5...
                 );
         end
-        filename = sprintf('Moving RMS of x,y,z length - Thrombus injection %d of %d - Volume %s',...
-            i,n_injection,char(injection_notes.thrombusVolume(i)));
-        title(strrep(filename,'_','\_'));
+        fileName = sprintf('Moving RMS of x,y,z length - Thrombus injection %d of %d - Volume %s',...
+            i,n_injection,char(injection_notes.thrombusVol(i)));
+        title(strrep(fileName,'_','\_'));
         
         % TODO: Fixed axis for all plots
         % TODO: Use time for set pivot ind, to define and sync intervals
@@ -42,5 +42,5 @@ function find_abruptchange_window(signal,notes)
         
     end
     hold off
-    h_leg = legend(string(notes.thrombusVolume(notes.event=='Thrombus injection')));
+    h_leg = legend(string(notes.thrombusVol(notes.event=='Thrombus injection')));
     get(h_leg)

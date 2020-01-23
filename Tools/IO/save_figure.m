@@ -1,7 +1,7 @@
 function save_figure(varargin)
     % SAVE_FIGURE Saves figure as graphics file, and as Matlab fig-file.
     %
-    % Check if there is already an exsisting file with the same filename in 
+    % Check if there is already an exsisting file with the same fileName in 
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do. The persistent variables
     % overwrite_existing og ignore_saving_for_existing allows the program to
@@ -9,8 +9,8 @@ function save_figure(varargin)
     % file.
     % 
     % Usage: 
-    %     save_figure(path, filename, resolution) 
-    %     save_figure(h_fig, path, filename, resolution)
+    %     save_figure(path, fileName, resolution) 
+    %     save_figure(h_fig, path, fileName, resolution)
     % 
     % If figure handle is not give as first argument input, then current figure
     % will be saved.
@@ -19,7 +19,7 @@ function save_figure(varargin)
     
     % TODO: Support key word for maximizing the figure
     % TODO: Support key word for saving fig file
-    % TODO: Support for filename given as string
+    % TODO: Support for fileName given as string
     % TODO: Input parsing
     
     % Persistent boolean switches for storing info about future actions
@@ -41,14 +41,14 @@ function save_figure(varargin)
     % First argument may be a figure handle for a specific figure to save,
     % otherwise use current figure as the figure to save.
     if numel(varargin)<4
-        [path, filename, resolution] = varargin{:};
+        [path, fileName, resolution] = varargin{:};
         h_fig = gcf;
     elseif numel(varargin)==4
-        [h_fig, path, filename, resolution] = varargin{:};
+        [h_fig, path, fileName, resolution] = varargin{:};
     end
     
-    % Replace illegal characters in filename with a valid replacement char
-    filename = make_valid_filename(filename);
+    % Replace illegal characters in fileName with a valid replacement char
+    fileName = make_valid_fileName(fileName);
 
     fprintf('\nSaving Figure %d %s',h_fig.Number,h_fig.Name)
     fprintf('\n\tAs .png with resolution: %d\n',resolution)
@@ -56,28 +56,28 @@ function save_figure(varargin)
         fprintf('\tAs .fig\n')
     end
     
-    % Check if there is already an exsisting file with the same filename in 
+    % Check if there is already an exsisting file with the same fileName in 
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do.
-    [path, png_filename, always_overwrite_existing, always_ignore_save_existing] = ...
-        save_destination_check(path, [filename,'.png'], always_overwrite_existing, ...
+    [path, png_fileName, always_overwrite_existing, always_ignore_save_existing] = ...
+        save_destination_check(path, [fileName,'.png'], always_overwrite_existing, ...
         always_ignore_save_existing);
-    if png_filename  
-        print(h_fig, fullfile(path, png_filename),...
+    if png_fileName  
+        print(h_fig, fullfile(path, png_fileName),...
             '-dpng', ['-r',num2str(resolution)])
-        display_filename(png_filename,path,'Saved file','\t');
+        display_filename(png_fileName,path,'Saved file','\t');
     end
 
     % The same persistent variables are used to keep track of future actions,
     % also for .fig files. If e.g. overwrite_existing was set to true for .png,
     % then this will also apply for .fig files. In addition, use dedicated
     % persistent variable if saving fig file nevertheless should be relevant.
-    [path, fig_filename, always_overwrite_existing, always_ignore_save_existing] = ...
-        save_destination_check(path, [filename,'.fig'], always_overwrite_existing, ...
+    [path, fig_fileName, always_overwrite_existing, always_ignore_save_existing] = ...
+        save_destination_check(path, [fileName,'.fig'], always_overwrite_existing, ...
         always_ignore_save_existing);  
-    if fig_filename & always_save_fig_file
-        savefig(h_fig, fullfile(path, fig_filename))
-        display_filename(fig_filename,path,'Saved file','\t');
+    if fig_fileName & always_save_fig_file
+        savefig(h_fig, fullfile(path, fig_fileName))
+        display_filename(fig_fileName,path,'Saved file','\t');
     end
     
 

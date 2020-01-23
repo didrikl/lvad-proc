@@ -1,15 +1,15 @@
-function raw = read_cardiaccs_raw_txtfile_parfor(filename,read_path)
+function raw = read_cardiaccs_raw_txtfile_parfor(fileName,read_path)
 
 if nargin==1, read_path = ''; end
-filepath = fullfile(read_path,filename);
+filePath = fullfile(read_path,fileName);
 
 % Open file and go to first line with a status="ok" record
-fid = fopen(filepath, 'r');
+fid = fopen(filePath, 'r');
 [first_row, n_skipped_rows] = spool_to_status_ok(fid);
 
 % no of lines / size in kb
 lines_per_kb = 1274174 / 246143;
-s = dir(filepath);         
+s = dir(filePath);         
 filesize_in_kb = s.bytes/1024;
 n_lines_approx = round(2*lines_per_kb*filesize_in_kb);
 n_lines_approx = n_lines_approx - n_skipped_rows;
@@ -67,5 +67,5 @@ raw = table(raw_frame, raw_t, raw_adcscale, raw_accscale, raw_adc, raw_acc,...
     'VariableNames',{'frame','t','adcscale','accscale','adc','acc'});
 
 raw = add_cardiaccs_raw_variable_properties(raw);
-raw.Properties.UserData = make_init_userdata(filename,read_path);
+raw.Properties.UserData = make_init_userdata(fileName,read_path);
 

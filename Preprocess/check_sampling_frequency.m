@@ -9,7 +9,7 @@ function [fs,signal] = check_sampling_frequency(signal)
             'Ignore'
             'Abort'
             };
-        response = ask_list_ui(opts,'Sample rate is undefined');
+        response = ask_list_ui(opts,sprintf('\n\n\tSample rate is undefined'));
         if response==1
             while true
                 try

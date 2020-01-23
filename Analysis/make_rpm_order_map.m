@@ -1,4 +1,4 @@
-function make_rpm_order_map(data)
+function make_rpm_order_map(data, varName)
     % MAKE_RPM_ORDER_MAP
     %   Make RPM order map using Matlab's build-in RPM order plots.
     %   Detrending is applied, so that the DC component is attenuated
@@ -22,12 +22,15 @@ function make_rpm_order_map(data)
     % 
     %
     
-    var = 'accNorm';
+    if nargin==1
+        varName = 'accNorm';
+    end
+    
     order_res = 0.1;
     overlap_pst = 80; % 70 percent perhaps slightly better...?
     
     rpm = str2double(string(data.pumpSpeed));
-    x = detrend(data.(var));
+    x = detrend(data.(varName));
     fs = data.Properties.SampleRate;
     
     rpmordermap(x,fs,rpm,order_res, ...

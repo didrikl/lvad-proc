@@ -17,31 +17,31 @@ init_matlab
 % into timetables)
 
 % User inputs
-lvad_signal_filename = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
-lead_signal_filename = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
-notes_filename       = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
-powerlab_filename    = fullfile('PowerLab','test.mat');
-ultrasound_filename  = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
+lvad_signal_fileName = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
+lead_signal_fileName = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
+notes_fileName       = fullfile('Notes','In Vitro 1 - HVAD - THROMBI SPEED IV.xlsx');
+powerlab_fileName    = fullfile('PowerLab','test.mat');
+ultrasound_fileName  = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
 
 experiment_subdir    = 'Preparations';
 [read_path, save_path] = init_io_paths(experiment_subdir);
 
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)
-% lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_filename,read_path);
-% lead_signal = init_cardiaccs_raw_txtfile(lead_signal_filename,read_path);
+% lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_fileName,read_path);
+% lead_signal = init_cardiaccs_raw_txtfile(lead_signal_fileName,read_path);
 % save_table('lvad_signal.mat', save_path, lvad_signal, 'matlab');
 % save_table('lead_signal.mat', save_path, lead_signal, 'matlab');
 lvad_signal = init_signal_proc_matfile('lvad_signal.mat', save_path);
 lead_signal = init_signal_proc_matfile('lead_signal.mat', save_path);
 
 % Initialization of Powerlab file(s)
-%powerlab_signals = init_powerlab_raw_matfile(powerlab_filename,read_path);
+%powerlab_signals = init_powerlab_raw_matfile(powerlab_fileName,read_path);
 
 % Read experiment notes in Excel file template
-notes = init_notes_xlsfile(notes_filename,read_path);
+notes = init_notes_xlsfile(notes_fileName,read_path);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-%ultrasound = init_m3_raw_textfile(ultrasound_filename,read_path);
+%ultrasound = init_m3_raw_textfile(ultrasound_fileName,read_path);
 
 features = init_features_from_notes(notes);
 
@@ -86,13 +86,13 @@ features = make_feature_windows(signal, features);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Look at RPM order plots as well: Should result in flat/stratified lines
-make_rpm_order_map(lvad_signal(lvad_signal.experimentPartNo=='1',:)) %
-make_rpm_order_map(lvad_signal(lvad_signal.experimentPartNo=='2',:)) %
-make_rpm_order_map(lvad_signal(lvad_signal.experimentPartNo=='3',:)) %
+make_rpm_order_map(lvad_signal(lvad_signal.part=='1',:)) %
+make_rpm_order_map(lvad_signal(lvad_signal.part=='2',:)) %
+make_rpm_order_map(lvad_signal(lvad_signal.part=='3',:)) %
 pause
-make_rpm_order_map(lead_signal(lead_signal.experimentPartNo=='1',:)) %'Order Map for Driveline Accelerometer - RPM Changes Prior to Thrombi Injections'
-make_rpm_order_map(lead_signal(lead_signal.experimentPartNo=='2',:)) %
-make_rpm_order_map(lead_signal(lead_signal.experimentPartNo=='3',:)) %
+make_rpm_order_map(lead_signal(lead_signal.part=='1',:)) %'Order Map for Driveline Accelerometer - RPM Changes Prior to Thrombi Injections'
+make_rpm_order_map(lead_signal(lead_signal.part=='2',:)) %
+make_rpm_order_map(lead_signal(lead_signal.part=='3',:)) %
 
 %% Make average order spectrogram and extract relevant features
 
@@ -102,10 +102,10 @@ Average_Order_Spectrum_For_Intervention_Segments
 
 figure
 hold on
-make_average_order_spectrum(lvad_signal(lvad_signal.experimentPartNo=='1',:));
-make_average_order_spectrum(lead_signal(lead_signal.experimentPartNo=='1',:));
-make_average_order_spectrum(lvad_signal(lvad_signal.experimentPartNo=='3',:));
-spec = make_average_order_spectrum(lead_signal(lead_signal.experimentPartNo=='3',:));
+make_average_order_spectrum(lvad_signal(lvad_signal.part=='1',:));
+make_average_order_spectrum(lead_signal(lead_signal.part=='1',:));
+make_average_order_spectrum(lvad_signal(lvad_signal.part=='3',:));
+spec = make_average_order_spectrum(lead_signal(lead_signal.part=='3',:));
 legend({'LVAD, before injections','Driveline, before injections','LVAD, after injections','Driveline, after injections'})
 
 

@@ -9,7 +9,15 @@ function signal = clip_to_experiment(signal, notes)
     %   data = clip_to_experiment(data, notes)
     %
      
-    last_note_ind = find(notes.intervType~='Experiment end',1,'last');
-    range = timerange(notes.time(1),notes.time(last_note_ind));
+    seq_end_event = 'Sequence end';
+    seq_start_event = 'Sequence start';
+    
+    % Find time s
+    end_note_ind = find(notes.intervType~=seq_end_event,1,'first');
+    start_note_ind = find(notes.intervType~=seq_start_event,1,'first');
+    if isempty(start_note_ind), start_note_ind=1; end
+    if isempty(end_note_ind), end_note_ind=height(notes); end
+    
+    range = timerange(notes.time(start_note_ind),notes.time(end_note_ind));
     signal = signal(range,:);
     

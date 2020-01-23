@@ -7,12 +7,12 @@ function signal = resample_signal(signal,fs)
     % Method default settings
     resample_method = 'linear';
 
-    fprintf('\nResampling signal:\n')
+    fprintf('\nResampling signal:')
     fprintf('\n\tMethod: %s',resample_method)
     
     % Resample to even sampling, before adding categorical data and more from notes
     % TODO: Implement a check/support for signal containing non-numeric columns
-    meassued_cols = signal.Properties.CustomProperties.MeassuredSignal;
+    meassued_cols = signal.Properties.CustomProperties.Measured;
     derived_cols = signal.Properties.VariableContinuity=='continuous' & not(meassued_cols);
     notes_cols = not(signal.Properties.VariableContinuity=='continuous');
         
@@ -32,7 +32,7 @@ function signal = resample_signal(signal,fs)
         end
     end
     
-    fprintf('\n\tVariable(s) to re-sample: %s\n',strjoin(resamp_varnames,', '))
+    fprintf('\n\tVariable(s) to re-sample: %s',strjoin(resamp_varnames,', '))
     fprintf('\n\tVariable(s) to drop: %s\n',strjoin(drop_varnames,', '))
     
     % In case there are notes columns merged with signal, then these columns
@@ -54,4 +54,4 @@ function signal = resample_signal(signal,fs)
         signal = merge_signal_and_notes(signal,notes_vars_in_signal);
     end
         
-    fprintf('\nResampling done.\n')
+    fprintf('Done.\n')

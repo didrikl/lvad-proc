@@ -1,4 +1,4 @@
-function signal = init_m3_raw_textfile_read(filename, startRow, endRow)
+function signal = init_m3_raw_textfile_read(fileName, startRow, endRow)
     %INIT_M3_RAW_TEXTFILE Import numeric data from a text file as a matrix.
     %   signal = init_m3_raw_textfile_read(FILENAME) Reads data from text file FILENAME
     %   for the default selection.
@@ -26,7 +26,7 @@ function signal = init_m3_raw_textfile_read(filename, startRow, endRow)
     formatSpec = '%q%*q%*q%*q%*q%*q%*q%q%*q%*q%*q%*q%*q%*q%q%q%q%[^\n\r]';
     
     %% Open the text file.
-    fileID = fopen(filename,'r');
+    fileID = fopen(fileName,'r');
     
     %% Read columns of data according to the format.
     % This call is based on the structure of the file used to generate this code. If

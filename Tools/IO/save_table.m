@@ -1,10 +1,10 @@
-function [save_path, filename] = save_table(filename, save_path, data, filetype, varargin)
+function [save_path, fileName] = save_table(fileName, save_path, data, filetype, varargin)
     % SAVE_TABLE
     % Write Matlab table to text files, using writetable, with convenient
     % user interactions.
     %
     % Usage:
-    %   save_table(filename, path, data, filetype, varargin)
+    %   save_table(fileName, path, data, filetype, varargin)
     %
     % Input:
     %   filetype must be either
@@ -14,7 +14,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
     %   varargin is used for additional parameter options for filetype is
     %       either 'text' or 'spreadsheet'.
     %
-    % Check if there is already an exsisting file with the same filename in
+    % Check if there is already an exsisting file with the same fileName in
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do. The persistent variables
     % overwrite_existing og ignore_saving_for_existing allows the program to
@@ -24,16 +24,16 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
     % See also writetable, save_destination_check, timetable2table
     
     % Note that save_path is handled as a separate input, instead of the
-    % possiblity to be baked into the filename. This help to avoid unintendent
+    % possiblity to be baked into the fileName. This help to avoid unintendent
     % saving in current working directory.
     
     % Name of the table as it exist in memory
     tabname = inputname(3);
     
     % If inputs are given as strings, then parse to char for compability
-    % TODO: Test support for filename given as string?
-    [filename, save_path, varargin{:}] = convertStringsToChars(...
-        filename, save_path, varargin{:});
+    % TODO: Test support for fileName given as string?
+    [fileName, save_path, varargin{:}] = convertStringsToChars(...
+        fileName, save_path, varargin{:});
 
     % Input validations
     if not(any(strcmpi(filetype,{'matlab','text','csv','spreadsheet'})))
@@ -55,36 +55,36 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
         ignore_saving_for_existing = false;
     end
     
-    [subfolder,filename,ext] = fileparts(filename);
+    [subfolder,fileName,ext] = fileparts(fileName);
     if not(strcmpi(filetype,ext))
         warning('Saving with new file extention according to given filetype');
     end
     switch lower(filetype)
         case 'matlab'
-            filename = [filename,'.mat'];
+            fileName = [fileName,'.mat'];
         case 'text'
-            filename = [filename,'.txt'];
+            fileName = [fileName,'.txt'];
         case 'csv'
-            filename = [filename,'.csv'];
+            fileName = [fileName,'.csv'];
         case 'spreadsheet'
-            filename = [filename,'.xls'];
+            fileName = [fileName,'.xls'];
     end
     save_path = fullfile(save_path,subfolder);
     
-    % Check if there is already an exsisting file with the same filename in
+    % Check if there is already an exsisting file with the same fileName in
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do. 
-    [save_path, filename, overwrite_existing, ignore_saving_for_existing] = ...
-        save_destination_check(save_path, filename, overwrite_existing, ...
+    [save_path, fileName, overwrite_existing, ignore_saving_for_existing] = ...
+        save_destination_check(save_path, fileName, overwrite_existing, ...
         ignore_saving_for_existing);
     
     % If cancelled in user interaction, then just return without saving
-    if not(filename)
+    if not(fileName)
         warning('No saving done.')
         return;
     end
     
-    filepath = fullfile(save_path,filename);
+    filePath = fullfile(save_path,fileName);
     
     try
         switch lower(filetype)
@@ -96,7 +96,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
             case 'matlab'
                 
                 eval([inputname(3),'=data;']);
-                save(filepath,tabname,varargin{:});
+                save(filePath,tabname,varargin{:});
             
             case {'csv'}
                 
@@ -105,7 +105,7 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
                 if istimetable(data)
                     data = timetable2table(data);
                 end
-                writetable(data, filepath, 'FileType', 'text', 'Delimiter', 'comma', varargin{:})
+                writetable(data, filePath, 'FileType', 'text', 'Delimiter', 'comma', varargin{:})
                 
             case {'text','spreadsheet'}
                 
@@ -114,11 +114,11 @@ function [save_path, filename] = save_table(filename, save_path, data, filetype,
                 if istimetable(data)
                     data = timetable2table(data);
                 end
-                writetable(data, filepath, 'FileType', filetype, varargin{:})
+                writetable(data, filePath, 'FileType', filetype, varargin{:})
                 
         end
         
-        display_filename(filename,save_path,'\nTable saved to file:');
+        display_filename(fileName,save_path,'\nTable saved to file:');
              
     catch ME
         

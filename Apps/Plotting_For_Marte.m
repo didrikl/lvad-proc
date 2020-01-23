@@ -14,7 +14,7 @@ file_path_2 = fullfile(read_path,file_name_2);
 TAVItest002 = import_file_format2(file_path_2);
 
 
-function testTAVI001 = importfile(filename, startRow, endRow)
+function testTAVI001 = importfile(fileName, startRow, endRow)
 
     %% Initialize variables.
     delimiter = ';';
@@ -26,7 +26,7 @@ function testTAVI001 = importfile(filename, startRow, endRow)
     formatSpec = '%f%f%f%f%f%f%f%f%f%f%f%f%f%f%f%f%[^\n\r]';
     
     %% Open the text file.
-    fileID = fopen(filename,'r');
+    fileID = fopen(fileName,'r');
     
     %% Read columns of data according to the format.
     % This call is based on the structure of the file used to generate this code. If
@@ -56,7 +56,7 @@ function testTAVI001 = importfile(filename, startRow, endRow)
     
 end
 
-function TAVItest002 = import_file_format2(filename, startRow, endRow)
+function TAVItest002 = import_file_format2(fileName, startRow, endRow)
 
     
     %% Initialize variables.
@@ -69,7 +69,7 @@ function TAVItest002 = import_file_format2(filename, startRow, endRow)
     formatSpec = '%f%f%f%f%f%f%f%f%[^\n\r]';
     
     %% Open the text file.
-    fileID = fopen(filename,'r');
+    fileID = fopen(fileName,'r');
     
     %% Read columns of data according to the format.
     % This call is based on the structure of the file used to generate this code. If

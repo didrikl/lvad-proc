@@ -212,9 +212,9 @@ function scrollHandles = scrollplot(varargin)
                 % never mind...
             end
         end
-        if isempty(findstr(mfilename,err.message))
+        if isempty(findstr(mfileName,err.message))
             % Indicate error origin, if not already stated within the error message
-            err.message = [mfilename ': ' err.message];
+            err.message = [mfileName ': ' err.message];
         end
         if v(1)<='6'
             while err.message(end)==char(10)

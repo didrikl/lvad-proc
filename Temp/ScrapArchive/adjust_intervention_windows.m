@@ -30,12 +30,12 @@ h_ax(2) = subplot(4,1,2);
 yyaxis left
 plot(data_clip.time, data_clip.pumpSpeed,'clipping','on')
 yyaxis right
-plot(data_clip.time, data_clip.thrombusVolume,'clipping','on')
+plot(data_clip.time, data_clip.thrombusVol,'clipping','on')
 % 
 % h_ax(3) = subplot(4,1,3);
-% scatter(notes.time, notes.efferentPressure, 'filled')
+% scatter(notes.time, notes.efferentP, 'filled')
 % hold on 
-% scatter(notes.time, notes.afferentPressure, 'filled')
+% scatter(notes.time, notes.afferentP, 'filled')
 % hold off
 % h_ax(3).YLim = [min(h_ax(3).YLim(1),-5),h_ax(3).YLim(2)*1.15];
 % legend({'Afferent','Efferent','Flow'})
@@ -68,7 +68,7 @@ h_ax = gca;
 h_ax.YLim(1) = 0;
 
 hold off
-h_leg = legend(string(notes.thrombusVolume(notes.event=='Thrombus injection')));
+h_leg = legend(string(notes.thrombusVol(notes.event=='Thrombus injection')));
 get(h_leg)
 
 

@@ -1665,11 +1665,11 @@ end
 
 function newME = setmessage(ME,prop)
 % SETMESSAGE  Sets the error message for set.Property functions.
-classLink  = sprintf('<a href="matlab:doc %s">Cursorbar</a>',mfilename('class'));
+classLink  = sprintf('<a href="matlab:doc %s">Cursorbar</a>',mfileName('class'));
 %
 firstLine  = sprintf('While setting the ''%s'' property of %s:',prop,classLink);
 messageStr = regexprep(ME.message,'Class',classLink);
-identifier = regexprep(ME.identifier,{'\<MATLAB\>','\.'},{mfilename('class'),':'},'ignorecase');
+identifier = regexprep(ME.identifier,{'\<MATLAB\>','\.'},{mfileName('class'),':'},'ignorecase');
 %
 newME      = MException(identifier,'%s\n%s',firstLine,messageStr);
 end

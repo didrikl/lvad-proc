@@ -23,7 +23,7 @@ function signal = make_signal_timetable(signal, include_time_duration)
     signal.Properties.VariableContinuity(:) = 'continuous';
     
     % Add metadata for picking out sensor-messured data, when analysing
-    signal = addprop(signal,'MeassuredSignal','variable');
-    signal.Properties.CustomProperties.MeassuredSignal(:) = true;
+    signal = addprop(signal,'Measured','variable');
+    signal.Properties.CustomProperties.Measured(:) = true;
     
    

@@ -1,4 +1,4 @@
-function notes = init_notes_xlsfile(filename, read_path)
+function notes = init_notes_xlsfile(fileName, read_path)
     if nargin==1, read_path = ''; end
     
     % TODO: Split this function into init and pre-proc functions??
@@ -9,15 +9,15 @@ function notes = init_notes_xlsfile(filename, read_path)
         'date'
         'timestamp'
         'time_elapsed'
-        'experimentPartNo'
+        .part'
         'intervType'
         'event'
-        'thrombusVolume'
+        'thrombusVol'
         'speedChangeRate'
         'dose'
         'pumpSpeed'
-        'afferentPressure'
-        'efferentPressure'
+        'afferentP'
+        'efferentP'
         'flow'
         'power'
         'comment'
@@ -31,19 +31,19 @@ function notes = init_notes_xlsfile(filename, read_path)
     % NOTE: If object-oriented, then should implement check for valid names
     num_cols = {
         'time_elapsed'
-        'afferentPressure'
-        'efferentPressure'
+        'afferentP'
+        'efferentP'
         'flow'
         'power'
-        ...'thrombusVolume'
+        ...'thrombusVol'
         'speedChangeRate'
         'pumpSpeed'
         }';
     cat_cols = {
-        'experimentPartNo'
+        .part'
         'intervType'
         'event'
-        'thrombusVolume'
+        'thrombusVol'
         ...'speedChangeRate'
         'dose'
         ...'pumpSpeed'
@@ -53,15 +53,15 @@ function notes = init_notes_xlsfile(filename, read_path)
     % doing syncing/data fusion
     event_vars = {
         'event'
-        'thrombusVolume'
+        'thrombusVol'
         'dose'
-        'afferentPressure'
-        'efferentPressure'
+        'afferentP'
+        'efferentP'
         'flow'
         'power'
     };
     step_vars = {
-        'experimentPartNo'
+        .part'
         'intervType'
         'speedChangeRate'
         'pumpSpeed'    
@@ -69,14 +69,14 @@ function notes = init_notes_xlsfile(filename, read_path)
     
     % Which variables are controlled or meassured, used for analysis
     controlled_vars = {    
-        'thrombusVolume'
+        'thrombusVol'
         'speedChangeRate'
         'dose'
         'pumpSpeed'
         };
     meassured_vars = {
-        'afferentPressure'
-        'efferentPressure'
+        'afferentP'
+        'efferentP'
         'flow'
         'power'
         };
@@ -101,26 +101,26 @@ function notes = init_notes_xlsfile(filename, read_path)
     
     %% Initialize notes
     
-    filepath = fullfile(read_path,filename);
+    filePath = fullfile(read_path,fileName);
     
-    notes = readtable(filepath,...
+    notes = readtable(filePath,...
         'Sheet',notes_sheet_name,...
         'Range',notes_range_name,...
         'ReadVariableNames',false,...
         'basic', true); 
-    header_lines = readtable(filepath,...
+    header_lines = readtable(filePath,...
         'Sheet',notes_sheet_name,...
         'Range',notes_header_name,...
         'ReadVariableNames',false,...
         'basic', true);  
     for i=1:numel(info_range_names)
-        info.(info_range_names{i}) = readtable(filepath,...
+        info.(info_range_names{i}) = readtable(filePath,...
             'Sheet',experiment_info_sheet_name,...
             'Range',info_range_names{i},...
             'ReadVariableNames',false,...
             'basic', true);
     end
-    protocol = readtable(filepath,...
+    protocol = readtable(filePath,...
         'Sheet',protocol_sheet_name,...
         'ReadVariableNames',false);
     

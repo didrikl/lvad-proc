@@ -23,7 +23,7 @@ grid on
 title('Part 3','FontSize',18)
 
 h_subax(2) = subplot(2,1,2);
-plot(t,s.thrombusVolume,'LineWidth',2)%t,signal.pumpSpeed);
+plot(t,s.thrombusVol,'LineWidth',2)%t,signal.pumpSpeed);
 h = gca;
 h.YLim = h.YLim*1.1;
 yyaxis right

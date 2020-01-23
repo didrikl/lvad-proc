@@ -1,24 +1,24 @@
-function signal = init_signal_proc_matfile(filename, read_path, varargin)
+function signal = init_signal_proc_matfile(fileName, read_path, varargin)
     % INIT_SIGNAL_FILE
     %   Read already initlized or processed signal from disc, stored as binary 
     %   .mat file, using Matlab's load function. User is ask for location the
-    %   file if given filename in given path does not exist.
+    %   file if given fileName in given path does not exist.
     %
     % Usage:
-    %   signal = init_signal_file(filename, read_path, varargin), where
+    %   signal = init_signal_file(fileName, read_path, varargin), where
     %   varargin optional inputs in the function load
     %
     % See also load, save, save_table
     
-    filepath = fullfile(read_path,filename);
-    display_filename(filename,read_path,'\nReading signal with loading .mat file');
+    filePath = fullfile(read_path,fileName);
+    display_filename(fileName,read_path,'\nReading signal with loading .mat file');
     
-    if not(exist(filepath,'file'))
+    if not(exist(filePath,'file'))
         fprintf('\nFile does not exist.')
         fprintf('\nSelect file... ')
-        [filename,read_path] = uigetfile('.mat','Select file to load',filepath);
-        if filename
-            filepath = fullfile(read_path,filename);           
+        [fileName,read_path] = uigetfile('.mat','Select file to load',filePath);
+        if fileName
+            filePath = fullfile(read_path,fileName);           
         else
             fprintf('\n')
             warning('\n\tNo file selected.\n')
@@ -28,7 +28,7 @@ function signal = init_signal_proc_matfile(filename, read_path, varargin)
     end
     
     % TODO: Test with load/saving structs/parts of file
-    signal = load(filepath, varargin{:});
+    signal = load(filePath, varargin{:});
     
      fields = fieldnames(signal);
      if numel(fields)~=1

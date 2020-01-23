@@ -9,20 +9,23 @@ function signal = calc_moving(signal, input_varnames, statistic_types)
         statistic_types = {'RMS','Var','Std'};
     end
     
-    win_length_fs_factor = 1;
+    win_dur_sec = 1;
     
-    if not(iscell(input_varnames))
-        input_varnames = {input_varnames};
-    end
-
+%     if not(iscell(input_varnames))
+%         input_varnames = {input_varnames};
+%     end
+%     % TODO: Try change to the following:
+    statistic_types = cellstr(statistic_types);
+    input_varnames = cellstr(input_varnames);
+    
     fprintf('\nCalculating moving statistics:\n\n\tTable: %s',inputname(1))
     
     [fs,signal] = check_sampling_frequency(signal);
     if isnan(fs), return; end
     
-    win_length = win_length_fs_factor*signal.Properties.SampleRate;
+    win_length = win_dur_sec*signal.Properties.SampleRate;
     fprintf('\n\tWindow length in samples: %d',win_length)
-    fprintf('\n\tWindow length in duration: %d (sec)\n',win_length_fs_factor)
+    fprintf('\n\tWindow length in duration: %d (sec)\n',win_dur_sec)
     
     for i=1:numel(input_varnames)
 

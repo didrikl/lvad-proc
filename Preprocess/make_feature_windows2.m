@@ -1,4 +1,4 @@
-function feats = make_feature_windows(signal, feats, plot_vars)
+function feats = make_feature_windows2(signal, feats, eventType)
     % make_feature_windows
     %   Quality control mainly used to check when thrombus enters LVAD (not to
     %   analyse features or to find features).
@@ -6,18 +6,14 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     % Definitios to allow user to search though more data
     lead_expansion = 30;
     trail_expansion = 30;
-    
-    % Event type for window quality control (qc)
-    qc_event_type = {'Thrombus injection'};
-    
-    sub1_y_var = {'accNorm_lvad_signal','accNorm_lead_signal'};
+     
+    sub1_y_var = {'accA_norm'};
     sub1_yy_var = {};
     
-    sub2_y_var = {'accNorm_movRMS_lvad_signal','accNorm_movRMS_lead_signal'};
-    sub2_yy_var = {};
-    %sub2_yy_var = {'acc_movStdNorm_lvad_signal','acc_movStdNorm_lead_signal'};
+    sub2_y_var = {'accA_norm_movRMS'};
+    sub2_yy_var = {'accA_norm_movStd'};
     
-    search_var = {'accNorm_movStd_lvad_signal','accNorm_movRMS_lvad_signal'};
+    search_var = {'accA_norm_movStd','accA_norm_movRMS'};
     
     % TODO: Check if variable names exist...
     
@@ -34,7 +30,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
        
     %h_fig = gobjects(n_iv,1);
     close all
-    qc_feat_inds = find(contains(string(feats.precursor),qc_event_type));
+    qc_feat_inds = find(contains(string(feats.precursor),eventType));
     n_qc_feats = numel(qc_feat_inds);
     for i=1:n_qc_feats
         
@@ -191,10 +187,10 @@ function make_annotations(h_sub, qc_event_feat, qc_event_no, n_qc_events)
     xlabel('Time (sec)','Position',[0.5,-0.11,0]);
     
     event_type = string(qc_event_feat.precursor);
-    vol = qc_event_feat.thrombusVol;
+    vol = qc_event_feat.balloonLevel;
     rpm = string(qc_event_feat.pumpSpeed);
     
-    h_tit = suptitle(sprintf('Signal for %s %d of %d: %s ml Thrombus at %s RPM',...
+    h_tit = suptitle(sprintf('Signal for %s %d of %d: Balloon level %s at %s RPM',...
         event_type,qc_event_no,n_qc_events,vol,rpm));
     h_tit.FontWeight = 'bold';
     h_tit.FontSize = 16;

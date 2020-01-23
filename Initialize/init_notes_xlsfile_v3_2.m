@@ -1,0 +1,278 @@
+function notes = init_notes_xlsfile_v3_2(fileName, read_path)
+    % 
+    % Read named ranges from Notes Excel file. Ranges must be defined by Excel
+    % name manager. (Named ranges make the Excel file more flexible w.r.t.
+    % changes, but should be double checked.)
+    %
+    % Column that consists of empty / undefined values are not stored in the
+    % notes table
+    
+    % Sheets and ranges to read from Excel sheet (tab names in Excel)
+    notes_sheet = 'Notes';
+    notes_range = 'Notes';
+    varsNames_controlled_range = 'Controlled_VarNames';
+    varNames_measured_range = 'Measured_VarNames';
+    varNames_range = 'Header_VarNames';
+    varUnits_range = 'Header_VarUnits';
+    
+    seqInfo_equip_sheet = 'Equipment';       
+    seqInfo_equip_range = 'Equipment';
+    
+    seqInfo_sheet = 'Sequence description';
+    seqInfo_parts_range = 'Sequence_Part_Descriptions';
+    seqInfo_general_range = 'Sequence_General_Info';
+    
+    % * Name in Excel: Must match the name in Excel, but can be changed easily.
+    % * Name Matlab code: Static variable name used in code. Must be valid a
+    %   variable name.
+    % * Type is used for parsing data from Excel into notes Matlab table
+    % * Continuity is a status property, particularily useful when merging with 
+    %   recorded data, c.f. timetable VariableContinuity documentation.  
+    var_map = {    
+        ...   
+        % Name in Excel            Name Matlab code    Type          Continuity
+        'Date'                     'date'              'cell'        'event'
+        'Timestamp'                'timestamp'         'cell'        'event'
+        'Elapsed time'             'part_elapsedTime'  'duration'    'continuous'
+        'Dur'                      'event_duration'    'numeric'     'event'
+        'Part'                     'part'              'categoric'   'step'
+        'Interval type'            'intervType'        'categoric'   'step'
+        'Event'                    'event'             'categoric'   'step'
+        'Thrombus volume'          'thrombusVol'       'categoric'   'step'
+        'Speed change rate'        'speedChangeRate'   'categoric'   'step'
+        'Dose'                     'dose'              'categoric'   'step'
+        'Pump speed'               'pumpSpeed'         'categoric'   'step'
+        'Balloon level'            'balloonLevel'      'categoric'   'step'
+        'Balloon offset'           'balloonOffset'     'categoric'   'step'
+        'Catheter type'            'catheter'          'categoric'   'unset'
+        'Clamp flow reduction'     'flowReduction'     'categoric'   'step'
+        'Afferent pressure'        'afferentP_noted'   'numeric'     'event'
+        'Effenrent pressure'       'efferentP_noted'   'numeric'     'event'
+        'Flow estimate'            'flow_noted'        'numeric'     'event'
+        'Power'                    'power_noted'       'numeric'     'event'
+        'Unclamped baseline flow'  'unclampFlow'       'numeric'     'event'
+        'Comment'                  'comment'           'cell'        'event'
+        ...
+        };
+
+    % Columns to omit (not in use or always constant in the sequence)
+    varNames_unneeded = {
+        'date'
+        'timestamp'
+        'part_elapsedTime'
+        'event_duration'
+        'thrombusVol'
+        'speedChangeRate'
+        'dose'
+        'balloonOffset'
+        'afferentP_noted'
+        'efferentP_noted'
+        };
+    
+    % TODO: For OO
+    missing_value_repr = {'','-','NA','N/A'};
+    time_varName = 'time';
+  
+    
+    %% Read from Excel file
+    
+    % TODO: For OO...
+    if nargin==1, read_path = ''; end
+    filePath = fullfile(read_path,fileName);
+    
+    notes = readtable(filePath,...
+        'Sheet',notes_sheet,...
+        'Range',notes_range,...
+        'ReadVariableNames',false,...
+        'basic',true); 
+    varNames = table2cell(readtable(filePath,...
+        'Sheet',notes_sheet,...
+        'Range',varNames_range,...
+        'ReadVariableNames',false,...
+        'basic', true))';
+    varUnits = table2cell(readtable(filePath,...
+        'Sheet',notes_sheet,...
+        'Range',varUnits_range,...
+        'ReadVariableNames',false,...
+        'basic', true))';
+    varNames_controlled = table2cell(readtable(filePath,...
+        'Sheet',notes_sheet,...
+        'Range',varsNames_controlled_range,...
+        'ReadVariableNames',false,...
+        'basic',true));
+    varNames_measured = table2cell(readtable(filePath,...
+        'Sheet',notes_sheet,...
+        'Range',varNames_measured_range,...
+        'ReadVariableNames',false,...
+        'basic', true))';
+    
+    seqInfo_equipment = table2cell(readtable(filePath,...
+        'Sheet',seqInfo_equip_sheet,...
+        'Range',seqInfo_equip_range,...
+        'ReadVariableNames',false,...
+        'basic', true))';
+    
+    seqInfo_parts = table2cell(readtable(filePath,...
+        'Sheet',seqInfo_sheet,...
+        'Range',seqInfo_parts_range,...
+        'ReadVariableNames',false,...
+        'basic', true))';   
+    seqInfo_general = table2cell(readtable(filePath,...
+        'Sheet',seqInfo_sheet,...
+        'Range',seqInfo_general_range,...
+        'ReadVariableNames',false,...
+        'basic', true))';
+    
+    
+    %% Parse and store all into one table
+    varNames_xls = var_map(:,1);
+    varNames_mat = var_map(:,2);
+    notes.Properties.VariableNames = varNames;
+    notes = map_varnames(notes, varNames_xls, varNames_mat);
+
+    notes.Properties.VariableUnits = erase(string(varUnits),{'(',')'});
+    
+    % Update and add variable metadata
+    notes = standardizeMissing(notes, missing_value_repr);
+    
+    notes = addprop(notes,{'Controlled','Measured'},{'variable','variable'}); 
+    notes.Properties.CustomProperties.Controlled(ismember(varNames_xls,varNames_controlled)) = true;
+    notes.Properties.CustomProperties.Measured(ismember(varNames_xls,varNames_measured)) = true;
+    
+    notes.Properties.UserData.Seq_info.Equipment = seqInfo_equipment;
+    notes.Properties.UserData.Seq_info.General = seqInfo_general;
+    notes.Properties.UserData.Seq_info.Parts = seqInfo_parts;
+    notes.Properties.VariableDescriptions = varNames_xls;
+
+    % Metadata used for populating non-matched rows when syncing/data fusion
+    notes.Properties.VariableContinuity = var_map(:,4);
+
+    %% Parse time info
+    
+    % 'timestamp' and 'date' into 'time' (datetime vector)
+    notes.time = datetime(double(string(notes.timestamp)),...
+        'ConvertFrom','datenum',...
+        'TimeZone','Europe/Oslo');
+    notes.time.Day = notes.date.Day;
+    notes.time.Month = notes.date.Month;
+    notes.time.Year = notes.date.Year;
+     
+    % Represent time_elapsed as a total duration vector in seconds
+    notes.part_elapsedTime = seconds(notes.part_elapsedTime);
+ 
+    % Derive the time column that was not in use when making the notes
+    % TODO: Move to separate function, to avoid derived columns before
+    % resampling and merging processes
+    if all(isnan(notes.part_elapsedTime))
+        parts = unique(notes.part);
+        parts = parts(not(cellfun(@isempty,parts)));
+        for i=1:numel(parts)
+            part_inds = ismember(notes.part,parts{i});
+            part_start = notes.time(find(part_inds,1,'first'));
+            notes.part_elapsedTime(part_inds) = notes.time(part_inds) - part_start;
+        end
+    elseif all(isnat(notes.time))
+         notes.time = datetime(notes.part_elapsedTime,...
+             'ConvertFrom','epochtime',...
+             'Epoch',notes.date(1));
+    else
+        warning('No time info given')
+    end
+    
+    %% Parse all columns, other than time columns
+    
+    % Parse relevant columns to numerical or to categorical
+    for j=1:numel(var_map(:,3))
+        switch var_map{j,3}
+            case 'categoric'
+                notes.(varNames_mat{j}) = categorical(notes{:,j});
+            case 'numeric'
+                notes.(varNames_mat{j}) = str2double(string(notes{:,j}));
+        end
+    end
+    
+    %% Add derived columns
+    
+    notes = add_event_range(notes);
+    
+    n_header_lines = 3;
+    notes = add_note_row_id(notes, n_header_lines);
+    
+    
+    %% Remove unneeded columns and finalize with converting to timetable
+    
+    % Remove specficed columns to be removed
+    notes(:,ismember(notes.Properties.VariableNames,varNames_unneeded)) = [];
+    
+    % Remove columns that only has missing info (i.e. not in use)
+    %notes(:,all(ismissing(notes))) = [];
+    
+    % Convert to timetable with timestamp as the time column
+    notes = table2timetable(notes,'RowTimes',time_varName);
+
+    
+    
+function notes = add_event_range(notes)
+    % Add info about how long the events are running. Two new columns are made,
+    % one column for event end time and one column with subscripts for timerange 
+    % extractions in timetables.
+    %
+    % The rule of thumb is that is run until next noted event in the notes.
+    % Exceptions are made for events with the key word 'start', which is
+    % presumed to be running in parallell until end of experiement or until a
+    % similar pairing counterpart event having the key word 'end' instead of
+    % 'start'.
+    
+    n_notes = height(notes);
+    
+    % Subscripts to extract ranges in timetables, just for convenience. It can
+    % be also used to quickly view the timerange, but has no other usage. 
+    notes.event_timerange = cell(n_notes,1);
+    
+    event_inds = find(notes.event~='-' & not(ismissing(notes.event)));
+    for i=1:numel(event_inds)
+        
+        % Applying the rule of thomb
+        ii = event_inds(i);
+        event_stop_ind = ii+1;
+        
+        % Include steady state as part of the preceeding event/intervention
+        while contains(string(notes.intervType(event_stop_ind)),...
+            {'steady-state','steady state'}) && event_stop_ind<n_notes
+            event_stop_ind = event_stop_ind+1;
+        end
+                
+        % Handle events that will run i parallell
+        event = string(notes.event(ii));
+        if contains(event,'start','IgnoreCase',true)
+            
+            % Search for pairing end of event note
+            remaining_events = string(notes.event(ii+1:end));
+            event_stop_name = strrep(event,'start','end');
+            event_stop_ind = find(remaining_events==event_stop_name,1,'first')+ii;
+            
+            % No pairing event implies running until the end
+            if isempty(event_stop_ind)
+                event_stop_ind = find(notes.time>notes.time(ii),1,'last');
+                warning(sprintf('The parallell running event %s was not ended.',event))
+            end
+            
+        end
+        
+        % Make the timerange
+        if ii<n_notes
+            end_time = notes.time(event_stop_ind);
+        else
+            end_time = datetime(inf,'ConvertFrom','datenum','TimeZone','Etc/UTC');
+        end
+        notes.event_timerange{ii} = timerange(notes.time(ii),end_time,'open');
+        notes.event_endTime(ii) = end_time;
+        
+        
+    end
+    
+function notes = add_note_row_id(notes, n_header_lines)
+    % Add note row ID, useful when merging with sensor data
+    notes.noteRow = (1:height(notes))'+n_header_lines';
+    notes = movevars(notes, 'noteRow', 'Before', 'part_elapsedTime');
+    notes.Properties.VariableContinuity('noteRow') = 'step';

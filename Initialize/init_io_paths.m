@@ -1,4 +1,4 @@
-function [read_path, save_path] = init_io_paths(experiment_subdir)
+function [read_path, save_path] = init_dir_structure(experiment_subdir)
     
     % Static definitions for I/O directory structure
     read_root = 'C:\Data\IVS\Didrik';

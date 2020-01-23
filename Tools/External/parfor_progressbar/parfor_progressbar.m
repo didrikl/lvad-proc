@@ -63,7 +63,7 @@ methods
         
         % Create a unique inter-process communication file.
         for i=1:10,
-            f = sprintf('%s%d.txt', mfilename, round(rand*1000));
+            f = sprintf('%s%d.txt', mfileName, round(rand*1000));
             this.ipcfile = fullfile(tempdir, f);
             if ~exist(this.ipcfile,'file'), break; end
         end
@@ -78,7 +78,7 @@ methods
         
         % Create timer to periodically update the waitbar in the GUI thread.
         this.htimer = timer( 'ExecutionMode','fixedSpacing', 'Period',0.5, ...
-                             'BusyMode','drop', 'Name',mfilename, ...
+                             'BusyMode','drop', 'Name',mfileName, ...
                              'TimerFcn',@(x,y)this.tupdate );
         start(this.htimer);
     end

@@ -1,5 +1,5 @@
-function [path, filename, overwrite_all, ignore_all] = ...
-        save_destination_check(path, filename, overwrite_all, ignore_all)
+function [path, fileName, overwrite_all, ignore_all] = ...
+        save_destination_check(path, fileName, overwrite_all, ignore_all)
     % SAVE_DESTINATION_CHECK
     %   Checks and initialize destination for saving, with user interaction and
     %   printed information the command line window.
@@ -9,7 +9,7 @@ function [path, filename, overwrite_all, ignore_all] = ...
     %
     %   If saving directory  exist: 
     %   - Check if file already exists in the directory
-    %   - If filename exist, then the user is given the following options:
+    %   - If fileName exist, then the user is given the following options:
     %
     %       Overwrite
     %       Overwrite all
@@ -31,7 +31,7 @@ function [path, filename, overwrite_all, ignore_all] = ...
     end
     
     % Check if file exists in given directory
-    if exist(fullfile(path,filename),'file')
+    if exist(fullfile(path,fileName),'file')
              
         % Start with using overwrite_all and ignore_all. If they both are false,
         % then we enter the user interaction part below, allowing the user to
@@ -39,8 +39,8 @@ function [path, filename, overwrite_all, ignore_all] = ...
         overwrite=overwrite_all;
         ignore=ignore_all;
         
-        % New filename or path is not yet given
-        new_filename_selected = false;
+        % New fileName or path is not yet given
+        new_fileName_selected = false;
         new_path_selected = false;
         
         % First, check with user about what to do, if not previously done 
@@ -51,7 +51,7 @@ function [path, filename, overwrite_all, ignore_all] = ...
             
             % Display warning and open user interaction menu
             user_opts = {'Overwrite','Overwrite all','Save to ...','Ignore','Ignore all'};
-            message = sprintf(['File already exist: ',strrep(filename,'\','\\')]);
+            message = sprintf(['File already exist: ',strrep(fileName,'\','\\')]);
             warning(message);
             response = ask_list_ui(user_opts, message);
         
@@ -64,25 +64,25 @@ function [path, filename, overwrite_all, ignore_all] = ...
                 overwrite_all = true; 
                 overwrite = true;
             elseif response==4
-                filename = 0;
+                fileName = 0;
             elseif response==5
                 ignore_all = true; 
-                filename = 0;
+                fileName = 0;
             end
             
-            % Open build-in browser for saving, giving full flexibility for filepath
+            % Open build-in browser for saving, giving full flexibility for filePath
             if response==3
-                [new_filename,new_path] = uiputfile(...
-                    fullfile(path,filename),'Save as');
+                [new_fileName,new_path] = uiputfile(...
+                    fullfile(path,fileName),'Save as');
                 
-                new_filename_selected = strcmp(new_filename, filename);
+                new_fileName_selected = strcmp(new_fileName, fileName);
                 new_path_selected = strcmp(new_path, path);
         
-                % If new filename and/or new path was not given
-                if not(new_filename_selected) && not(new_path_selected)
+                % If new fileName and/or new path was not given
+                if not(new_fileName_selected) && not(new_path_selected)
                     overwrite = true;                   
-                elseif not(isnumeric(new_filename)) && not(isnumeric(new_path))
-                    filename = new_filename;
+                elseif not(isnumeric(new_fileName)) && not(isnumeric(new_path))
+                    fileName = new_fileName;
                     path = new_path;
                     overwrite = false;
                 end
@@ -91,17 +91,17 @@ function [path, filename, overwrite_all, ignore_all] = ...
             
             % Interperate user-closed window or 'Cancel' as ignore=true
             if isempty(response)
-                filename = 0;
+                fileName = 0;
             end
             
         end
         
         % Display info after user interaction
-        if new_filename_selected || new_path_selected
+        if new_fileName_selected || new_path_selected
             fprintf('\nSaving to new destination.\n')
         elseif overwrite            
             fprintf('\nExisting file will be overwritten.\n');       
-        elseif isnumeric(filename)
+        elseif isnumeric(fileName)
             fprintf('\nSaving will not be done.\n');   
         end
         
