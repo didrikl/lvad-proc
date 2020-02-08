@@ -1,4 +1,4 @@
-function blocks = init_m3_raw_textfile(fileNames,read_path)
+function T = init_m3_raw_textfile(fileNames,read_path)
     
     %
     % TODO: Make one generic function to initialize blocks, that can be used for
@@ -7,35 +7,59 @@ function blocks = init_m3_raw_textfile(fileNames,read_path)
     
     timestamp_fmt = 'dd-MMM-uuuu HH:mm:ss.SSS';
     
-    blocks = cell(numel(fileNames),1);
+    var_map = {
+        ...   
+        % Name in Spectrum   Name in Matlab    Type     Continuity   Units
+        'ArtflowLmin'        'affQ'           'numeric' 'continuous' 'L/min'
+        'VenflowLMin'        'effQ'           'numeric' 'continuous' 'L/min'
+        'EmboliVolume1uLsec' 'affEmboliVol'   'numeric' 'continuous' 'uL/sec'
+        'EmboliTotalCount1'  'affEmboliCount' 'numeric' 'step'       ''
+        'EmboliVolume2uLsec' 'effEmboliVol'   'numeric' 'continuous' 'uL/sec'
+        'EmboliTotalCount2'  'effEmboliCount' 'numeric' 'step'       ''
+        };
+    
+     % Columns to omit (not in use or always constant in the sequence)
+    varNames_unneeded = {
+        'affEmboliVol'
+        'affEmboliCount'
+        'effEmboliVol'
+        'effEmboliCount'
+        };
+    
+    fprintf('\nInitializing Spectrum:\n')
+    
+    B = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         filePath = fullfile(read_path, fileNames{i});
-        blocks{i} = init_m3_raw_textfile_read_2sensors(filePath);
-        blocks{i}.time = datetime(blocks{i}.('DateandTime'),...
+        B{i} = init_m3_raw_textfile_read_2sensors(filePath);
+        B{i}.time = datetime(B{i}.('DateandTime'),...
             'InputFormat',"yyyy/MM/dd HH:mm:ss",...
             'Format',timestamp_fmt,...
             'TimeZone','Europe/Oslo');
-        blocks{i}(:,'DateandTime') = [];
+        B{i}(:,'DateandTime') = [];
         
         % Make timetable, and add properties metadata
-        blocks{i} = table2timetable(blocks{i},'RowTimes','time');
+        B{i} = table2timetable(B{i},'RowTimes','time');
         
         %T = retime(T,'regular','fillwithmissing','SampleRate',1);
         
         % Add metadata for picking out sensor-messured data, when analysing
-        blocks{i} = addprop(blocks{i},{'Measured','Controlled'},{'variable','variable'});
-        blocks{i}.Properties.CustomProperties.Measured(:) = true;
-        blocks{i}.Properties.CustomProperties.Controlled(:) = false;
+        B{i} = addprop(B{i},{'Measured','Controlled'},{'variable','variable'});
+        B{i}.Properties.CustomProperties.Measured(:) = true;
+        B{i}.Properties.CustomProperties.Controlled(:) = false;
         
-        blocks{i}.Properties.VariableUnits = ...
-            {'L/min','L/min','uL/sec','','uL/sec',''};
+        B{i}.Properties.VariableNames = var_map(:,2);
+        B{i}.Properties.VariableUnits = var_map(:,5);
         
         % Metadata used for populating non-matched rows when syncing
-        blocks{i}.Properties.VariableContinuity = ...
-            {'continuous','continuous','continuous','step','continuous','step'};
+        B{i}.Properties.VariableContinuity = var_map(:,4);
 
+        B{i}(:,ismember(B{i}.Properties.VariableNames,varNames_unneeded)) = [];
     end
-   
+    
+    T = merge_table_blocks(B);
+    
+    fprintf('\nInitializing Spectrum done.\n')
     
 function T_block = init_m3_raw_textfile_read_2sensors(filePath)
    %IMPORTFILE Import data from a text file
@@ -54,7 +78,7 @@ function T_block = init_m3_raw_textfile_read_2sensors(filePath)
     opts = delimitedTextImportOptions("NumVariables", 115);
     
     % Specify range and delimiter
-    opts.DataLines = [1, Inf];
+    opts.DataLines = [3, Inf];
     opts.Delimiter = "\t";
     
     % Specify column names and types

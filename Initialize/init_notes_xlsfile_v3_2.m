@@ -7,7 +7,9 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     % Column that consists of empty / undefined values are not stored in the
     % notes table
     
+    
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
+    % TODO: Notes range defined in name manager is a bit confusing(?)
     notes_sheet = 'Notes';
     notes_range = 'Notes';
     varsNames_controlled_range = 'Controlled_VarNames';
@@ -41,15 +43,15 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
         'Thrombus volume'          'thrombusVol'       'categoric'   'step'
         'Speed change rate'        'speedChangeRate'   'categoric'   'step'
         'Dose'                     'dose'              'categoric'   'step'
-        'Pump speed'               'pumpSpeed'         'categoric'   'step'
+        'Pump speed'               'pumpSpeed'         'numeric'     'step'
         'Balloon level'            'balloonLevel'      'categoric'   'step'
         'Balloon offset'           'balloonOffset'     'categoric'   'step'
         'Catheter type'            'catheter'          'categoric'   'unset'
         'Clamp flow reduction'     'flowReduction'     'categoric'   'step'
-        'Afferent pressure'        'afferentP_noted'   'numeric'     'event'
-        'Effenrent pressure'       'efferentP_noted'   'numeric'     'event'
-        'Flow estimate'            'flow_noted'        'numeric'     'event'
-        'Power'                    'power_noted'       'numeric'     'event'
+        'Afferent pressure'        'affP_noted'        'numeric'     'event'
+        'Effenrent pressure'       'effP_noted'         'numeric'     'event'
+        'Flow estimate'            'Q_noted'           'numeric'     'step'
+        'Power'                    'power_noted'       'numeric'     'step'
         'Unclamped baseline flow'  'unclampFlow'       'numeric'     'event'
         'Comment'                  'comment'           'cell'        'event'
         ...
@@ -65,20 +67,25 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
         'speedChangeRate'
         'dose'
         'balloonOffset'
-        'afferentP_noted'
-        'efferentP_noted'
+        'affP_noted'
+        'effP_noted'
         };
     
     % TODO: For OO
-    missing_value_repr = {'','-','NA','N/A'};
+    missing_value_repr = {''};
     time_varName = 'time';
-  
+    n_header_lines = 3;
+    intervTypesToIncludeinEventRange = {'steady','baseline'};
     
+  
     %% Read from Excel file
+    
+    fprintf('\nInitializing notes:\n')
     
     % TODO: For OO...
     if nargin==1, read_path = ''; end
     filePath = fullfile(read_path,fileName);
+    display_filename(read_path,fileName);
     
     notes = readtable(filePath,...
         'Sheet',notes_sheet,...
@@ -193,9 +200,7 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     
     %% Add derived columns
     
-    notes = add_event_range(notes);
-    
-    n_header_lines = 3;
+    notes = add_event_range(notes, intervTypesToIncludeinEventRange);
     notes = add_note_row_id(notes, n_header_lines);
     
     
@@ -210,9 +215,10 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     % Convert to timetable with timestamp as the time column
     notes = table2timetable(notes,'RowTimes',time_varName);
 
+    fprintf('\nInitializing notes done.\n')
     
     
-function notes = add_event_range(notes)
+function notes = add_event_range(notes, intervTypesToIncludeinEventRange)
     % Add info about how long the events are running. Two new columns are made,
     % one column for event end time and one column with subscripts for timerange 
     % extractions in timetables.
@@ -229,16 +235,19 @@ function notes = add_event_range(notes)
     % be also used to quickly view the timerange, but has no other usage. 
     notes.event_timerange = cell(n_notes,1);
     
-    event_inds = find(notes.event~='-' & not(ismissing(notes.event)));
+    event_inds = find(...
+        (notes.event~='-' & not(ismissing(notes.event))) ...
+        | notes.intervType=='Continue from pause');
     for i=1:numel(event_inds)
         
         % Applying the rule of thomb
         ii = event_inds(i);
-        event_stop_ind = ii+1;
+        event_stop_ind = ii+1;%find(notes.event(ii:end)~='-',1,'first');
         
-        % Include steady state as part of the preceeding event/intervention
-        while contains(string(notes.intervType(event_stop_ind)),...
-            {'steady-state','steady state'}) && event_stop_ind<n_notes
+        % Include steady-states and baselines as part of the precursor event when
+        % deriving timeranges for the event
+        while contains(lower(string(notes.intervType(event_stop_ind))),...
+            intervTypesToIncludeinEventRange) && event_stop_ind<n_notes
             event_stop_ind = event_stop_ind+1;
         end
                 

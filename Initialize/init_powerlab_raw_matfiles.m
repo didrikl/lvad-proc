@@ -16,46 +16,73 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
     
     % Default viewing format of timestamps (not very important)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSS';
+
+    % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
+    % for accelerometer a parent class and child class for cardiaccs. Could be
+    % useful if different digital sampling boxes are used.
+    acc_gyr_sampleRate = 540;
+    p_sampleRate = 1000;
     
     var_map = {
         ...   
-        % Name in LabChart   Name in Matlab code   
-        'Trykk1'             'afferentP'
-        'Trykk2'             'efferentP'
-        'SensorAAccX'        'accA_x'
-        'SensorAAccY'        'accA_y'  
-        'SensorAAccZ'        'accA_z'            
-        'SensorAGyrX'        'gyrA_x'
-        'SensorAGyrY'        'gyrA_y'
-        'SensorAGyrZ'        'gyrA_z'
-        'SensorBAccX'        'accB_x'
-        'SensorBAccY'        'accB_y'  
-        'SensorBAccZ'        'accB_z'            
-        'SensorBGyrX'        'gyrB_x'
-        'SensorBGyrY'        'gyrB_y'
-        'SensorBGyrZ'        'gyrB_z'
+        % LabChart name  Matlab name  Sensor sample rate
+        'Trykk1'         'affP'       p_sampleRate
+        'Trykk2'         'effP'       p_sampleRate
+        'SensorAAccX'    'accA_x'     acc_gyr_sampleRate
+        'SensorAAccY'    'accA_y'     acc_gyr_sampleRate
+        'SensorAAccZ'    'accA_z'     acc_gyr_sampleRate
+        'SensorAGyrX'    'gyrA_x'     acc_gyr_sampleRate
+        'SensorAGyrY'    'gyrA_y'     acc_gyr_sampleRate
+        'SensorAGyrZ'    'gyrA_z'     acc_gyr_sampleRate
+        'SensorBAccX'    'accB_x'     acc_gyr_sampleRate
+        'SensorBAccY'    'accB_y'     acc_gyr_sampleRate
+        'SensorBAccZ'    'accB_z'     acc_gyr_sampleRate            
+        'SensorBGyrX'    'gyrB_x'     acc_gyr_sampleRate
+        'SensorBGyrY'    'gyrB_y'     acc_gyr_sampleRate
+        'SensorBGyrZ'    'gyrB_z'     acc_gyr_sampleRate
         };
 
+
+    fprintf('\nInitializing PowerLab:\n')
+    
     % Initialization of Powerlab block file(s)
     B = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         
-        B{i} = read_signal_block(filePaths{i},timestampFmt);
-        B{i} = map_varnames(B{i}, var_map(:,1), var_map(:,2));
-        B{i}.Properties.DimensionNames{1} = 'time'; 
+        fprintf(display_filename(fileNames{i}))
         
+        B{i} = read_signal_block(filePaths{i},timestampFmt);
+        
+        % TODO: Check for overlap with already read data, in case double saving
+        % from LabChart
+        
+        B{i} = map_varnames(B{i}, var_map(:,1), var_map(:,2));
+        
+        B{i}.Properties.DimensionNames{1} = 'time'; 
+               
+        % Storing info about sensors (metadata for each variable)
+        B{i} = addprop(B{i},'SensorSampleRate','variable');
+        in_use = ismember(B{i}.Properties.VariableNames,var_map(:,2));
+        B{i}.Properties.CustomProperties.SensorSampleRate(in_use) = var_map{:,3};
+        
+        % Gather 3 components as one variable (convenient when all 3 components
+        % are arguments in combination with other inputs, and also when viewing)
         B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
         B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
         B{i} = spatial_comp_as_vector(B{i},{'gyrA_x','gyrA_y','gyrA_z'},'gyrA');
         B{i} = spatial_comp_as_vector(B{i},{'gyrB_x','gyrB_y','gyrB_z'},'gyrB');
         
-        % Metadata used for populating non-matched rows when syncing
+        % All variables shall be treated as continous and measured in data fusion
         B{i} = addprop(B{i},'Measured','variable');
         B{i}.Properties.CustomProperties.Measured(:) = true;
         B{i}.Properties.VariableContinuity(:) = 'continuous';
         
-       
-    end    
+ 
+        
+    end   
+    
+    fprintf('\nInitializing PowerLab done.\n')
+
     
 function T_block = read_signal_block(filePath,timestamp_fmt)    
     
@@ -79,7 +106,8 @@ function T_block = read_signal_block(filePath,timestamp_fmt)
     % function argument
     wait_complete = sum(sum(interv_lengths));
     wait_progress = 0;
-    h_wait = waitbar(wait_progress,'Reading raw data');    
+    [~,fileName,~] = fileparts(filePath);
+    h_wait = waitbar(wait_progress,['Initializing: ',strrep(fileName,'_','\_'),'.mat']);
     
     for j=1:n_vars
         
@@ -98,7 +126,7 @@ function T_block = read_signal_block(filePath,timestamp_fmt)
             
             % Append column with new interval. There is no need to resample if
             % the sample rates for each interval is not constant.
-            col_interv = raw.data(raw.datastart(j,i):raw.dataend(j,i))';           
+            col_interv = raw.data(raw.datastart(j,i):raw.dataend(j,i))';
             col_interv = timetable(col_interv,...
                 'SampleRate',raw.samplerate(j,i),...
                 'VariableNames',varnames(j),...
@@ -107,7 +135,7 @@ function T_block = read_signal_block(filePath,timestamp_fmt)
             
             % Update progress represented in no of samples in the interval
             wait_progress = wait_progress+(interv_lengths(j,i)/wait_complete);
-            waitbar(wait_progress,h_wait,'Reading raw data');
+            waitbar(wait_progress,h_wait);
             
         end
         
@@ -134,10 +162,10 @@ function T_block = read_signal_block(filePath,timestamp_fmt)
         
     % Store various/unstructured info (start with initializing standard info)
     T_block.Properties.UserData = make_init_userdata(filePath);
-    T_block.Properties.UserData.header = cellstr(raw.titles);
-    T_block.Properties.UserData.col_units = col_unit;
-    T_block.Properties.UserData.interv_start_timestamps = interv_start_timestamps;
-    T_block.Properties.UserData.interv_units = interv_units;
+    T_block.Properties.UserData.Headers = cellstr(raw.titles);
+    T_block.Properties.UserData.ColumnUnits = col_unit;
+    T_block.Properties.UserData.IntervalStartTimes = interv_start_timestamps;
+    T_block.Properties.UserData.IntervalUnits = interv_units;
     
     close2(h_wait)
   

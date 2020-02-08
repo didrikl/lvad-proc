@@ -1,57 +1,68 @@
-function signal = resample_signal(signal,fs)
-    % RESAMPLE_SIGNAL
-    
-    % Must be applied before merging with note columns, as this function is
-    % implemented with a given method.
+function T = resample_signal(T,sampleRate,method)
+    %RESAMPLE_SIGNAL resamples timetable 
+    % Resampling T to new given sampling frequency fs. Method may by specified,
+    % as supported by Matlab's retime function
+    %
+    % T = resample_signal(T,fs)
+    % T = resample_signal(T,fs,method)
+    %
+    % See also timetable, retime
+    %
     
     % Method default settings
-    resample_method = 'linear';
-
-    fprintf('\nResampling signal:')
-    fprintf('\n\tMethod: %s',resample_method)
+    if nargin<3
+        method = 'linear';
+    end
+    
+    fprintf('\nResampling:')
+    fprintf('\n\tMethod: %s\n',method)
+    fprintf('\n\t: %sNew sample rate: %d\n',sampleRate)
     
     % Resample to even sampling, before adding categorical data and more from notes
     % TODO: Implement a check/support for signal containing non-numeric columns
-    meassued_cols = signal.Properties.CustomProperties.Measured;
-    derived_cols = signal.Properties.VariableContinuity=='continuous' & not(meassued_cols);
-    notes_cols = not(signal.Properties.VariableContinuity=='continuous');
+    meassued_cols = T.Properties.CustomProperties.Measured;
+    derived_cols = T.Properties.VariableContinuity=='continuous' & not(meassued_cols);
+    resamp_cols = meassued_cols | derived_cols;
+    merge_cols = not(resamp_cols);
         
-    resamp_varnames = signal.Properties.VariableNames(meassued_cols);
-    drop_varnames = {};
-    notes_varnames = signal.Properties.VariableNames(notes_cols);
+%    resamp_varNames = T.Properties.VariableNames(meassued_cols);
+    drop_varNames = {};
+    merge_varNames = T.Properties.VariableNames(merge_cols);
+    resamp_varNames = T.Properties.VariableNames(meassued_cols | derived_cols);
     
-    if any(derived_cols)
-        msg = sprintf('There are continous, but derived variables:\n\t%s',...
-            strjoin(signal.Properties.VariableNames(derived_cols),', '));
-        opts = {'Drop (delete) variables','Resample variables'};
-        response = ask_list_ui(opts,msg,1);
-        if response==2
-            resamp_varnames = signal.Properties.VariableNames(meassued_cols & derived_cols);
-        elseif response==1
-            drop_varnames = signal.Properties.VariableNames(derived_cols);
-        end
-    end
+%     % Ask user about derived variables
+%     if any(derived_cols)
+%         msg = sprintf('\n\tThere are continous, but derived variables:\n\t\t%s',...
+%             strjoin(T.Properties.VariableNames(derived_cols),', '));
+%         opts = {'Drop (delete) variables','Resample variables'};
+%         response = ask_list_ui(opts,msg,1);
+%         if response==2
+%             resamp_varNames = T.Properties.VariableNames(meassued_cols | derived_cols);
+%         elseif response==1
+%             drop_varNames = T.Properties.VariableNames(derived_cols);
+%         end
+%     end
     
-    fprintf('\n\tVariable(s) to re-sample: %s',strjoin(resamp_varnames,', '))
-    fprintf('\n\tVariable(s) to drop: %s\n',strjoin(drop_varnames,', '))
+    
+    fprintf('\n\tVariable(s) to re-sample: %s',strjoin(resamp_varNames,', '))
+    fprintf('\n\tVariable(s) to drop: %s\n',strjoin(drop_varNames,', '))
     
     % In case there are notes columns merged with signal, then these columns
     % must be kept separately and then merged with signal after resampling
-    % NOTE: A better way is to merge with initialized notes table, which could
-    % e.g. be accessible with object orientation
-    if any(notes_cols)
-        fprintf('\tVariable(s) to re-merge: %s\n',strjoin(notes_varnames,', '))
-        notes_vars_in_signal = signal(:,notes_varnames);
+    if any(merge_cols)
+        fprintf('\tVariable(s) to re-merge: %s\n',strjoin(merge_varNames,', '))
+        merge_varsTable = T(:,merge_varNames);
    end
     
     % Resampling
-    signal = retime(signal(:,resamp_varnames),...
-        'regular',resample_method,...
-        'SampleRate',fs);
+    T = retime(T(:,resamp_varNames),...
+        'regular',method,...
+        'SampleRate',sampleRate);
     
     % Re-include notes info
-    if any(notes_cols)
-        signal = merge_signal_and_notes(signal,notes_vars_in_signal);
+    if any(merge_cols)
+        T = fuse_timetables(T,merge_varsTable,...
+            'regular','SampleRate',sampleRate);
     end
         
-    fprintf('Done.\n')
+    fprintf('\nResampling done.\n')

@@ -8,9 +8,9 @@ function user_data = make_init_userdata(fileName,filePath)
     end
     
     user_data = struct;
-    user_data.read_date = datetime('now');
-    user_data.fileName = fileName;
-    user_data.filePath = filePath;
+    user_data.ReadDate = datetime('now');
+    user_data.FileName = fileName;
+    user_data.FilePath = filePath;
     s = dbstack;
-    user_data.source_code = s(end);
+    user_data.SourceCode = s(end);
     

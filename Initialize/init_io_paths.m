@@ -1,4 +1,4 @@
-function [read_path, save_path] = init_dir_structure(experiment_subdir)
+function [read_path, save_path] = init_io_paths(experiment_subdir)
     
     % Static definitions for I/O directory structure
     read_root = 'C:\Data\IVS\Didrik';
@@ -12,31 +12,31 @@ function [read_path, save_path] = init_dir_structure(experiment_subdir)
     input_subdir = fullfile([input_subdir,'\']);
     output_subdir = fullfile([output_subdir,'\']);
     
-    fprintf('\n\tRoot for data storage:')
     read_root = check_path_existence(read_root);
-    display_filename(read_root);
     if not(read_root) 
-        error('No experiment path given'); 
+        error('Data root path not specified'); 
     end
     
-    fprintf('\n\tExperiment:')
+    fprintf('\nExperiment:')
     experiment_path = check_path_existence(fullfile(read_root,experiment_subdir));
-    display_filename(experiment_path);
+    display_filename('',experiment_path);
     if not(experiment_path) 
-        error('No experiment path given'); 
+        error('Experiment path not specified'); 
     end
     
-    fprintf('\n\tReading:')
+    fprintf('\nReading:')
     read_path = check_path_existence(fullfile(experiment_path,input_subdir));
+    display_filename('',read_path);
     if not(experiment_path) 
-        error('No read path given'); 
+        error('Read path not specified'); 
     end
-    display_filename(read_path);
     
     % Same structure as read_path, but in a dedicated subdirectory. (For saving
     % there is not need to check its existence)
-    fprintf('\n\tSaving:')
+    fprintf('\nSaving:')
     save_path = fullfile(read_root,experiment_subdir,output_subdir);
-    display_filename(save_path);
+    display_filename('',save_path);
     
+    cd(experiment_path)
+
     

@@ -6,7 +6,7 @@ function abort(confirm,open_dlgbox)
     
     confirm_msg = 'Do you want to abort program execution?';
     dlg_msg = 'Execution aborted';
-    confirm_default = 'No';
+    ans_default = 'Yes';
     
     if nargin<1
         confirm = false;
@@ -32,7 +32,7 @@ function abort(confirm,open_dlgbox)
         answer = questdlg(confirm_msg,...
             'Abort confirmation', ...
             'Yes','No',...
-            confirm_default);
+            ans_default);
         if strcmp(answer,'No')
             return
         end

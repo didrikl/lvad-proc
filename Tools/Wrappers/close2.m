@@ -12,7 +12,7 @@ function close2(h_fig, varargin)
 			close(h_fig, varargin);
 		end
     catch ME
-        Warn('Figure window could not be closed:')
+        warning('Figure window could not be closed:')
         disp(ME.message)
     end
     

@@ -1,11 +1,14 @@
 %% Path
 
 % Add all subdirectories from current path into Matlab path
-addpath(genpath('.')) 
+addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 
 
-%% Memory
+%% Clearing of memory and command line
 
+% Make command window empty (but keeping command history in memory)
+home
+ 
 % Close all figures
 close all;
 
@@ -35,3 +38,5 @@ warning('off','backtrace')
 % Control whether to use separate windows for figures or not
 %set(0,'DefaultFigureWindowStyle','docked')
 %set(0,'DefaultFigureWindowStyle','normal')
+
+%set(0,'DefaultAxesColorOrder',brewermap(NaN,'Accent'))

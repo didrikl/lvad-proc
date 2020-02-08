@@ -23,24 +23,24 @@ function save_figure(varargin)
     % TODO: Input parsing
     
     % Persistent boolean switches for storing info about future actions
-    persistent always_overwrite_existing
-    persistent always_ignore_save_existing
-    persistent always_save_fig_file
+    persistent alwaysOverwriteExisting
+    persistent alwaysIgnoreSaveExisting
+    persistent alwaysSaveFigFile
     
     % Initialize the persistent variables, if not done before
-    if isempty(always_overwrite_existing)
-        always_overwrite_existing = false;
+    if isempty(alwaysOverwriteExisting)
+        alwaysOverwriteExisting = false;
     end
-    if isempty(always_ignore_save_existing)
-        always_ignore_save_existing = false;
+    if isempty(alwaysIgnoreSaveExisting)
+        alwaysIgnoreSaveExisting = false;
     end
-    if isempty(always_save_fig_file)
-        always_save_fig_file = false;
+    if isempty(alwaysSaveFigFile)
+        alwaysSaveFigFile = false;
     end
     
     % First argument may be a figure handle for a specific figure to save,
     % otherwise use current figure as the figure to save.
-    if numel(varargin)<4
+    if numel(varargin)==3
         [path, fileName, resolution] = varargin{:};
         h_fig = gcf;
     elseif numel(varargin)==4
@@ -48,20 +48,20 @@ function save_figure(varargin)
     end
     
     % Replace illegal characters in fileName with a valid replacement char
-    fileName = make_valid_fileName(fileName);
+    fileName = make_valid_filename(fileName);
 
     fprintf('\nSaving Figure %d %s',h_fig.Number,h_fig.Name)
     fprintf('\n\tAs .png with resolution: %d\n',resolution)
-    if always_save_fig_file
+    if alwaysSaveFigFile
         fprintf('\tAs .fig\n')
     end
     
     % Check if there is already an exsisting file with the same fileName in 
     % the saving directory path. If there is an exsisting file, then let the
     % user decide what action to do.
-    [path, png_fileName, always_overwrite_existing, always_ignore_save_existing] = ...
-        save_destination_check(path, [fileName,'.png'], always_overwrite_existing, ...
-        always_ignore_save_existing);
+    [path, png_fileName, alwaysOverwriteExisting, alwaysIgnoreSaveExisting] = ...
+        save_destination_check(path, [fileName,'.png'], alwaysOverwriteExisting, ...
+        alwaysIgnoreSaveExisting);
     if png_fileName  
         print(h_fig, fullfile(path, png_fileName),...
             '-dpng', ['-r',num2str(resolution)])
@@ -72,10 +72,10 @@ function save_figure(varargin)
     % also for .fig files. If e.g. overwrite_existing was set to true for .png,
     % then this will also apply for .fig files. In addition, use dedicated
     % persistent variable if saving fig file nevertheless should be relevant.
-    [path, fig_fileName, always_overwrite_existing, always_ignore_save_existing] = ...
-        save_destination_check(path, [fileName,'.fig'], always_overwrite_existing, ...
-        always_ignore_save_existing);  
-    if fig_fileName & always_save_fig_file
+    [path, fig_fileName, alwaysOverwriteExisting, alwaysIgnoreSaveExisting] = ...
+        save_destination_check(path, [fileName,'.fig'], alwaysOverwriteExisting, ...
+        alwaysIgnoreSaveExisting);  
+    if fig_fileName & alwaysSaveFigFile
         savefig(h_fig, fullfile(path, fig_fileName))
         display_filename(fig_fileName,path,'Saved file','\t');
     end

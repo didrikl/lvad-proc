@@ -1,4 +1,4 @@
-function signal = calc_moving(signal, input_varnames, statistic_types)
+function T = calc_moving(T, input_varNames, statisticTypes, winDur_sec)
     % CALC_MOVING
     %   
     %
@@ -6,66 +6,66 @@ function signal = calc_moving(signal, input_varnames, statistic_types)
     %
 
     if nargin < 3
-        statistic_types = {'RMS','Var','Std'};
+        statisticTypes = {'RMS','Std'};
     end
     
-    win_dur_sec = 1;
+    if nargin<4
+        winDur_sec = 1;
+    end
     
-%     if not(iscell(input_varnames))
-%         input_varnames = {input_varnames};
-%     end
-%     % TODO: Try change to the following:
-    statistic_types = cellstr(statistic_types);
-    input_varnames = cellstr(input_varnames);
+    statisticTypes = cellstr(statisticTypes);
+    input_varNames = cellstr(input_varNames);
     
-    fprintf('\nCalculating moving statistics:\n\n\tTable: %s',inputname(1))
+    fprintf('\nCalculating moving statistics:\n\tTable: %s',inputname(1))
     
-    [fs,signal] = check_sampling_frequency(signal);
+    [fs,T] = get_sampling_rate(T);
     if isnan(fs), return; end
     
-    win_length = win_dur_sec*signal.Properties.SampleRate;
+    win_length = winDur_sec*fs;
     fprintf('\n\tWindow length in samples: %d',win_length)
-    fprintf('\n\tWindow length in duration: %d (sec)\n',win_dur_sec)
+    fprintf('\n\tWindow length in duration: %d (sec)\n',winDur_sec)
     
-    for i=1:numel(input_varnames)
-
-        for j=1:numel(statistic_types)
-            
-            suffix = ['_mov',statistic_types{j}];
-            [input_varname,output_varname] = ...
-                check_calc_io(signal,input_varnames{i},suffix);
-            if isempty(output_varname), continue; end
-
-            signal_vec = signal.(input_varname);
+    for i=1:numel(input_varNames)
         
-            switch lower(statistic_types{j})
+        fprintf('\n\tInput variable: %s\n',input_varNames{i})
+        for j=1:numel(statisticTypes)
+            
+            suffix = ['_',num2str(win_length),'mov',statisticTypes{j}];
+            [input_varname,output_varname] = ...
+                check_calc_io(T,input_varNames{i},suffix);
+            if isempty(output_varname), continue; end
+            fprintf('\tOutput_varname variable: %s\n',output_varname)
+            
+            signal_vec = T.(input_varname);
+            
+            switch lower(statisticTypes{j})
                 
                 case 'rms'
                     MovRMSObj = dsp.MovingRMS(win_length);
-                    signal.(output_varname) = MovRMSObj(signal_vec);
-                    signal.Properties.VariableDescriptions(output_varname) = {sprintf(...
+                    T.(output_varname) = MovRMSObj(signal_vec);
+                    T.Properties.VariableDescriptions(output_varname) = {sprintf(...
                         'Moving root mean sqaure (RMS)\n\tWindow length: %s',win_length)};
             
                 case 'var'
                     MovVarObj = dsp.MovingVariance(win_length);
-                    signal.(output_varname) = MovVarObj(signal_vec);
-                    signal.Properties.VariableDescriptions(output_varname) = {sprintf(...
+                    T.(output_varname) = MovVarObj(signal_vec);
+                    T.Properties.VariableDescriptions(output_varname) = {sprintf(...
                         'Moving variance\n\tWindow length: %s',win_length)};
         
                 case 'std'
                     
                     MovSTDObj = dsp.MovingStandardDeviation(win_length);
-                    signal.(output_varname) = MovSTDObj(signal_vec);
-                    signal.Properties.VariableDescriptions(output_varname) = {sprintf(...
+                    T.(output_varname) = MovSTDObj(signal_vec);
+                    T.Properties.VariableDescriptions(output_varname) = {sprintf(...
                         'Moving standard deviation\n\tWindow length: %s',win_length)};
         
             end
              
             % Moving statistic samples before full window make less sence/can
             % cause confusion, hence setting these sample values as nan
-            signal.(output_varname)(1:win_length,:) = nan;
+            T.(output_varname)(1:win_length,:) = nan;
             
-            signal.Properties.VariableContinuity(output_varname) = 'continuous';
+            T.Properties.VariableContinuity(output_varname) = 'continuous';
         
         end
         

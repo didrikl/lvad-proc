@@ -3,12 +3,13 @@ function str = display_filename(names,path,msg,indent)
     ILLEGAL_CHARS_FOR_FILENAME = '[/\*:?"<>|]';
     ILLEGAL_CHARS_FOR_PATH = '[\*?"<>|]';
     CHARS_NEED_ESCAPING = '\';
+    %CHARS_NEED_ESCAPING = {'\','_'};
     
     if nargin<2
         path = '';
     end
     if nargin<3
-            msg = '';
+        msg = '';
     end
     if nargin<4
         indent = '\t';
@@ -35,7 +36,7 @@ function str = display_filename(names,path,msg,indent)
         str = [str,newline];
         
         if not(isempty(path_in_name))
-            str = [str,sprintf([indent,'Path: ',path_in_name])];
+            str = [str,sprintf([indent,'Subdir: ',path_in_name])];
             if ~isempty(regexp(path_in_name, ILLEGAL_CHARS_FOR_PATH, 'once'))
                 str = [str,sprintf(' (contains illegal characters for saving)')];
             end
@@ -60,5 +61,5 @@ function str = display_filename(names,path,msg,indent)
     end
     
     if nargout==0
-        disp(str)
+        fprintf([strrep(str,'\','\\'),'\n'])
     end

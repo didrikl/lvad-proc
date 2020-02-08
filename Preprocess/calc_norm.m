@@ -10,8 +10,12 @@ function T = calc_norm(T, input_varnames)
     end
     
     new_var_suffix = '_norm';
+    tableName = inputname(1);
     
-    fprintf('\nCalculating Euclidian norm (L2-norm):\n\n\tTable: %s',inputname(1))
+    fprintf('\nCalculating Euclidian norm (L2-norm):\n')
+    if not(isempty(tableName))
+        fprintf('\tTable: %s\n',tableName)
+    end
     
     for i=1:numel(input_varnames)
         

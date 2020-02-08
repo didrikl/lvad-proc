@@ -93,6 +93,7 @@ function print_ask_list_menu(options, default)
     for i=1:n_option
 		num_width = floor(log10(i));
 		num_str = ['\n\t[',num2str(i),']',repmat(' ',(max_num_width-num_width))];
+        if i==default, options{i} = strrep(options{i},'(default)',''); end
         fprintf([num_str,' ',options{i}]);
 		space = repmat(' ',1,M_max-M(i)+1);
 		if i==default, fprintf([space,'{default <enter>}']); end
