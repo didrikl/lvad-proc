@@ -1,4 +1,8 @@
-function [signal,raw] = init_cardiaccs_raw_txtfile(fileName,read_path)
+function [T,raw] = init_cardiaccs_raw_txtfile(fileName,read_path, accVarName)
+    
+    if nargin<3
+        accVarName='acc';
+    end
     
     filePath = fullfile(read_path,fileName);
     display_filename(fileName,read_path,'\nReading Cardiaccs text file input')
@@ -6,13 +10,15 @@ function [signal,raw] = init_cardiaccs_raw_txtfile(fileName,read_path)
     raw = read_cardiaccs_raw_txtfile(filePath);
     
     % Unfold to one row per acc registration and type conversions
-    signal = parse_cardiaccs_raw(raw);
+    T = parse_cardiaccs_raw(raw);
     
     % Let time be represented as datetime (timestamp) and convert to timetable
     % where the timestamp is not a variable, but an internal row id. Timetable
     % have built-in methods for signal processing
     % NOTE: Move this into parse_cardiaccs_raw .m-file?
-    signal = make_signal_timetable(signal);
+    T = make_signal_timetable(T);
+    
+    T.Properties.VariableNames{'acc'}  = accVarName;
     
 function raw = read_cardiaccs_raw_txtfile(filePath)
     

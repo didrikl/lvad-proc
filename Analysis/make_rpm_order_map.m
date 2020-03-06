@@ -20,32 +20,39 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, varName, maxFreq)
     % NOTE: Waterfall plot example is likely irrelevant, since it does not have
     % any time axis.
     % 
-    %
-    
+
     if nargin<3
         maxFreq = nan;
     end
     
-    order_res = 0.05;
-    order_res = 0.1;
-    overlap_pst = 80; %80; % greater percent is perhaps slightly better...?
+     order_res = 0.1;
+     overlap_pst = 90; %80; % greater percent is perhaps slightly better...?
+%      order_res = 0.02;
+%      overlap_pst = 99;
+    varName = check_var_input_from_table(T, varName);
     
     T = T(:,{varName,'pumpSpeed'});
     
-    
     [fs,T] = get_sampling_rate(T,false);
+
     if isnan(maxFreq) && isnan(fs)
         [fs,T] = get_sampling_rate(T);
         if isnan(fs), return; end
-    elseif not(maxFreq~=fs)
+    elseif maxFreq~=fs
        T = resample_signal(T,maxFreq);
     end
     
+    % Ensure numeric pumpspeed, then look for NaNs
+    if iscategorical(T.pumpSpeed)
+        T.pumpSpeed = double(string(T.pumpSpeed));
+    end
     missingRPM = isnan(T.pumpSpeed);
     if any(missingRPM)
         warning(sprintf('%d rows have missing RPM',nnz(missingRPM)));
     end
     T(missingRPM,:) = [];
+    
+    % Remove DC component
     x = detrend(T.(varName));
 
     if nargout==0
@@ -63,6 +70,7 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, varName, maxFreq)
             'Scale','dB',...'linear',...
             'Window',{'chebwin',80}... % flattopwin perhaps slightly better...?
             ...'Window','flattopwin'... % not so good
+            ...'Window','hamming'... 
             );
     end
   

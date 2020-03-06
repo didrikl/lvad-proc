@@ -1,4 +1,4 @@
-function feats = make_feature_windows(signal, feats, plot_vars)
+function feats = make_feature_windows(T, feats, qc_event_type, plot_vars, search_varName)
     % make_feature_windows
     %   Quality control mainly used to check when thrombus enters LVAD (not to
     %   analyse features or to find features).
@@ -7,19 +7,31 @@ function feats = make_feature_windows(signal, feats, plot_vars)
     lead_expansion = 30;
     trail_expansion = 30;
     
-    % Event type for window quality control (qc)
-    qc_event_type = {'Thrombus injection'};
-    
-    sub1_y_var = {'accNorm_lvad_signal','accNorm_lead_signal'};
-    sub1_yy_var = {};
-    
-    sub2_y_var = {'accNorm_movRMS_lvad_signal','accNorm_movRMS_lead_signal'};
-    sub2_yy_var = {};
-    %sub2_yy_var = {'acc_movStdNorm_lvad_signal','acc_movStdNorm_lead_signal'};
-    
-    search_var = {'accNorm_movStd_lvad_signal','accNorm_movRMS_lvad_signal'};
-    
-    % TODO: Check if variable names exist...
+    % For backward compatibility
+    if nargin<3
+        % Event type for window quality control (qc)
+        qc_event_type = {'Thrombus injection'};
+    end
+    if nargin<4
+        sub1_y_var = {'accNorm_lvad_signal','accNorm_lead_signal'};
+        sub1_yy_var = {};  
+        sub2_y_var = {'accNorm_movRMS_lvad_signal','accNorm_movRMS_lead_signal'};
+        sub2_yy_var = {};
+    else
+        sub1_y_var = plot_vars.sub1_y_var;
+        sub1_yy_var = plot_vars.sub1_yy_var;
+        sub2_y_var = plot_vars.sub2_y_var;
+        sub2_yy_var = plot_vars.sub2_yy_var;
+    end
+    if nargin<5
+        search_varName = {'accNorm_movStd_lvad_signal','accNorm_movRMS_lvad_signal'};      
+    end
+        
+    search_varName = check_var_input_from_table(T, search_varName);
+    sub1_y_var = check_var_input_from_table(T,sub1_y_var);
+    sub1_yy_var = check_var_input_from_table(T,sub1_yy_var);
+    sub2_y_var = check_var_input_from_table(T,sub2_y_var);
+    sub2_yy_var = check_var_input_from_table(T,sub2_yy_var);
     
     % More specified window for the feature, to be adjusted in quality control.
     % Start with using the window to be equal to the precursor window
@@ -34,7 +46,11 @@ function feats = make_feature_windows(signal, feats, plot_vars)
        
     %h_fig = gobjects(n_iv,1);
     close all
+    
     qc_feat_inds = find(contains(string(feats.precursor),qc_event_type));
+    % TODO: Check if qc_event_type exists in precoursor column, and ask user to 
+    % revise if it does not exist
+    
     n_qc_feats = numel(qc_feat_inds);
     for i=1:n_qc_feats
         
@@ -43,7 +59,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         qc_event_feat = feats(feat_ind,:);
         
         plot_range = timerange(qc_event_feat.leadTrailSplit,qc_event_feat.trailWinEnd);
-        plot_data = signal(plot_range,:);
+        plot_data = T(plot_range,:);
         search_range = timerange(feats.precursor_startTime(feat_ind),feats.precursor_endTime(feat_ind));
         t = seconds(plot_data.time-plot_data.time(1));%feats.precursor_startTime(1))
         t = t-lead_expansion;
@@ -54,7 +70,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         % * Let the window go all the way to the next intervention?
         % * Store automatic detection findings
         
-        abrupt_change_time = find_abrupt_change(t,signal(search_range,:),search_var);
+        abrupt_change_time = find_abrupt_change(t,T(search_range,:),search_varName);
         
         % Handling of no automatic detection.
         if all(isnan(abrupt_change_time))
@@ -76,7 +92,7 @@ function feats = make_feature_windows(signal, feats, plot_vars)
         h_sub(2) = plot_in_lower_panel(t,plot_data,sub2_y_var,sub2_yy_var);        
         
         % Add title
-        make_annotations(h_sub, qc_event_feat, i, n_qc_feats);
+        %make_annotations(h_sub, qc_event_feat, i, n_qc_feats);
         
         % Axis relation control
         h_sub(2).Position(4) = h_sub(1).Position(4)*1.18;

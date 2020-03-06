@@ -15,37 +15,21 @@ function T = resample_signal(T,sampleRate,method)
     end
     
     fprintf('\nResampling:')
-    fprintf('\n\tMethod: %s\n',method)
-    fprintf('\n\t: %sNew sample rate: %d\n',sampleRate)
+    fprintf('\n\tMethod: %s',method)
+    fprintf('\n\tNew sample rate: %d',sampleRate)
     
     % Resample to even sampling, before adding categorical data and more from notes
     % TODO: Implement a check/support for signal containing non-numeric columns
-    meassued_cols = T.Properties.CustomProperties.Measured;
-    derived_cols = T.Properties.VariableContinuity=='continuous' & not(meassued_cols);
-    resamp_cols = meassued_cols | derived_cols;
+    measured_cols = T.Properties.CustomProperties.Measured;
+    derived_cols = T.Properties.VariableContinuity=='continuous' & not(measured_cols);
+    resamp_cols = measured_cols | derived_cols;
     merge_cols = not(resamp_cols);
         
 %    resamp_varNames = T.Properties.VariableNames(meassued_cols);
-    drop_varNames = {};
     merge_varNames = T.Properties.VariableNames(merge_cols);
-    resamp_varNames = T.Properties.VariableNames(meassued_cols | derived_cols);
-    
-%     % Ask user about derived variables
-%     if any(derived_cols)
-%         msg = sprintf('\n\tThere are continous, but derived variables:\n\t\t%s',...
-%             strjoin(T.Properties.VariableNames(derived_cols),', '));
-%         opts = {'Drop (delete) variables','Resample variables'};
-%         response = ask_list_ui(opts,msg,1);
-%         if response==2
-%             resamp_varNames = T.Properties.VariableNames(meassued_cols | derived_cols);
-%         elseif response==1
-%             drop_varNames = T.Properties.VariableNames(derived_cols);
-%         end
-%     end
-    
-    
-    fprintf('\n\tVariable(s) to re-sample: %s',strjoin(resamp_varNames,', '))
-    fprintf('\n\tVariable(s) to drop: %s\n',strjoin(drop_varNames,', '))
+    resamp_varNames = T.Properties.VariableNames(measured_cols | derived_cols);
+  
+    fprintf('\n\tVariable(s) to re-sample: %s\n',strjoin(resamp_varNames,', '))
     
     % In case there are notes columns merged with signal, then these columns
     % must be kept separately and then merged with signal after resampling

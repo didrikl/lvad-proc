@@ -15,9 +15,6 @@ function T = merge_table_blocks(varargin)
     end
     
     T = blocks{1};
-    %B_userData = cell(numel(blocks),1);
-    
-    %B_sampleRate = nan(numel(blocks),1);
     
     for i=2:numel(blocks)
     
@@ -30,7 +27,6 @@ function T = merge_table_blocks(varargin)
         
         if istimetable(blocks{i})
             T.Properties.UserData.Blocks{i}.SampleRate = blocks{i}.Properties.SampleRate;
-            %B_sampleRate(i) = blocks{i}.Properties.SampleRate;
         end
         
         if i==1 
@@ -42,11 +38,6 @@ function T = merge_table_blocks(varargin)
         T = [T;blocks{i}];
         
     end
-    
-    %T.Properties.UserData = struct;
-    %T.Properties.UserData.Blocks = B_userData;
-    %T.Properties.UserData.Blocks.SampleRate = B_sampleRate;
-    
     
     
 end

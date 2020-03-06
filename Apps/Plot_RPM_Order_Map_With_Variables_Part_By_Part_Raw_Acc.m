@@ -1,59 +1,92 @@
 resolution = 300;
-orderMapVar = {'accA_x','accA_norm','accA_norm_movRMS'};
+orderMapVar = {'accA_xz_norm','accA_norm'};
 plotVars = {
         %'P'
-        %'accA_movStd'
+        'accA_xz_norm_movStd'
+        'accA_norm_movStd'
+        'accA_xz_norm_movRMS'
         'accA_norm_movRMS'
-        'power_noted'
+        %'accA_movRMS'
+        %'power_noted'
         %'gyrA_norm_movRMS'
-        'Q'
+        %'Q'
         };
-
-% Muting of non-comparable data in baseline
+barVars = {
+    'part',           brewermap(20,'Set3');
+    %'intervType'      brewermap(20,'Pastel2');
+    'pumpSpeed'       brewermap(20,'Paired');
+    'flowReduction'   brewermap(10,'BuPu');%'YlGnBu');
+    'balloonLevel'    brewermap(10,'RdPu');
+    };
+% Muting of non-comparable data (due to wrong setting in LabChart) in baseline
 S_parts{1}.gyrA = nan(height(S_parts{1}),3);
 S_parts{1}.gyrA_norm = nan(height(S_parts{1}),1);
 S_parts{1}.gyrA_norm_movRMS = nan(height(S_parts{1}),1);
+%Init_IV2_Seq2
+    
+%% Angio catheter parts
 
-% Angio catheter parts
-baseline_part = 22;
+baseline_parts = [1,15,22];
+intervention_parts = [8];
 rpm = [2600];
-parts = ;
+baseline_parts = [15,22];
+intervention_parts = [19];
+rpm = [2300];
+colScale = [-100,-30];
 
-BL = S_parts{baseline_part};
-for i=1:numel(parts)
-    BL = BL(get_steady_state_rows(BL) & BL.pumpSpeed==rpm(i),:);
-    BL = calc_moving(BL, {'accA','accA_norm'}, {'Std','RMS'}, 0.1);
-    P = S_parts{parts(i)};
-    P = calc_moving(P, {'accA','accA_norm'}, {'Std','RMS'}, 0.1);
-    P = merge_table_blocks({BL,P});
-    P = splitvars(P,'accA','NewVariableNames',{'accA_x','accA_y','accA_z'});
-    P = P(get_steady_state_rows(P) & P.pumpSpeed==rpm(i),:);
+close all
+clear check_var_input_from_table
+
+for i=1:numel(intervention_parts)
+    
+    parts = sort([baseline_parts,intervention_parts(i)]);
+    T = cell(numel(parts),1);
+    for j=1:numel(parts)
+        T{j} = S_parts{parts(j)};
+        
+        % overwrite with other overlapping in moving statistics calc
+        T{j} = calc_moving(T{j}, ...
+            {'accA_xz_norm'},{'Std','RMS'},sampleRate*1);
+        
+        T{j} = T{j}(get_steady_state_rows(T{j}) & T{j}.pumpSpeed==rpm(i),:);
+    end
+    
+    T = merge_table_blocks(T);
+    T.Properties.SampleRate = sampleRate;
+    T.accA_x = T.accA(:,1);
+    T.accA_y = T.accA(:,2);
+    T.accA_z = T.accA(:,3);
+    
+    % Merging, so they will be plotted in same panel
+    T = mergevars(T,{'affP','effP'},'NewVariableName','P');
+    T = mergevars(T,{'affQ','effQ','Q_noted'},'NewVariableName','Q');
+    %T = mergevars(T,{'accA_x','accA_y','accA_y'},'NewVariableName','accA');
+
     for j=1:numel(orderMapVar)
-        h_fig = plot_ordermap_with_vars(P,orderMapVar{j},plotVars);
-        h_fig.Name = sprintf('Part=%d (BL=Part%d) - Order map of %s with vars',...
-            parts(i),baseline_part,orderMapVar{j});
+        h_fig = plot_ordermap_with_vars(T,orderMapVar{j},plotVars,barVars,sampleRate,colScale);
+        h_fig.Name = sprintf('IV2_Seq2: Parts=%s - Order map of %s with vars',...
+            mat2str(parts),orderMapVar{j});
         save_figure(h_fig, [proc_basePath,'\Figures'], h_fig.Name, resolution)
     end
 end
 
+%% PCI catherter parts
 
-% % PCI catherter parts
-% close all
-% baseline = 15;
-% baseline_rpm = [2600];
-% parts = 16;
-% for i=1:numel(parts)
-%     make_rpm_order_plots(...
-%         proc_basePath,S_parts,parts(i),baseline,sampleRate,baseline_rpm(i));
-% end
-% 
-% % Clamping parts
-% baseline = [1];
-% for j=1:numel(baseline)
-%     baseline_rpm = [2600,2600,2000,2300,2900,3200];
-%     parts = 2:6;
-%     for i=1:numel(parts)
-%         make_rpm_order_plots(...
-%             proc_basePath,S_parts,parts(i),baseline(j),sampleRate,baseline_rpm(i));
-%     end
-% end
+baseline = 15;
+baseline_rpm = [2600];
+parts = 16;
+for i=1:numel(parts)
+    make_rpm_order_plots(...
+        proc_basePath,S_parts,parts(i),baseline,sampleRate,baseline_rpm(i));
+end
+
+% Clamping parts
+baseline = [1];
+for j=1:numel(baseline)
+    baseline_rpm = [2600,2600,2000,2300,2900,3200];
+    parts = 2:6;
+    for i=1:numel(parts)
+        make_rpm_order_plots(...
+            proc_basePath,S_parts,parts(i),baseline(j),sampleRate,baseline_rpm(i));
+    end
+end

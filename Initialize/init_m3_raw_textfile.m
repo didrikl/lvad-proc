@@ -28,6 +28,9 @@ function T = init_m3_raw_textfile(fileNames,read_path)
     
     fprintf('\nInitializing Spectrum:\n')
     
+    T = table;
+    if numel(fileNames)==0, return; end
+    
     B = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         filePath = fullfile(read_path, fileNames{i});

@@ -70,8 +70,12 @@ function colsToDrop = determineColsToDrop(T2)
     % Return logical array of new columns to drop before data fusion
     
     persistent overwaysIncludeEmptyVariables
-      if isempty(overwaysIncludeEmptyVariables)
+    persistent overwaysExcludeEmptyVariables
+    if isempty(overwaysIncludeEmptyVariables)
         overwaysIncludeEmptyVariables = false;
+    end
+    if isempty(overwaysExcludeEmptyVariables)
+        overwaysExcludeEmptyVariables = false;
     end
     
     % Merge only data with specified variable continuity (which is used for
@@ -87,7 +91,12 @@ function colsToDrop = determineColsToDrop(T2)
                 '\n(type "clear fuse_timetables" to reset)\n'])
             return;
         end
-    
+        if overwaysExcludeEmptyVariables==true
+            fprintf(['\nEmpty variables will always be excluded',...
+                '\n(type "clear fuse_timetables" to reset)\n'])
+            colsToDrop(emptyCols) = true;
+            return;
+        end
         
         varName = T2.Properties.VariableNames{emptyCols(i)};
         msg = sprintf('\nColumn %s contain only missing data',varName);
@@ -95,14 +104,18 @@ function colsToDrop = determineColsToDrop(T2)
             'Include'
             'Include, always'
             'Exclude'
-            'Cancel merging'
+            'Exclude, always'
             'Abort execution'
             };
         response = ask_list_ui(opts,msg,1);
         if response==2, overwaysIncludeEmptyVariables = true; end
         if response==3, colsToDrop(emptyCols(i)) = true; end %#ok<AGROW>
-        if response==4 || not(response), return; end
+        if response==4, overwaysExcludeEmptyVariables = true; end
         if response==5, abort(true); end
+        
+        % if cancelled in GUI
+        if not(response), return; end
+        
     end
 end
     

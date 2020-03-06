@@ -9,7 +9,7 @@ function notes = init_notes_xlsfile(fileName, read_path)
         'date'
         'timestamp'
         'time_elapsed'
-        .part'
+        'part'
         'intervType'
         'event'
         'thrombusVol'
@@ -40,7 +40,7 @@ function notes = init_notes_xlsfile(fileName, read_path)
         'pumpSpeed'
         }';
     cat_cols = {
-        .part'
+        'part'
         'intervType'
         'event'
         'thrombusVol'
@@ -53,7 +53,7 @@ function notes = init_notes_xlsfile(fileName, read_path)
     % doing syncing/data fusion
     event_vars = {
         'event'
-        'thrombusVol'
+        ...'thrombusVol'
         'dose'
         'afferentP'
         'efferentP'
@@ -61,8 +61,9 @@ function notes = init_notes_xlsfile(fileName, read_path)
         'power'
     };
     step_vars = {
-        .part'
+        'part'
         'intervType'
+        'thrombusVol'
         'speedChangeRate'
         'pumpSpeed'    
     };
@@ -74,7 +75,7 @@ function notes = init_notes_xlsfile(fileName, read_path)
         'dose'
         'pumpSpeed'
         };
-    meassured_vars = {
+    measured_vars = {
         'afferentP'
         'efferentP'
         'flow'
@@ -128,7 +129,7 @@ function notes = init_notes_xlsfile(fileName, read_path)
     notes = standardizeMissing(notes, missing_value_repr);
     notes = addprop(notes,{'Controlled','Measured'},{'variable','variable'});
     notes.Properties.CustomProperties.Controlled = ismember(all_vars,controlled_vars);
-    notes.Properties.CustomProperties.Measured = ismember(all_vars,meassured_vars);
+    notes.Properties.CustomProperties.Measured = ismember(all_vars,measured_vars);
     notes.Properties.UserData.info = info;
     notes.Properties.UserData.protocol = protocol;
     notes.Properties.VariableNames = all_vars; % header_lines{1,:}
@@ -140,7 +141,7 @@ function notes = init_notes_xlsfile(fileName, read_path)
     notes.Properties.VariableContinuity(event_vars) = 'event';
     
     % Change the time representation, similar to the parsing of recorded data
-    notes.time = datetime(notes.time,...
+    notes.time = datetime(notes.timestamp,...
         'ConvertFrom','datenum',...
         'TimeZone','Europe/Oslo');
     

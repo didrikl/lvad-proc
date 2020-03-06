@@ -5,11 +5,18 @@ function S = fuse_data(notes,PL,US)
     %
     % See also merge_table_blocks, fuse_timetables
     
+    if nargin<3, US = table; end
+    
     fprintf('\nData fusion:')
     
+    if not(iscell(PL))
+       PL = {PL};
+    end
+    
+    % Loop over each stored PowerLab file
     for i=1:numel(PL)
         
-        % merging notes
+        % Union merging PowerLab timetable with notes
         fprintf('\nData fusion of block with notes')
         notes_block = notes(...
             notes.time>=PL{i}.time(1) & notes.time<=PL{i}.time(end),:);
@@ -23,16 +30,16 @@ function S = fuse_data(notes,PL,US)
         
         % Ultrasound is clipped to time range of B and notes, only (i.e. not
         % clipping of B to achive a union of the two time ranges)
+        if isempty(US) || height(US)==0, continue; end
         fprintf('\nData fusion of block with ultrasound')
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
         PL{i} = fuse_timetables(PL{i},US_block);
-        
-        clear fuse_timetables
-        
+         
     end
     
     S = merge_table_blocks(PL);
     
     fprintf('\nData fusion done.\n')
-    
+    clear fuse_timetables
+
 end

@@ -12,14 +12,13 @@ function feats = init_features_from_notes(notes)
         (notes.Properties.CustomProperties.Measured & ...
         contains(string(notes.Properties.VariableContinuity),{'step','event'}));
 
-     ss_rows = find(contains(lower(string(notes.intervType)),'steady'));
-     
+     ss_rows = find(get_steady_state_rows(notes));
      feats = timetable2table(notes(ss_rows,feature_cols));
      
      % Rename meassured (point-wise manual reading) as steady-state values
      ss_vars = feats.Properties.CustomProperties.Measured;
      ss_varnames = feats.Properties.VariableNames(ss_vars);
-     feats.Properties.VariableNames(ss_vars) = string(ss_varnames)+"_steadyState";
+     feats.Properties.VariableNames(ss_vars) = string(ss_varnames)+"_steady";
          
      % Store additional ID and reference columns
      % (These columns are not feature-columns.) 

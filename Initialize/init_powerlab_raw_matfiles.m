@@ -20,7 +20,7 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
     % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
     % for accelerometer a parent class and child class for cardiaccs. Could be
     % useful if different digital sampling boxes are used.
-    acc_gyr_sampleRate = 540;
+    acc_gyr_sampleRate = 700;
     p_sampleRate = 1000;
     
     var_map = {
