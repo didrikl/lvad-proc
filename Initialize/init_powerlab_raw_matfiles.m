@@ -15,31 +15,31 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
     filePaths = fullfile(raw_Basepath,fileNames);
     
     % Default viewing format of timestamps (not very important)
-    timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSS';
+    timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
 
     % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
     % for accelerometer a parent class and child class for cardiaccs. Could be
     % useful if different digital sampling boxes are used.
-    acc_gyr_sampleRate = 700;
-    p_sampleRate = 1000;
+    acc_gyr_maxFreq = 700;
+    p_maxFreq = 1000;
     
     var_map = {
         ...   
         % LabChart name  Matlab name  Sensor sample rate
-        'Trykk1'         'affP'       p_sampleRate
-        'Trykk2'         'effP'       p_sampleRate
-        'SensorAAccX'    'accA_x'     acc_gyr_sampleRate
-        'SensorAAccY'    'accA_y'     acc_gyr_sampleRate
-        'SensorAAccZ'    'accA_z'     acc_gyr_sampleRate
-        'SensorAGyrX'    'gyrA_x'     acc_gyr_sampleRate
-        'SensorAGyrY'    'gyrA_y'     acc_gyr_sampleRate
-        'SensorAGyrZ'    'gyrA_z'     acc_gyr_sampleRate
-        'SensorBAccX'    'accB_x'     acc_gyr_sampleRate
-        'SensorBAccY'    'accB_y'     acc_gyr_sampleRate
-        'SensorBAccZ'    'accB_z'     acc_gyr_sampleRate            
-        'SensorBGyrX'    'gyrB_x'     acc_gyr_sampleRate
-        'SensorBGyrY'    'gyrB_y'     acc_gyr_sampleRate
-        'SensorBGyrZ'    'gyrB_z'     acc_gyr_sampleRate
+        'Trykk1'         'affP'       p_maxFreq
+        'Trykk2'         'effP'       p_maxFreq
+        'SensorAAccX'    'accA_x'     acc_gyr_maxFreq
+        'SensorAAccY'    'accA_y'     acc_gyr_maxFreq
+        'SensorAAccZ'    'accA_z'     acc_gyr_maxFreq
+%         'SensorAGyrX'    'gyrA_x'     acc_gyr_maxFreq
+%         'SensorAGyrY'    'gyrA_y'     acc_gyr_maxFreq
+%         'SensorAGyrZ'    'gyrA_z'     acc_gyr_maxFreq
+%         'SensorBAccX'    'accB_x'     acc_gyr_maxFreq
+%         'SensorBAccY'    'accB_y'     acc_gyr_maxFreq
+%         'SensorBAccZ'    'accB_z'     acc_gyr_maxFreq            
+%         'SensorBGyrX'    'gyrB_x'     acc_gyr_maxFreq
+%         'SensorBGyrY'    'gyrB_y'     acc_gyr_maxFreq
+%         'SensorBGyrZ'    'gyrB_z'     acc_gyr_maxFreq
         };
 
 
@@ -57,9 +57,7 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
         % from LabChart
         
         B{i} = map_varnames(B{i}, var_map(:,1), var_map(:,2));
-        
-        B{i}.Properties.DimensionNames{1} = 'time'; 
-               
+            
         % Storing info about sensors (metadata for each variable)
         B{i} = addprop(B{i},'SensorSampleRate','variable');
         in_use = ismember(B{i}.Properties.VariableNames,var_map(:,2));
@@ -77,7 +75,8 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
         B{i}.Properties.CustomProperties.Measured(:) = true;
         B{i}.Properties.VariableContinuity(:) = 'continuous';
         
- 
+        B{i}.Properties.DimensionNames{1} = 'time'; 
+        B{i}.Properties.DimensionNames{2} = 'variables'; 
         
     end   
     

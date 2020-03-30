@@ -3,7 +3,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     
     fprintf('\nMaking RPM order map with stacked variable plots\n')
     colScale = [-95,-30];
-    colScale = [-60,-20];
+    colScale = [-95,-35];
     ymax = 6;
  
     [T,orderMapVar,plotVars] = check_input_data(T,orderMapVar,plotVars);
@@ -27,7 +27,11 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     
     for i=1:numel(blocks.end_inds)-1
         line_pos = T.dur(blocks.end_inds(i));
-        xline(T.dur(blocks.end_inds(i)),':','Color',[.15 .15 .15],'LineWidth',1);
+        xline(T.dur(blocks.end_inds(i)),':','Color',[255, 18, 18]/256,'LineWidth',1.5);
+        
+        % Make a thick white stripe between each part (indicating a possible
+        % break)
+        %xline(T.dur(blocks.end_inds(i)),'-','Color',[1, 1, 1],'LineWidth',2);
     end
     
     subplot(2,1,2,'Position',[0.10,0.04430,0.8,0.4069]);

@@ -1,14 +1,21 @@
-function T = map_varnames(T,varNames_raw,varNames_mat)
+function T = map_varnames(T,varNamesInFile,varNamesInCode)
     
-    varNames_T = T.Properties.VariableNames;
+    varNamesInT = T.Properties.VariableNames;
     
-    missing_vars = varNames_mat(not(ismember(varNames_raw,varNames_T)));
-    if not(isempty(missing_vars))
-        warning(sprintf(['\n\tVariable name mapping is inconsistent with:'...
-            '\n\t\t',strjoin(missing_vars,', ')]))
-        %TODO
-        %Ask for input: Abort, ignore/cont., give new name
+    missingVarsInCode = varNamesInT(not(ismember(varNamesInT,varNamesInFile)));
+    if not(isempty(missingVarsInCode))
+        warning(sprintf(['\n\tMissing variable(s) in code for mapping:'...
+            '\n\t\t',strjoin(missingVarsInCode,', ')]))
+
     end
     
-    T.Properties.VariableNames = varNames_mat(ismember(varNames_raw,varNames_T));
+    missingVarsInFile = varNamesInCode(not(ismember(varNamesInFile,varNamesInT)));
+    if not(isempty(missingVarsInFile))
+        warning(sprintf(['\n\tMissing variable(s) in file for mapping:'...
+            '\n\t\t',strjoin(missingVarsInFile,', ')]))
+    end
+    
+    %NOTE: Can make UI and OO
+
+    T.Properties.VariableNames = varNamesInCode(ismember(varNamesInFile,varNamesInT));
     

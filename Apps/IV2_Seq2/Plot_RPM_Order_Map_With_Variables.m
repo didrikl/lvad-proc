@@ -6,10 +6,11 @@ clear check_var_input_from_table
 resolution = 300;
 catBarColor
 barVars = {
-    'part',           partBarColorSet;
+    %'part',           partBarColorSet;
     'pumpSpeed'       pumpSpeedColorSet;%brewermap(20,'Paired');
     'flowReduction'   flowRedColorSet;% brewermap(10,'BuPu');%'YlGnBu');
     'balloonLevel'    balLevColorSet;%brewermap(10,'RdPu');
+    'intervType'      intervTypeColorSet;%brewermap(10,'RdPu');
     };
 
 % Calculation settings
@@ -20,6 +21,7 @@ std_winLenSec = 10;
 
 % Selections of variables to use
 orderMapVar = 'accA_norm';%,'accA_xz_norm_filt'};
+%orderMapVar = 'accA_x';%,'accA_xz_norm_filt'};
 plotVars = {
         %{'affP','effP'}
         %{'affQ','effQ','Q_noted'}
@@ -29,8 +31,8 @@ plotVars = {
         %'power_noted'
         };
 
-baseline_parts = [1];
-intervention_parts = [2];
+baseline_parts = [15];
+intervention_parts = [8];
 rpm = [2600,2600];
 
 % baseline_parts = [1];
@@ -41,7 +43,8 @@ for i=1:numel(intervention_parts)
     parts = sort([baseline_parts,intervention_parts(i)]);
     T = make_plot_data(parts,S_parts,rpm(i),...
         sampleRate,notches,notchWidth,std_winLenSec,rms_winLenSec);
-    
+    T.accA_z = T.accA(:,3);
+    T.accA_x = T.accA(:,1);
     T = rename_parts(T,baseline_parts,intervention_parts);
     
     figName = make_figure_name(parts,orderMapVar,notches);
@@ -88,7 +91,7 @@ function T = make_plot_data(parts,S_parts,rpm,...
         T{j} = calc_moving(T{j},{'accA'},{'RMS'},sampleRate*rms_winLenSec);
         T{j} = calc_moving(T{j},{'accA'},{'Std'},sampleRate*std_winLenSec);
         
-        T{j} = T{j}(get_steady_state_rows(T{j}),:);
+        %T{j} = T{j}(get_steady_state_rows(T{j}),:);
         
         
         if height(T{j})==0, continue; end
@@ -105,7 +108,7 @@ function T = make_plot_data(parts,S_parts,rpm,...
         end
         
         % Clip long intervals to max 10 minutes
-        T{j} = T{j}(1:min(sampleRate*10*60,height(T{j})),:);
+        %T{j} = T{j}(1:min(sampleRate*10*60,height(T{j})),:);
         
         % Ignore balloon level 0 (same as level 1)
         T{j} = T{j}(T{j}.pumpSpeed==rpm,:);

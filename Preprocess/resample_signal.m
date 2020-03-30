@@ -11,6 +11,7 @@ function T = resample_signal(T,sampleRate,method)
     
     % Method default settings
     if nargin<3
+        method = 'spline';
         method = 'linear';
     end
     

@@ -52,7 +52,7 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
         'Effenrent pressure'       'effP_noted'        'numeric'     'event'
         'Flow estimate'            'Q_noted'           'numeric'     'step'
         'Power'                    'power_noted'       'numeric'     'step'
-        'Unclamped baseline flow'  'unclampFlow'       'numeric'     'event'
+        'Reduced baseline flow'    'redBaseFlow'       'numeric'     'event'
         'Comment'                  'comment'           'cell'        'event'
         ...
         };

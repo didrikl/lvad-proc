@@ -5,26 +5,29 @@ function T = fuse_timetables(T1,T2,varargin)
     %
     % See also timetables, syncronize
     
-    T=T1;
+    drop_cols = determineColsToDrop(T2);
+    drop_varNames = T2.Properties.VariableNames(drop_cols);
+    merge_cols = not(drop_cols);
+    merge_varNames = T2.Properties.VariableNames(merge_cols);
+    overwrite_cols = determine_cols_to_overwrite(T1,merge_varNames);
+    overwrite_varNames = T1.Properties.VariableNames(overwrite_cols);
     
-    colsToDrop = determineColsToDrop(T2);
-    drop_varNames = T2.Properties.VariableNames(colsToDrop);
+    display_info(merge_varNames,drop_varNames,overwrite_varNames)
     
-    colsToMerge = not(colsToDrop);
-    merge_varNames = T2.Properties.VariableNames(colsToMerge);
-    
-    colsToOverwrite = determine_cols_to_overwrite(T1,merge_varNames);
-    overwrite_varNames = T1.Properties.VariableNames(colsToOverwrite);
-    
-    fprintf('\n\tNew variables to merge: %s',strjoin(merge_varNames,', '))
-    fprintf('\n\tNew variables to drop: %s',strjoin(drop_varNames,', '))
-    fprintf('\n\tExisting variables to overwrite: %s\n',strjoin(overwrite_varNames,', '))
-    
-    T1(:,colsToOverwrite) = [];
+    T1(:,overwrite_cols) = [];
     T2 = T2(:,merge_varNames);
-    
     T = synchronize(T1,T2,varargin{:});
     
+end
+
+function display_info(merge_varNames,drop_varNames,overwrite_varNames)
+    fprintf('\n\tNew variables to merge: %s',strjoin(merge_varNames,', '))
+    if any(drop_cols)
+        fprintf('\n\tNew variables to drop: %s',strjoin(drop_varNames,', '))
+    end
+    if any(overwrite_cols)
+        fprintf('\n\tExisting variables to overwrite: %s\n',strjoin(overwrite_varNames,', '))
+    end
 end
 
 function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
@@ -43,8 +46,8 @@ function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
         
         if overways_overwrite_existing_variables==true
             colsToRemove(i:n_alreadyExist)= alreadyExist(i:n_alreadyExist);
-            fprintf(['\nExisting variables will always be overwritten',...
-                '\n(type "clear fuse_timetables" to reset)\n'])
+            fprintf(['\n\tExisting variables will always be overwritten',...
+                ' (type "clear fuse_timetables" to reset)\n'])
             return;
         end
     
@@ -53,15 +56,18 @@ function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
         opts = {
             'Overwrite'
             'Overwrite, always'
-            'Keep both'
-            'Cancel merging'
+            'Keep both'           
             'Abort execution'
             };
         response = ask_list_ui(opts,msg,1);
+       
         if response==1, colsToRemove(alreadyExist(i)) = true; end
         if response==2, overways_overwrite_existing_variables = true; end
-        if response==4 || not(response), return; end
-        if response==5, abort(true); end
+        if response==4, abort(true); end
+        
+        % If user cancelled
+        if not(response), return; end
+        
     end
     
 end
@@ -87,13 +93,13 @@ function colsToDrop = determineColsToDrop(T2)
     for i=1:numel(emptyCols)
         
         if overwaysIncludeEmptyVariables==true
-            fprintf(['\nEmpty variables will always be included',...
-                '\n(type "clear fuse_timetables" to reset)\n'])
+            fprintf(['\n\tEmpty variables will always be included',...
+                ' (type "clear fuse_timetables" to reset)\n'])
             return;
         end
         if overwaysExcludeEmptyVariables==true
-            fprintf(['\nEmpty variables will always be excluded',...
-                '\n(type "clear fuse_timetables" to reset)\n'])
+            fprintf(['\n\tEmpty variables will always be excluded',...
+                ' (type "clear fuse_timetables" to reset)\n'])
             colsToDrop(emptyCols) = true;
             return;
         end

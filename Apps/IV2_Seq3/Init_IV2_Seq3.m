@@ -6,9 +6,10 @@
 % import Calculate.*
 % import Analyze.*
 % import Tools.*
+init_matlab
 
 % Which experiment
-experiment_subdir    = 'IV2_Seq2 - Water simulated HVAD thrombosis - Pre-pump - Pilot';
+experiment_subdir    = 'IV2_Seq3 - Water simulated HVAD thrombosis - Pre-pump - Pilot';
 
 % Directory structure
 powerlab_subdir = 'PowerLab';
@@ -18,27 +19,44 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-    'IV2_Seq2 - B1.mat'
-     'IV2_Seq2 - B2.mat' 
-      'IV2_Seq2 - B3.mat' 
-      %'IV2_Seq2 - B4.mat' % included in B5 by mistake 
-      'IV2_Seq2 - B5.mat' 
-      'IV2_Seq2 - B6.mat' 
+    'IV2_Seq3 - B1_Sel1_ch1-5.mat'
+    'IV2_Seq3 - B1_Sel2_ch1-5.mat'
+    'IV2_Seq3 - B1_Sel3_ch1-5.mat'
+    'IV2_Seq3 - B1_Sel4_ch1-5.mat'
+    'IV2_Seq3 - B2_Sel1_ch1-5.mat'
+    'IV2_Seq3 - B2_Sel2_ch1-5.mat'
+    'IV2_Seq3 - B2_Sel3_ch1-5.mat'
+    'IV2_Seq3 - B2_Sel4_ch1-5.mat'
+    'IV2_Seq3 - B3_ch1-5.mat'
+    'IV2_Seq3 - B4_ch1-5.mat'
+    'IV2_Seq3 - B5_ch1-5.mat'
+    'IV2_Seq3 - B6_ch1-5.mat'
+    'IV2_Seq3 - B7_ch1-5.mat'
+    'IV2_Seq3 - B8_ch1-5.mat'
+    'IV2_Seq3 - B9_ch1-5.mat'
+    'IV2_Seq3 - B10_ch1-5.mat'
+    'IV2_Seq3 - B11_ch1-5.mat'
+    'IV2_Seq3 - B12_ch1-5.mat'
     };
-notes_fileName = 'IV2_Seq2 - Notes ver3.5 - Rev4.xlsm';
-ultrasound_fileNames = {
-    'ECM_2020_01_08__11_06_21.wrf'
-    'ECM_2020_01_09__16_14_36.wrf'
-    'ECM_2020_01_09__17_05_19.wrf'
-    'ECM_2020_01_14__11_41_39.wrf'
-    'ECM_2020_01_14__13_34_12.wrf'
-    'ECM_2020_01_20__12_36_17.wrf'
-    'ECM_2020_01_22__12_59_46.wrf'
-    'ECM_2020_01_22__15_50_05.wrf'
+notes_fileName = 'IV2_Seq3 - Notes ver3.8 - Rev1.xlsm';
+ultrasound_fileNames = {                         
+    'ECM_2020_03_17__17_01_50.wrf'
+    'ECM_2020_03_18__18_33_45.wrf'
+    'ECM_2020_03_19__19_03_38.wrf'
+    'ECM_2020_03_19__20_34_11.wrf'
+    'ECM_2020_03_20__20_05_59.wrf'
+    'ECM_2020_03_20__20_57_04.wrf'
+    'ECM_2020_03_22__22_19_15.wrf'
+    'ECM_2020_03_23__18_25_13.wrf'
+    'ECM_2020_03_24__22_38_46.wrf'
+    'ECM_2020_03_26__01_51_14.wrf'
+    'ECM_2020_03_26__01_54_55.wrf'
+    'ECM_2020_03_26__21_31_35.wrf'
+    'ECM_2020_03_26__21_54_23.wrf'
+    'ECM_2020_03_26__22_13_44.wrf'
     };
 
 % Settings for Matlab
-init_matlab
 [raw_basePath, proc_basePath] = init_io_paths(experiment_subdir);
 
 % Add subdir specification to filename lists
@@ -47,18 +65,12 @@ powerlab_fileNames = fullfile(powerlab_subdir,powerlab_fileNames);
 notes_filePath = fullfile(notes_subdir,notes_fileName);
 
 
-% TODO: Make OO, list files and ask for which version to use
-% [notes_filePath] = init_notes(experiment_subdir);
-% [pl_filePath] = init_powerlab(experiment_subdir);
-% [ul_filePath] = init_spectrum(experiment_subdir);
-% [cardiaccs_filePath] = init_cardiaccs(experiment_subdir);
-
 %% Read data into Matlab
 % Initialize data into Matlab timetable format
-% * Read PowerLab data (PL) and ultrasound (US) files as blocks, stored as into
-%   cell arrays
+% * Read PowerLab data (PL) and ultrasound (US) files stored as into cell arrays
 % * Read notes from Excel file
 
+% Sample rate for re-sampling down to highest signal content frequency 
 sampleRate = 700;
 
 % Read PowerLab data in files exported from LabChart
@@ -77,8 +89,6 @@ feats = init_features_from_notes(notes);
 % * Block-wise fusion of notes into PL, and then US into PL, followed by merging
 %   of blocks into one table S
 % * Splitting into parts, each resampling to regular sampling intervals of given frequency
-% * Deriving new variables of:
-%      part duration, moving RMS and moving standard deviation
 
 S = fuse_data(notes,PL,US);
 
@@ -86,11 +96,8 @@ S = fuse_data(notes,PL,US);
 
 S_parts = preprocess_sequence_parts(S, sampleRate);
 
-% Muting of non-comparable data (due to wrong setting in LabChart) in baseline
-S_parts{1}.gyrA = nan(height(S_parts{1}),3);
-S_parts{1}.gyrA_norm = nan(height(S_parts{1}),1);
-S_parts{1}.gyrA_norm_movRMS = nan(height(S_parts{1}),1);
-
+% Saving memory:
+clear S PL US
 
 
 

@@ -4,7 +4,7 @@ function user_data = make_init_userdata(fileName,filePath)
     
     if nargin==1
         [filePath,fileName,fileExt]=fileparts(fileName);
-        fileName = fullfile(fileName,fileExt);
+        fileName = [fileName,fileExt];
     end
     
     user_data = struct;
