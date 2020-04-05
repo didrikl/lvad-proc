@@ -2,7 +2,9 @@ function feats = init_features_from_notes(notes)
     % EXTRACT_FEATURES_FROM_NOTES
     %   Extract selected event features from notes.
     %   Features in all table cells should be populated with values.
-        
+       
+    welcome('Initializing feature table')
+    
     % Ignore columns not in use
     notes(:,all(ismissing(notes))) = [];
     

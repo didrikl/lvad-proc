@@ -1,76 +1,59 @@
-function [map,order,rpmOut,time] = make_rpm_order_map(T, varName, maxFreq)
+function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
+        maxFreq, rpm_varName, order_res, overlap_pst)
     % MAKE_RPM_ORDER_MAP
     %   Make RPM order map using Matlab's build-in RPM order plots.
     %   Detrending is applied, so that the DC component is attenuated
     %
-    % Usage:
-    %   make_rpm_order_map(data)
-    %
     % See also DETREND, RPMORDERMAP
     
-    %
-    % TODO: Implement custom made STFT and visualization instead:
-    % * To control more subplot info
-    % * Avoid speed change transition artifacts
-    % * To be able to calculate difference values and to do plotting for pre 
-    % and post baselines (control interventions). Difference plots requires
-    % either a cut-off, time axis stretch/aggregation so that RPM speed 
-    % durations are equal. 
-    %
     % NOTE: Waterfall plot example is likely irrelevant, since it does not have
     % any time axis.
-    % 
-
-    if nargin<3
-        maxFreq = nan;
+    
+    if nargin<3, [maxFreq,T] = get_sampling_rate(T,false); end    
+    if nargin<4, rpm_varName = 'pumpSpeed'; end
+    if nargin<5, order_res = 0.05; end
+    if nargin<6, overlap_pst = 80; end
+    
+    map_varName = check_var_input_from_table(T, map_varName);
+    rpm_varName = check_var_input_from_table(T, rpm_varName);
+    
+    if isnan(maxFreq)
+        [maxFreq,~] = get_sampling_rate(T(:,{map_varName,rpm_varName}));
+        if isnan(maxFreq), return; end
     end
     
-     order_res = 0.1;
-     overlap_pst = 90; %80; % greater percent is perhaps slightly better...?
-%      order_res = 0.02;
-%      overlap_pst = 99;
-    varName = check_var_input_from_table(T, varName);
-    
-    T = T(:,{varName,'pumpSpeed'});
-    
-    [fs,T] = get_sampling_rate(T,false);
-
-    if isnan(maxFreq) && isnan(fs)
-        [fs,T] = get_sampling_rate(T);
-        if isnan(fs), return; end
-    elseif maxFreq~=fs
-       T = resample_signal(T,maxFreq);
-    end
-    
-    % Ensure numeric pumpspeed, then look for NaNs
-    if iscategorical(T.pumpSpeed)
-        T.pumpSpeed = double(string(T.pumpSpeed));
-    end
-    missingRPM = isnan(T.pumpSpeed);
-    if any(missingRPM)
-        warning(sprintf('%d rows have missing RPM',nnz(missingRPM)));
-    end
-    T(missingRPM,:) = [];
+    % Ensure numeric pumpspeed, and remove rows for missing (NaN) rpm values
+    [T, rpm_missing] = check_rpm_var(T,rpm_varName);
+    T(rpm_missing,:) = [];
     
     % Remove DC component
-    x = detrend(T.(varName));
-
+    x = detrend(T.(map_varName));
+    
     if nargout==0
-        rpmordermap(x,maxFreq,T.pumpSpeed,order_res, ...
-            'Amplitude','peak',...'power',...'rms',...'peak',...
+        rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
+            'Amplitude','peak',...'power',...'rms',
             'OverlapPercent',overlap_pst,...
             'Scale','dB',...
-            'Window',{'chebwin',80}... % flattopwin perhaps slightly better...?
-            ...'Window','flattopwin'...
+            'Window',{'chebwin',80}...
             );
-    else    
-        [map,order,rpmOut,time] = rpmordermap(x,maxFreq,T.pumpSpeed,order_res, ...
-            'Amplitude','peak',...'rms',...'power',...'rms',...'peak',...
+    else
+        [map,order,rpmOut,time] = rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
+            'Amplitude','peak',...'rms',...'power',
             'OverlapPercent',overlap_pst,...
             'Scale','dB',...'linear',...
-            'Window',{'chebwin',80}... % flattopwin perhaps slightly better...?
+            'Window',{'chebwin',80}...
             ...'Window','flattopwin'... % not so good
-            ...'Window','hamming'... 
+            ...'Window','hamming'...
             );
     end
-  
+    
+    
+    function [T, missing] = check_rpm_var(T,rpm_varName)
+        
+        if iscategorical(T.(rpm_varName))
+            T.(rpm_varName) = double(string(T.(rpm_varName)));
+        end
+        missing = isnan(T.(rpm_varName));
+        if any(missing)
+            warning(sprintf('%d rows have missing RPM',nnz(missing)));
+        end

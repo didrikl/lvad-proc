@@ -36,12 +36,12 @@ function str = display_filename(names,path,msg,indent)
         str = [str,newline];
         
         if not(isempty(path_in_name))
-            str = [str,sprintf([indent,'Subdir: ',path_in_name])];
+            str = [str,sprintf([indent,'Path: ',path_in_name])];
             if ~isempty(regexp(path_in_name, ILLEGAL_CHARS_FOR_PATH, 'once'))
                 str = [str,sprintf(' (contains illegal characters for saving)')];
             end
             if not(isempty(name))
-                str = [str,newline];
+                str = [str];%,newline];
             end
             %path = '';
         end

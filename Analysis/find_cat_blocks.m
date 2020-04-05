@@ -1,13 +1,12 @@
 function [blocks,vars] = find_cat_blocks(T,vars)
     
     blocks = struct;
-    if height(T)==0
-        return; 
-    end
+    if height(T)==0, return; end
     
     vars = check_var_input_from_table(T,vars);
     vars = cellstr(vars);
     vars = vars(not(cellfun(@isempty,vars)));
+    
     for i=1:numel(vars)
         
         cats = get_cats(T,vars{i});

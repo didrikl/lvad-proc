@@ -84,7 +84,7 @@ S = fuse_data(notes,PL,US);
 
 % ...syncing here, if needed...
 
-S_parts = preprocess_sequence_parts(S, sampleRate);
+S_parts = split_into_parts(S);
 
 % Muting of non-comparable data (due to wrong setting in LabChart) in baseline
 S_parts{1}.gyrA = nan(height(S_parts{1}),3);

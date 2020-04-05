@@ -21,12 +21,12 @@ function T = fuse_timetables(T1,T2,varargin)
 end
 
 function display_info(merge_varNames,drop_varNames,overwrite_varNames)
-    fprintf('\n\tNew variables to merge: %s',strjoin(merge_varNames,', '))
-    if any(drop_cols)
-        fprintf('\n\tNew variables to drop: %s',strjoin(drop_varNames,', '))
+    fprintf('\n\tMerging: %s',strjoin(merge_varNames,', '))
+    if not(isempty(drop_varNames))
+        fprintf('\n\tDropping: %s',strjoin(drop_varNames,', '))
     end
-    if any(overwrite_cols)
-        fprintf('\n\tExisting variables to overwrite: %s\n',strjoin(overwrite_varNames,', '))
+    if not(isempty(overwrite_varNames))
+        fprintf('\n\tOverwriting: %s\n',strjoin(overwrite_varNames,', '))
     end
 end
 
@@ -46,8 +46,6 @@ function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
         
         if overways_overwrite_existing_variables==true
             colsToRemove(i:n_alreadyExist)= alreadyExist(i:n_alreadyExist);
-            fprintf(['\n\tExisting variables will always be overwritten',...
-                ' (type "clear fuse_timetables" to reset)\n'])
             return;
         end
     
@@ -62,7 +60,10 @@ function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
         response = ask_list_ui(opts,msg,1);
        
         if response==1, colsToRemove(alreadyExist(i)) = true; end
-        if response==2, overways_overwrite_existing_variables = true; end
+        if response==2
+            overways_overwrite_existing_variables = true; 
+            fprintf('\n\t(Type "clear fuse_timetables" to reset this choice.)\n')
+        end
         if response==4, abort(true); end
         
         % If user cancelled
@@ -92,14 +93,11 @@ function colsToDrop = determineColsToDrop(T2)
     emptyCols = find(all(ismissing(T2)));
     for i=1:numel(emptyCols)
         
-        if overwaysIncludeEmptyVariables==true
-            fprintf(['\n\tEmpty variables will always be included',...
-                ' (type "clear fuse_timetables" to reset)\n'])
+        if overwaysIncludeEmptyVariables==true          
             return;
         end
         if overwaysExcludeEmptyVariables==true
-            fprintf(['\n\tEmpty variables will always be excluded',...
-                ' (type "clear fuse_timetables" to reset)\n'])
+            fprintf('\n\t(Type "clear fuse_timetables" to reset this choice.)\n')
             colsToDrop(emptyCols) = true;
             return;
         end
@@ -114,13 +112,20 @@ function colsToDrop = determineColsToDrop(T2)
             'Abort execution'
             };
         response = ask_list_ui(opts,msg,1);
-        if response==2, overwaysIncludeEmptyVariables = true; end
-        if response==3, colsToDrop(emptyCols(i)) = true; end %#ok<AGROW>
-        if response==4, overwaysExcludeEmptyVariables = true; end
-        if response==5, abort(true); end
+        if response==2, overwaysIncludeEmptyVariables = true; 
+            fprintf('\n\t(Type "clear fuse_timetables" to reset this choice.)\n')
+        elseif response==3 
+            colsToDrop(emptyCols(i)) = true; 
+        elseif response==4 
+            overwaysExcludeEmptyVariables = true; 
+            fprintf('\n\t(Type "clear fuse_timetables" to reset this choice.)\n')
+        elseif response==5 
+            abort(true); 
+        end
         
         % if cancelled in GUI
         if not(response), return; end
+        
         
     end
 end

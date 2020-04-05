@@ -1,11 +1,13 @@
-function [read_path, save_path] = init_io_paths(experiment_subdir)
+function [read_path, save_path] = init_io_paths(experiment_subdir,read_root)
     
     % Static definitions for I/O directory structure
-    read_root = 'C:\Data\IVS\Didrik';
+    if nargin<2
+        read_root = 'C:\Data\IVS\Didrik';
+    end
     input_subdir = 'Recorded';
     output_subdir = 'Processed';
     
-    fprintf('\nInitializing directory structure\n')
+    welcome('Initializing directory structure')
     
     read_root = fullfile([read_root,'\']);
     experiment_subdir = fullfile([experiment_subdir,'\']);

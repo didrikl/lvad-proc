@@ -7,6 +7,7 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     % Column that consists of empty / undefined values are not stored in the
     % notes table
     
+    if nargin==1, read_path = ''; end
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
     % TODO: Notes range defined in name manager is a bit confusing(?)
@@ -80,10 +81,9 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
   
     %% Read from Excel file
     
-    fprintf('\nInitializing notes:\n')
+    welcome('Reading notes file')
     
     % TODO: For OO...
-    if nargin==1, read_path = ''; end
     filePath = fullfile(read_path,fileName);
     display_filename(read_path,fileName);
     
@@ -137,23 +137,26 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     notes.Properties.VariableNames = varNames;
     notes = map_varnames(notes, varNames_xls, varNames_mat);
 
-    notes.Properties.VariableUnits = erase(string(varUnits),{'(',')'});
-    
     % Update and add variable metadata
     notes = standardizeMissing(notes, missing_value_repr);
     
+    % Variable metadata, just descriptions
+    notes.Properties.VariableDescriptions = varNames_xls;
+    notes.Properties.VariableUnits = erase(string(varUnits),{'(',')'});
+    
+    % Variable metadata used for populating non-matched rows for syncing/fusion
     notes = addprop(notes,{'Controlled','Measured'},{'variable','variable'}); 
     notes.Properties.CustomProperties.Controlled(ismember(varNames_xls,varNames_controlled)) = true;
     notes.Properties.CustomProperties.Measured(ismember(varNames_xls,varNames_measured)) = true;
-    
+    notes.Properties.VariableContinuity = var_map(:,4);
+
+    % Various user-data
+    notes.Properties.UserData = make_init_userdata(filePath);
     notes.Properties.UserData.Seq_info.Equipment = seqInfo_equipment;
     notes.Properties.UserData.Seq_info.General = seqInfo_general;
     notes.Properties.UserData.Seq_info.Parts = seqInfo_parts;
-    notes.Properties.VariableDescriptions = varNames_xls;
 
-    % Metadata used for populating non-matched rows when syncing/data fusion
-    notes.Properties.VariableContinuity = var_map(:,4);
-
+    
     %% Parse time info
     
     % 'timestamp' and 'date' into 'time' (datetime vector)
@@ -209,13 +212,8 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     % Remove specficed columns to be removed
     notes(:,ismember(notes.Properties.VariableNames,varNames_unneeded)) = [];
     
-    % Remove columns that only has missing info (i.e. not in use)
-    %notes(:,all(ismissing(notes))) = [];
-    
     % Convert to timetable with timestamp as the time column
     notes = table2timetable(notes,'RowTimes',time_varName);
-
-    fprintf('\nInitializing notes done.\n')
     
     
 function notes = add_event_range(notes, intervTypesToIncludeinEventRange)

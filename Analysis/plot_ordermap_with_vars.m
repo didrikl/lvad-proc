@@ -1,9 +1,10 @@
 function [h_fig,map,order] = plot_ordermap_with_vars(...
-        T,orderMapVar,plotVars,barVars,sampleRate,figName)
+        T,orderMapVar,plotVars,barVars,sampleRate,figName,BL)
     
     fprintf('\nMaking RPM order map with stacked variable plots\n')
     colScale = [-95,-30];
-    colScale = [-95,-35];
+    colScale = [-85,-45]; % best for 6mm x 8mm catheter, x,y and z
+    colScale = [-80,-40]; % best for 6mm x 8mm catheter, x and z, filtered
     ymax = 6;
  
     [T,orderMapVar,plotVars] = check_input_data(T,orderMapVar,plotVars);
@@ -13,8 +14,30 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
         'Position',[0.10 0.4589 0.8 0.5411]);
     
     [map,order,~,time] = make_rpm_order_map(T,orderMapVar,sampleRate); %
-    imagesc(time,order,map);
-    caxis(colScale);
+     imagesc(time,order,map);
+     caxis(colScale);
+     
+    
+    
+    
+%     order_spec = orderspectrum(map,order,'Amplitude','peak');
+%      [bl_map,bl_order] = make_rpm_order_map(BL,orderMapVar,sampleRate); %
+%      bl_orderspec = orderspectrum(bl_map,bl_order,'Amplitude','peak');
+%      try
+%          corr_map = map+bl_orderspec;
+%      catch
+%          disp hei
+%      end
+%      imagesc(time,bl_order,corr_map);
+%      caxis([-3,11]);
+        
+    
+    
+    
+
+    
+    
+    
     
     h_mapAx = gca;
     set(h_mapAx,'ydir','normal');
@@ -40,7 +63,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     
 function s = add_stacked_plot(T,plotVars)
     
-    T.accA = T.accA - mean(T.accA,'omitnan');
+    %T.accA = T.accA - mean(T.accA,'omitnan');
     
     T.dur_sec = seconds(T.dur);
     T = timetable2table(T);
@@ -146,7 +169,7 @@ function [T,orderMapVar,plotVars] = check_input_data(T,orderMapVar,plotVars)
     % Check of input variable values
     nanRows = isnan(T.(orderMapVar));
     if height(T)==0
-        error('No rows in data table');
+        warning('No rows in data table');
     elseif all(nanRows)
         error('All values for RPM order map is NaN');
     elseif any(nanRows)

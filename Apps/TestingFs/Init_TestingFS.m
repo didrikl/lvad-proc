@@ -28,7 +28,7 @@ testFs_notes = init_notes_xlsfile_v3_2(testFs_notes_fileName,raw_basePath);
 %% Pre-processing of data from IV2_Seq1
 
 testFs_S = fuse_data(testFs_notes,testFs_PL);
-testFs_S_parts = preprocess_sequence_parts(testFs_S, testFs_sampleRate);
+testFs_S_parts = split_into_parts(testFs_S, testFs_sampleRate);
 
 
 %% Initilize data from IV2_Seq1
@@ -71,7 +71,7 @@ IV2S1_notes = init_notes_xlsfile_v3_2(notes_filePath);
 %% Pre-processing of data from IV2_Seq1
 
 IV2S1_S = fuse_data(IV2S1_notes,IV2S1_PL,IV2S1_US);
-IV2S1_S_parts = preprocess_sequence_parts(IV2S1_S, IV2S1_sampleRate);
+IV2S1_S_parts = split_into_parts(IV2S1_S, IV2S1_sampleRate);
 
 
 %% Initilize data from IV1_Seq1
@@ -90,7 +90,7 @@ IV1_Seq1_notes = init_notes_xlsfile(IV1S1_notes_fileName,IV1S1_path);
 %%  Pre-processing of data from IV1_Seq1
 
 IV1S1_SA = fuse_data(IV1_Seq1_notes,IV1S1_accA);
-IV1S1_SA_parts = preprocess_sequence_parts(IV1S1_SA, 540);
+IV1S1_SA_parts = split_into_parts(IV1S1_SA, 540);
 
 % Manual sync of the two tables
 ts_start_diff = IV1S1_accB.time(1) - IV1S1_accA.time(1);
@@ -101,7 +101,7 @@ ts_data_diff = lead_signal_sync_point - lvad_signal_sync_point;
 IV1S1_accB.time = IV1S1_accB.time - ts_data_diff;
 
 IV1S1_SB = fuse_data(IV1_Seq1_notes,IV1S1_accB);
-IV1S1_SB_parts = preprocess_sequence_parts(IV1S1_SB, 540);
+IV1S1_SB_parts = split_into_parts(IV1S1_SB, 540);
 
 
 

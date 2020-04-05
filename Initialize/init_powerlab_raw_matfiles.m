@@ -1,4 +1,4 @@
-function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
+function B = init_powerlab_raw_matfiles(fileNames,path)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
     % as mat file from PowerLab's LabChart program.
@@ -11,8 +11,8 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
     %
     % See also timetable
     
-    if nargin==1, raw_Basepath = ''; end
-    filePaths = fullfile(raw_Basepath,fileNames);
+    if nargin==1, path = ''; end
+    filePaths = fullfile(path,fileNames);
     
     % Default viewing format of timestamps (not very important)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
@@ -22,7 +22,6 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
     % useful if different digital sampling boxes are used.
     acc_gyr_maxFreq = 700;
     p_maxFreq = 1000;
-    
     var_map = {
         ...   
         % LabChart name  Matlab name  Sensor sample rate
@@ -43,32 +42,33 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
         };
 
 
-    fprintf('\nInitializing PowerLab:\n')
+    welcome('Initializing PowerLab')
     
     % Initialization of Powerlab block file(s)
     B = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         
-        fprintf(display_filename(fileNames{i}))
+        display_filename(fileNames{i});
         
-        B{i} = read_signal_block(filePaths{i},timestampFmt);
+        B{i} = read_signal_file(filePaths{i},timestampFmt);
         
         % TODO: Check for overlap with already read data, in case double saving
-        % from LabChart
+        % from LabChart. Ask to cut data in newest file from the start, or to
+        % remove file
         
         B{i} = map_varnames(B{i}, var_map(:,1), var_map(:,2));
             
         % Storing info about sensors (metadata for each variable)
         B{i} = addprop(B{i},'SensorSampleRate','variable');
-        in_use = ismember(B{i}.Properties.VariableNames,var_map(:,2));
-        B{i}.Properties.CustomProperties.SensorSampleRate(in_use) = var_map{:,3};
+        channels_in_use = ismember(B{i}.Properties.VariableNames,var_map(:,2));
+        B{i}.Properties.CustomProperties.SensorSampleRate(channels_in_use) = var_map{:,3};
         
-        % Gather 3 components as one variable (convenient when all 3 components
-        % are arguments in combination with other inputs, and also when viewing)
-        B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
-        B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
-        B{i} = spatial_comp_as_vector(B{i},{'gyrA_x','gyrA_y','gyrA_z'},'gyrA');
-        B{i} = spatial_comp_as_vector(B{i},{'gyrB_x','gyrB_y','gyrB_z'},'gyrB');
+%         % Gather 3 components as one variable (convenient when all 3 components
+%         % are arguments in combination with other inputs, and also when viewing)
+%         B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
+%         B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
+%         B{i} = spatial_comp_as_vector(B{i},{'gyrA_x','gyrA_y','gyrA_z'},'gyrA');
+%         B{i} = spatial_comp_as_vector(B{i},{'gyrB_x','gyrB_y','gyrB_z'},'gyrB');
         
         % All variables shall be treated as continous and measured in data fusion
         B{i} = addprop(B{i},'Measured','variable');
@@ -79,11 +79,9 @@ function B = init_powerlab_raw_matfiles(fileNames,raw_Basepath)
         B{i}.Properties.DimensionNames{2} = 'variables'; 
         
     end   
-    
-    fprintf('\nInitializing PowerLab done.\n')
 
     
-function T_block = read_signal_block(filePath,timestamp_fmt)    
+function T_block = read_signal_file(filePath,timestamp_fmt)    
     
     
     % Read data with variable organized and accessible in a struct d

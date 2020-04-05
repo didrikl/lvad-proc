@@ -117,6 +117,7 @@ signals = merge_signal_and_notes(lvad_signal,notes);
 signals = clip_to_experiment(signals,notes);
 
 % After new variable have been calculated, then split the prepared data
+
 signal_parts = split_into_experiment_parts(signals,notes);
 signal_parts.part2_iv = signal_parts.part2(signal_parts.part2.event~='Baseline',:);
 

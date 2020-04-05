@@ -42,7 +42,7 @@ rpm = [2600,2600];
 for i=1:numel(intervention_parts)
     parts = sort([baseline_parts,intervention_parts(i)]);
     T = make_plot_data(parts,S_parts,rpm(i),...
-        sampleRate,notches,notchWidth,std_winLenSec,rms_winLenSec);
+        700,notches,notchWidth,std_winLenSec,rms_winLenSec);
     T.accA_z = T.accA(:,3);
     T.accA_x = T.accA(:,1);
     T = rename_parts(T,baseline_parts,intervention_parts);
