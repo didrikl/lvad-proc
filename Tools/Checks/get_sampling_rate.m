@@ -31,7 +31,7 @@ function [fs,T] = get_sampling_rate(T,ask_user_if_nan)
             'Ignore'
             'Abort'
             };
-        response = ask_list_ui(opts,sprintf('\n\n\tSample rate is undefined'));
+        response = ask_list_ui(opts,sprintf('\n\tSample rate is undefined'));
         if response==1
             fs = ask_for_new_sample_rate;
             T = resample_signal(T,fs); 

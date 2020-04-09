@@ -31,7 +31,7 @@ function S_parts = add_in_parts(S_parts,inputVarNames, outputVarName, p)
         S_parts{i} = calc_spatial_norm(S_parts{i},inputVarNames, outputVarName, p);     
         
         % Filter out the DC component (e.g. gravity and linear drift)
-        S_parts{i}.(outputVarName) = detrend(S_parts{i}.(outputVarName));
+        %S_parts{i}.(outputVarName) = detrend(S_parts{i}.(outputVarName));
         
     end
    

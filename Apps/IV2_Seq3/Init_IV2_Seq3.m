@@ -65,6 +65,7 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 init_matlab
 welcome('Initializing data','module')
+if load_workspace; return; end
 
 % Read PowerLab data in files exported from LabChart
 PL = init_powerlab_raw_matfiles(powerlab_filePaths);
@@ -102,7 +103,8 @@ S_parts = add_moving_statistics(S_parts);
 % Revise categoric blocks, and put into feats
 
 % Save to mat file
-
+response = ask_list_ui('Initializing done, save workspace file?',{'Yes','No'});
+if response==1, save; end
 
 
 

@@ -33,8 +33,8 @@ function S_parts = add_moving_statistics(S_parts)
         S_parts{i} = calc_moving(S_parts{i},{'accA_xz_norm'},{'Std'},fs*std_winDur);
         
         % for testing
-        S_parts{i} = calc_moving(S_parts{i},{'accA_xz_norm'},{'RMS'},fs*rms_winDur);
-        S_parts{i} = calc_moving(S_parts{i},{'accA_xz_norm'},{'Std'},fs*std_winDur);
+        S_parts{i} = calc_moving(S_parts{i},{'accA_xz_1norm'},{'RMS'},fs*rms_winDur);
+        S_parts{i} = calc_moving(S_parts{i},{'accA_xz_1norm'},{'Std'},fs*std_winDur);
     end
     
     clear clear check_var_output_to_table
