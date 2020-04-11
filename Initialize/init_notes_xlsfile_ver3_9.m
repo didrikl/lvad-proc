@@ -1,4 +1,4 @@
-function notes = init_notes_xlsfile_v3_2(fileName, read_path)
+function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     % 
     % Read named ranges from Notes Excel file. Ranges must be defined by Excel
     % name manager. (Named ranges make the Excel file more flexible w.r.t.
@@ -77,7 +77,6 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     missing_value_repr = {''};
     time_varName = 'time';
     n_header_lines = 3;
-    intervTypesToIncludeinEventRange = {'steady','baseline'};
     
   
     %% Read from Excel file
@@ -204,7 +203,10 @@ function notes = init_notes_xlsfile_v3_2(fileName, read_path)
     
     %% Add derived columns
     
+    % TODO: Move add_event_range to notes_qc and/or init_feats
+    intervTypesToIncludeinEventRange = {'steady','baseline'};
     notes = add_event_range(notes, intervTypesToIncludeinEventRange);
+    
     notes = add_note_row_id(notes, n_header_lines);
     
     
@@ -262,7 +264,7 @@ function notes = add_event_range(notes, intervTypesToIncludeinEventRange)
             % No pairing event implies running until the end
             if isempty(event_stop_ind)
                 event_stop_ind = find(notes.time>notes.time(ii),1,'last');
-                warning(sprintf('The parallell running event %s was not ended.',event))
+                warning('\n\tThe parallell running event %s was not ended.',event)
             end
             
         end

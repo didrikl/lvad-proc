@@ -1,44 +1,53 @@
-function [read_path, save_path] = init_io_paths(experiment_subdir,read_root)
+function [read_path, save_path] = init_io_paths(sequence,data_root)
     
     % Static definitions for I/O directory structure
     if nargin<2
-        read_root = 'C:\Data\IVS\Didrik';
+        data_root = 'C:\Data\IVS\Didrik';
     end
     input_subdir = 'Recorded';
     output_subdir = 'Processed';
     
     welcome('Initializing directory structure')
     
-    read_root = fullfile([read_root,'\']);
-    experiment_subdir = fullfile([experiment_subdir,'\']);
+    
+    data_root = check_data_root_path(data_root);
+    seq_path = check_sequence_path(data_root,sequence);
+    
     input_subdir = fullfile([input_subdir,'\']);
     output_subdir = fullfile([output_subdir,'\']);
-    
-    read_root = check_path_existence(read_root);
-    if not(read_root) 
-        error('Data root path not specified'); 
-    end
-    
-    fprintf('\nExperiment:')
-    experiment_path = check_path_existence(fullfile(read_root,experiment_subdir));
-    display_filename('',experiment_path);
-    if not(experiment_path) 
-        error('Experiment path not specified'); 
-    end
-    
+        
     fprintf('\nReading:')
-    read_path = check_path_existence(fullfile(experiment_path,input_subdir));
+    read_path = check_path_existence(fullfile(seq_path,input_subdir));
     display_filename('',read_path);
-    if not(experiment_path) 
-        error('Read path not specified'); 
+    if not(seq_path)
+        error('Read path not specified');
     end
     
     % Same structure as read_path, but in a dedicated subdirectory. (For saving
     % there is not need to check its existence)
     fprintf('\nSaving:')
-    save_path = fullfile(read_root,experiment_subdir,output_subdir);
+    save_path = fullfile(data_root,seq_path,output_subdir);
     display_filename('',save_path);
     
-    cd(experiment_path)
-
+    cd(seq_path)
+     
+function seq_path = check_sequence_path(read_root,sequence)
     
+    fprintf('\nExperiment sequence:')
+    pattern = fullfile(read_root,['*',sequence,'*']);
+    seq_path = get_path(pattern);
+    
+    display_filename('',seq_path);
+    if not(seq_path)
+        error('Experiment sequence path not specified');
+    end
+    
+function data_root_path = check_data_root_path(data_root_path)
+    
+    fprintf('\nData root:')
+    data_root_path = get_path(data_root_path);
+    
+    display_filename('',data_root_path);
+    if not(data_root_path)
+        error('Data root path not specified');
+    end

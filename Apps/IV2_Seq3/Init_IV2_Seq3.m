@@ -2,7 +2,9 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
+sequence = 'IV2_Seq3';
 experiment_subdir = 'IV2_Seq3 - Water simulated HVAD thrombosis - Pre-pump - Pilot';
+% TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -32,7 +34,7 @@ powerlab_fileNames = {
     'IV2_Seq3 - B12_ch1-5.mat'
     'IV2_Seq3 - B13_ch1-5.mat'
     };
-notes_fileName = 'IV2_Seq3 - Notes ver3.8 - Rev1.xlsm';
+notes_fileName = 'IV2_Seq3 - Notes ver3.9 - Rev1.xlsm';
 ultrasound_fileNames = {                         
     'ECM_2020_03_17__17_01_50.wrf'
     'ECM_2020_03_18__18_33_45.wrf'
@@ -52,7 +54,7 @@ ultrasound_fileNames = {
     };
 
 % Add subdir specification to filename lists
-[read_path, save_path] = init_io_paths(experiment_subdir,basePath);
+[read_path, save_path] = init_io_paths(sequence,basePath);
 ultrasound_filePaths  = fullfile(basePath,experiment_subdir,spectrum_subdir,ultrasound_fileNames);
 powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
@@ -74,21 +76,26 @@ PL = init_powerlab_raw_matfiles(powerlab_filePaths);
 US = init_m3_raw_textfile(ultrasound_filePaths);
     
 % Read sequence notes made with Excel file template
-notes = init_notes_xlsfile_v3_2(notes_filePath);
+notes = init_notes_xlsfile_ver3_9(notes_filePath);
 
 
 %% Pre-processing
 % Transform and extract data for analysis
+% * QC/pre-fixing data
 % * Block-wise fusion of notes into PL, and then US into PL, followed by merging
 %   of blocks into one table S
 % * Splitting into parts, each resampling to regular sampling intervals of given frequency
 
 notes = qc_notes(notes);
 
+% Correct for unsync'ed M3 clock
+unsync_inds = US.time>'22-Mar-2020 22:19:14.00' & US.time<'22-Mar-2020 22:52:13.00';
+US.time(unsync_inds) = US.time(unsync_inds)+seconds(42);
+
 feats = init_features_from_notes(notes);
 
 S = fuse_data(notes,PL,US);
-% clear PL US
+clear PL US
 
 % ...syncing here, if needed...
 
@@ -102,15 +109,5 @@ S_parts = add_moving_statistics(S_parts);
 % Add MPF, std, RMS and other statistics/indices into feats
 % Revise categoric blocks, and put into feats
 
-% Save to mat file
-response = ask_list_ui('Initializing done, save workspace file?',{'Yes','No'});
-if response==1, save; end
-
-
-
-
-
-
-
-
+ask_to_save(sequence);
 

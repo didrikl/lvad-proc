@@ -37,7 +37,7 @@ function selection = ask_list_ui(options, question, default)
 	if isa(default,'char'), default = str2double(default); end
     
     % Validate default spec
-    if default>numel(options) | default<1 | not(isfinite(default))   
+    if default>numel(options) | default<1 | not(isfinite(default))    %#ok<OR2>
         warning('Default specification is invalid.')
         default = [];
         init_val = 1;
@@ -53,13 +53,17 @@ function selection = ask_list_ui(options, question, default)
     height = 110;
     n_char = max(cellfun(@length,options));
     n_char = max(n_char,max(cellfun(@length,strsplit(question))));
-    width = max(width,n_char*16);
+    width = max(width,n_char*6);
     height = max(height,height*(numel(options)/7.2));
+    
+    % Splitting into cell array, so that enough space is made for the question
+    % (prompt diaglouge).
+    prompt_string = strsplit(question,'\n');
     
     disp(question);
 	fprintf('\t(User input required in popup window...)\n')   
     [selection, ~] = listdlg(...
-        'PromptString',{question;'';'';''},...
+        'PromptString',prompt_string,...
         'SelectionMode','single',...
         'OKString','Select',...
         'CancelString','Cancel',...
@@ -94,7 +98,7 @@ function print_ask_list_menu(options, default)
 		num_width = floor(log10(i));
 		num_str = ['\n\t[',num2str(i),']',repmat(' ',(max_num_width-num_width))];
         if i==default, options{i} = strrep(options{i},'(default)',''); end
-        fprintf([num_str,' ',options{i}]);
+        fprintf([num_str,' ',strrep(options{i},'\','\\')]);
 		space = repmat(' ',1,M_max-M(i)+1);
 		if i==default, fprintf([space,'{default <enter>}']); end
     end
