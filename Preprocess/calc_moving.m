@@ -33,15 +33,11 @@ function T = calc_moving(T, varNames, statisticTypes, nSamples)
                     MovVarObj = dsp.MovingVariance(nSamples);
                     T.(movVarName) = MovVarObj(vec);
                     descr = 'variance';
-                    
                 case 'std'
-                    
                     MovSTDObj = dsp.MovingStandardDeviation(nSamples);
                     T.(movVarName) = MovSTDObj(vec);
                     descr = 'standard deviation';
-                    
-                otherwise
-                    
+                otherwise                  
                     error(['Statistic type ',statisticTypes{j},'not supported.'])
                     
             end

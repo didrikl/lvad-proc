@@ -8,6 +8,10 @@ function T = merge_table_blocks(varargin)
     % 
     % See also table
     
+    % TODO: T = S_parts{[1,2]} automatically merges the to parts, and it seems
+    % to be quick. Special handling with column mismatch is done with this code,
+    % while simple merge as with the example.
+    
     if numel(varargin)==1
         blocks = varargin{1};
     else 

@@ -1,32 +1,33 @@
-function T = filter_notches(T,varName,notches,BW,new_varName)
+function T = filter_notches(T,filt,varName,new_varName,ignoreNaN)
+    % Filter a variable with a designed filter
     
-    if nargin<5, new_varName = ''; end
-    if nargin<4, BW = 1; end
+    % TODO: Make part of table tool or table preprocess package
     
-    if numel(notches)==0
-        return
-    end
-    
-    filterOrder = 2;
-    
-    [fs,T] = get_sampling_rate(T);
-    if isnan(fs), return; end
-    
-    
-    for i=1:numel(notches)
-        
-        f{i} = fdesign.notch('N,F0,BW',filterOrder,notches(i),BW,fs);
-        h{i} = design(f{i});
-        
-    end
-    
-    hd = dfilt.cascade(h{:});
+    if nargin<4, new_varName = ''; end
+    if nargin<5, ignoreNaN = false; end    
     
     % To look at the filter response
     %hfvt= fvtool(hd,'Color','white');
-    
-    if new_varName
-        T.(new_varName) = filter(hd,T.(varName));
-    else
-        T.(varName) = filter(hd,T.(varName));
+ 
+    % NaN entries are set to zero so that the filter method does not result 
+    % in only NaN values
+    nan_inds = isnan(T.(varName));
+    if ignoreNaN
+        T.(varName)(nan_inds) = 0;
+    elseif any(nan_inds)
+        warning(['There are %d NaN entries in the input data. Use IgnoreNaN',...
+            'input as true'],nnz(nan_inds));
     end
+    
+    if not(new_varName), new_varName = varName; end
+    T.(new_varName) = filter(filt,T.(varName));
+
+    % Restore NaN
+    if ignoreNaN
+        T.(varName)(nan_inds) = nan;
+    end
+    
+     T.Properties.VariableContinuity(varName) = 'continuous';
+%     T.Properties.VariableDescriptions(varName) = 'filtered'; %{sprintf(...
+%         'Moving %s\n\t%s\n\tSample rate: %d\n\tFrequencies (samples)',...
+%         descr,fs,nSamples)};

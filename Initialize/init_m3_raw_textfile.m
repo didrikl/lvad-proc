@@ -7,21 +7,21 @@ function T = init_m3_raw_textfile(fileNames,path)
     
     if nargin==1, path = ''; end
     
-    timestamp_fmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
+    timeFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
     
-    var_map = {
+    varMap = {
         ...   
         % Name in Spectrum   Name in Matlab    Type     Continuity   Units
-        'ArtflowLmin'        'affQ'           'numeric' 'continuous' 'L/min'
-        'VenflowLMin'        'effQ'           'numeric' 'continuous' 'L/min'
-        'EmboliVolume1uLsec' 'affEmboliVol'   'numeric' 'continuous' 'uL/sec'
-        'EmboliTotalCount1'  'affEmboliCount' 'numeric' 'step'       ''
-        'EmboliVolume2uLsec' 'effEmboliVol'   'numeric' 'continuous' 'uL/sec'
-        'EmboliTotalCount2'  'effEmboliCount' 'numeric' 'step'       ''
+        'ArtflowLmin'        'affQ'           'single' 'continuous' 'L/min'
+        'VenflowLMin'        'effQ'           'single' 'continuous' 'L/min'
+        'EmboliVolume1uLsec' 'affEmboliVol'   'single' 'continuous' 'uL/sec'
+        'EmboliTotalCount1'  'affEmboliCount' 'single' 'step'       ''
+        'EmboliVolume2uLsec' 'effEmboliVol'   'single' 'continuous' 'uL/sec'
+        'EmboliTotalCount2'  'effEmboliCount' 'single' 'step'       ''
         };
     
      % Columns to omit (not in use or always constant in the sequence)
-    varNames_unneeded = {
+    unneededVarNames = {
         'affEmboliVol'
         'affEmboliCount'
         'effEmboliVol'
@@ -39,7 +39,7 @@ function T = init_m3_raw_textfile(fileNames,path)
         B{i} = init_m3_raw_textfile_read_2sensors(filePath);
         B{i}.time = datetime(B{i}.('DateandTime'),...
             'InputFormat',"yyyy/MM/dd HH:mm:ss",...
-            'Format',timestamp_fmt,...
+            'Format',timeFmt,...
             'TimeZone','Europe/Oslo');
         B{i}(:,'DateandTime') = [];
         
@@ -53,13 +53,19 @@ function T = init_m3_raw_textfile(fileNames,path)
         B{i}.Properties.CustomProperties.Measured(:) = true;
         B{i}.Properties.CustomProperties.Controlled(:) = false;
         
-        B{i}.Properties.VariableNames = var_map(:,2);
-        B{i}.Properties.VariableUnits = var_map(:,5);
+        B{i}.Properties.VariableNames = varMap(:,2);
+        B{i}.Properties.VariableUnits = varMap(:,5);
         
         % Metadata used for populating non-matched rows when syncing
-        B{i}.Properties.VariableContinuity = var_map(:,4);
+        B{i}.Properties.VariableContinuity = varMap(:,4);
 
-        B{i}(:,ismember(B{i}.Properties.VariableNames,varNames_unneeded)) = [];
+        unneededVars = ismember(B{i}.Properties.VariableNames,unneededVarNames);
+        B{i}(:,unneededVars) = [];
+        
+        % Cast all columns, other than time columns
+        B{i} = convert_columns(B{i},varMap(not(unneededVars),3));
+        
+        
     end
     
     T = merge_table_blocks(B);

@@ -67,7 +67,7 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 init_matlab
 welcome('Initializing data','module')
-if load_workspace; return; end
+if load_workspace({'S_parts','notes','feats'}); return; end
 
 % Read PowerLab data in files exported from LabChart
 PL = init_powerlab_raw_matfiles(powerlab_filePaths);
@@ -97,17 +97,20 @@ feats = init_features_from_notes(notes);
 S = fuse_data(notes,PL,US);
 clear PL US
 
-% ...syncing here, if needed...
-
 S_parts = split_into_parts(S);
 clear S
 
-S_parts = add_spatial_norms(S_parts);
+S_parts = add_spatial_norms(S_parts,2);
 S_parts = add_moving_statistics(S_parts);
+
+S_parts = add_spatial_norms(S_parts,2,{'accA_x','accA_z'},'accA_xz_norm');
+S_parts = add_moving_statistics(S_parts,{'accA_xz_norm'});
+
+% Maybe not a pre-processing thing
+S_parts = add_harmonics_filtered_variables(S_parts);
 
 % TODO:
 % Add MPF, std, RMS and other statistics/indices into feats
 % Revise categoric blocks, and put into feats
 
-ask_to_save(sequence);
-
+ask_to_save({'S_parts','notes','feats'},sequence);

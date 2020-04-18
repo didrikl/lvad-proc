@@ -3,7 +3,7 @@ function path = get_path(pattern)
     % the get_fullpath_filelisting function.
     
     if isfolder(pattern)
-        path = pattern;
+        path = fullfile([pattern,'\']);
         return
     end
     

@@ -22,23 +22,24 @@ function B = init_powerlab_raw_matfiles(fileNames,path)
     % useful if different digital sampling boxes are used.
     acc_gyr_maxFreq = 700;
     p_maxFreq = 1000;
+   
     var_map = {
         ...   
-        % LabChart name  Matlab name  Sensor sample rate
-        'Trykk1'         'affP'       p_maxFreq
-        'Trykk2'         'effP'       p_maxFreq
-        'SensorAAccX'    'accA_x'     acc_gyr_maxFreq
-        'SensorAAccY'    'accA_y'     acc_gyr_maxFreq
-        'SensorAAccZ'    'accA_z'     acc_gyr_maxFreq
-%         'SensorAGyrX'    'gyrA_x'     acc_gyr_maxFreq
-%         'SensorAGyrY'    'gyrA_y'     acc_gyr_maxFreq
-%         'SensorAGyrZ'    'gyrA_z'     acc_gyr_maxFreq
-%         'SensorBAccX'    'accB_x'     acc_gyr_maxFreq
-%         'SensorBAccY'    'accB_y'     acc_gyr_maxFreq
-%         'SensorBAccZ'    'accB_z'     acc_gyr_maxFreq            
-%         'SensorBGyrX'    'gyrB_x'     acc_gyr_maxFreq
-%         'SensorBGyrY'    'gyrB_y'     acc_gyr_maxFreq
-%         'SensorBGyrZ'    'gyrB_z'     acc_gyr_maxFreq
+        % LabChart name  Matlab name  Max frequency     Type        Continuity
+        'Trykk1'         'affP'       p_maxFreq         'single'    'continuous'
+        'Trykk2'         'effP'       p_maxFreq         'single'    'continuous'
+        'SensorAAccX'    'accA_x'     acc_gyr_maxFreq   'numeric'   'continuous'
+        'SensorAAccY'    'accA_y'     acc_gyr_maxFreq   'numeric'   'continuous'
+        'SensorAAccZ'    'accA_z'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorAGyrX'    'gyrA_x'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorAGyrY'    'gyrA_y'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorAGyrZ'    'gyrA_z'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorBAccX'    'accB_x'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorBAccY'    'accB_y'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorBAccZ'    'accB_z'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorBGyrX'    'gyrB_x'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorBGyrY'    'gyrB_y'     acc_gyr_maxFreq   'numeric'   'continuous'
+%        'SensorBGyrZ'    'gyrB_z'     acc_gyr_maxFreq   'numeric'   'continuous'
         };
 
 
@@ -73,10 +74,13 @@ function B = init_powerlab_raw_matfiles(fileNames,path)
         % All variables shall be treated as continous and measured in data fusion
         B{i} = addprop(B{i},'Measured','variable');
         B{i}.Properties.CustomProperties.Measured(:) = true;
-        B{i}.Properties.VariableContinuity(:) = 'continuous';
+        B{i}.Properties.VariableContinuity = var_map(:,5);
         
         B{i}.Properties.DimensionNames{1} = 'time'; 
         B{i}.Properties.DimensionNames{2} = 'variables'; 
+        
+        % Convert to specified numeric format (e.g. pressure as single)
+        B{i} = convert_columns(B{i},var_map(:,4));
         
     end   
 

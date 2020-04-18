@@ -3,10 +3,11 @@ function T = map_varnames(T,varNamesInFile,varNamesInCode)
     varNamesInT = T.Properties.VariableNames;
     
     missingVarsInCode = varNamesInT(not(ismember(varNamesInT,varNamesInFile)));
-    if not(isempty(missingVarsInCode))
-        warning(sprintf(['\n\tMissing variable(s) in code for mapping:'...
-            '\n\t\t',strjoin(missingVarsInCode,', ')]))
-
+    if numel(missingVarsInCode)>0
+        warning('\nt\tMissing variable(s) in code for variable mapping:\n\t\t%s',...
+            strjoin(missingVarsInCode,', '));
+        %ask_list_ui()
+        T(:,missingVarsInCode) = [];
     end
     
     missingVarsInFile = varNamesInCode(not(ismember(varNamesInFile,varNamesInT)));

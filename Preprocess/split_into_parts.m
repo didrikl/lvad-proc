@@ -3,7 +3,7 @@ function S_parts = split_into_parts(S)
     % Sample rate for re-sampling down to highest signal content frequency 
     maxSignalFreq = 700;
 
-    welcome('Splitting into parts')
+    welcome('Splitting into resampled parts')
     h_wait = waitbar(0,'','Name','Preprocessing parts...');
     
     parts = sort_nat(unique(string(S.part(not(ismissing(S.part))))));
@@ -22,13 +22,18 @@ function S_parts = split_into_parts(S)
             continue; 
         end
         
-        %if any(seconds(diff(S_parts{i}.time))>1/sampleRate)
-        if S_parts{i}.Properties.SampleRate~=maxSignalFreq
+        if isnan(S_parts{i}.Properties.SampleRate) || ...
+                S_parts{i}.Properties.SampleRate~=maxSignalFreq
             S_parts{i} = resample_signal(S_parts{i}, maxSignalFreq);
         end
-        %else
-            %S_parts{i}.Properties.SampleRate = sampleRate;
-        %end
+        
+        % Remove possible first/last row(s) with undefined part after re-sampling
+        S_parts{i}(isundefined(S_parts{i}.part),:) = [];
+        if isnan(S_parts{i}.Properties.SampleRate)
+            [fs,S_parts{i}] = get_sampling_rate(S_parts{i});
+        end
+        
+        fprintf('\n');
     
     end
     

@@ -31,31 +31,32 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     % * Type is used for parsing data from Excel into notes Matlab table
     % * Continuity is a status property, particularily useful when merging with 
     %   recorded data, c.f. timetable VariableContinuity documentation.  
+    %   NB: Categoric type take a lot less memory to store
     var_map = {    
         ...   
-        % Name in Excel            Name Matlab code    Type          Continuity
-        'Date'                     'date'              'cell'        'event'
-        'Timestamp'                'timestamp'         'cell'        'event'
-        'Elapsed time'             'part_elapsedTime'  'duration'    'continuous'
-        'Dur'                      'event_duration'    'numeric'     'event'
-        'Part'                     'part'              'categoric'   'step'
-        'Interval type'            'intervType'        'categoric'   'step'
-        'Event'                    'event'             'categoric'   'step'
-        'Thrombus volume'          'thrombusVol'       'categoric'   'step'
-        'Speed change rate'        'speedChangeRate'   'categoric'   'step'
-        'Dose'                     'dose'              'categoric'   'step'
-        'Pump speed'               'pumpSpeed'         'numeric'     'step'
-        'Balloon level'            'balloonLevel'      'categoric'   'step'
-        'Balloon offset'           'balloonOffset'     'categoric'   'step'
-        'Balloon diameter'         'balloonDiam'       'numeric'     'continuous'
-        'Catheter type'            'catheter'          'categoric'   'unset'
-        'Clamp flow reduction'     'flowReduction'     'categoric'   'step'
-        'Afferent pressure'        'affP_noted'        'numeric'     'event'
-        'Effenrent pressure'       'effP_noted'        'numeric'     'event'
-        'Flow estimate'            'Q_noted'           'numeric'     'step'
-        'Power'                    'power_noted'       'numeric'     'step'
-        'Reduced baseline flow'    'redBaseFlow'       'numeric'     'event'
-        'Comment'                  'comment'           'cell'        'event'
+        % Name in Excel           Name Matlab code     Type            Continuity
+        'Date'                    'date'               'cell'          'event'
+        'Timestamp'               'timestamp'          'cell'          'event'
+        'Elapsed time'            'part_elapsedTime'   'duration'      'continuous'
+        'Dur'                     'event_duration'     'int16'         'event'
+        'Part'                    'part'               'categorical'   'step'
+        'Interval type'           'intervType'         'categorical'   'step'
+        'Event'                   'event'              'categorical'   'step'
+        'Thrombus volume'         'thrombusVol'        'categorical'   'step'
+        'Speed change rate'       'speedChangeRate'    'categorical'   'step'
+        'Dose'                    'dose'               'categorical'   'step'
+        'Pump speed'              'pumpSpeed'          'int16'         'step'
+        'Balloon level'           'balloonLevel'       'categorical'   'step'
+        'Balloon diameter'        'balloonDiam'        'categorical'   'step'
+        'Balloon offset'          'balloonOffset'      'categorical'   'step'
+        'Catheter type'           'catheter'           'categorical'   'unset'
+        'Clamp flow reduction'    'flowReduction'      'categorical'   'step'
+        'Afferent pressure'       'affP_noted'         'single'        'event'
+        'Effenrent pressure'      'effP_noted'         'single'        'event'
+        'Flow estimate'           'Q_noted'            'single'        'step'
+        'Power'                   'power_noted'        'single'        'step'
+        'Reduced baseline flow'   'redBaseFlow'        'single'        'event'
+        'Comment'                 'comment'            'cell'          'event'
         ...
         };
 
@@ -192,14 +193,9 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     %% Parse all columns, other than time columns
     
     % Parse relevant columns to numerical or to categorical
-    for j=1:numel(var_map(:,3))
-        switch var_map{j,3}
-            case 'categoric'
-                notes.(varNames_mat{j}) = categorical(notes{:,j});
-            case 'numeric'
-                notes.(varNames_mat{j}) = str2double(string(notes{:,j}));
-        end
-    end
+    % Cast all columns, other than time columns
+    notes = convert_columns(notes,var_map(:,3));
+
     
     %% Add derived columns
     
