@@ -63,12 +63,14 @@ end
 
 function T = make_plot_data(parts,S_parts,rpm,...
         sampleRate,notches,notchWidth,std_winLenSec,rms_winLenSec)
-    
+    S_parts{42}.Properties.SampleRate
     % Extract relevant data
     T = cell(numel(parts),1);
     for j=1:numel(parts)
+        parts
         T{j} = S_parts{parts(j)};
         T{j}.dur = linspace(0,1/sampleRate*height(T{j}),height(T{j}))';   
+        T{j}.Properties.SampleRate
         
         % Filter 1st harmonic
         T{j}(isnan(T{j}.pumpSpeed),:) = [];

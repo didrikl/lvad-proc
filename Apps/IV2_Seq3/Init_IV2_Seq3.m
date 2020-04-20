@@ -34,7 +34,7 @@ powerlab_fileNames = {
     'IV2_Seq3 - B12_ch1-5.mat'
     'IV2_Seq3 - B13_ch1-5.mat'
     };
-notes_fileName = 'IV2_Seq3 - Notes ver3.9 - Rev1.xlsm';
+notes_fileName = 'IV2_Seq3 - Notes ver3.9 - Rev2.xlsm';
 ultrasound_fileNames = {                         
     'ECM_2020_03_17__17_01_50.wrf'
     'ECM_2020_03_18__18_33_45.wrf'
@@ -50,6 +50,7 @@ ultrasound_fileNames = {
     'ECM_2020_03_26__21_31_35.wrf'
     'ECM_2020_03_26__21_54_23.wrf'
     'ECM_2020_03_26__22_13_44.wrf'
+    %'ECM_2020_04_01__22_15_22.wrf'
     'ECM_2020_04_01__22_15_22-shifted1Hour.wrf'
     };
 
@@ -90,7 +91,11 @@ notes = qc_notes(notes);
 
 % Correct for unsync'ed M3 clock
 unsync_inds = US.time>'22-Mar-2020 22:19:14.00' & US.time<'22-Mar-2020 22:52:13.00';
-US.time(unsync_inds) = US.time(unsync_inds)+seconds(42);
+US.time(unsync_inds) = US.time(unsync_inds)-seconds(42);
+
+% Shift 1 hours due to summer daylight saving time
+% unsync_inds = US.time>'01-Apr-2020 22:15:22.00' & US.time<'01-Apr-2020 23:12:53';
+% US.time(unsync_inds) = US.time(unsync_inds)+hours(1);
 
 feats = init_features_from_notes(notes);
 

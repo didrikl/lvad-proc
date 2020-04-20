@@ -6,12 +6,7 @@ function T_parts = add_moving_statistics(T_parts, varNames)
     % Good practice could e.g. be to do some extra recording at start of
     % the part before doing interventions, which would avoid such gaps.
     
-    if nargin<2 
-        varNames = {
-            'accA_norm'
-            %'accA_xz_norm'
-            }; 
-    end
+    if nargin<2, varNames = {'accA_norm'}; end
     
     rms_winDur = 1;
     std_winDur = 10;

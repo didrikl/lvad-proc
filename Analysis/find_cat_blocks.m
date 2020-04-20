@@ -19,14 +19,13 @@ function [blocks,vars] = find_cat_blocks(T,vars,sampleRate)
     %           Block end time in the same representation as with start_durSec
     %
     %        start_inds
-    %           Start time in duration seconds (stored as double) of the
-    %           combined blocks of all given categories and their values
+    %           Start index of the combined blocks of all given categories 
+    %           and their values
     %
     %        end_inds
-    %           End time in duration seconds (stored as double) of the
-    %           combined blocks of all given categories and their values
+    %           End index of the combined blocks of all given categories 
+    %           and their values
     %
-    
     
     if nargin<3, [sampleRate, T] = get_sampling_rate(T); end
     blocks = struct;
@@ -77,6 +76,12 @@ function blocks = find_cat_val_blocks(T,blocks)
     blocks.end_inds = nan(numel(block.end_times),1);
     for i=1:numel(block.start_times)
         blocks.start_inds(i) = find(T.dur==block.start_times(i));
+%         blocks.end_inds(i)
+%         block.end_times(i)
         blocks.end_inds(i) = find(T.dur==block.end_times(i));
     end
-   
+    
+    start_at_end = blocks.start_inds==height(T);
+    blocks.start_inds(start_at_end) = [];
+    blocks.end_inds(start_at_end) = [];
+    

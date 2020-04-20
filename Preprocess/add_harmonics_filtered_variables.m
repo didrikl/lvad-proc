@@ -6,14 +6,7 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
         varNames = {
             'accA_norm'
             'accA_norm_movRMS'
-            %'accA_xz_norm_movRMS'
             'accA_norm_movStd'
-            %'accA_xz_norm_movStd'
-            'accB_norm'
-            'accB_norm_movRMS'
-            %'accB_xz_norm_movRMS'
-            'accB_norm_movStd'
-            %'accB_xz_norm_movStd'
             }; 
     end
     if nargin<3, harmonics = [1]; end
@@ -24,7 +17,6 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     welcome('Adding filtered variables')
  
     
-    varNames = varNames(ismember(varNames,T_parts{1}.Properties.VariableNames));
     newVarNames = varNames+"_["+mat2str(harmonics)+"]hFilt";
     fprintf('Input\n\t%s\n',strjoin(varNames,', '))
     fprintf('Output\n\t%s\n',strjoin(newVarNames,', '))
@@ -32,8 +24,15 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     for i=1:numel(T_parts)
         
         T = T_parts{i};
-        T{:,newVarNames} = nan(height(T),numel(newVarNames));
         if isempty(T), continue; end
+        
+        varsNotInPart = not(ismember(varNames,T.Properties.VariableNames));
+        if any(varsNotInPart)
+            error('\n\tPart %d does not contain input variables:\n\t\t%s',...
+                i,strjoin(varNames(varsNotInPart),', '));
+        end
+        
+        T{:,newVarNames} = nan(height(T),numel(newVarNames));
         
         [fs,T] = get_sampling_rate(T);
         [start_inds, end_inds, rpm_vals] = find_rpm_blocks(T);
@@ -62,5 +61,3 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     end
 
     T_parts = convert_to_single(T_parts, newVarNames);
-
-    
