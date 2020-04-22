@@ -3,6 +3,9 @@ function welcome(str, type)
     if nargin<2, type = 'function'; end
     
     switch type
+        case 'iteration'
+            fprintf('\n<strong>%s</strong>\n',str)
+        
         case 'function'
             line = repmat('-',1,numel(str)+2);
             fprintf('\n<strong> %s</strong>\n%s\n',str,line)

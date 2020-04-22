@@ -13,14 +13,14 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 powerlab_fileNames = {
-    'IV2_Seq2 - B1.mat'
-     'IV2_Seq2 - B2.mat' 
-      'IV2_Seq2 - B3.mat' 
+%     'IV2_Seq2 - B1.mat'
+%      'IV2_Seq2 - B2.mat' 
+%       'IV2_Seq2 - B3.mat' 
       %'IV2_Seq2 - B4.mat' % included in B5 by mistake 
       'IV2_Seq2 - B5.mat' 
       'IV2_Seq2 - B6.mat' 
     };
-notes_fileName = 'IV2_Seq2 - Notes ver3.9 - Rev5.xlsm';
+notes_fileName = 'IV2_Seq2 - Notes ver3.9 - Rev5';
 ultrasound_fileNames = {
     'ECM_2020_01_08__11_06_21.wrf'
     'ECM_2020_01_09__16_14_36.wrf'
