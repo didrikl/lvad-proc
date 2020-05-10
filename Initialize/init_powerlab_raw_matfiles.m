@@ -1,4 +1,4 @@
-function B = init_powerlab_raw_matfiles(fileNames,path)
+function B = init_powerlab_raw_matfiles(fileNames,path,var_map)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
     % as mat file from PowerLab's LabChart program.
@@ -11,6 +11,7 @@ function B = init_powerlab_raw_matfiles(fileNames,path)
     %
     % See also timetable
     
+   
     if nargin==1, path = ''; end
     filePaths = fullfile(path,fileNames);
     
@@ -22,43 +23,34 @@ function B = init_powerlab_raw_matfiles(fileNames,path)
     % useful if different digital sampling boxes are used.
     acc_gyr_maxFreq = 700;
     p_maxFreq = 1000;
-   
-    var_map = {
-        ...   
-        % LabChart name  Matlab name  Max frequency     Type        Continuity
-        'Trykk1'         'affP'       p_maxFreq         'single'    'continuous'
-        'Trykk2'         'effP'       p_maxFreq         'single'    'continuous'
-        'SensorAAccX'    'accA_x'     acc_gyr_maxFreq   'numeric'   'continuous'
-        'SensorAAccY'    'accA_y'     acc_gyr_maxFreq   'numeric'   'continuous'
-        'SensorAAccZ'    'accA_z'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorAGyrX'    'gyrA_x'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorAGyrY'    'gyrA_y'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorAGyrZ'    'gyrA_z'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorBAccX'    'accB_x'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorBAccY'    'accB_y'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorBAccZ'    'accB_z'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorBGyrX'    'gyrB_x'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorBGyrY'    'gyrB_y'     acc_gyr_maxFreq   'numeric'   'continuous'
-%        'SensorBGyrZ'    'gyrB_z'     acc_gyr_maxFreq   'numeric'   'continuous'
-        };
-
-
+    if nargin<3
+        var_map = {
+            % LabChart name  Matlab name  Max frequency     Type        Continuity
+            'Trykk1'         'affP'       p_maxFreq         'single'    'continuous'
+            'Trykk2'         'effP'       p_maxFreq         'single'    'continuous'
+            'SensorAAccX'    'accA_x'     acc_gyr_maxFreq   'numeric'   'continuous'
+            'SensorAAccY'    'accA_y'     acc_gyr_maxFreq   'numeric'   'continuous'
+            'SensorAAccZ'    'accA_z'     acc_gyr_maxFreq   'numeric'   'continuous'
+            };
+    end
+    
     welcome('Initializing PowerLab')
     
     % Initialization of Powerlab block file(s)
     B = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         
+        fileNames{i} = ensure_filename_extension(fileNames{i}, 'mat');
         display_filename(fileNames{i});
-        
         B{i} = read_signal_file(filePaths{i},timestampFmt);
         
         % TODO: Check for overlap with already read data, in case double saving
         % from LabChart. Ask to cut data in newest file from the start, or to
         % remove file
         
-        B{i} = map_varnames(B{i}, var_map(:,1), var_map(:,2));
-            
+        [B{i},inFile_inds] = map_varnames(B{i}, var_map(:,1), var_map(:,2));
+        var_map = var_map(inFile_inds,:);
+        
         % Storing info about sensors (metadata for each variable)
         B{i} = addprop(B{i},'SensorSampleRate','variable');
         channels_in_use = ismember(B{i}.Properties.VariableNames,var_map(:,2));

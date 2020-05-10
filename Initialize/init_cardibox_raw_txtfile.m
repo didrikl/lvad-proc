@@ -1,32 +1,60 @@
-function [T,raw] = init_cardiaccs_raw_txtfile(fileName,read_path,accVarName)
+function T = init_cardibox_raw_txtfile(fileNames,read_path,accVarName)
     
     if nargin<2, read_path = ''; end
-    if nargin<3, accVarName='acc'; end
+    if nargin<3, accVarName='accC'; end
     
-    welcome('Initializing Cardiaccs Teguar')
+    welcome('Initializing Cardiaccs Cardibox')
+      
+    if numel(fileNames)==0 
+        T = table;
+        return; 
+    end
+    fileNames = cellstr(fileNames);
     
-    filePath = fullfile(read_path,fileName);
-    filePath = ensure_filename_extension(filePath, {'txt','csv'});  
-    display_filename(fileName,read_path);
+    T = cell(numel(fileNames),1);
+    for i=1:numel(fileNames)
     
-    raw= read_cardiaccs_raw_txtfile_parfor(filePath);
-    %raw = read_cardiaccs_raw_txtfile(filePath);
+        filePath = fullfile(read_path,fileNames{i});
+        filePath = ensure_filename_extension(filePath, {'txt','csv'});
+        display_filename(filePath);
+        
+        % Likely that parallellization is quicker when several files
+        if numel(fileNames)>1
+            if i==1, h_wait = waitbar(0,'Reading raw Cardibox data'); end
+            waitbar(i/numel(fileNames),h_wait)
+            T{i}= read_txtfile_parfor(filePath);
+            if i==numel(fileNames), close(h_wait); end  
+        else
+            T{i} = read_txtfile(filePath);
+        end
+        
+        % Unfold to one row per acc registration and type conversions
+        T{i} = parse_raw(T{i});
+        
+        % Let time be represented as datetime (timestamp) and convert to timetable
+        % where the timestamp is not a variable, but an internal row id. Timetable
+        % have built-in methods for signal processing
+        T{i} = make_signal_timetable(T{i});
+        
+        % Add info for built-in table properties
+        %T{i} = add_variable_properties(T{i});
+        T{i}.Properties.UserData = make_init_userdata(filePath);
+        T{i}.Properties.VariableNames{'acc'}  = accVarName;
     
-    % Unfold to one row per acc registration and type conversions
-    T = parse_cardiaccs_raw(raw);
+        T{i}.(accVarName) = single(T{i}.(accVarName));
+        T{i} = splitvars(T{i},accVarName,'NewVariableNames',accVarName+["_x","_y","_z"]);
     
-    % Let time be represented as datetime (timestamp) and convert to timetable
-    % where the timestamp is not a variable, but an internal row id. Timetable
-    % have built-in methods for signal processing
-    % NOTE: Move this into parse_cardiaccs_raw .m-file?
-    T = make_signal_timetable(T);
+    end
     
-     % Add info for built-in table properties
-    raw = add_cardiaccs_raw_variable_properties(raw);
-    raw.Properties.UserData = make_init_userdata(filePath);
-    raw.Properties.VariableNames{'acc'}  = accVarName;
+    % TODO: Check if timestamps are increasing and not overlapping
+    %starts = cellfun(@(c)c.time(1),T)
+    %ends = cellfun(@(c)c.time(end),T)
+
     
-function raw = read_cardiaccs_raw_txtfile(filePath)
+    T = merge_table_blocks(T);
+    
+    
+function raw = read_txtfile(filePath)
     
     % Open file and go to first line with a status="ok" record
     fid = fopen(filePath, 'r');
@@ -99,7 +127,7 @@ function raw = read_cardiaccs_raw_txtfile(filePath)
     
     close(h_wait)
     
-function raw = read_cardiaccs_raw_txtfile_parfor(filePath)
+function raw = read_txtfile_parfor(filePath)
     
     % Open file and go to first line with a status="ok" record
     fid = fopen(filePath, 'r');
@@ -165,7 +193,7 @@ function raw = read_cardiaccs_raw_txtfile_parfor(filePath)
         'VariableNames',{'frame','t','adcscale','accscale','adc','acc'});
     
     
-function signal = parse_cardiaccs_raw(raw, include_adc)
+function signal = parse_raw(raw, include_adc)
     
     % Default is to exclude adc signal, assumed it is not in use/been recorded
     if nargin==1, include_adc= false; end
@@ -284,15 +312,15 @@ function [n_records,end_inds,start_inds,n_rows] = find_unfold_distr(acc_records)
     n_rows = sum(n_records);
     
     
-function raw = add_cardiaccs_raw_variable_properties(raw)
+function T = add_variable_properties(T)
     
-    raw.Properties.VariableDescriptions{'t'} = 'The Current Unix Timestamp';
-    raw.Properties.VariableDescriptions{'adc'} = 'External analog input';
-    raw.Properties.VariableDescriptions{'adcscale'} = 'Scaling factor for physical scale in voltage (mV)';
-    raw.Properties.VariableDescriptions{'acc'} = 'Acceleration';
-    raw.Properties.VariableDescriptions{'accscale'} = 'Scaling factor for gravitational scale (g)';
-    raw.Properties.VariableUnits{'t'} = 'sec';
-    raw.Properties.VariableUnits{'adc'} = 'AU';
-    raw.Properties.VariableUnits{'acc'} = 'AU';
-    raw.Properties.VariableUnits{'adcscale'} = 'mV';
-    raw.Properties.VariableUnits{'accscale'} = 'g';
+    T.Properties.VariableDescriptions{'t'} = 'The Current Unix Timestamp';
+    T.Properties.VariableDescriptions{'adc'} = 'External analog input';
+    T.Properties.VariableDescriptions{'adcscale'} = 'Scaling factor for physical scale in voltage (mV)';
+    T.Properties.VariableDescriptions{'acc'} = 'Acceleration';
+    T.Properties.VariableDescriptions{'accscale'} = 'Scaling factor for gravitational scale (g)';
+    T.Properties.VariableUnits{'t'} = 'sec';
+    T.Properties.VariableUnits{'adc'} = 'AU';
+    T.Properties.VariableUnits{'acc'} = 'AU';
+    T.Properties.VariableUnits{'adcscale'} = 'mV';
+    T.Properties.VariableUnits{'accscale'} = 'g';

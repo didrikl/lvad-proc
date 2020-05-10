@@ -28,15 +28,23 @@ function T = init_m3_raw_textfile(fileNames,path)
         'effEmboliCount'
         };
     
-    welcome('Initializing Spectrum')
+    welcome('Initializing Spectrum M3')
     
-    T = table;
-    if numel(fileNames)==0, return; end
+    if numel(fileNames)==0 
+        T = table;
+        return; 
+    end
+    fileNames = cellstr(fileNames);
     
     B = cell(numel(fileNames),1);
     for i=1:numel(fileNames)
         filePath = fullfile(path, fileNames{i});
+        filePath = ensure_filename_extension(filePath, 'wrf');
+        display_filename(filePath);
+    
         B{i} = init_m3_raw_textfile_read_2sensors(filePath);
+        B{i}.Properties.UserData = make_init_userdata(filePath);
+
         B{i}.time = datetime(B{i}.('DateandTime'),...
             'InputFormat',"yyyy/MM/dd HH:mm:ss",...
             'Format',timeFmt,...
@@ -51,6 +59,12 @@ function T = init_m3_raw_textfile(fileNames,path)
         % Add metadata for picking out sensor-messured data, when analysing
         B{i} = addprop(B{i},{'Measured','Controlled'},{'variable','variable'});
         B{i}.Properties.CustomProperties.Measured(:) = true;
+        % TODO: Use this function instead:
+        %signal = make_signal_timetable(signal, include_time_duration)
+        % TODO: The above function must be modified to support raw time format
+        % as function argument input.
+        
+        
         B{i}.Properties.CustomProperties.Controlled(:) = false;
         
         B{i}.Properties.VariableNames = varMap(:,2);
@@ -106,7 +120,6 @@ function T_block = init_m3_raw_textfile_read_2sensors(filePath)
     T_block = readtable(filePath, opts);
     
     % Store various/unstructured info (start with initializing standard info)
-    T_block.Properties.UserData = make_init_userdata(filePath);
     T_block.Properties.UserData.header = cellstr(opts.SelectedVariableNames);
     
 function signal = init_m3_raw_textfile_read_1sensor(fileName)
@@ -185,4 +198,7 @@ function signal = init_m3_raw_textfile_read_1sensor(fileName)
     signal.emboliVolume = cell2mat(rawNumericColumns(:, 2));
     signal.emboliTotalCount = cell2mat(rawNumericColumns(:, 3));
     signal.emboliTotalVolume = cell2mat(rawNumericColumns(:, 4));
+    
+   
+
     

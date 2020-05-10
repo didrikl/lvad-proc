@@ -21,6 +21,11 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     fprintf('Input\n\t%s\n',strjoin(varNames,', '))
     fprintf('Output\n\t%s\n',strjoin(newVarNames,', '))
  
+    if not(isempty(gcp('nocreate')))
+        ...Parallell toolbox is started
+        ...run in parallell by parfor implementation
+    end
+
     for i=1:numel(T_parts)
         
         T = T_parts{i};

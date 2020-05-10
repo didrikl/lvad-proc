@@ -22,7 +22,6 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
 
     % Remove DC component
     x = detrend(T.(map_varName));
-    
     if nargout==0
         rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
             'Amplitude','peak',...'power',...'rms',

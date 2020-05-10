@@ -85,6 +85,7 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     welcome('Reading notes file')
     
     % TODO: For OO...
+    fileName = ensure_filename_extension(fileName, 'xlsm');
     filePath = fullfile(read_path,fileName);
     display_filename(read_path,fileName);
     
@@ -136,8 +137,11 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     varNames_xls = var_map(:,1);
     varNames_mat = var_map(:,2);
     notes.Properties.VariableNames = varNames;
-    notes = map_varnames(notes, varNames_xls, varNames_mat);
-
+    [notes, inFile_ind] = ...
+        map_varnames(notes, varNames_xls, varNames_mat);
+    var_map = var_map(inFile_ind,:);
+    varNames_xls = var_map(:,1);
+    
     % Update and add variable metadata
     notes = standardizeMissing(notes, missing_value_repr);
     

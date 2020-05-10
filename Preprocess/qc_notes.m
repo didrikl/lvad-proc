@@ -22,7 +22,6 @@ function notes = qc_notes(notes)
     
 function notes = ask_to_reinit(notes)
     % Pause and let user make changes in Excel and re-initialize
-    
     winopen(notes.Properties.UserData.FilePath);
     answer = ask_list_ui({'Re-initialize', 'Ignore', 'Abort'},...
         sprintf('\nPause: Check and save as new notes file revision'),1);
@@ -44,7 +43,10 @@ function notChrono_ind = check_chronological_time(notes)
         notChrono_rows = find(notChrono_ind);
         for i=1:numel(notChrono_rows)
             fprintf('\nNon-chronological timestamps found:\n\n')
-            notes(notChrono_rows(i)-1:notChrono_rows(i),:)
+            non_chronological_timestamps = ...
+                notes(notChrono_rows(i):notChrono_rows(i)+1,:);
+            disp(non_chronological_timestamps);
+            %openvar non_chronological_timestamps
         end
     else
         fprintf('\nAll time stamps are chronological')
@@ -57,11 +59,15 @@ function [natPause_inds, natPart_inds] = check_missing_time(notes)
     natPart_inds = isnat(notes.time) & notes.part~='-'; 
     if any(natPause_inds)
         fprintf('\nTimestamps missing for Pause notes:\n\n')
-        disp(notes(natPause_inds,:))
+        missing_pause_timestamps = notes(natPause_inds,:);
+        disp(missing_pause_timestamps)
+        %openvar missing_pause_timestamps
     end
     if any(natPart_inds)
         fprintf('\nTimestamps missing for Part notes:\n\n')
-        disp(notes(natPart_inds,:))
+        missing_part_timestamps = notes(natPart_inds,:);
+        disp(missing_part_timestamps)
+        %openvar missing_part_timestamps
     end
     
     if not(any(isnat(notes.time)))
@@ -77,7 +83,9 @@ function undefCat_inds = check_missing_part(notes)
     undefCat_inds = any(isundefined(notes{:,mustHaveCats}),2);
     if any(undefCat_inds)
         fprintf('\n\nEssential categoric info missing:\n\n')
-        disp(notes(undefCat_inds,:))
+        missing_categories = notes(undefCat_inds,:);
+        disp(missing_categories)
+        %openvar missing_categories
     else
         fprintf('\nAll rows have essential categoric info')
     end

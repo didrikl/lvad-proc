@@ -70,10 +70,10 @@ function [blocks,vars] = find_cat_blocks(T,vars,sampleRate)
     
 function blocks = find_cat_val_blocks(T,blocks)
     
-    block.start_times = unique([blocks.start_durSec{:,:,:}])
-    block.end_times = unique([blocks.end_durSec{:,:,:}])
-    blocks.start_inds = nan(numel(block.start_times),1)
-    blocks.end_inds = nan(numel(block.end_times),1)
+    block.start_times = unique([blocks.start_durSec{:,:,:}]);
+    block.end_times = unique([blocks.end_durSec{:,:,:}]);
+    blocks.start_inds = nan(numel(block.start_times),1);
+    blocks.end_inds = nan(numel(block.end_times),1);
     for i=1:numel(block.start_times)
         
         %TODO: Debug, fix or rewrite

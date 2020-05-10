@@ -1,7 +1,7 @@
-function S = fuse_data(notes,PL,US)
+function S = fuse_powerlab_and_cardibox(notes,PL,US)
     % fuse_data Fuse notes and ultrasound into PowerLab data
     %
-    %    S = fuse_data(notes,PL,US)
+    %    S = fuse_data(notes,PL,DL)
     %
     % See also merge_table_blocks, fuse_timetables
     

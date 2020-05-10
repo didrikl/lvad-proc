@@ -2,40 +2,60 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
-sequence = 'IV2_Seq2';
-experiment_subdir = 'IV2_Seq2 - Water simulated HVAD thrombosis - Pilot';
+sequence = 'IV2_Seq4';
+experiment_subdir = 'IV2_Seq4 - Water simulated HVAD thrombosis';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
-spectrum_subdir = 'Recorded\M3\Blocks';
+driveline_subdir = 'Recorded\Teguar';
+ultrasound_subdir = 'Recorded\M3\Blocks';
 notes_subdir = 'Noted';
 
 % Which files to input from input directory 
+% NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-%     'IV2_Seq2 - B1.mat'
-%      'IV2_Seq2 - B2.mat' 
-%       'IV2_Seq2 - B3.mat' 
-      %'IV2_Seq2 - B4.mat' % included in B5 by mistake 
-      'IV2_Seq2 - B5.mat' 
-      'IV2_Seq2 - B6.mat' 
+    'IV2_Seq4 - F1_ch1-5.mat'
+    'IV2_Seq4 - F2_ch1-5.mat'
+    'IV2_Seq4 - F3_ch1-5.mat'
+    'IV2_Seq4 - F4_ch1-5.mat'
+    'IV2_Seq4 - F5_ch1-5.mat'
+    'IV2_Seq4 - F6_ch1-5.mat'
+    'IV2_Seq4 - F7_ch1-5.mat'
+    'IV2_Seq4 - F8_ch1-5.mat'
+    'IV2_Seq4 - F9_Sel1_ch1-5.mat'
+    'IV2_Seq4 - F10_ch1-5.mat'
+    'IV2_Seq4 - F11_ch1-5.mat'
+    'IV2_Seq4 - F12_ch1-5.mat'
     };
-notes_fileName = 'IV2_Seq2 - Notes ver3.9 - Rev5';
+driveline_fileNames = {
+    'monitor-20200430-171551\monitor-20200430-171615.txt'
+    'monitor-20200501-145804\monitor-20200501-151024.txt'
+    'monitor-20200501-164801\monitor-20200501-164807.txt'
+    'monitor-20200501-164801\monitor-20200501-172633.txt'
+    'monitor-20200501-180858\monitor-20200501-180918.txt'
+    'monitor-20200501-180858\monitor-20200501-190409.txt'
+    'monitor-20200505-120202\monitor-20200505-135648.txt'
+    'monitor-20200507-122526\monitor-20200507-140957.txt' % check if needed
+    'monitor-20200507-122526\monitor-20200507-142148.txt'
+    'monitor-20200508-142644\monitor-20200508-150237.txt'
+    };
+notes_fileName = 'IV2_Seq4 - Notes ver3.10 - Rev2.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_01_08__11_06_21.wrf'
-    'ECM_2020_01_09__16_14_36.wrf'
-    'ECM_2020_01_09__17_05_19.wrf'
-    'ECM_2020_01_14__11_41_39.wrf'
-    'ECM_2020_01_14__13_34_12.wrf'
-    'ECM_2020_01_20__12_36_17.wrf'
-    'ECM_2020_01_22__12_59_46.wrf'
-    'ECM_2020_01_22__15_50_05.wrf'
+    'ECM_2020_04_30__15_34_00 - Truncated.wrf'
+    'ECM_2020_05_01__16_11_43.wrf'
+    'ECM_2020_05_01__20_07_47.wrf'
+    'ECM_2020_05_04__17_47_31.wrf'
+    'ECM_2020_05_05__15_01_10.wrf'
+    'ECM_2020_05_07__15_24_58.wrf'
+    'ECM_2020_05_08__16_06_03.wrf'
     };
 
 % Add subdir specification to filename lists
 [read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,spectrum_subdir,ultrasound_fileNames);
+ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
 powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
+driveline_filePaths = fullfile(basePath,experiment_subdir,driveline_subdir,driveline_fileNames);
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
@@ -54,60 +74,54 @@ powerlab_variable_map = {
 
 init_matlab
 welcome('Initializing data','module')
-if load_workspace; return; end
+if load_workspace({'S_parts','notes','feats'}); return; end
 
 % Read PowerLab data in files exported from LabChart
 PL = init_powerlab_raw_matfiles(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
 US = init_m3_raw_textfile(ultrasound_filePaths);
-    
+
+% Read driveline accelerometer data
+DL = init_cardibox_raw_txtfile(driveline_filePaths,'','accC');
+
 % Read sequence notes made with Excel file template
 notes = init_notes_xlsfile_ver3_9(notes_filePath);
 
 
-
 %% Pre-processing
 % Transform and extract data for analysis
+% * QC/pre-fixing data
 % * Block-wise fusion of notes into PL, and then US into PL, followed by merging
 %   of blocks into one table S
 % * Splitting into parts, each resampling to regular sampling intervals of given frequency
-% * Deriving new variables of:
-%      part duration, moving RMS and moving standard deviation
 
 notes = qc_notes(notes);
 
-% Correct for unsync'ed M3 clock
-unsync_inds = US.time>'22-Mar-2020 22:19:14.00' & US.time<'22-Mar-2020 22:52:13.00';
-US.time(unsync_inds) = US.time(unsync_inds)+seconds(42);
-
-S = fuse_data(notes,PL,US);
-clear PL US
-
-% Merge balloon level 0 into level 1 (as it actually was the same as level 1)
-S.balloonLevel = mergecats(S.balloonLevel,{'0','1'},'1');
-
-S_parts = split_into_parts(S);
-clear S
+% Correct for unsync'ed clock on driveline monitor
+% unsync_inds = DL.time + hours(1)+minutes(3)+seconds(29);
 
 feats = init_features_from_notes(notes);
+
+clear S
+%S = fuse_data_parfor(notes,PL,US);
+S = fuse_data(notes,PL,US);
+%clear PL US
+S_parts = split_into_parts(S);
+clear S
 
 S_parts = add_spatial_norms(S_parts,2);
 S_parts = add_moving_statistics(S_parts);
 S_parts = add_moving_statistics(S_parts,{'accA_x'});
+S_parts = add_moving_statistics(S_parts,{'accA_y'});
 S_parts = add_moving_statistics(S_parts,{'accA_z'});
 
 % Maybe not a pre-processing thing
-S_parts = add_harmonics_filtered_variables(S_parts);
+%S_parts = add_harmonics_filtered_variables(S_parts);
 
 % TODO:
 % Add MPF, std, RMS and other statistics/indices into feats
 % Revise categoric blocks, and put into feats
- 
-% % Muting of non-comparable data (due to wrong setting in LabChart) in baseline
-S_parts{1}.gyrA = nan(height(S_parts{1}),3);
-S_parts{1}.gyrA_norm = nan(height(S_parts{1}),1);
-S_parts{1}.gyrA_norm_movRMS = nan(height(S_parts{1}),1);
 
 ask_to_save({'S_parts','notes','feats'},sequence);
 

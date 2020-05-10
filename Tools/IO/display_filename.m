@@ -15,6 +15,7 @@ function str = display_filename(names,path,msg,indent)
         indent = '\t';
     end
     
+    [names,path,msg] = convertStringsToChars(names,path,msg);
     if not(iscell(names)), names = {names}; end
         
     str = sprintf(msg);
