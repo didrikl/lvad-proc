@@ -30,6 +30,11 @@ function T = resample_signal(T,sampleRate,method)
     measured_cols = T.Properties.CustomProperties.Measured;
     derived_cols = T.Properties.VariableContinuity=='continuous' & not(measured_cols);
     resamp_cols = measured_cols | derived_cols;
+    %TODO: 
+    % int_resamp_cols = resamp_cols && isa(T{:,resamp_cols),'int16')
+    % T{:,int_resamp_cols} = single(T{:,int_resamp_cols});
+    % ...resample...
+    % T{:,int_resamp_cols} = int(T{:,int_resamp_cols});
     merge_cols = not(resamp_cols);
     merge_varNames = T.Properties.VariableNames(merge_cols);
     resamp_varNames = T.Properties.VariableNames(resamp_cols);

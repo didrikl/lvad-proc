@@ -1,63 +1,36 @@
-%Init_IV2_Seq3
 close all
 clear check_var_input_from_table
+seq_no = 1;
 
 % Calculation settings
 sampleRate = 700;
 
 orderMapVar = 'accA_y';
-%mapColScale = [-80,-40];  % best for 6mm x 8mm catheter, x and z, filtered
 mapColScale = [-85,-45]; % best for 6mm x 8mm catheter, x,y and z
-
-%All catheter parts
-%parts = {23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42};
-%circ_ylim = [-65,5];
-   
-% RHC catheter parts
-%parts = {33,34,35,36,38};
-%circ_ylim = [-100,10]; 
-    
-% 6mm X 8mm catheter parts
-parts = {21,22,39,40,41,42};
-circ_ylim = [-30,7.5]; 
-    
-% Clamping parts
-%parts = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
-%circ_ylim = [-100,10]; 
-
-
-% Various
-% parts = {29};
-% circ_ylim = [-65,5];
-
-rpm= cell(numel(parts),1);
-
+circ_ylim = [-55,15];
+           
 % % Extract data for these RPM values
-% rpm = {
-%        [2000,2300,2600,2900]
-%        [2900]
-%     };
-
+rpm = {};
 bl_part = [];
+parts = {[4,5]};
+cbl_part = [];
 
-% For IV2_Seq2...
-parts = {31};
-bl_part = 28;
-rpm = {2800};
-
-
+if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
+if numel(rpm)==0, rpm = cell(numel(parts),1); end
+    
 for i=1:numel(parts)
     welcome(['Part(s) ',num2str(parts{i})],'iteration')
-    [T,rpms] = make_plot_data(parts{i},S_parts,rpm{i},sampleRate,bl_part);
-   
+    
+    [T,rpms] = make_plot_data(parts{i},S_parts,rpm{i},sampleRate,bl_part,cbl_part);
+    
     h_fig = plot_ordermap_with_vars(...
         T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim);
 
-    %save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms)
+    save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
     
 end
 
-function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms)
+function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms, seq_no)
     resolution = 300;
     
     catheter = string(notes.catheter(T.noteRow(...
@@ -67,65 +40,96 @@ function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms)
     end
     rpms = mat2str(rpms);
     
-    fig_name = sprintf('IV2_Seq3 - RPM=%s - Catheter=%s - %s - Part=%s',...
-        mat2str(rpms),catheter,orderMapVar,mat2str(parts));
+    fig_name = sprintf('IV2_Seq%d - RPM=%s - Catheter=%s - %s - Part=%s',...
+        seq_no,mat2str(rpms),catheter,orderMapVar,mat2str(parts));
     set(h_fig,'Name',fig_name);
     
     save_figure([save_path,'\Figures'], fig_name, resolution)
 end
 
-function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part)
-    % Extract relevant data
-        
-    T = S_parts(parts);
-        
-    for j=1:numel(T)
-        T{j} = merge_table_blocks(S_parts([bl_part,parts(j)]));
-        T{j}.dur = linspace(0,1/fs*height(T{j}),height(T{j}))';
-        
-        if isempty(rpm)
-            rpm(j) = unique(T{j}.pumpSpeed);
-        end
-        T{j} = T{j}(T{j}.pumpSpeed==rpm(j),:);
-        T{j} = T{j}(not(contains(string(T{j}.event),'clamp start')),:);
-        T{j} = T{j}(not(contains(string(T{j}.event),'clamp 20cm')),:);
-        bline_inds = get_baseline_rows(T{j});
-        
-        if height(T{j})==0, continue; end
-        
-        bal_blocks = find_cat_blocks(T{j},{'balloonLevel','intervType'},fs);
-        for k=1:numel(bal_blocks.start_inds)
-            range = bal_blocks.start_inds(k):bal_blocks.end_inds(k);
-            T{j}.accA_x_std(range) = std(T{j}.accA_x(range));
-            T{j}.accA_x_rms(range) = rms(T{j}.accA_x(range));
-            T{j}.accA_norm_std(range) = std(T{j}.accA_norm(range));
-            T{j}.accA_norm_rms(range) = rms(T{j}.accA_norm(range));
-            
-            freq{k} = meanfreq(detrend(T{j}.accA_norm(range)),fs);
-            T{j}.accA_norm_mpf(range) = freq{k};
-            T{j}.accA_norm_mpf_shift(range) = freq{k} - freq{1};
-            
-            freqx{k} = meanfreq(detrend(T{j}.accA_x(range)),fs);
-            T{j}.accA_x_mpf(range) = freqx{k};
-            T{j}.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
-
-%             freqfilt{k} = meanfreq(detrend(T{j}.("accA_norm_[1]hFilt")(range)),fs);
-%             T{j}.accA_norm_filt_mpf(range) = freqfilt{k};
-%             T{j}.accA_norm_filt_mpf_shift(range) = freqfilt{k} - freqfilt{1};
-             
-            Q_ultrasound = mean([T{j}.affQ,T{j}.effQ],2);
-            T{j}.Q_ultrasound_shift = 100*(Q_ultrasound-mean(Q_ultrasound(bline_inds)))/mean(Q_ultrasound(bline_inds));
-            T{j}.Q_noted_shift = 100*(T{j}.Q_noted-mean(T{j}.Q_noted(bline_inds)))/mean(T{j}.Q_noted(bline_inds));
-            T{j}.power_noted_shift = 100*(T{j}.power_noted-mean(T{j}.power_noted(bline_inds)))/mean(T{j}.power_noted(bline_inds));
-            
-            T{j}.accA_norm_std_shift = -100*(T{j}.accA_norm_std-mean(T{j}.accA_norm_std(bline_inds)))/mean(T{j}.accA_norm_std(bline_inds));
-            T{j}.accA_norm_movStd_shift = -100*(T{j}.accA_norm_movStd-mean(T{j}.accA_norm_movStd(bline_inds),'omitnan'))/mean(T{j}.accA_norm_movStd(bline_inds),'omitnan');
-            
-        end
-        
+function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
+    % Extract relevant data, and baseline is always put first
+    all_parts = [bl_part,sort([parts,cbl_part])];
+    T = merge_table_blocks(S_parts(all_parts));
+    T.dur = linspace(0,1/fs*height(T),height(T))';
+    
+    % If not given, find RPM values from all parts (that are not baseline parts)
+    if isempty(rpm)
+        T2 = merge_table_blocks(S_parts(parts));
+        rpm = unique(T2.pumpSpeed);
+    end
+    T = T(ismember(T.pumpSpeed,rpm),:);
+    T = T(not(contains(string(T.event),'clamp start')),:);
+    
+    % Keep only steady or baseline denoted row in the baseline parts
+    T(contains(string(T.part),string([bl_part,cbl_part])) & ...
+        not(contains(lower(string(T.intervType)),{'baseline','steady'})),:) = [];
+    
+    if height(T)==0
+        warning('No rows in data parts %s, with RPM=%s',...
+            mat2str(all_parts),mat2str(rpm));
     end
     
-    T = merge_table_blocks(T);
+    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
+    
+    if isempty(bl_part)
+        bl_inds = contains(lower(string(T.intervType)),{'baseline'});
+    else
+        bl_inds = contains(string(T.part),string(bl_part)) & ...
+            contains(lower(string(T.intervType)),{'baseline','steady'});
+    end
+    if nnz(bl_inds)==0
+        warning('No baseline intervals explicitly given in notes')
+        bl_inds = blocks.start_inds(1):blocks.end_inds(1);
+    end   
+        
+%     LC = 45;
+%     HC = 349;
+%     f_win = [LC , HC]/(700/2);
+%     [b,a] = butter(4, f_win);
+%     T.accA_norm = double(T.accA_norm);
+%     T.accA_norm = single( filtfilt( b, a, T.accA_norm ) );       
+    
+    for k=1:height(blocks)
+        range = blocks.start_inds(k):blocks.end_inds(k);
+        
+        % This is a workaround for bug
+        if numel(range)==1, continue; end
+        % TODO: Fix issue with numel(range)==1 in find_cat_block_inds instead. 
+        
+        T.accA_x_rms(range) = rms(T.accA_x(range));
+        T.accA_x_std(range) = std(T.accA_x(range));
+        T.accA_y_std(range) = std(T.accA_y(range));
+        T.accA_z_std(range) = std(T.accA_z(range));
+        T.accA_norm_std(range) = std(T.accA_norm(range));
+        T.accA_norm_rms(range) = rms(T.accA_norm(range));
+        
+        freqx{k} = meanfreq(detrend(T.accA_x(range)),fs);
+        T.accA_x_mpf(range) = freqx{k};
+        T.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
+        freqy{k} = meanfreq(detrend(T.accA_y(range)),fs);
+        T.accA_y_mpf(range) = freqy{k};
+        T.accA_y_mpf_shift(range) = freqy{k} - freqy{1};
+        freqz{k} = meanfreq(detrend(T.accA_z(range)),fs);
+        T.accA_z_mpf(range) = freqz{k};
+        T.accA_z_mpf_shift(range) = freqz{k} - freqz{1};
+        freq{k} = meanfreq(detrend(T.accA_norm(range)),fs);
+        T.accA_norm_mpf(range) = freq{k};
+        T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
+        
+        Q = T.graftQ;
+        P = T.effP_movAvg;
+        T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
+        T.P_shift = -100*(P-mean(P(bl_inds),'omitnan'))/mean(P(bl_inds),'omitnan');
+        T.Q_noted_shift = 100*(T.Q_noted-mean(T.Q_noted(bl_inds),'omitnan'))/mean(T.Q_noted(bl_inds),'omitnan');
+        T.power_noted_shift = 100*(T.power_noted-mean(T.power_noted(bl_inds),'omitnan'))/mean(T.power_noted(bl_inds),'omitnan');
+        
+        T.accA_norm_std_shift = -100*(T.accA_norm_std-mean(T.accA_norm_std(bl_inds)))/mean(T.accA_norm_std(bl_inds));
+        T.accA_norm_movStd_shift = -100*(T.accA_norm_movStd-mean(T.accA_norm_movStd(bl_inds),'omitnan'))/mean(T.accA_norm_movStd(bl_inds),'omitnan');
+        T.accA_x_std_shift = -100*(T.accA_x_std-mean(T.accA_x_std(bl_inds)))/mean(T.accA_x_std(bl_inds));
+        T.accA_x_movStd_shift = -100*(T.accA_x_movStd-mean(T.accA_x_movStd(bl_inds),'omitnan'))/mean(T.accA_x_movStd(bl_inds),'omitnan');
+    end
+    
     %T = T(get_steady_state_rows(T),:);
     T.Properties.SampleRate = fs;
     
@@ -133,13 +137,12 @@ end
 
 function [h_fig,map,order] = plot_ordermap_with_vars(...
         T,orderMapVar,fs,bl_part,mapColScale,notes,circ_ylim)
-    
+
     if nargin<4, bl_part = []; end
     if nargin<5, mapColScale = []; end
     
-    %[map,order,~,map_time] = make_rpm_order_map(T,orderMapVar,sampleRate); %
     [map,order,rpm,map_time] = make_rpm_order_map(T,orderMapVar,fs,...
-        'pumpSpeed', 0.02, 90); %
+        'pumpSpeed', 0.01, 80); %
     T.t = seconds(T.time-T.time(1))+map_time(1);
     
     flow_ax = 5;
@@ -154,7 +157,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     % TODO: Make this programatically determined
     specs.circ_ylim = circ_ylim;
     
-    specs.mapOrderLim = [0, 5.15];
+    specs.mapOrderLim = [0, 5.25];
     specs.mapColScale = mapColScale;
     specs.baseline_title = {
         'Units','data',...
@@ -163,14 +166,19 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
         'FontWeight','bold'};
     specs.event_bar = {
         'LineStyle','-',...
-        'LineWidth',6.5,...
+        'LineWidth',7,...
         'Marker','none',...
-        'Color', [.8 .8 .8]};
+        'Color', [.85 .85 .85]};
     specs.bal_lev_bar = {
         'LineStyle','-',...
         'LineWidth',6,...
         'Marker','none',...
-        'Color', [.8 .8 .8]}; %'Color',[0.91,0.56,0.56]
+        'Color', [.7 .7 .7]}; 
+    specs.trans_lev_bar = {
+        'LineStyle',':',...
+        'LineWidth',1.5,...
+        'Marker','none',...
+        'Color', [.7 .7 .7]}; 
     specs.leg = {
         'EdgeColor','none',...
         'Box','off',...
@@ -204,6 +212,7 @@ function [h_fig,h_ax] = init_axes_layout
         ...'Position',[0 70 1100 950],...
         'Units','pixels');
     fig_pos = get(0, 'MonitorPositions');
+    fig_pos = fig_pos(end,:); % take position of monitor 2 if multiple monitors
     win_taskbar_height = 31;
     fig_pos(3) = 0.65*fig_pos(3);
     fig_pos(2) = win_taskbar_height;
@@ -213,7 +222,7 @@ function [h_fig,h_ax] = init_axes_layout
     ax_xPos = 0.075;
     ax_width = 0.72;
     ax_yGap = 0.0037;
-    bar_height = 0.031;
+    bar_height = 0.035;
     xLab_space = 0.035;
     
     ax_height(5) = 0.24;
@@ -249,6 +258,7 @@ function add_interv_bar(h,T,notes)
     % remove unused categories and given categories of no interest
     ss_inds = get_steady_state_rows(T);
     
+    %T.event = renamecats(T.event,{'Balloon volume change'},{'Volume change'});
     event = removecats(removecats(T.event),{'-'});
     %event = mergecats(event,categories(event),'Hands on');
     plot(T.t,event,specs.event_bar{:})
@@ -261,15 +271,12 @@ function add_interv_bar(h,T,notes)
         sprintf('Empty balloon'));%sprintf('Empty %s balloon',catheter));
     T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
     
-    blocks = find_cat_blocks(T,{'balloonLevel','event'},700);
-    for i=1:min(numel(blocks.start_inds),numel(blocks.end_inds))
-       inds = false(height(T),1);
-       inds(blocks.start_inds(i):blocks.end_inds(i)) = true;
-       inds = inds & ss_inds;
-       plot(T.t(inds),T.balloonLevel(inds),specs.bal_lev_bar{:})
-    end
-    
-%    h.YColor = [0 0 0];
+    plot(T.t(ss_inds),T.balloonLevel(ss_inds),specs.trans_lev_bar{:})
+    t_ss = nan(height(T),1);
+    t_ss(ss_inds) = T.t(ss_inds);
+    plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
+
+    h.YColor = [0 0 0];
     
     yyaxis left
     
@@ -297,12 +304,12 @@ function add_interv_bar(h,T,notes)
         'FitBoxToText','on',...
         'BackgroundColor',[1 1 1],...
         'String',titleStr,...
-        'FontSize',9);
+        'FontSize',10.5);
     
-    [start_ind, end_ind] = get_baseline_block(T);
+    [bl_start_ind, bl_end_ind] = get_baseline_block(T);
     try
-        text(double(T.t( floor(mean([start_ind(1),end_ind(1)])) )),0.5,...
-            sprintf('%Baseline_{%d}',T.pumpSpeed(start_ind)),...
+        text(double(T.t( floor(mean([bl_start_ind(1),bl_end_ind(1)])) )),0.5,...
+            sprintf('%Baseline_{%d}',T.pumpSpeed(bl_start_ind)),...
         specs.baseline_title{:})
     catch
         text(0,0.5,'Baseline',...
@@ -343,8 +350,9 @@ function [start_ind, end_ind] = get_baseline_block(T,bl_part)
             T.intervType(block.end_inds))),'baseline'));
         if numel(start_ind)>1
             fprintf('\nMultiple baseline intervals in signal part.\n')
-            start_ind = start_ind(1);
-            %end_ind = end_ind(end);
+%             start_ind = start_ind(1);
+%             end_ind = end_ind(1);
+            %TODO Ask for which one to use
         end
     end
     
@@ -377,7 +385,7 @@ function add_baseline_xlines(h_ax,T,bl_part)
     end
     end_ind = end_ind(end_ind<height(T));
     for i=1:numel(end_ind)
-        draw_xline_for_all_axes(h_ax,T.t(end_ind))
+        draw_xline_for_all_axes(h_ax,T.t(end_ind(i)))
     end
     
     
@@ -393,6 +401,11 @@ end
 function add_ylabel(text_str,specs)
     h_yLab = ylabel(text_str,specs.yLab{:});
     h_yLab.Position(1) = specs.yLab_xPos;
+end
+
+function add_yylabel(text_str,specs)
+    h_yyLab = ylabel(text_str,specs.yLab{:});
+    h_yyLab.Position(1) = specs.yyLab_xPos;
 end
 
 function add_linked_map_yyaxis(h,rpm,specs)
@@ -415,7 +428,7 @@ function add_freqStats(h,T)
 
     ss_rows = get_steady_state_rows(T);
     
-    plot(T.t,T.accA_norm_mpf_shift,...
+    plot(T.t(ss_rows),T.accA_norm_mpf_shift(ss_rows),...
         'LineWidth',1.5,...
         'LineStyle',':',...
         'Color',[0 0 0,0.8],...
@@ -424,41 +437,44 @@ function add_freqStats(h,T)
     plot(T.t,T.accA_norm_mpf_shift,...
         'LineWidth',2,...
         'LineStyle','-',...
+        'DisplayName','MPF_{|x,y,z|}',...
         'Color',[0 0 0,0.8]);
     
-    add_ylabel('MPF Shift  (Hz)',specs);
+    add_ylabel('Shift  (Hz)',specs);
     
-%     plot(T.t,T.accA_norm_filt_mpf_shift,...
-%         'LineWidth',1.5,...
-%         'LineStyle',':',...
-%         'Color',green_solid,...
-%         'HandleVisibility','off');
-%     T.accA_norm_filt_mpf_shift(not(ss_rows)) = nan;
-%     plot(T.t,T.accA_norm_filt_mpf_shift,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',green_solid);
-
-    plot(T.t,T.accA_x_mpf_shift,...
+    plot(T.t(ss_rows),T.accA_x_mpf_shift(ss_rows),...
         'LineWidth',1.5,...
         'LineStyle',':',...
-        'Color',[0.39,0.56,0.15,0.7],...
+        'Color',[0.39,0.56,0.15,0.7],... 
         'HandleVisibility','off');
     T.accA_x_mpf_shift(not(ss_rows)) = nan;
     plot(T.t,T.accA_x_mpf_shift,...
         'LineWidth',2,...
         'LineStyle','-',...
+        'DisplayName','MPF_x',...
         'Color',[0.39,0.56,0.15,0.9]);
 
+%     plot(T.t(ss_rows),T.accA_z_mpf_shift(ss_rows),...
+%         'LineWidth',1.5,...
+%         'LineStyle',':',...
+%         'HandleVisibility','off');...,'Color',[0.39,0.56,0.15,0.7]);
+%     T.accA_z_mpf_shift(not(ss_rows)) = nan;
+%     plot(T.t,T.accA_z_mpf_shift,...
+%         'LineWidth',2,...
+%         'LineStyle','-',...
+%         'DisplayName','MPF_y');...,'Color',[0.39,0.56,0.15,0.9]);
+
+    
 %     h_yyLab = ylabel({'Rectangular';'Window RMS'},specs.yLab{:});
 %     h_yyLab.Position(1) = specs.yyLab_xPos;
 
-    %h.YLim = [-2, 10];
+    yrange = h.YLim(2)-h.YLim(1);
+    h.YLim = [h.YLim(1)-0.1*yrange, h.YLim(2)+0.1*yrange];
     h.YTick(end) = [];
+    %h.YLim = [-2, 10];
     %h.Clipping = 'off';
     
-    add_legend(h,{'MPF, xyz-norm','MPF, x-component'},'Frequency energy',specs);
-    %add_legend(h,{'MPF','MPF, 1st harm. filt.'},'Frequency energy',specs);
+    add_legend(h,{},'Frequency energy',specs);
         
   
 end
@@ -469,79 +485,62 @@ function add_vibrations(h,T)
     axes(h);
     hold on
     
-    h_yLab = ylabel('RMS  (g)',specs.yLab{:});
-    h_yLab.Position(1) = specs.yLab_xPos;
-    
     ss_rows = get_steady_state_rows(T);
-    
-%     blue_solid = [0.0156,0.3555, 0.7188];
-%     plot(T.t,T.accA_norm_movRMS,...
-%         'LineWidth',0.5,...
-%         'LineStyle','-',...
-%         'Color',[0.46,0.66,0.79,0.3]);
-%     accA_norm_rms_ss = T.accA_norm_rms;
-%     accA_norm_rms_ss(not(ss_rows)) = nan;
-%     plot(T.t,accA_norm_rms_ss,....
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',blue_solid);
     
     plot(T.t,T.accA_x_movStd,...
         'LineWidth',0.5,...
         'LineStyle','-',...
-        'Color',[0.46,0.66,0.79,0.3],...
-        'DisplayName','SD_{x}, moving win.');
+        'DisplayName','SD_x, moving 5sec',...
+        'Color',[0.30,0.50,0.88,0.3]);
     accA_x_std_ss = T.accA_x_std;
     accA_x_std_ss(not(ss_rows)) = nan;
     plot(T.t,accA_x_std_ss,....
         'LineWidth',2,...
         'LineStyle','-',...
-        'Color',[0.0156,0.3555, 0.7188],...
-        'DisplayName','SD_{x}, steady-state');
-    
-    plot(T.t,T.accA_z_movStd,...
-        'LineWidth',0.5,...
-        'LineStyle','-',...
-        ...'Color',[0.46,0.66,0.79,0.3],...
-        'DisplayName','SD_{z}, moving win.');
-    accA_z_std_ss = T.accA_z_std;
-    accA_z_std_ss(not(ss_rows)) = nan;
-    plot(T.t,accA_z_std_ss,....
-        'LineWidth',2,...
-        'LineStyle','-',...
-        ...'Color',[0.0156,0.3555, 0.7188],...
-        'DisplayName','SD_{z}, steady-state');
+        'DisplayName','SD_x, steady-state',...
+        'Color',[0.0156,0.3555, 0.7188]);
+    add_ylabel('SD_x  (g)',specs);
+ 
+%     plot(T.t,T.accA_z_movStd,...
+%         'LineWidth',0.5,...
+%         'LineStyle','-',...
+%         'DisplayName','SD_z, moving 1sec',...
+%         'Color',[0.46,0.66,0.79,0.3]);
+%     accA_z_std_ss = T.accA_z_std;
+%     accA_z_std_ss(not(ss_rows)) = nan;
+%     plot(T.t,accA_z_std_ss,....
+%         'LineWidth',2,...
+%         'LineStyle','-',...
+%         'DisplayName','SD_z, steady-state',...
+%         'Color',[0.0156,0.3555, 0.7188]);
+%    add_ylabel('SD_z  (g)',specs);
     
     yrange = h.YLim(2)-h.YLim(1);
     h.YLim = [h.YLim(1)-0.1*yrange, h.YLim(2)+0.1*yrange];
-    h.YTick([1,end]) = []; 
+    %h.YTick([1,end]) = []; 
     
     yyaxis right
+    
     plot(T.t,T.accA_norm_movStd,...
         'LineWidth',.5,...
         'LineStyle','-',...
-        'Color',[0.96,0.39,0.35,0.85],...
-        'DisplayName','SD_{xyz}, moving win.');
+        'DisplayName','SD_{|x,y,z|}, moving 5sec',...
+        'Color',[0.96,0.39,0.35,0.65]);
     accA_norm_std_ss = T.accA_norm_std;
     accA_norm_std_ss(not(ss_rows)) = nan;
     plot(T.t,accA_norm_std_ss,....
         'LineWidth',2,...
         'LineStyle','-',...
-        'Color',[0.74,0.04,0.17],...
-        'DisplayName','SD_{xyz}, steady-state');
+        'DisplayName','SD_{|x,y,z|}, steady-state',...
+        'Color',[0.74,0.04,0.17]);
+    
+    add_yylabel('SD_{|x,y,z|} (10^{-3} g)',specs);    
+    add_legend(h,{},'Vibration Intensity',specs);
     
     yrange = h.YLim(2)-h.YLim(1);
     h.YLim = [h.YLim(1)-0.1*yrange, h.YLim(2)+0.1*yrange];
     h.YTickLabel = string(h.YTick*1000);
-    h.YTick([1,end]) = []; 
-    
-    %add_yylabel('SD (10^{-3} g)',specs.yLab{:});
-    h_yyLab = ylabel('SD  (10^{-3} g)',specs.yLab{:});
-    h_yyLab.Position(1) = specs.yyLab_xPos;
-    
-%     add_legend(h,{'RMS, moving win.','RMS, steady-state','SD, moving win.', 'SD, steady-state'},...
-%         'Vibration Intensity',specs);
-    add_legend(h,{},'Vibration Intensity',specs);
+    h.YTick([1]) = []; 
     
 end
 
@@ -567,9 +566,9 @@ function add_circulation(h,T)
         'HandleVisibility',powVisability,...
         'DisplayName','Power, monitor')
     plot(T.t(ss_rows),T.power_noted_shift(ss_rows),...
-        'LineWidth',1.25,...
+        'LineWidth',1.5,...
         'LineStyle',':',...
-        'Color',[0.9961,0.4961,0,0.7],...
+        'Color',[0.9961,0.4961,0,0.95],...
         'HandleVisibility','off')
     
     Q_noted_shift_ss = T.Q_noted_shift;
@@ -582,60 +581,100 @@ function add_circulation(h,T)
     plot(T.t,Q_noted_shift_ss,...
         'LineWidth',2,...
         'LineStyle','-',...
-        'Color',[0.39,0.60,0.12,0.75],...
+        'Color',[0.47,0.67,0.76,0.8],...
         'HandleVisibility',QVisability,...
-        'DisplayName','\itQ\rm, ultrasound');
+        'DisplayName','\itQ\rm, monitor');
     plot(T.t(ss_rows),T.Q_noted_shift(ss_rows),...
-        'LineWidth',1.25,...
+        'LineWidth',1.5,...
         'LineStyle',':',...
-        'Color',[0.39,0.60,0.12,0.6],...
+        'Color',[0.47,0.67,0.76,0.7],...
         'HandleVisibility','off');
      
-    area_bal = pi*((double(string(T.balloonDiam))/2).^2);
-    area_inlet = pi*(13.0/2)^2;
-    area_red = 100*((area_inlet-area_bal)/area_inlet - 1);
-    area_red_ss = area_red;
-    area_red_ss(not(ss_rows)) = nan;
-    if all(isnan(area_red_ss))
-        areaRedVisability = 'off';
-    else
-        areaRedVisability = 'on';
-    end
-    plot(T.t,area_red_ss,...
-        'LineWidth',2,...
-        'LineStyle','-',...
-        'Color',[0.5781,0.5117,0.9453],...
-        'DisplayName','Inlet area reduction',...);%[0.7188,0.6289,0.9297]);%[0.6055,0.1406, 0.4414, 0.85]);
-        'HandleVisibility',areaRedVisability);
-    plot(T.t(ss_rows),area_red(ss_rows),...
-        'LineWidth',1.25,...
+%     area_bal = pi*((double(string(T.balloonDiam))/2).^2);
+%     area_inlet = pi*(13.0/2)^2;
+%     area_red = 100*((area_inlet-area_bal)/area_inlet - 1);
+%     area_red_ss = area_red;
+%     area_red_ss(not(ss_rows)) = nan;
+%     if all(isnan(area_red_ss))
+%         areaRedVisability = 'off';
+%     else
+%         areaRedVisability = 'on';
+%     end
+%     plot(T.t,area_red_ss,...
+%         'LineWidth',2,...
+%         'LineStyle','-',...
+%         'Color',[0.5781,0.5117,0.9453],...
+%         'DisplayName','Inlet area reduction',...);%[0.7188,0.6289,0.9297]);%[0.6055,0.1406, 0.4414, 0.85]);
+%         'HandleVisibility',areaRedVisability);
+%     plot(T.t(ss_rows),area_red(ss_rows),...
+%         'LineWidth',1,...
+%         'LineStyle',':',...
+%         'Color',[0.5781,0.5117,0.9453],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
+%         'HandleVisibility','off');
+    
+    plot(T.t,T.P_shift,...
+        'LineWidth',1,...
         'LineStyle',':',...
-        'Color',[0.5781,0.5117,0.9453],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
+        'Color',[0.52,0.07,0.67, 0.5],...
         'HandleVisibility','off');
+    T.P_shift(not(ss_rows)) = nan;
+    plot(T.t,T.P_shift,...
+        'LineWidth',1.5,...
+        'LineStyle','-',...
+        'Color',[0.52,0.07,0.67, 0.50],...
+        'DisplayName','\itP\rm, graft');
     
     plot(T.t,T.Q_ultrasound_shift,...
-        'LineWidth',2,...
+        'LineWidth',1,...
+        'LineStyle',':',...
+        'Color',[0.04,0.37,0.37, 0.50],...
+        'HandleVisibility','off');
+    T.Q_ultrasound_shift(not(ss_rows)) = nan;
+    plot(T.t,T.Q_ultrasound_shift,...
+        'LineWidth',1.75,...
         'LineStyle','-',...
-        'Color',[0 0 0, 0.6],...
+        'Color',[0.04,0.37,0.37, 0.50],...
         'DisplayName','\itQ\rm, ultrasound');
     
+
+    
+    
+%     accA_x_std_shift_ss = T.accA_x_std_shift;
+%     accA_x_std_shift_ss(not(ss_rows)) = nan;
+% %     plot(T.t,T.accA_x_movStd_shift,...
+% %         'LineWidth',0.5,...
+% %         'LineStyle','-',...
+% %         'Color',[0.96,0.39,0.35,0.3],...
+% %         'DisplayName','SD*, moving 5sec');
+%     plot(T.t,accA_x_std_shift_ss,...
+%         'LineWidth',2,...
+%         'LineStyle','-',...
+%         'Color',[0.74,0.04,0.17],...
+%         'DisplayName','SD*_x, steady-state');
+%     plot(T.t(ss_rows),accA_x_std_shift_ss(ss_rows),...
+%         'LineWidth',1.25,...
+%         'LineStyle',':',...
+%         'Color',[0.74,0.04,0.17,0.6],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
+%         'HandleVisibility','off');
     
     accA_norm_std_shift_ss = T.accA_norm_std_shift;
     accA_norm_std_shift_ss(not(ss_rows)) = nan;
 %     plot(T.t,T.accA_norm_movStd_shift,...
 %         'LineWidth',0.5,...
 %         'LineStyle','-',...
-%         'Color',[0.96,0.39,0.35,0.5]);
+%         'Color',[0.96,0.39,0.35,0.3],...
+%         'DisplayName','SD*, moving 5sec');
     plot(T.t,accA_norm_std_shift_ss,...
         'LineWidth',2,...
         'LineStyle','-',...
-        'Color',[0.74,0.04,0.17,0.7],...
-        'DisplayName','SD*_{xyz-norm}, steady-state');
+        'Color',[0.74,0.04,0.17],...
+        'DisplayName','SD*, steady-state');
     plot(T.t(ss_rows),accA_norm_std_shift_ss(ss_rows),...
         'LineWidth',1.25,...
         'LineStyle',':',...
         'Color',[0.74,0.04,0.17,0.6],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
         'HandleVisibility','off');
+    
     
     h.YLim = specs.circ_ylim;
     
@@ -646,7 +685,7 @@ function add_circulation(h,T)
     h.YGrid = 'on';
     h.GridAlpha = 0.1;
     
-    add_legend(h,{},'Intervention modalities',specs);
+    add_legend(h,{},'Flow Modalities',specs);
 
 end
 

@@ -26,22 +26,31 @@ function T = calc_moving(T, varNames, statisticTypes, nSamples)
             switch lower(statisticTypes{j})
                 
                 case 'rms'
-                    MovRMSObj = dsp.MovingRMS(nSamples);
-                    T.(movVarName) = MovRMSObj(vec);
+                    MovObj = dsp.MovingRMS(nSamples);
                     descr = 'root-mean-square';
                 case 'var'
-                    MovVarObj = dsp.MovingVariance(nSamples);
-                    T.(movVarName) = MovVarObj(vec);
+                    MovObj = dsp.MovingVariance(nSamples);
                     descr = 'variance';
                 case 'std'
-                    MovSTDObj = dsp.MovingStandardDeviation(nSamples);
-                    T.(movVarName) = MovSTDObj(vec);
+                    MovObj = dsp.MovingStandardDeviation(nSamples);
                     descr = 'standard deviation';
+                case 'min'
+                    MovObj = dsp.MovingMinimum(nSamples);
+                    descr = 'moving minimum';
+                case 'max'
+                    MovObj = dsp.MovingMaximum(nSamples);
+                    descr = 'moving maximum';
+                case 'avg'
+                    MovObj = dsp.MovingAverage(nSamples);
+                    descr = 'moving average';
+                    
                 otherwise                  
                     error(['Statistic type ',statisticTypes{j},'not supported.'])
-                    
+                     
             end
-             
+            
+            T.(movVarName) = MovObj(vec);
+            
             % Moving statistic samples before full window make less sence/can
             % cause confusion, hence setting these sample values as nan
             T.(movVarName)(1:nSamples,:) = nan;

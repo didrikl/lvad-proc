@@ -29,7 +29,7 @@ function S = fuse_data(notes,PL,US)
             PL{i}.time>=notes_block.time(1) & PL{i}.time<=notes_block.time(end),:);
         if isempty(notes_block)
             warning('No notes for PowerLab file')
-        end         
+        end  
         PL{i} = fuse_timetables(PL{i},notes_block);
         
         % Ultrasound is clipped to time range of B and notes, only (i.e. not

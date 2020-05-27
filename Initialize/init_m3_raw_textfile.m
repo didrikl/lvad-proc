@@ -11,23 +11,19 @@ function T = init_m3_raw_textfile(fileNames,path)
     
     varMap = {
         ...   
-        % Name in Spectrum   Name in Matlab    Type     Continuity   Units
-        'ArtflowLmin'        'affQ'           'single' 'continuous' 'L/min'
-        'VenflowLMin'        'effQ'           'single' 'continuous' 'L/min'
-        'EmboliVolume1uLsec' 'affEmboliVol'   'single' 'continuous' 'uL/sec'
-        'EmboliTotalCount1'  'affEmboliCount' 'single' 'step'       ''
-        'EmboliVolume2uLsec' 'effEmboliVol'   'single' 'continuous' 'uL/sec'
-        'EmboliTotalCount2'  'effEmboliCount' 'single' 'step'       ''
+        % Name in Spectrum   Name in Matlab     SampleRate Type     Continuity   Units
+        'ArterialflowLmin'   'graftQ'           1          'single' 'continuous' 'L/min'
+%         'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
+%         'VenflowLMin'        'affQ'             1          'single' 'continuous' 'L/min'
+%         'EmboliVolume1uLsec' 'affEmboliVol'     1          'single' 'continuous' 'uL/sec'
+%         'EmboliTotalCount1'  'affEmboliCount'   1          'int16'  'step'       ''
+%         'EmboliVolume2uLsec' 'effEmboliVol'     1          'single' 'continuous' 'uL/sec'
+%         'EmboliTotalCount2'  'effEmboliCount'   1          'int16'  'step'       ''
+        'EmboliVolume3uLsec' 'graftEmboliVol'   1          'single' 'continuous' 'uL/sec'
+        'EmboliTotalCount3'  'graftEmboliCount' 1          'single'  'step'       ''
         };
     
-     % Columns to omit (not in use or always constant in the sequence)
-    unneededVarNames = {
-        'affEmboliVol'
-        'affEmboliCount'
-        'effEmboliVol'
-        'effEmboliCount'
-        };
-    
+     
     welcome('Initializing Spectrum M3')
     
     if numel(fileNames)==0 
@@ -53,32 +49,35 @@ function T = init_m3_raw_textfile(fileNames,path)
         
         % Make timetable, and add properties metadata
         B{i} = table2timetable(B{i},'RowTimes','time');
-        
-        %T = retime(T,'regular','fillwithmissing','SampleRate',1);
-        
-        % Add metadata for picking out sensor-messured data, when analysing
-        B{i} = addprop(B{i},{'Measured','Controlled'},{'variable','variable'});
-        B{i}.Properties.CustomProperties.Measured(:) = true;
         % TODO: Use this function instead:
         %signal = make_signal_timetable(signal, include_time_duration)
         % TODO: The above function must be modified to support raw time format
         % as function argument input.
         
+        % TODO: Make OO, for which much of the same code of is used for PowerLab
+        % as well
+        [B{i},inFile_inds] = map_varnames(B{i}, varMap(:,1), varMap(:,2));
+        varMap = varMap(inFile_inds,:);
         
-        B{i}.Properties.CustomProperties.Controlled(:) = false;
+        % Storing info about sensors (metadata for each variable)
+        B{i} = addprop(B{i},'SensorSampleRate','variable');
+        channels_in_use = ismember(B{i}.Properties.VariableNames,varMap(:,2));
+        B{i}.Properties.CustomProperties.SensorSampleRate(channels_in_use) = varMap{:,3};
+        
+        % All variables shall be treated as continous and measured in data fusion
+        B{i} = addprop(B{i},'Measured','variable');
+        B{i}.Properties.CustomProperties.Measured(:) = true;
+        
+        B{i}.Properties.VariableContinuity = varMap(:,5);
+        
+        B{i}.Properties.DimensionNames{1} = 'time'; 
+        B{i}.Properties.DimensionNames{2} = 'variables'; 
+        
+        % Cast all columns, other than time columns, to specific format
+        B{i} = convert_columns(B{i},varMap(:,4));
         
         B{i}.Properties.VariableNames = varMap(:,2);
-        B{i}.Properties.VariableUnits = varMap(:,5);
-        
-        % Metadata used for populating non-matched rows when syncing
-        B{i}.Properties.VariableContinuity = varMap(:,4);
-
-        unneededVars = ismember(B{i}.Properties.VariableNames,unneededVarNames);
-        B{i}(:,unneededVars) = [];
-        
-        % Cast all columns, other than time columns
-        B{i} = convert_columns(B{i},varMap(not(unneededVars),3));
-        
+        B{i}.Properties.VariableUnits = varMap(:,6);
         
     end
     
@@ -104,17 +103,19 @@ function T_block = init_m3_raw_textfile_read_2sensors(filePath)
     opts.Delimiter = "\t";
     
     % Specify column names and types
-    opts.VariableNames = ["DateandTime", "Var2", "Var3", "Var4", "Var5", "Var6", "Var7", "ArtflowLmin", "VenflowLmin", "Var10", "Var11", "Var12", "Var13", "Var14", "EmboliVolume1uLsec", "EmboliTotalCount1", "EmboliTotalVolume1uL", "EmboliVolume2uLsec", "EmboliTotalCount2", "EmboliTotalVolume2uL", "Var21", "Var22", "Var23", "Var24", "Var25", "Var26", "Var27", "Var28", "Var29", "Var30", "Var31", "Var32", "Var33", "Var34", "Var35", "Var36", "Var37", "Var38", "Var39", "Var40", "Var41", "Var42", "Var43", "Var44", "Var45", "Var46", "Var47", "Var48", "Var49", "Var50", "Var51", "Var52", "Var53", "Var54", "Var55", "Var56", "Var57", "Var58", "Var59", "Var60", "Var61", "Var62", "Var63", "Var64", "Var65", "Var66", "Var67", "Var68", "Var69", "Var70", "Var71", "Var72", "Var73", "Var74", "Var75", "Var76", "Var77", "Var78", "Var79", "Var80", "Var81", "Var82", "Var83", "Var84", "Var85", "Var86", "Var87", "Var88", "Var89", "Var90", "Var91", "Var92", "Var93", "Var94", "Var95", "Var96", "Var97", "Var98", "Var99", "Var100", "Var101", "Var102", "Var103", "Var104", "Var105", "Var106", "Var107", "Var108", "Var109", "Var110", "Var111", "Var112", "Var113", "Var114", "Var115"];
-    opts.SelectedVariableNames = ["DateandTime", "ArtflowLmin", "VenflowLmin", "EmboliVolume1uLsec", "EmboliTotalCount1", "EmboliVolume2uLsec", "EmboliTotalCount2"];
-    opts.VariableTypes = ["char", "char", "char", "char", "char", "char", "char", "double", "double", "char", "char", "char", "char", "char", "double", "double", "double", "double", "double", "double", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char"];
+    opts.VariableNames = ["DateandTime", "Var2", "Var3", "Var4", "Var5", "Var6", "Var7", "ArtflowLmin", "VenflowLmin", "ArterialflowLmin", "Var11", "Var12", "Var13", "Var14", "EmboliVolume1uLsec", "EmboliTotalCount1", "Var17", "EmboliVolume2uLsec", "EmboliTotalCount2", "Var20", "EmboliVolume3uLsec", "EmboliTotalCount3", "Var23", "Var24", "Var25", "Var26", "Var27", "Var28", "Var29", "Var30", "Var31", "Var32", "Var33", "Var34", "Var35", "Var36", "Var37", "Var38", "Var39", "Var40", "Var41", "Var42", "Var43", "Var44", "Var45", "Var46", "Var47", "Var48", "Var49", "Var50", "Var51", "Var52", "Var53", "Var54", "Var55", "Var56", "Var57", "Var58", "Var59", "Var60", "Var61", "Var62", "Var63", "Var64", "Var65", "Var66", "Var67", "Var68", "Var69", "Var70", "Var71", "Var72", "Var73", "Var74", "Var75", "Var76", "Var77", "Var78", "Var79", "Var80", "Var81", "Var82", "Var83", "Var84", "Var85", "Var86", "Var87", "Var88", "Var89", "Var90", "Var91", "Var92", "Var93", "Var94", "Var95", "Var96", "Var97", "Var98", "Var99", "Var100", "Var101", "Var102", "Var103", "Var104", "Var105", "Var106", "Var107", "Var108", "Var109", "Var110", "Var111", "Var112", "Var113", "Var114", "Var115"];
+    opts.SelectedVariableNames = ["DateandTime", "ArtflowLmin", "VenflowLmin", "ArterialflowLmin", "EmboliVolume1uLsec", "EmboliTotalCount1", "EmboliVolume2uLsec", "EmboliTotalCount2", "EmboliVolume3uLsec", "EmboliTotalCount3"];
+    opts.VariableTypes = ["char", "char", "char", "char", "char", "char", "char", "char", "char", "double", "char", "char", "char", "char", "double", "double", "char", "double", "double", "char", "double", "double", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char", "char"];
     
     % Specify file level properties
     opts.ExtraColumnsRule = "ignore";
     opts.EmptyLineRule = "read";
     
     % Specify variable properties
-    opts = setvaropts(opts, ["DateandTime", "Var2", "Var3", "Var4", "Var5", "Var6", "Var7", "Var10", "Var11", "Var12", "Var13", "Var14", "Var21", "Var22", "Var23", "Var24", "Var25", "Var26", "Var27", "Var28", "Var29", "Var30", "Var31", "Var32", "Var33", "Var34", "Var35", "Var36", "Var37", "Var38", "Var39", "Var40", "Var41", "Var42", "Var43", "Var44", "Var45", "Var46", "Var47", "Var48", "Var49", "Var50", "Var51", "Var52", "Var53", "Var54", "Var55", "Var56", "Var57", "Var58", "Var59", "Var60", "Var61", "Var62", "Var63", "Var64", "Var65", "Var66", "Var67", "Var68", "Var69", "Var70", "Var71", "Var72", "Var73", "Var74", "Var75", "Var76", "Var77", "Var78", "Var79", "Var80", "Var81", "Var82", "Var83", "Var84", "Var85", "Var86", "Var87", "Var88", "Var89", "Var90", "Var91", "Var92", "Var93", "Var94", "Var95", "Var96", "Var97", "Var98", "Var99", "Var100", "Var101", "Var102", "Var103", "Var104", "Var105", "Var106", "Var107", "Var108", "Var109", "Var110", "Var111", "Var112", "Var113", "Var114", "Var115"], "WhitespaceRule", "preserve");
-    opts = setvaropts(opts, ["DateandTime", "Var2", "Var3", "Var4", "Var5", "Var6", "Var7", "Var10", "Var11", "Var12", "Var13", "Var14", "Var21", "Var22", "Var23", "Var24", "Var25", "Var26", "Var27", "Var28", "Var29", "Var30", "Var31", "Var32", "Var33", "Var34", "Var35", "Var36", "Var37", "Var38", "Var39", "Var40", "Var41", "Var42", "Var43", "Var44", "Var45", "Var46", "Var47", "Var48", "Var49", "Var50", "Var51", "Var52", "Var53", "Var54", "Var55", "Var56", "Var57", "Var58", "Var59", "Var60", "Var61", "Var62", "Var63", "Var64", "Var65", "Var66", "Var67", "Var68", "Var69", "Var70", "Var71", "Var72", "Var73", "Var74", "Var75", "Var76", "Var77", "Var78", "Var79", "Var80", "Var81", "Var82", "Var83", "Var84", "Var85", "Var86", "Var87", "Var88", "Var89", "Var90", "Var91", "Var92", "Var93", "Var94", "Var95", "Var96", "Var97", "Var98", "Var99", "Var100", "Var101", "Var102", "Var103", "Var104", "Var105", "Var106", "Var107", "Var108", "Var109", "Var110", "Var111", "Var112", "Var113", "Var114", "Var115"], "EmptyFieldRule", "auto");
+    opts = setvaropts(opts, ["DateandTime", "Var2", "Var3", "Var4", "Var5", "Var6", "Var7", "ArtflowLmin", "VenflowLmin", "Var11", "Var12", "Var13", "Var14", "Var17", "Var20", "Var23", "Var24", "Var25", "Var26", "Var27", "Var28", "Var29", "Var30", "Var31", "Var32", "Var33", "Var34", "Var35", "Var36", "Var37", "Var38", "Var39", "Var40", "Var41", "Var42", "Var43", "Var44", "Var45", "Var46", "Var47", "Var48", "Var49", "Var50", "Var51", "Var52", "Var53", "Var54", "Var55", "Var56", "Var57", "Var58", "Var59", "Var60", "Var61", "Var62", "Var63", "Var64", "Var65", "Var66", "Var67", "Var68", "Var69", "Var70", "Var71", "Var72", "Var73", "Var74", "Var75", "Var76", "Var77", "Var78", "Var79", "Var80", "Var81", "Var82", "Var83", "Var84", "Var85", "Var86", "Var87", "Var88", "Var89", "Var90", "Var91", "Var92", "Var93", "Var94", "Var95", "Var96", "Var97", "Var98", "Var99", "Var100", "Var101", "Var102", "Var103", "Var104", "Var105", "Var106", "Var107", "Var108", "Var109", "Var110", "Var111", "Var112", "Var113", "Var114", "Var115"], "WhitespaceRule", "preserve");
+    opts = setvaropts(opts, ["DateandTime", "Var2", "Var3", "Var4", "Var5", "Var6", "Var7", "ArtflowLmin", "VenflowLmin", "Var11", "Var12", "Var13", "Var14", "Var17", "Var20", "Var23", "Var24", "Var25", "Var26", "Var27", "Var28", "Var29", "Var30", "Var31", "Var32", "Var33", "Var34", "Var35", "Var36", "Var37", "Var38", "Var39", "Var40", "Var41", "Var42", "Var43", "Var44", "Var45", "Var46", "Var47", "Var48", "Var49", "Var50", "Var51", "Var52", "Var53", "Var54", "Var55", "Var56", "Var57", "Var58", "Var59", "Var60", "Var61", "Var62", "Var63", "Var64", "Var65", "Var66", "Var67", "Var68", "Var69", "Var70", "Var71", "Var72", "Var73", "Var74", "Var75", "Var76", "Var77", "Var78", "Var79", "Var80", "Var81", "Var82", "Var83", "Var84", "Var85", "Var86", "Var87", "Var88", "Var89", "Var90", "Var91", "Var92", "Var93", "Var94", "Var95", "Var96", "Var97", "Var98", "Var99", "Var100", "Var101", "Var102", "Var103", "Var104", "Var105", "Var106", "Var107", "Var108", "Var109", "Var110", "Var111", "Var112", "Var113", "Var114", "Var115"], "EmptyFieldRule", "auto");
+    opts = setvaropts(opts, ["EmboliVolume2uLsec", "EmboliTotalCount2"], "TrimNonNumeric", true);
+    opts = setvaropts(opts, ["EmboliVolume2uLsec", "EmboliTotalCount2"], "ThousandsSeparator", ",");
     
     % Import the data
     T_block = readtable(filePath, opts);

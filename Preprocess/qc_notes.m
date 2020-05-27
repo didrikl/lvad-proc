@@ -30,7 +30,7 @@ function notes = ask_to_reinit(notes)
             [notes.Properties.UserData.Path,'\*.xls;*.xlsx;*.xlsm'],...
             'Select notes Excel file to re-initialize');
         % TODO: Make OO, so that correct init_notes version is used
-        notes = init_notes_xlsfile_ver3_9(fullfile(filePath,fileName));
+        notes = init_notes_xlsfile_ver3_11(fullfile(filePath,fileName));
     elseif answer==3
         abort;
     end

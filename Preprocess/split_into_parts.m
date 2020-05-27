@@ -6,7 +6,7 @@ function S_parts = split_into_parts(S)
     welcome('Splitting into resampled parts')
     h_wait = waitbar(0,'','Name','Preprocessing parts...');
     
-    parts = sort_nat(unique(string(S.part(not(ismissing(S.part))))));
+    parts = string(sort_nat(cellstr(unique(string(S.part(not(ismissing(S.part))))))));
     parts(strcmp(parts,'-')) = [];
     n_parts = max(double(parts));
     

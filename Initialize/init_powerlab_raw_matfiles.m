@@ -1,4 +1,4 @@
-function B = init_powerlab_raw_matfiles(fileNames,path,var_map)
+function B = init_powerlab_raw_matfiles(fileNames,path,varMap)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
     % as mat file from PowerLab's LabChart program.
@@ -24,7 +24,7 @@ function B = init_powerlab_raw_matfiles(fileNames,path,var_map)
     acc_gyr_maxFreq = 700;
     p_maxFreq = 1000;
     if nargin<3
-        var_map = {
+        varMap = {
             % LabChart name  Matlab name  Max frequency     Type        Continuity
             'Trykk1'         'affP'       p_maxFreq         'single'    'continuous'
             'Trykk2'         'effP'       p_maxFreq         'single'    'continuous'
@@ -48,13 +48,13 @@ function B = init_powerlab_raw_matfiles(fileNames,path,var_map)
         % from LabChart. Ask to cut data in newest file from the start, or to
         % remove file
         
-        [B{i},inFile_inds] = map_varnames(B{i}, var_map(:,1), var_map(:,2));
-        var_map = var_map(inFile_inds,:);
+        [B{i},inFile_inds] = map_varnames(B{i}, varMap(:,1), varMap(:,2));
+        varMap = varMap(inFile_inds,:);
         
         % Storing info about sensors (metadata for each variable)
         B{i} = addprop(B{i},'SensorSampleRate','variable');
-        channels_in_use = ismember(B{i}.Properties.VariableNames,var_map(:,2));
-        B{i}.Properties.CustomProperties.SensorSampleRate(channels_in_use) = var_map{:,3};
+        channels_in_use = ismember(B{i}.Properties.VariableNames,varMap(:,2));
+        B{i}.Properties.CustomProperties.SensorSampleRate(channels_in_use) = varMap{:,3};
         
 %         % Gather 3 components as one variable (convenient when all 3 components
 %         % are arguments in combination with other inputs, and also when viewing)
@@ -66,13 +66,13 @@ function B = init_powerlab_raw_matfiles(fileNames,path,var_map)
         % All variables shall be treated as continous and measured in data fusion
         B{i} = addprop(B{i},'Measured','variable');
         B{i}.Properties.CustomProperties.Measured(:) = true;
-        B{i}.Properties.VariableContinuity = var_map(:,5);
+        B{i}.Properties.VariableContinuity = varMap(:,5);
         
         B{i}.Properties.DimensionNames{1} = 'time'; 
         B{i}.Properties.DimensionNames{2} = 'variables'; 
         
         % Convert to specified numeric format (e.g. pressure as single)
-        B{i} = convert_columns(B{i},var_map(:,4));
+        B{i} = convert_columns(B{i},varMap(:,4));
         
     end   
 
