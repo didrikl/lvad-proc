@@ -1,4 +1,4 @@
-function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
+function notes = init_notes_xlsfile_ver4_0(fileName, read_path)
     % 
     % Read named ranges from Notes Excel file. Ranges must be defined by Excel
     % name manager. (Named ranges make the Excel file more flexible w.r.t.
@@ -11,7 +11,7 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
     % TODO: Notes range defined in name manager is a bit confusing(?)
-    notes_sheet = 'Notes';
+    notes_sheet = 'Recording notes';
     notes_range = 'Notes';
     varsNames_controlled_range = 'Controlled_VarNames';
     varNames_measured_range = 'Measured_VarNames';
@@ -37,6 +37,7 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
         % Name in Excel           Name Matlab code     Type            Continuity
         'Date'                    'date'               'cell'          'event'
         'Timestamp'               'timestamp'          'cell'          'event'
+        'Tag'                     'tag'                'cell'          'event'
         'Elapsed time'            'part_elapsedTime'   'duration'      'continuous'
         'Dur'                     'event_duration'     'int16'         'event'
         'Part'                    'part'               'categorical'   'step'
@@ -50,13 +51,14 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
         'Balloon diameter'        'balloonDiam'        'categorical'   'step'
         'Balloon offset'          'balloonOffset'      'categorical'   'step'
         'Catheter type'           'catheter'           'categorical'   'unset'
-        'Clamp flow reduction'    'Q_reduction'        'categorical'   'step'
+        'Clamp flow reduction'    'Q_reduction'      'categorical'   'step'
         'Afferent pressure'       'affP_noted'         'single'        'event'
         'Effenrent pressure'      'effP_noted'         'single'        'event'
-        'Flow estimate'           'Q_LVAD'             'single'        'step'
-        'Power'                   'P_LVAD'             'single'        'step'
+        'Flow estimate'           'Q_LVAD'            'single'        'step'
+        'Power'                   'P_LVAD'        'single'        'step'
         'Reduced baseline flow'   'redBaseFlow'        'single'        'event'
-        'Comment'                 'comment'            'cell'          'event'
+        'Preparation and planning' 'comment_plan'      'cell'          'event'
+        'Comment'                  'comment_exper'     'cell'          'event'
         ...
         };
 
@@ -88,6 +90,17 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     fileName = ensure_filename_extension(fileName, 'xlsm');
     filePath = fullfile(read_path,fileName);
     display_filename(read_path,fileName);
+    
+    % Check sheet names
+    sheets_in_file = sheetnames(fileName);
+    ismember(notes_sheet,sheets_in_file)
+    
+    % Check if latest version is being read
+    
+    % Check for missing columns (just inform and take no action)
+    
+    % Check for extra columns (and add these to notes table?)
+    
     
     notes = readtable(filePath,...
         'Sheet',notes_sheet,...

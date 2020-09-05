@@ -2,56 +2,67 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
-sequence = 'IV2_Seq5';
-experiment_subdir = [sequence,' - Water simulated HVAD thrombosis'];
+sequence = 'IV2_Seq9';
+experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq9 - LVAD6';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
-driveline_subdir = 'Recorded\Teguar';
-ultrasound_subdir = 'Recorded\M3';
+cardibox_subdir = 'Recorded\Cardibox - LVAD';
+ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-    'IV2_Seq5 - F1_ch1-5.mat'
-    'IV2_Seq5 - F2_ch1-5.mat'
-    'IV2_Seq5 - F3_ch1-5.mat'
-    'IV2_Seq5 - F4_ch2-5.mat'
-    'IV2_Seq5 - F5_ch1-5.mat'
-    'IV2_Seq5 - F6_ch1-5.mat'
-    'IV2_Seq5 - F7_ch1-5.mat'
-    'IV2_Seq5 - F8_ch1-5.mat'
-    'IV2_Seq5 - F9_ch1-5.mat'
+    'IV2_Seq9 - F1.mat'
+    'IV2_Seq9 - F2.mat'
+    'IV2_Seq9 - F3.mat'
+    'IV2_Seq9 - F4.mat'
+    'IV2_Seq9 - F5.mat'
+    'IV2_Seq9 - F6.mat' % was retaken
+    'IV2_Seq9 - F7.mat'
+    'IV2_Seq9 - F8.mat'
+    'IV2_Seq9 - F9.mat'
+    'IV2_Seq9 - F10_Sel1.mat'
+    'IV2_Seq9 - F10_Sel2.mat'
+    'IV2_Seq9 - F11.mat'
+    'IV2_Seq9 - F12.mat'
+    'IV2_Seq9 - F13_Sel1.mat'
+    'IV2_Seq9 - F13_Sel2.mat'
     };
-driveline_fileNames = {
-    'monitor-20200512-084303\monitor-20200512-180822.txt'
+cardibox_fileNames = { 
     };
-notes_fileName = 'IV2_Seq5 - Notes ver3.10 - Rev0.xlsm';
+notes_fileName = 'IV2_Seq9 - Notes ver4.9 - Rev1.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_05_12__19_14_11.wrf'
-    'ECM_2020_05_25__18_14_34.wrf'
-    'ECM_2020_05_26__17_32_36.wrf'
-    'ECM_2020_05_27__13_31_01.wrf'
-    'ECM_2020_05_27__15_28_33.wrf'
-    'ECM_2020_05_27__17_18_04.wrf'
-    };
+    'ECM_2020_08_31__12_20_52.wrf'
+    'ECM_2020_08_31__14_33_40.wrf'
+    'ECM_2020_09_01__11_04_20.wrf'
+};
 
 % Add subdir specification to filename lists
-[read_path, save_path] = init_io_paths(sequence,basePath);
+%[read_path, save_path] = init_io_paths(sequence,basePath);
 ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
 powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
-driveline_filePaths = fullfile(basePath,experiment_subdir,driveline_subdir,driveline_fileNames);
+driveline_filePaths = fullfile(basePath,experiment_subdir,cardibox_subdir,cardibox_fileNames);
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
-    % LabChart name  Matlab name  Max frequency  Type        Continuity
-    'Trykk1'         'affP'       1000           'single'    'continuous'
-    'Trykk2'         'effP'       1000           'single'    'continuous'
-    'SensorAAccX'    'accA_x'     700            'numeric'   'continuous'
-    'SensorAAccY'    'accA_y'     700            'numeric'   'continuous'
-    'SensorAAccZ'    'accA_z'     700            'numeric'   'continuous'
+    % LabChart name  Matlab name  Target fs  Type        Continuity
+    'Trykk1'         'affP'       1000       'single'    'continuous'
+    'Trykk2'         'effP'       1000       'single'    'continuous'
+    'SensorAAccX'    'accA_x'     1000       'numeric'   'continuous'
+    'SensorAAccY'    'accA_y'     1000       'numeric'   'continuous'
+    'SensorAAccZ'    'accA_z'     1000       'numeric'   'continuous'
+    %'SensorBAccX'    'accB_x'     1000       'numeric'   'continuous'
+    %'SensorBAccY'    'accB_y'     1000       'numeric'   'continuous'
+    %'SensorBAccZ'    'accB_z'     1000       'numeric'   'continuous'
+    };
+
+systemM_varMap = {
+    % Name in Spectrum   Name in Matlab     SampleRate Type     Continuity   Units
+    'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
+    'VenflowLmin'        'affQ'             1          'single' 'continuous' 'L/min'
     };
 
 %% Read data into Matlab
@@ -67,13 +78,13 @@ if load_workspace({'S_parts','notes','feats'}); return; end
 PL = init_powerlab_raw_matfiles(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths);
+US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
 
-% Read driveline accelerometer data
-%DL_seq5 = init_cardibox_raw_txtfile(driveline_filePaths,'','accC');
+% Read 2.and LVAD accelerometer data
+%CB = init_cardibox_raw_txtfile(cardibox_filePaths,'','accC');
 
 % Read sequence notes made with Excel file template
-notes = init_notes_xlsfile_ver3_9(notes_filePath);
+notes = init_notes_xlsfile_ver4(notes_filePath);
 
 
 %% Pre-processing
@@ -83,16 +94,16 @@ notes = init_notes_xlsfile_ver3_9(notes_filePath);
 %   of blocks into one table S
 % * Splitting into parts, each resampling to regular sampling intervals of given frequency
 
-notes = qc_notes(notes);
+%notes = qc_notes_ver4(notes);
 
 feats = init_features_from_notes(notes);
 
 clear S
-%S = fuse_data_parfor(notes,PL,US);
+% S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US);
 %clear PL US
 S_parts = split_into_parts(S);
-clear S
+%clear S
 
 S_parts = add_spatial_norms(S_parts,2);
 S_parts = add_moving_statistics(S_parts);
@@ -101,8 +112,6 @@ S_parts = add_moving_statistics(S_parts,{'accA_y'});
 S_parts = add_moving_statistics(S_parts,{'accA_z'});
 S_parts = add_moving_statistics(S_parts,{'effP','affP'});
 
-% Maybe not a pre-processing thing
-%S_parts = add_harmonics_filtered_variables(S_parts);
 
 % TODO:
 % Add MPF, std, RMS and other statistics/indices into feats

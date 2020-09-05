@@ -2,27 +2,27 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
-sequence = 'G1_Seq1';
+sequence = 'G1_Seq2';
 experiment_subdir = [sequence,' - Simulated HVAD pre-pump thrombosis'];
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
-driveline_subdir = 'Recorded\Teguar';
+driveline_subdir = 'Recorded\Cardibox - Driveline';
 ultrasound_subdir = 'Recorded\M3';
 notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-    'G1_Seq1 - F1_Sel1_ch1-5.mat'
-    'G1_Seq1 - F1_Sel2_ch1-5.mat'
+    'G1_Seq2 - F1_ch2-5.mat'
+    'G1_Seq2 - F2_ch2-5.mat'
     };
 driveline_fileNames = {
     };
-notes_fileName = 'G1_Seq1 - Notes ver3.12 - Rev3.xlsm';
+notes_fileName = 'G1_Seq2 - Notes ver3.12 - Rev5.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_05_14__13_27_19.wrf'
+    'ECM_2020_05_28__11_44_52.wrf'
     };
 
 % Add subdir specification to filename lists
@@ -33,8 +33,8 @@ driveline_filePaths = fullfile(basePath,experiment_subdir,driveline_subdir,drive
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
-    % LabChart name  Matlab name  Max frequency  Type        Continuity
-    'Trykk1'         'affP'       1000           'single'    'continuous'
+    % LabChart name  Matlab name  Sample rate    Type        Continuity
+    %'Trykk1'         'affP'       1000           'single'    'continuous'
     'Trykk2'         'effP'       1000           'single'    'continuous'
     'SensorAAccX'    'accA_x'     700            'numeric'   'continuous'
     'SensorAAccY'    'accA_y'     700            'numeric'   'continuous'
@@ -73,11 +73,11 @@ notes = qc_notes(notes);
 % unsync_inds = DL.time + hours(1)+minutes(3)+seconds(29);
 
 % Correct for clock drift in M3 monitor
-secsAhead = 38; % TO BE UPDATED!!!
+secsAhead = 48;
 secsRecDur = height(US);
-driftPerSec = secsRecDur/secsAhead;
+driftPerSec = secsAhead/secsRecDur;
 driftCompensation = seconds(0:driftPerSec:secsAhead);
-driftCompensation = driftCompensation(1:height(US));
+driftCompensation = driftCompensation(1:height(US))';
 US.time = US.time-driftCompensation;
 
 feats = init_features_from_notes(notes);

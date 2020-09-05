@@ -5,7 +5,7 @@ function [T,inFile_inds] = map_varnames(T,varNamesInFile,varNamesInCode)
     % Handle uncovered columns in map (i.e. extra columns in file are removed)
     missingVarsInCode = varNamesInT(not(ismember(varNamesInT,varNamesInFile)));
     if numel(missingVarsInCode)>0
-        warning('\nt\tMissing variable(s) in code for variable mapping:\n\t\t%s',...
+        warning('\n\tMissing variable(s) in code for variable mapping:\n\t\t%s',...
             strjoin(missingVarsInCode,', '));
         T(:,missingVarsInCode) = [];
     end

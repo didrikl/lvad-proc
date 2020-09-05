@@ -1,4 +1,4 @@
-function T = init_m3_raw_textfile(fileNames,path)
+function T = init_m3_raw_textfile(fileNames,path,varMap)
     
     %
     % TODO: Make one generic function to initialize blocks, that can be used for
@@ -9,20 +9,21 @@ function T = init_m3_raw_textfile(fileNames,path)
     
     timeFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
     
-    varMap = {
-        ...   
-        % Name in Spectrum   Name in Matlab     SampleRate Type     Continuity   Units
-        'ArterialflowLmin'   'graftQ'           1          'single' 'continuous' 'L/min'
-%         'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
-%         'VenflowLMin'        'affQ'             1          'single' 'continuous' 'L/min'
-%         'EmboliVolume1uLsec' 'affEmboliVol'     1          'single' 'continuous' 'uL/sec'
-%         'EmboliTotalCount1'  'affEmboliCount'   1          'int16'  'step'       ''
-%         'EmboliVolume2uLsec' 'effEmboliVol'     1          'single' 'continuous' 'uL/sec'
-%         'EmboliTotalCount2'  'effEmboliCount'   1          'int16'  'step'       ''
-        'EmboliVolume3uLsec' 'graftEmboliVol'   1          'single' 'continuous' 'uL/sec'
-        'EmboliTotalCount3'  'graftEmboliCount' 1          'single'  'step'       ''
-        };
-    
+    if nargin<3
+        varMap = {
+            ...
+            % Name in Spectrum   Name in Matlab     SampleRate Type     Continuity   Units
+            %        'ArterialflowLmin'   'graftQ'           1          'single' 'continuous' 'L/min'
+            'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
+            'VenflowLmin'        'affQ'             1          'single' 'continuous' 'L/min'
+            %'EmboliVolume1uLsec' 'affEmboliVol'     1          'single' 'continuous' 'uL/sec'
+            %'EmboliTotalCount1'  'affEmboliCount'   1          'int16'  'step'       ''
+            %'EmboliVolume2uLsec' 'effEmboliVol'     1          'single' 'continuous' 'uL/sec'
+            %'EmboliTotalCount2'  'effEmboliCount'   1          'int16'  'step'       ''
+            %        'EmboliVolume3uLsec' 'graftEmboliVol'   1          'single' 'continuous' 'uL/sec'
+            %        'EmboliTotalCount3'  'graftEmboliCount' 1          'single'  'step'       ''
+            };
+    end
      
     welcome('Initializing Spectrum M3')
     

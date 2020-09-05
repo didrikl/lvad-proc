@@ -21,16 +21,17 @@ function B = init_powerlab_raw_matfiles(fileNames,path,varMap)
     % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
     % for accelerometer a parent class and child class for cardiaccs. Could be
     % useful if different digital sampling boxes are used.
-    acc_gyr_maxFreq = 700;
-    p_maxFreq = 1000;
     if nargin<3
         varMap = {
-            % LabChart name  Matlab name  Max frequency     Type        Continuity
-            'Trykk1'         'affP'       p_maxFreq         'single'    'continuous'
-            'Trykk2'         'effP'       p_maxFreq         'single'    'continuous'
-            'SensorAAccX'    'accA_x'     acc_gyr_maxFreq   'numeric'   'continuous'
-            'SensorAAccY'    'accA_y'     acc_gyr_maxFreq   'numeric'   'continuous'
-            'SensorAAccZ'    'accA_z'     acc_gyr_maxFreq   'numeric'   'continuous'
+            % LabChart name  Matlab name  Target fs  Type        Continuity
+            'Trykk1'         'affP'       1000,      'single'    'continuous'
+            'Trykk2'         'effP'       1000,      'single'    'continuous'
+            'SensorAAccX'    'accA_x'     1000,      'numeric'   'continuous'
+            'SensorAAccY'    'accA_y'     1000,      'numeric'   'continuous'
+            'SensorAAccZ'    'accA_z'     1000,      'numeric'   'continuous'
+            'SensorBAccX'    'accB_x'     1000,      'numeric'   'continuous'
+            'SensorBAccY'    'accB_y'     1000,      'numeric'   'continuous'
+            'SensorBAccZ'    'accB_z'     1000,      'numeric'   'continuous'
             };
     end
     

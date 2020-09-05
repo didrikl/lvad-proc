@@ -1,4 +1,4 @@
-function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
+function notes = init_notes_xlsfile_ver4(fileName, read_path)
     % 
     % Read named ranges from Notes Excel file. Ranges must be defined by Excel
     % name manager. (Named ranges make the Excel file more flexible w.r.t.
@@ -11,19 +11,14 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
     % TODO: Notes range defined in name manager is a bit confusing(?)
-    notes_sheet = 'Notes';
+    notes_sheet = 'Recording notes';
     notes_range = 'Notes';
     varsNames_controlled_range = 'Controlled_VarNames';
     varNames_measured_range = 'Measured_VarNames';
     varNames_range = 'Header_VarNames';
     varUnits_range = 'Header_VarUnits';
-    
-    seqInfo_equip_sheet = 'Equipment';       
-    seqInfo_equip_range = 'Equipment';
-    
-    seqInfo_sheet = 'Sequence description';
-    seqInfo_parts_range = 'Sequence_Part_Descriptions';
-    seqInfo_general_range = 'Sequence_General_Info';
+    experiment_info_sheet = 'Description';
+    experiment_info_range = 'Experiment_Info';
     
     % * Name in Excel: Must match the name in Excel, but can be changed easily.
     % * Name Matlab code: Static variable name used in code. Must be valid a
@@ -34,44 +29,81 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     %   NB: Categoric type take a lot less memory to store
     var_map = {    
         ...   
-        % Name in Excel           Name Matlab code     Type            Continuity
-        'Date'                    'date'               'cell'          'event'
-        'Timestamp'               'timestamp'          'cell'          'event'
-        'Elapsed time'            'part_elapsedTime'   'duration'      'continuous'
-        'Dur'                     'event_duration'     'int16'         'event'
-        'Part'                    'part'               'categorical'   'step'
-        'Interval type'           'intervType'         'categorical'   'step'
-        'Event'                   'event'              'categorical'   'step'
-        'Thrombus volume'         'thrombusVol'        'categorical'   'step'
-        'Speed change rate'       'speedChangeRate'    'categorical'   'step'
-        'Dose'                    'dose'               'categorical'   'step'
-        'Pump speed'              'pumpSpeed'          'int16'         'step'
-        'Balloon level'           'balloonLevel'       'categorical'   'step'
-        'Balloon diameter'        'balloonDiam'        'categorical'   'step'
-        'Balloon offset'          'balloonOffset'      'categorical'   'step'
-        'Catheter type'           'catheter'           'categorical'   'unset'
-        'Clamp flow reduction'    'Q_reduction'        'categorical'   'step'
-        'Afferent pressure'       'affP_noted'         'single'        'event'
-        'Effenrent pressure'      'effP_noted'         'single'        'event'
-        'Flow estimate'           'Q_LVAD'             'single'        'step'
-        'Power'                   'P_LVAD'             'single'        'step'
-        'Reduced baseline flow'   'redBaseFlow'        'single'        'event'
-        'Comment'                 'comment'            'cell'          'event'
+        % Name in Excel           Name Matlab code     Type          Continuity
+        'Date'                    'date'             'cell'          'event'
+        'Timestamp'               'timestamp'        'cell'          'event'
+        'Elapsed time'            'durTime'          'duration'      'continuous'
+        'Timer'                   'timer'            'int16'         'event'
+        'X-ray no'                'xrayNo'           'int16'         'step'
+        'Tag'                     'tag'              'cell'          'event'
+        'Part'                    'part'             'categorical'   'step' 
+        'Interval'                'intervType'       'categorical'   'step'
+        'Event'                   'event'            'categorical'   'step'
+        'Injected thrombus vol.'  'thrombusVol'      'categorical'   'step'
+        'Pump speed'              'pumpSpeed'        'int16'         'step'
+        'Balloon level'           'balloonLevel'     'categorical'   'step'
+        'Balloon diameter'        'balloonDiam'      'categorical'   'step'
+        'Manometer control'       'manometerCtrl'    'categorical'   'step'
+        'Catheter type'           'catheter'         'categorical'   'unset'
+        'Clamp flow red.'         'Q_reduction'      'categorical'   'step'
+        'Flow red. target'        'flowRedTarget'    'single'        'event'
+        'Afferent pressure'       'affP_noted'       'single'        'event'
+        'Effenrent pressure'      'effP_noted'       'single'        'event'
+        'Balloon offset'          'balloonOffset'    'categorical'   'step'
+        'Balloon diam. est.'      'balDiamEst'       'int16'         'step'
+        'Flow est.'               'Q_LVAD'           'single'        'step'
+        'Power'                   'P_LVAD'           'single'        'step'
+        'Flow'                    'Q_noted'          'single'        'step'
+        'Max art. p'              'p_maxArt'         'int16'         'step'
+        'Min art. p'              'p_minArt'         'int16'         'step'
+        'Mean art. p'             'p_avgArt'         'int16'         'step'
+        'Max pulm. p'             'p_maxPulm'        'int16'         'step'
+        'Min pulm. p'             'p_minPulm'        'int16'         'step'
+        'Mean pulm. p'            'p_avgPulm'        'int16'         'step'
+        'HR'                      'HR'               'int16'         'step'
+        'CVP'                     'CVP'              'int16'         'step'
+        'Cardiac output'          'CO'               'int16'         'step'
+        'SvO2'                    'SvO2'             'int16'         'step'
+        'Plan and preparations'   'plan_prep_notes'  'cell'          'event'
+        'Experiment'              'exper_notes'      'cell'          'event'
+        'Quality control'         'QC_notes'         'cell'          'event'
+        'Interval annotation'     'annotation'       'cell'          'event'
         ...
         };
 
     % Columns to omit (not in use or always constant in the sequence)
+    % TODO: Specific a list of variables for data fusion, while the rest is just
+    % stored in the notes table??
     varNames_unneeded = {
         'date'
         'timestamp'
-        'part_elapsedTime'
-        'event_duration'
+        'tag'
+        'durTime'
+        'timer'
+        'xrayNo'
         'thrombusVol'
-        'speedChangeRate'
-        'dose'
-        'balloonOffset'
+        'balloonDiam'
+        'manometerCtrl'
+        'Q_reduction'
+        'Q_noted'
+        'flowRedTarget'
         'affP_noted'
         'effP_noted'
+        'balloonOffset'
+        'balDiamEst'
+        'p_maxArt'
+        'p_minArt'
+        'p_avgArt'
+        'p_maxPulm'
+        'p_minPulm'
+        'p_avgPulm'
+        'HR'
+        'CVP'
+        'CO'
+        'SvO2'
+        'plan_prep_notes'
+        'exper_notes'
+        'QC_notes'
         };
     
     % TODO: For OO
@@ -88,6 +120,17 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     fileName = ensure_filename_extension(fileName, 'xlsm');
     filePath = fullfile(read_path,fileName);
     display_filename(read_path,fileName);
+    
+    % TODO: Implement checks sheet names (low pri.)
+%     sheets_in_file = sheetnames(fileName);
+%     ismember(notes_sheet,sheets_in_file)
+     
+    % Check if latest version is being read
+    
+    % Check for missing columns (just inform and take no action)
+    
+    % Check for extra columns (and add these to notes table?)
+    
     
     notes = readtable(filePath,...
         'Sheet',notes_sheet,...
@@ -115,20 +158,9 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
         'ReadVariableNames',false,...
         'basic', true))';
     
-    seqInfo_equipment = table2cell(readtable(filePath,...
-        'Sheet',seqInfo_equip_sheet,...
-        'Range',seqInfo_equip_range,...
-        'ReadVariableNames',false,...
-        'basic', true))';
-    
-    seqInfo_parts = table2cell(readtable(filePath,...
-        'Sheet',seqInfo_sheet,...
-        'Range',seqInfo_parts_range,...
-        'ReadVariableNames',false,...
-        'basic', true))';   
-    seqInfo_general = table2cell(readtable(filePath,...
-        'Sheet',seqInfo_sheet,...
-        'Range',seqInfo_general_range,...
+    experiment_info = table2cell(readtable(filePath,...
+        'Sheet',experiment_info_sheet,...
+        'Range',experiment_info_range,...
         'ReadVariableNames',false,...
         'basic', true))';
     
@@ -140,6 +172,7 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     [notes, inFile_ind] = ...
         map_varnames(notes, varNames_xls, varNames_mat);
     var_map = var_map(inFile_ind,:);
+    varUnits = varUnits(inFile_ind);
     varNames_xls = var_map(:,1);
     
     % Update and add variable metadata
@@ -157,10 +190,8 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
 
     % Various user-data
     notes.Properties.UserData = make_init_userdata(filePath);
-    notes.Properties.UserData.Seq_info.Equipment = seqInfo_equipment;
-    notes.Properties.UserData.Seq_info.General = seqInfo_general;
-    notes.Properties.UserData.Seq_info.Parts = seqInfo_parts;
-
+    notes.Properties.UserData.Seq_info.Experiment = experiment_info;
+    
     
     %% Parse time info
     
@@ -173,21 +204,21 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
     notes.time.Year = notes.date.Year;
      
     % Represent time_elapsed as a total duration vector in seconds
-    notes.part_elapsedTime = seconds(notes.part_elapsedTime);
+    notes.durTime = seconds(notes.durTime);
  
     % Derive the time column that was not in use when making the notes
     % TODO: Move to separate function, to avoid derived columns before
     % resampling and merging processes
-    if all(isnan(notes.part_elapsedTime))
+    if all(isnan(notes.durTime))
         parts = unique(notes.part);
         parts = parts(not(cellfun(@isempty,parts)));
         for i=1:numel(parts)
             part_inds = ismember(notes.part,parts{i});
             part_start = notes.time(find(part_inds,1,'first'));
-            notes.part_elapsedTime(part_inds) = notes.time(part_inds) - part_start;
+            notes.durTime(part_inds) = notes.time(part_inds) - part_start;
         end
     elseif all(isnat(notes.time))
-         notes.time = datetime(notes.part_elapsedTime,...
+         notes.time = datetime(notes.durTime,...
              'ConvertFrom','epochtime',...
              'Epoch',notes.date(1));
     else
@@ -284,5 +315,5 @@ function notes = add_event_range(notes, intervTypesToIncludeinEventRange)
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
     notes.noteRow = (1:height(notes))'+n_header_lines';
-    notes = movevars(notes, 'noteRow', 'Before', 'part_elapsedTime');
+    notes = movevars(notes, 'noteRow', 'Before', 'durTime');
     notes.Properties.VariableContinuity('noteRow') = 'step';

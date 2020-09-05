@@ -8,7 +8,7 @@ catBarColor
 barVars = {
     %'part',           partBarColorSet;
     'pumpSpeed'       pumpSpeedColorSet;%brewermap(20,'Paired');
-    'flowReduction'   flowRedColorSet;% brewermap(10,'BuPu');%'YlGnBu');
+    'Q_reduction'   flowRedColorSet;% brewermap(10,'BuPu');%'YlGnBu');
     'balloonLevel'    balLevColorSet;%brewermap(10,'RdPu');
     'intervType'      intervTypeColorSet;%brewermap(10,'RdPu');
     };
@@ -24,11 +24,11 @@ orderMapVar = 'accA_norm';%,'accA_xz_norm_filt'};
 %orderMapVar = 'accA_x';%,'accA_xz_norm_filt'};
 plotVars = {
         %{'affP','effP'}
-        %{'affQ','effQ','Q_noted'}
+        %{'affQ','effQ','Q_LVAD'}
         %{'accA_norm_mpf'}
         {'accA_norm_movStd','accA_norm_std'}
         %{'accA_xz_norm_movRMS','accA_xz_norm_rms'}
-        %'power_noted'
+        %'P_LVAD'
         };
 
 baseline_parts = [15];

@@ -7,7 +7,7 @@ plotVars = {
         'accA_xz_norm_movRMS'
         'accA_norm_movRMS'
         %'accA_movRMS'
-        %'power_noted'
+        %'P_LVAD'
         %'gyrA_norm_movRMS'
         %'Q'
         };
@@ -15,7 +15,7 @@ barVars = {
     'part',           brewermap(20,'Set3');
     %'intervType'      brewermap(20,'Pastel2');
     'pumpSpeed'       brewermap(20,'Paired');
-    'flowReduction'   brewermap(10,'BuPu');%'YlGnBu');
+    'Q_reduction'   brewermap(10,'BuPu');%'YlGnBu');
     'balloonLevel'    brewermap(10,'RdPu');
     };
 % Muting of non-comparable data (due to wrong setting in LabChart) in baseline
@@ -59,7 +59,7 @@ for i=1:numel(intervention_parts)
     
     % Merging, so they will be plotted in same panel
     T = mergevars(T,{'affP','effP'},'NewVariableName','P');
-    T = mergevars(T,{'affQ','effQ','Q_noted'},'NewVariableName','Q');
+    T = mergevars(T,{'affQ','effQ','Q_LVAD'},'NewVariableName','Q');
     %T = mergevars(T,{'accA_x','accA_y','accA_y'},'NewVariableName','accA');
 
     for j=1:numel(orderMapVar)

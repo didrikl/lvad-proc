@@ -10,7 +10,7 @@ function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
     if nargin<3, statisticTypes = {'RMS','Std','Min','Max','Avg'}; end
     
     rms_winDur = 1;
-    std_winDur = 10;
+    std_winDur = 15;
     min_winDur = 5;
     max_winDur = 5;
     avg_winDur = 10;

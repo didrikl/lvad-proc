@@ -1,4 +1,4 @@
-function notes = qc_notes(notes)
+function notes = qc_notes_ver4(notes)
     % Checks of Excel file for misssing and chronological time, and that 
     % essential categoric info is not missing
     % * time not missing for intervType equal 'Pause'
@@ -22,7 +22,9 @@ function notes = qc_notes(notes)
     
 function notes = ask_to_reinit(notes)
     % Pause and let user make changes in Excel and re-initialize
+    input(sprintf('\nHit a key to open notes sheet --> '));
     winopen(notes.Properties.UserData.FilePath);
+    
     answer = ask_list_ui({'Re-initialize', 'Ignore', 'Abort'},...
         sprintf('\nPause: Check and save as new notes file revision'),1);
     if answer==1
@@ -30,7 +32,7 @@ function notes = ask_to_reinit(notes)
             [notes.Properties.UserData.Path,'\*.xls;*.xlsx;*.xlsm'],...
             'Select notes Excel file to re-initialize');
         % TODO: Make OO, so that correct init_notes version is used
-        notes = init_notes_xlsfile_ver3_12(fullfile(filePath,fileName));
+        notes = init_notes_xlsfile_ver4(fullfile(filePath,fileName));
     elseif answer==3
         abort;
     end

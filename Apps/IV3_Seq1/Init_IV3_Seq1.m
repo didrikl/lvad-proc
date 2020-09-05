@@ -2,8 +2,8 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
-sequence = 'G1_Seq1';
-experiment_subdir = [sequence,' - Simulated HVAD pre-pump thrombosis'];
+sequence = 'IV3_Seq1';
+experiment_subdir = ['IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot'];
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -15,18 +15,20 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-    'G1_Seq1 - F1_Sel1_ch1-5.mat'
-    'G1_Seq1 - F1_Sel2_ch1-5.mat'
+    'IV3_Seq1 - F1_Sel1_ch1-5.mat'
     };
 driveline_fileNames = {
     };
-notes_fileName = 'G1_Seq1 - Notes ver3.12 - Rev3.xlsm';
+notes_fileName = 'IV3_Seq1 - Notes ver3.10 - Rev1.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_05_14__13_27_19.wrf'
-    };
+    'ECM_2020_06_18__10_46_24.wrf'
+    'ECM_2020_06_18__11_32_16.wrf'
+};
 
 % Add subdir specification to filename lists
-[read_path, save_path] = init_io_paths(sequence,basePath);
+%[read_path, save_path] = init_io_paths('Seq1 - LVAD2 - Pilot',basePath);
+read_path = 'C:\Data\IVS\Didrik\IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot\Recorded\';
+save_path = 'C:\Data\IVS\Didrik\IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot\Processed';
 ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
 powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
 driveline_filePaths = fullfile(basePath,experiment_subdir,driveline_subdir,driveline_fileNames);
@@ -48,7 +50,7 @@ powerlab_variable_map = {
 
 init_matlab
 welcome('Initializing data','module')
-%if load_workspace({'S_parts','notes','feats'}); return; end
+if load_workspace({'S_parts','notes','feats'}); return; end
 
 % Read PowerLab data in files exported from LabChart
 PL = init_powerlab_raw_matfiles(powerlab_filePaths,'',powerlab_variable_map);
@@ -57,53 +59,62 @@ PL = init_powerlab_raw_matfiles(powerlab_filePaths,'',powerlab_variable_map);
 US = init_m3_raw_textfile(ultrasound_filePaths);
 
 % Read sequence notes made with Excel file template
-notes = init_notes_xlsfile_ver3_12(notes_filePath);
+notes = init_notes_xlsfile_ver3_9(notes_filePath);
+
+
 
 
 %% Pre-processing
-% Transform and extract data for analysis
-% * QC/pre-fixing data
-% * Block-wise fusion of notes into PL, and then US into PL, followed by merging
-%   of blocks into one table S
-% * Splitting into parts, each resampling to regular sampling intervals of given frequency
 
 notes = qc_notes(notes);
 
-% Correct for unsync'ed clock on driveline monitor
-% unsync_inds = DL.time + hours(1)+minutes(3)+seconds(29);
+S_parts = add_spatial_norms(S_parts,2);
 
-% Correct for clock drift in M3 monitor
-secsAhead = 38; % TO BE UPDATED!!!
-secsRecDur = height(US);
-driftPerSec = secsRecDur/secsAhead;
-driftCompensation = seconds(0:driftPerSec:secsAhead);
-driftCompensation = driftCompensation(1:height(US));
-US.time = US.time-driftCompensation;
+ask_to_save({'S_parts','notes','feats'},sequence);
 
-feats = init_features_from_notes(notes);
 
 %%
 
-%S = fuse_data_parfor(notes,PL,US);
-S = fuse_data(notes,PL,US);
-%clear PL US
-S_parts = split_into_parts(S);
-%clear S
+PL = add_spatial_norms(PL,2);
+T = PL{1};
+T = resample_signal(T, 350);
+T.pumpSpeed = 2500*ones(height(T),1);
 
-S_parts = add_spatial_norms(S_parts,2);
+% cut off where RPM is not actually 2500
+T.dur = T.time - T.time(1);
+T = T(T.dur>minutes(0.84),:);
 
-S_parts = add_moving_statistics(S_parts);
-S_parts = add_moving_statistics(S_parts,{'accA_x'});
-S_parts = add_moving_statistics(S_parts,{'accA_y'});
-S_parts = add_moving_statistics(S_parts,{'accA_z'});
-S_parts = add_moving_statistics(S_parts,{'effP'});
+%make_rpm_order_map(S_parts, 'accA_norm', 700, 'pumpSpeed', 0.02, 80)
 
-% Maybe not a pre-processing thing
-%S_parts = add_harmonics_filtered_variables(S_parts);
+rpm = 2500;
+s = T.accA_norm;
+%s = detrend(s);
+Fs = 350;
 
-% TODO:
-% Add MPF, std, RMS and other statistics/indices into feats
-% Revise categoric blocks, and put into feats
+L = numel(s);                                   % Signal Length
+Fn = Fs/2;                                      % Nyquist Frequency
+FTvr = fft(s)/L;                                % Fourier Transform
+freq = linspace(0, 1, fix(L/2)+1)*Fn;           % Frequency Vector
+Iv = 1:length(freq);                            % Index Vector
 
-%ask_to_save({'S_parts','notes','feats'},sequence);
+ampl = abs(FTvr(Iv))*2;
+phase = angle(FTvr(Iv));
 
+plot(freq, ampl);
+title('Frequency amplitude plot')
+
+% Add harmonics lines
+harmonics = (1:4)*(rpm/60);
+for i=1:numel(harmonics)
+    xline(gca,harmonics(i),':',...
+        'Color',[0.9290 0.740 0.1250,0.5],...
+        'LineWidth',1.5,...
+        'FontWeight','bold',...
+        'LabelHorizontalAlignment','left',...
+        'LabelVerticalAlignment','middle',...
+        'Label',['harmonic ',num2str(i)]);
+end
+
+%ylim([0 prctile(ampl,99.9)])
+xlim([1 200])
+grid off
