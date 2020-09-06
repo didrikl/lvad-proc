@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns="http://www.cardiaccs.com/CmData-CBv3" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.cardiaccs.com/CmData-CBv3">
+
+  <xs:simpleType name="scale">
+    <xs:restriction base="xs:decimal">
+      <xs:fractionDigits value="6" />
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="1" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="xyz">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="^\-?[1-2]{0,1}\d{0,3},\-?[0-2]{0,1}\d{0,3},\-?[0-2]{0,1}\d{0,3}$" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="acclist">
+    <xs:list itemType="xyz" />
+  </xs:simpleType>
+  <xs:element name="cmdata">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" name="sd">
+          <xs:complexType>
+            <xs:attribute name="id" type="xs:unsignedLong" use="optional" />
+            <xs:attribute name="frame" type="xs:unsignedLong" use="optional" />
+            <xs:attribute name="t" type="xs:long" use="optional" />
+            <xs:attribute name="dt" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="xs:short">
+                  <xs:maxExclusive value="30000" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="status" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="ok" />
+                  <xs:enumeration value="boxInitializing" />
+                  <xs:enumeration value="boxInitError" />
+                  <xs:enumeration value="boxNotConnected" />
+                  <xs:enumeration value="boxAcquiringStarted" />
+                  <xs:enumeration value="accNotConnected" />
+                  <xs:enumeration value="accInitError" />
+                  <xs:enumeration value="accReadError" />
+                  <xs:enumeration value="adcNotConnected" />
+                  <xs:enumeration value="adcInitError" />
+                  <xs:enumeration value="adcReadError" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="adcscale" type="scale" use="optional" />
+            <xs:attribute name="accscale" type="scale" use="optional" />
+            <xs:attribute name="adc" type="xs:short" use="optional" />
+            <xs:attribute name="acc" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="acclist">
+                  <xs:minLength value="1" />
+                  <xs:maxLength value="32" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="sn" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:pattern value="^[0-9_\-\s\.a-zA-Z]{0,64}$" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="description" use="optional">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:minLength value="0" />
+                  <xs:maxLength value="40" />
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required" />
+      <xs:attribute name="hash" use="required">
+        <xs:simpleType>
+          <xs:union memberTypes="xs:unsignedInt">
+            <xs:simpleType>
+              <xs:restriction base="xs:string">
+                <xs:pattern value="[0-9a-f]{32}" />
+                <xs:length value="32" />
+              </xs:restriction>
+            </xs:simpleType>
+          </xs:union>
+        </xs:simpleType>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
