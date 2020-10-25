@@ -6,23 +6,23 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
     %
     % See also DETREND, RPMORDERMAP
     
-    if nargin<3, [maxFreq,T] = get_sampling_rate(T,false); end
+    if nargin<3, maxFreq=NaN; end
     if nargin<4, rpm_varName = 'pumpSpeed'; end
     if nargin<5, order_res = 0.02; end
     if nargin<6, overlap_pst = 80; end
     
-    [rpm_varName,map_varName] = check_table(T,rpm_varName,map_varName);
-    [T, rpm_varName] = check_rpm_values(T,rpm_varName);
-    [T,map_varName] = check_map_values(T,map_varName);
-
-    if isnan(maxFreq)
-        [maxFreq,~] = get_sampling_rate(T(:,{map_varName,rpm_varName}));
-        if isnan(maxFreq), return; end
-    end
-
+    n_rows = check_table_height(T);
+    [maxFreq,T] = check_sampling_rate(maxFreq,T);
+    if isnan(maxFreq) || n_rows==0, return; end
+    
+    [rpm_varName,map_varName] = check_table_cols(T,rpm_varName,map_varName);
+    T = check_missing_rpm_values(T,rpm_varName);
+    T = check_rpm_as_zero_values(T,rpm_varName,map_varName);
+    T = check_map_values(T,map_varName);
+    
     % Remove DC component
-    %x = detrend(T.(map_varName));
-    x = T.(map_varName);
+    x = detrend(T.(map_varName));
+    %x = T.(map_varName);
     
     if nargout==0
         rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
@@ -42,17 +42,36 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
             ...'Window','hamming'...
             );
     end
-  
-function [rpm_varName,map_varName] = check_table(T,rpm_varName,map_varName)
+
+function n_rows = check_table_height(T)
+    n_rows = height(T);
+    if n_rows==0
+        warning('No data rows to make RPM order map');
+    end
+    if n_rows<100
+        warning('There are too few rows to make RPM order map');
+    end
+    
+function [maxFreq,T] = check_sampling_rate(maxFreq,T)
+    % if maxFreq is not explicitly given, try getting it from table without any
+    % user interaction
+    if isnan(maxFreq)
+        [maxFreq,T] = get_sampling_rate(T,false);
+    end
+    
+    % If still not determined, then try getting it by user interaction followed
+    % by resampling.
+    if isnan(maxFreq)
+        [maxFreq,~] = get_sampling_rate(T(:,{map_varName,rpm_varName}));
+    end
+    
+function [rpm_varName,map_varName] = check_table_cols(T,rpm_varName,map_varName)
     
     % Check existence of variables to use
     rpm_varName = check_var_input_from_table(T, rpm_varName);
     map_varName = check_var_input_from_table(T, map_varName);
-    if height(T)==0
-        error('No rows in table for RPM order map')
-    end
     
-function [T, rpm_varName] = check_rpm_values(T,rpm_varName)
+function T = check_missing_rpm_values(T,rpm_varName)
     
     if iscategorical(T.(rpm_varName))
         T.(rpm_varName) = double(string(T.(rpm_varName)));
@@ -66,7 +85,22 @@ function [T, rpm_varName] = check_rpm_values(T,rpm_varName)
     elseif all(missing)
         error(['All values is NaN in RPM variable ',rpm_varName])
     end
-         
+    
+    if height(T)==0
+        warning('All rows were removed.')
+    end
+
+function T = check_rpm_as_zero_values(T,rpm_varName,map_varName)
+    zeroSpeed = T.(rpm_varName)==0;
+    if any(zeroSpeed)
+        warning(sprintf(['%d rows have RPM=0 in RPM variable %s:',...
+            '\n\tCorresponding map values are set to zero.',...
+            '\n\tRPM=1000 is made as dummy substitute values.'],...
+            nnz(zeroSpeed),rpm_varName));
+        T.(rpm_varName)(zeroSpeed) = 1000;
+        T.(map_varName)(zeroSpeed) = 0;
+    end
+    
 function [T,map_varName] = check_map_values(T,map_varName)
     
     missing = isnan(T.(map_varName));

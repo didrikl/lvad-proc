@@ -87,7 +87,7 @@ function T_block = read_signal_file(filePath,timestamp_fmt)
     % Parse raw metadata that are needed
     [n_vars,n_intervals] = size(raw.datastart);
     varnames = genvarname(string(raw.titles));
-    [col_unit,interv_units] = make_unit_string_arr(raw);
+    %[col_unit,interv_units] = make_unit_string_arr(raw);
     interv_lengths = raw.dataend-raw.datastart;
     interv_start_timestamps = datetime(raw.blocktimes,...
         'ConvertFrom','datenum',...
@@ -151,15 +151,15 @@ function T_block = read_signal_file(filePath,timestamp_fmt)
     % Variable metadata
     % TODO: Move to calling code, and check for consistency for all blocks, for
     % which units and descriptions are stored in userdata cell array.
-    T_block.Properties.VariableUnits = col_unit;
+    %T_block.Properties.VariableUnits = col_unit;
     T_block.Properties.VariableDescriptions = cellstr(raw.titles);
         
     % Store various/unstructured info (start with initializing standard info)
     T_block.Properties.UserData = make_init_userdata(filePath);
     T_block.Properties.UserData.Headers = cellstr(raw.titles);
-    T_block.Properties.UserData.ColumnUnits = col_unit;
+    %T_block.Properties.UserData.ColumnUnits = col_unit;
     T_block.Properties.UserData.IntervalStartTimes = interv_start_timestamps;
-    T_block.Properties.UserData.IntervalUnits = interv_units;
+    %T_block.Properties.UserData.IntervalUnits = interv_units;
     
     close2(h_wait)
   

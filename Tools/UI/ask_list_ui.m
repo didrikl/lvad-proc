@@ -51,8 +51,9 @@ function selection = ask_list_ui(options, question, default)
     % Set/adjust windows size
     width = 200;
     height = 110;
-    n_char = max(cellfun(@length,options));
-    n_char = max(n_char,max(cellfun(@length,strsplit(question))));
+    n_char_opts = max(cellfun(@length,options));
+    n_char_question = max(cellfun(@length,strsplit(question,'\n')));
+    n_char = max(n_char_opts,n_char_question);
     width = max(width,n_char*6);
     height = max(height,height*(numel(options)/7.2));
     

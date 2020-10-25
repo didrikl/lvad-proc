@@ -16,6 +16,20 @@ function T = fuse_timetables(T1,T2,varargin)
     
     T1(:,overwrite_cols) = [];
     T2 = T2(:,merge_varNames);
+    
+    if not(issorted(T1))
+        fprintf('\n')
+        T_name = inputname(1);
+        if isempty(T_name), T_name = 'First (left) table'; end
+        warning([class(T1),' ',inputname(1),' is not sorted in time.'])
+    end
+    if not(issorted(T2))
+        fprintf('\n')
+        T_name = inputname(2);
+        if isempty(T_name), T_name = 'Second (right) table'; end
+        warning([class(T2),' ',inputname(2),' is not sorted in time.'])
+    end
+    
     T = synchronize(T1,T2,varargin{:});
     
 end
@@ -76,6 +90,15 @@ end
 function colsToDrop = determineColsToDrop(T2)
     % Return logical array of new columns to drop before data fusion
     
+    % Merge only data with specified variable continuity (which is used for
+    % filling empty entries in non-matching rows when syncing).
+    colsToDrop = ismember(T2.Properties.VariableContinuity,{'unset','event'});
+    
+    %colsToDrop = ask_user_for_handling_empty_cols(T2, colsToDrop);
+    
+end
+    
+function colsToDrop = ask_user_for_handling_empty_cols(T2, colsToDrop)
     persistent overwaysIncludeEmptyVariables
     persistent overwaysExcludeEmptyVariables
     if isempty(overwaysIncludeEmptyVariables)
@@ -84,11 +107,6 @@ function colsToDrop = determineColsToDrop(T2)
     if isempty(overwaysExcludeEmptyVariables)
         overwaysExcludeEmptyVariables = false;
     end
-    
-    % Merge only data with specified variable continuity (which is used for
-    % filling empty entries in non-matching rows when syncing).
-    colsToDrop = ismember(T2.Properties.VariableContinuity,{'unset','event'});
-    
     % Let user choose what to do with columns that only contains missing values
     emptyCols = find(all(ismissing(T2)));
     for i=1:numel(emptyCols)
@@ -103,7 +121,7 @@ function colsToDrop = determineColsToDrop(T2)
         end
         
         varName = T2.Properties.VariableNames{emptyCols(i)};
-        msg = sprintf('\nColumn %s contain only missing data',varName);
+        warning(sprintf('Column %s contain only missing data',varName));
         opts = {
             'Include'
             'Include, always'
@@ -125,8 +143,6 @@ function colsToDrop = determineColsToDrop(T2)
         
         % if cancelled in GUI
         if not(response), return; end
-        
-        
+           
     end
 end
-    

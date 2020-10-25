@@ -12,7 +12,8 @@ function notes = qc_notes_ver4(notes)
         
     notChrono_ind = check_chronological_time(notes);
     [natPause_inds, natPart_inds] = check_missing_time(notes);
-    undefCat_inds = check_missing_part(notes);
+    irregularParts_ind = check_irregular_parts(notes);
+    undefCat_inds = check_missing_essential_info(notes);
     
     if any(notChrono_ind | natPause_inds | natPart_inds | undefCat_inds)
         notes = ask_to_reinit(notes);
@@ -36,6 +37,13 @@ function notes = ask_to_reinit(notes)
     elseif answer==3
         abort;
     end
+
+function irregularParts_ind = check_irregular_parts(notes)
+    notes_parts = notes(notes.part~='-',:);
+    parts = str2double(string(notes_parts.part));
+    irregularParts_ind = find(diff(parts)<0)+1;
+    fprintf('\nIrregular decreasing parts numbering found:\n\n')
+    notes_parts(irregularParts_ind,:)
     
 function notChrono_ind = check_chronological_time(notes)
     % Get and display note (set of) rows for which the time is not increasing
@@ -54,17 +62,24 @@ function notChrono_ind = check_chronological_time(notes)
         fprintf('\nAll time stamps are chronological')
     end
 
-function [natPause_inds, natPart_inds] = check_missing_time(notes)
+function [natPauseStart_inds, natPart_inds] = check_missing_time(notes)
     % Get and display essiential note rows with missing time stamps
     
-    natPause_inds = isnat(notes.time) & notes.intervType=='Pause';
-    natPart_inds = isnat(notes.time) & notes.part~='-'; 
-    if any(natPause_inds)
-        fprintf('\nTimestamps missing for Pause notes:\n\n')
-        missing_pause_timestamps = notes(natPause_inds,:);
+    natPause_rows = find(isnat(notes.time) & notes.intervType=='Pause');
+    first_part_row = find(notes.part~='-',1,'first');
+    natPause_rows = natPause_rows(natPause_rows>first_part_row);
+    natPauseStart_rows = natPause_rows(notes.intervType(natPause_rows-1)~='Pause');
+    
+    if any(natPauseStart_rows)
+        fprintf('\nTimestamps missing for start of pauses:\n\n')
+        missing_pause_timestamps = notes(natPauseStart_rows,:);
         disp(missing_pause_timestamps)
         %openvar missing_pause_timestamps
     end
+    natPauseStart_inds = false(height(notes),1);
+    natPauseStart_inds(natPauseStart_rows)=true;
+    
+    natPart_inds = isnat(notes.time) & notes.part~='-';
     if any(natPart_inds)
         fprintf('\nTimestamps missing for Part notes:\n\n')
         missing_part_timestamps = notes(natPart_inds,:);
@@ -76,7 +91,7 @@ function [natPause_inds, natPart_inds] = check_missing_time(notes)
         fprintf('\nNo missing time stamps.')
     end
     
-function undefCat_inds = check_missing_part(notes)
+function undefCat_inds = check_missing_essential_info(notes)
     % Get and display rows with missing essential categoric info
     
     % NOTE: If OO, then this is notes object property

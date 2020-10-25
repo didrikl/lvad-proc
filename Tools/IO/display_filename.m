@@ -63,4 +63,7 @@ function str = display_filename(names,path,msg,indent)
     
     if nargout==0
         fprintf([strrep(str,'\','\\'),'\n'])
+    else
+        % Remove empty line, in case only path is displayed with no names
+        str = strip(str);
     end

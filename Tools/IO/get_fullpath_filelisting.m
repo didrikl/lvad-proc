@@ -1,4 +1,4 @@
-function files = get_fullpath_filelisting(pattern,filter)
+function files = get_fullpath_filelisting(pattern,take_out_filter)
     % List files with full path. A pattern for what to list (like in Unix)
     % may be given as input. If not given, all files, in all durdirectories, 
     % will be listed.
@@ -10,7 +10,8 @@ function files = get_fullpath_filelisting(pattern,filter)
     %            separately from this function.)
     
     if nargin<1, pattern = '**/*'; end
-    if nargin<2, filter={'..','.'}; end
+    if nargin<2, take_out_filter={'..','.'}; end
+    %if nargin<3, keep_filter=...; end
     
     listing_struct = dir(pattern);
     if isempty(listing_struct) 
@@ -19,7 +20,7 @@ function files = get_fullpath_filelisting(pattern,filter)
     end
     
     % Apply filter
-    filter_inds = ismember({listing_struct(:).name}',filter);
+    filter_inds = ismember({listing_struct(:).name}',take_out_filter);
     listing_struct = listing_struct(not(filter_inds));
     
     listing_table = struct2table(listing_struct);

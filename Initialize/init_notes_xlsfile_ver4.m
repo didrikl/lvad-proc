@@ -27,14 +27,13 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
     % * Continuity is a status property, particularily useful when merging with 
     %   recorded data, c.f. timetable VariableContinuity documentation.  
     %   NB: Categoric type take a lot less memory to store
-    var_map = {    
-        ...   
+    var_map = {...  
         % Name in Excel           Name Matlab code     Type          Continuity
         'Date'                    'date'             'cell'          'event'
         'Timestamp'               'timestamp'        'cell'          'event'
         'Elapsed time'            'durTime'          'duration'      'continuous'
         'Timer'                   'timer'            'int16'         'event'
-        'X-ray no'                'xrayNo'           'int16'         'step'
+        'X-ray ser.'              'xraySer'          'int16'         'step'
         'Tag'                     'tag'              'cell'          'event'
         'Part'                    'part'             'categorical'   'step' 
         'Interval'                'intervType'       'categorical'   'step'
@@ -62,13 +61,13 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'Mean pulm. p'            'p_avgPulm'        'int16'         'step'
         'HR'                      'HR'               'int16'         'step'
         'CVP'                     'CVP'              'int16'         'step'
-        'Cardiac output'          'CO'               'int16'         'step'
+        'Cont. CO'                'CO_cont'          'int16'         'step'
         'SvO2'                    'SvO2'             'int16'         'step'
-        'Plan and preparations'   'plan_prep_notes'  'cell'          'event'
+        'Thermo. CO'             'CO_thermo'        'int16'         'step'
+        'Planned'                 'plan_prep_notes'  'cell'          'event'
         'Experiment'              'exper_notes'      'cell'          'event'
         'Quality control'         'QC_notes'         'cell'          'event'
         'Interval annotation'     'annotation'       'cell'          'event'
-        ...
         };
 
     % Columns to omit (not in use or always constant in the sequence)
@@ -80,12 +79,12 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'tag'
         'durTime'
         'timer'
-        'xrayNo'
+        'xraySer'
         'thrombusVol'
         'balloonDiam'
         'manometerCtrl'
         'Q_reduction'
-        'Q_noted'
+        %'Q_LVAD'
         'flowRedTarget'
         'affP_noted'
         'effP_noted'
@@ -99,7 +98,8 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'p_avgPulm'
         'HR'
         'CVP'
-        'CO'
+        'CO_cont'
+        'CO_thermo'
         'SvO2'
         'plan_prep_notes'
         'exper_notes'
@@ -146,7 +146,7 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'Sheet',notes_sheet,...
         'Range',varUnits_range,...
         'ReadVariableNames',false,...
-        'basic', true))';
+        'basic', true));
     varNames_controlled = table2cell(readtable(filePath,...
         'Sheet',notes_sheet,...
         'Range',varsNames_controlled_range,...
@@ -172,7 +172,11 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
     [notes, inFile_ind] = ...
         map_varnames(notes, varNames_xls, varNames_mat);
     var_map = var_map(inFile_ind,:);
-    varUnits = varUnits(inFile_ind);
+    
+    % Will not work when there is mismatch in actual columns and varmap
+    % TODO: fix this
+    %varUnits = varUnits(find(inFile_ind));
+    
     varNames_xls = var_map(:,1);
     
     % Update and add variable metadata
@@ -180,7 +184,7 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
     
     % Variable metadata, just descriptions
     notes.Properties.VariableDescriptions = varNames_xls;
-    notes.Properties.VariableUnits = erase(string(varUnits),{'(',')'});
+    %notes.Properties.VariableUnits = erase(string(varUnits),{'(',')'});
     
     % Variable metadata used for populating non-matched rows for syncing/fusion
     notes = addprop(notes,{'Controlled','Measured'},{'variable','variable'}); 
@@ -236,8 +240,11 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
     
     % TODO: Move add_event_range to notes_qc and/or init_feats
     intervTypesToIncludeinEventRange = {'steady','baseline'};
+    try
     notes = add_event_range(notes, intervTypesToIncludeinEventRange);
-    
+    catch
+        warning('Something went wrong in creating the event interval ranges')
+    end
     notes = add_note_row_id(notes, n_header_lines);
     
     

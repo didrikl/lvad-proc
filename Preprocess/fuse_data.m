@@ -22,9 +22,9 @@ function S = fuse_data(Notes,PL,US)
     block_inds = cell(n_files,1);
     for i=1:n_files
         
-        fprintf('\n<strong>PowerLab file no %d: </strong>\nFilename: %s\n',...
-            i,PL{i}.Properties.UserData.FileName)
-        
+        fprintf('\n<strong>PowerLab file (no %d/%d): </strong>\nFilename: %s\n',...
+            i,n_files,PL{i}.Properties.UserData.FileName)
+
         [Blocks, block_inds] = determine_notes_block(Notes,PL{i},i,n_files,Blocks,block_inds);
         
         
@@ -39,7 +39,9 @@ function S = fuse_data(Notes,PL,US)
             PL{i} = PL{i}(PL{i}.time>=Blocks{i}.time(1) & ...
                 PL{i}.time<=Blocks{i}.time(end),:);
         end
-        PL{i} = fuse_timetables(PL{i},Blocks{i});
+        PL_i = PL{i};
+        B_i = Blocks{i};
+        PL{i} = fuse_timetables(PL_i,B_i);
         
         
         

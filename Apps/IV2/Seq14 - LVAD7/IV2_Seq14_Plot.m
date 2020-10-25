@@ -1,32 +1,34 @@
 close all
 clear check_var_input_from_table
-seq_no = 2;
+seq_no = 14;
 
 % Calculation settings
 sampleRate = 700;
 
-orderMapVar = 'accA_norm';
-mapColScale = [-85,-45];
-circ_ylim = [-90,50];
+orderMapVar = 'accA_x';
+mapColScale = [-85,-40];
+mapOrderLim = [0,5.25];
+circ_ylim = [-55,5];
            
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {[8]};
+parts = {2,3,4,5};
 cbl_part = [];
+
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
 if numel(rpm)==0, rpm = cell(numel(parts),1); end
     
 for i=1:numel(parts)
     welcome(['Part(s) ',num2str(parts{i})],'iteration')
-    tic
+    
     [T,rpms] = make_plot_data(parts{i},S_parts,rpm{i},sampleRate,bl_part,cbl_part);
-    toc
+    T2 = T(T.intervType=='Transitional',:);
     h_fig = plot_ordermap_with_vars(...
-        T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim);
+        T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim,mapOrderLim);
 
-    save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
+    %save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
     
 end
 
@@ -44,7 +46,7 @@ function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms, seq_no)
         seq_no,mat2str(rpms),catheter,orderMapVar,mat2str(parts));
     set(h_fig,'Name',fig_name);
     
-    save_figure([save_path,'\Figures'], fig_name, resolution)
+    %save_figure([save_path,'\Figures'], fig_name, resolution)
 end
 
 function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
@@ -59,7 +61,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         rpm = unique(T2.pumpSpeed);
     end
     T = T(ismember(T.pumpSpeed,rpm),:);
-    T = T(not(contains(string(T.event),'clamp start')),:);
+    %T = T(not(contains(string(T.event),'clamp start')),:);
     
     % Keep only steady or baseline denoted row in the baseline parts
     T(contains(string(T.part),string([bl_part,cbl_part])) & ...
@@ -110,22 +112,22 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         T.accA_norm_mpf(range) = freq{k};
         T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
         
-        Q = T.graftQ;
-        P = T.effP_movAvg;
-        T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
-        T.P_shift = 100*(P-mean(P(bl_inds),'omitnan'))/mean(P(bl_inds),'omitnan');
-        T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
+        %Q = mean([T.affQ,T.effQ],2);
+        P = mean([T.effP,T.affP],2);
+        %T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
+        T.P_shift = -100*(P-mean(P(bl_inds),'omitnan'))/mean(P(bl_inds),'omitnan');
+        %T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
         T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');
         
         T.accA_norm_std_shift = -100*(T.accA_norm_std-mean(T.accA_norm_std(bl_inds)))/mean(T.accA_norm_std(bl_inds));
         T.accA_norm_movStd_shift = -100*(T.accA_norm_movStd-mean(T.accA_norm_movStd(bl_inds),'omitnan'))/mean(T.accA_norm_movStd(bl_inds),'omitnan');
-        T.accA_x_std_shift = -100*(T.accA_x_std-mean(T.accA_x_std(bl_inds)))/mean(T.accA_x_std(bl_inds));
-        T.accA_x_movStd_shift = -100*(T.accA_x_movStd-mean(T.accA_x_movStd(bl_inds),'omitnan'))/mean(T.accA_x_movStd(bl_inds),'omitnan');
+        %T.accA_x_std_shift = -100*(T.accA_x_std-mean(T.accA_x_std(bl_inds)))/mean(T.accA_x_std(bl_inds));
+        %T.accA_x_movStd_shift = -100*(T.accA_x_movStd-mean(T.accA_x_movStd(bl_inds),'omitnan'))/mean(T.accA_x_movStd(bl_inds),'omitnan');
     
         T.accA_norm_rms_shift = -100*(T.accA_norm_rms-mean(T.accA_norm_rms(bl_inds)))/mean(T.accA_norm_rms(bl_inds));
         T.accA_norm_movRMS_shift = -100*(T.accA_norm_movRMS-mean(T.accA_norm_movRMS(bl_inds),'omitnan'))/mean(T.accA_norm_movRMS(bl_inds),'omitnan');
-        T.accA_x_rms_shift = -100*(T.accA_x_std-mean(T.accA_x_rms(bl_inds)))/mean(T.accA_x_rms(bl_inds));
-        T.accA_x_movRMS_shift = -100*(T.accA_x_movRMS-mean(T.accA_x_movRMS(bl_inds),'omitnan'))/mean(T.accA_x_movRMS(bl_inds),'omitnan');
+        %T.accA_x_rms_shift = -100*(T.accA_x_std-mean(T.accA_x_rms(bl_inds)))/mean(T.accA_x_rms(bl_inds));
+        %T.accA_x_movRMS_shift = -100*(T.accA_x_movRMS-mean(T.accA_x_movRMS(bl_inds),'omitnan'))/mean(T.accA_x_movRMS(bl_inds),'omitnan');
     
     end
     
@@ -135,11 +137,11 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
 end
 
 function [h_fig,map,order] = plot_ordermap_with_vars(...
-        T,orderMapVar,fs,bl_part,mapColScale,notes,circ_ylim)
+        T,orderMapVar,fs,bl_part,mapColScale,notes,circ_ylim,mapOrderLim)
 
     if nargin<4, bl_part = []; end
     if nargin<5, mapColScale = []; end
-    
+    if nargin<6, mapOrderLim = [0, 6.25]; end
     [map,order,rpm,map_time] = make_rpm_order_map(T,orderMapVar,fs,...
         'pumpSpeed', 0.02, 80); %
     T.t = seconds(T.time-T.time(1))+map_time(1);
@@ -155,7 +157,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     % TODO: Make this programatically determined
     specs.circ_ylim = circ_ylim;
     
-    specs.mapOrderLim = [0, 6.25];
+    specs.mapOrderLim = mapOrderLim;
     specs.mapColScale = mapColScale;
     specs.baseline_title = {
         'Units','data',...
@@ -583,18 +585,18 @@ function add_circulation(h,T)
         'Color',[0.52,0.07,0.67, 0.75],...
         'DisplayName','\itP\rm, graft');
     
-    plot(T.t,T.Q_ultrasound_shift,...
-        'LineWidth',0.5,...
-        'LineStyle','-',...
-        'Color',[0.04,0.37,0.37, 0.11],...
-        'HandleVisibility','off');
-    T.Q_ultrasound_shift(not(ss_rows)) = nan;
-    plot(T.t,T.Q_ultrasound_shift,...
-        'LineWidth',0.75,...
-        'LineStyle','-',...
-        'Color',[0.04,0.37,0.37, 0.75],...
-        'DisplayName','\itQ\rm, ultrasound');
-    
+%     plot(T.t,T.Q_ultrasound_shift,...
+%         'LineWidth',0.5,...
+%         'LineStyle','-',...
+%         'Color',[0.04,0.37,0.37, 0.11],...
+%         'HandleVisibility','off');
+%     T.Q_ultrasound_shift(not(ss_rows)) = nan;
+%     plot(T.t,T.Q_ultrasound_shift,...
+%         'LineWidth',0.75,...
+%         'LineStyle','-',...
+%         'Color',[0.04,0.37,0.37, 0.75],...
+%         'DisplayName','\itQ\rm, ultrasound');
+%     
 
     
     
@@ -667,24 +669,24 @@ function add_circulation(h,T)
         'Color',[0.9961,0.4961,0,1],...
         'HandleVisibility','off')
     
-    Q_LVAD_shift_ss = T.Q_LVAD_shift;
-    Q_LVAD_shift_ss(not(ss_rows)) = nan;
-    if all(isnan(Q_LVAD_shift_ss))
-        QVisability = 'off';
-    else
-        QVisability = 'on';
-    end
-    plot(T.t,Q_LVAD_shift_ss,...
-        'LineWidth',2,...
-        'LineStyle','-',...
-        'Color',[0.00,0.78,0.00,0.7],...
-        'HandleVisibility',QVisability,...
-        'DisplayName','\itQ\rm, monitor');
-    plot(T.t(ss_rows),T.Q_LVAD_shift(ss_rows),...
-        'LineWidth',1.5,...
-        'LineStyle',':',...
-        'Color',[0.00,0.78,0.00,0.5],...
-        'HandleVisibility','off');
+%     Q_LVAD_shift_ss = T.Q_LVAD_shift;
+%     Q_LVAD_shift_ss(not(ss_rows)) = nan;
+%     if all(isnan(Q_LVAD_shift_ss))
+%         QVisability = 'off';
+%     else
+%         QVisability = 'on';
+%     end
+%     plot(T.t,Q_LVAD_shift_ss,...
+%         'LineWidth',2,...
+%         'LineStyle','-',...
+%         'Color',[0.00,0.78,0.00,0.7],...
+%         'HandleVisibility',QVisability,...
+%         'DisplayName','\itQ\rm, monitor');
+%     plot(T.t(ss_rows),T.Q_LVAD_shift(ss_rows),...
+%         'LineWidth',1.5,...
+%         'LineStyle',':',...
+%         'Color',[0.00,0.78,0.00,0.5],...
+%         'HandleVisibility','off');
     
     
     
