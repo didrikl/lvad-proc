@@ -1,5 +1,5 @@
 %close all
-clear check_var_input_from_table
+clear check_table_var_input
 seq_no = 7;
 
 % Calculation settings
@@ -8,12 +8,12 @@ sampleRate = 700;
 orderMapVar = 'accA_norm';
 mapColScale = [-85,-30];
 mapOrderLim = [0,5.3];
-circ_ylim = [-90,55];
+circ_ylim = [-90,35];
            
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {8:16};
+parts = {16};
 %parts = {};
 cbl_part = [];
 
@@ -30,7 +30,7 @@ for i=1:numel(parts)
         T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim,mapOrderLim);
 
     save_path = 'C:\Data\IVS\Didrik\G1 - Simulated pre-pump and in situ thrombosis\Seq2 - LVAD2 - Pilot\Processed\Figures';
-    save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
+    %save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
     
 end
 
@@ -72,6 +72,8 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
     if height(T)==0
         warning('No rows in data parts %s, with RPM=%s',...
             mat2str(all_parts),mat2str(rpm));
+    elseif height(T)<T.Properties.SampleRate
+        warning('Data table is shorter than one second')
     end
     
     blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
@@ -90,6 +92,11 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
     for k=1:height(blocks)
         range = blocks.start_inds(k):blocks.end_inds(k);
         
+        if numel(range)<T.Properties.SampleRate
+            warning('Interval between is shorter than one second')
+            continue
+        end
+    
         % This is a workaround for bug
         if numel(range)==1, continue; end
         % TODO: Fix issue with numel(range)==1 in find_cat_block_inds instead. 
@@ -119,8 +126,8 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         Q = T.Q_graft;%mean([T.affQ,T.effQ],2);
         T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
         T.p_graft_shift = 100*(T.p_graft_movAvg-mean(T.p_graft(bl_inds),'omitnan'))/mean(T.p_graft(bl_inds),'omitnan');
-        %T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
-        %T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');
+        T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
+        T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');
         
         T.accA_norm_std_shift = -100*(T.accA_norm_std-mean(T.accA_norm_std(bl_inds)))/mean(T.accA_norm_std(bl_inds));
         T.accA_norm_movStd_shift = -100*(T.accA_norm_movStd-mean(T.accA_norm_movStd(bl_inds),'omitnan'))/mean(T.accA_norm_movStd(bl_inds),'omitnan');
@@ -176,7 +183,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
         'Color', [.85 .85 .85]};
     specs.bal_lev_bar = {
         'LineStyle','-',...
-        'LineWidth',9,...
+        'LineWidth',8,...
         'Marker','none',...
         'Color', [0.96,0.68,0.68]}; 
     specs.trans_lev_bar = {
@@ -229,10 +236,10 @@ function [h_fig,h_ax] = init_axes_layout
     ax_xPos = 0.075;
     ax_width = 0.72;
     ax_yGap = 0.0037;
-    bar_height = 0.045;
+    bar_height = 0.070;
     xLab_space = 0.035;
     
-    ax_height(3) = 0.5;
+    ax_height(3) = 0.48;
     ax_yPos(3) = xLab_space;
     
 %     ax_height(3) = 0.15;
@@ -657,43 +664,43 @@ function add_circulation(h,T)
         'DisplayName','SD_{|(x,y,z)|}^{*}, mov. 15sec');
     
     
-%     P_LVAD_shift_ss = T.P_LVAD_shift;
-%     P_LVAD_shift_ss(not(ss_rows)) = nan;
-%     if all(isnan(P_LVAD_shift_ss))
-%         powVisability = 'off';
-%     else
-%         powVisability = 'on';
-%     end
-%     plot(T.t,P_LVAD_shift_ss,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',[0.9961,0.4961,0,1],...
-%         'HandleVisibility',powVisability,...
-%         'DisplayName','Power, monitor')
-%     plot(T.t(ss_rows),T.P_LVAD_shift(ss_rows),...
-%         'LineWidth',1.5,...
-%         'LineStyle',':',...
-%         'Color',[0.9961,0.4961,0,0.5],...
-%         'HandleVisibility','off')
-%     
-%     Q_LVAD_shift_ss = T.Q_LVAD_shift;
-%     Q_LVAD_shift_ss(not(ss_rows)) = nan;
-%     if all(isnan(Q_LVAD_shift_ss))
-%         QVisability = 'off';
-%     else
-%         QVisability = 'on';
-%     end
-%     plot(T.t,Q_LVAD_shift_ss,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',[0.00,0.78,0.00,0.7],...
-%         'HandleVisibility',QVisability,...
-%         'DisplayName','\itQ\rm, monitor');
-%     plot(T.t(ss_rows),T.Q_LVAD_shift(ss_rows),...
-%         'LineWidth',1.5,...
-%         'LineStyle',':',...
-%         'Color',[0.00,0.78,0.00,0.5],...
-%         'HandleVisibility','off');
+    P_LVAD_shift_ss = T.P_LVAD_shift;
+    P_LVAD_shift_ss(not(ss_rows)) = nan;
+    if all(isnan(P_LVAD_shift_ss))
+        powVisability = 'off';
+    else
+        powVisability = 'on';
+    end
+    plot(T.t,P_LVAD_shift_ss,...
+        'LineWidth',2,...
+        'LineStyle','-',...
+        'Color',[0.9961,0.4961,0,1],...
+        'HandleVisibility',powVisability,...
+        'DisplayName','Power, monitor')
+    plot(T.t(ss_rows),T.P_LVAD_shift(ss_rows),...
+        'LineWidth',1.5,...
+        'LineStyle',':',...
+        'Color',[0.9961,0.4961,0,0.5],...
+        'HandleVisibility','off')
+    
+    Q_LVAD_shift_ss = T.Q_LVAD_shift;
+    Q_LVAD_shift_ss(not(ss_rows)) = nan;
+    if all(isnan(Q_LVAD_shift_ss))
+        QVisability = 'off';
+    else
+        QVisability = 'on';
+    end
+    plot(T.t,Q_LVAD_shift_ss,...
+        'LineWidth',2,...
+        'LineStyle','-',...
+        'Color',[0.00,0.78,0.00,0.7],...
+        'HandleVisibility',QVisability,...
+        'DisplayName','\itQ\rm, monitor');
+    plot(T.t(ss_rows),T.Q_LVAD_shift(ss_rows),...
+        'LineWidth',1.5,...
+        'LineStyle',':',...
+        'Color',[0.00,0.78,0.00,0.5],...
+        'HandleVisibility','off');
     
     
     
@@ -741,7 +748,16 @@ function adjust_axes(h_ax)
     xlims = xlim(h_ax(end));
 %    h_ax(end).XTick = seconds(120:120:xlims(2)-60);
 %    xtickformat(h_ax(end),'mm:ss')
+totHDur = diff(xlims)/60;
+if totHDur<30
     h_ax(end).XTick = 60:60:xlims(2);
+elseif totHDur>=30 && totHDur<60
+    h_ax(end).XTick = 60:120:xlims(2);
+elseif totHDur>=60 && totHDur<120
+    h_ax(end).XTick = 60:180:xlims(2);
+elseif totHDur>=120 && totHDur<180
+    h_ax(end).XTick = 60:240:xlims(2);
+end
     %h_ax(end).XMinorTick = 'on';
     %Minor = 60:60:xlims(2);
     %h_ax(end).XTickLabel = durs/60

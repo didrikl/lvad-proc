@@ -35,7 +35,7 @@ rpm = [2300];
 colScale = [-100,-30];
 
 close all
-clear check_var_input_from_table
+clear check_table_var_input
 
 for i=1:numel(intervention_parts)
     

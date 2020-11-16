@@ -68,8 +68,8 @@ function [maxFreq,T] = check_sampling_rate(maxFreq,T)
 function [rpm_varName,map_varName] = check_table_cols(T,rpm_varName,map_varName)
     
     % Check existence of variables to use
-    rpm_varName = check_var_input_from_table(T, rpm_varName);
-    map_varName = check_var_input_from_table(T, map_varName);
+    rpm_varName = check_table_var_input(T, rpm_varName);
+    map_varName = check_table_var_input(T, map_varName);
     
 function T = check_missing_rpm_values(T,rpm_varName)
     

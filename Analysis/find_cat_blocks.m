@@ -31,7 +31,7 @@ function [blocks,vars] = find_cat_blocks(T,vars,sampleRate)
     blocks = struct;
     if height(T)==0, return; end
     
-    vars = check_var_input_from_table(T,vars);
+    vars = check_table_var_input(T,vars);
     vars = cellstr(vars);
     vars = vars(not(cellfun(@isempty,vars)));
     

@@ -1,11 +1,11 @@
 close all
-clear check_var_input_from_table
+clear check_table_var_input
 seq_no = 12;
 
 % Calculation settings
 sampleRate = 700;
 
-orderMapVar = 'accA_norm';
+orderMapVar = 'accA_x';
 mapColScale = [-85,-40];
 mapOrderLim = [0,5.25];
 circ_ylim = [-55,5];
@@ -13,7 +13,7 @@ circ_ylim = [-55,5];
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {6,7,8,9};
+parts = {30,31};
 cbl_part = [];
 
 
@@ -143,7 +143,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     if nargin<5, mapColScale = []; end
     if nargin<6, mapOrderLim = [0, 6.25]; end
     [map,order,rpm,map_time] = make_rpm_order_map(T,orderMapVar,fs,...
-        'pumpSpeed', 0.01, 80); %
+        'pumpSpeed', 0.02, 80); %
     T.t = seconds(T.time-T.time(1))+map_time(1);
     
     flow_ax = 4;

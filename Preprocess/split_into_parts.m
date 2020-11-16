@@ -37,4 +37,4 @@ function S_parts = split_into_parts(S)
     
     end
     
-    close(h_wait)
+    close2(h_wait)

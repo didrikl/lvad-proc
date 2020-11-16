@@ -7,12 +7,9 @@ function T_parts = add_spatial_norms(T_parts, p, compNames, newVarName)
     if nargin<2, p=2; end
     if nargin<3, compNames = {'accA_x','accA_y','accA_z'}; end
     if nargin<4
-        if p==1
-            newVarName = 'accA_1norm';
-        elseif p==2
-            newVarName = 'accA_norm';
-        else
-            newVarName = sprintf('accA_%snorm',p);
+        if p==1, newVarName = 'accA_1norm';
+        elseif p==2, newVarName = 'accA_norm';
+        else, newVarName = sprintf('accA_%snorm',p);
         end
     end
     
@@ -30,28 +27,27 @@ function T_parts = add_spatial_norms(T_parts, p, compNames, newVarName)
     end
     fprintf('\nInput\n\t%s\nOutput\n\t%s\n',strjoin(compNames,', '),newVarName);
     
-    T_parts = add_in_parts(T_parts,compNames,newVarName, p);
+    T_parts = add_in_parts(T_parts,compNames,newVarName,p);
+    T_parts = convert_to_single(T_parts,newVarName);
     
-    clear clear check_var_output_to_table
-    clear clear check_var_input_to_table
+    clear check_table_var_output check_table_var_input
     
     
 function T_parts = add_in_parts(T_parts,inputVarNames, outputVarName, p)
     % NOTE: This function could e.g. be made generic or common in master class.
     % Function handle can then be passed as input
-    
     for i=1:numel(T_parts)
         
         if height(T_parts{i})==0, continue; end
         
+        inputVarNames = check_table_var_input(T_parts{i}, inputVarNames);
+        if any(cellfun(@isempty,inputVarNames))
+            fprintf('%s is not added in part %d\n',outputVarName,i)
+            continue;
+        end
+        outputVarName = check_table_var_output(T_parts{i}, outputVarName);
+        if isempty(outputVarName), continue; end
+        
         T_parts{i} = calc_spatial_norm(T_parts{i},inputVarNames, outputVarName, p);
         
-        % Filter out the DC component (e.g. gravity and linear drift)
-        %S_parts{i}.(outputVarName) = detrend(S_parts{i}.(outputVarName));
-        
     end
-    
-    T_parts = convert_to_single(T_parts,outputVarName);
-    
-    
-    

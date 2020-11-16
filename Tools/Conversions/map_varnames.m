@@ -5,8 +5,8 @@ function [T,inFile_inds] = map_varnames(T,varNamesInFile,varNamesInCode)
     % Handle uncovered columns in map (i.e. extra columns in file are removed)
     missingVarsInCode = varNamesInT(not(ismember(varNamesInT,varNamesInFile)));
     if numel(missingVarsInCode)>0
-        warning('\n\tMissing variable(s) in code for variable mapping:\n\t\t%s',...
-            strjoin(missingVarsInCode,', '));
+        warning(sprintf('\n\tVariables in file, but not in variable mapping:\n\t\t%s',...
+            strjoin(missingVarsInCode,', ')));
         T(:,missingVarsInCode) = [];
     end
     
@@ -14,11 +14,9 @@ function [T,inFile_inds] = map_varnames(T,varNamesInFile,varNamesInCode)
     inFile_inds = ismember(varNamesInFile,varNamesInT);
     if any(not(inFile_inds))
         missingVarsInFile = varNamesInCode(not(ismember(varNamesInFile,varNamesInT)));
-        warning(sprintf(['\n\tMissing variable(s) in file for mapping:'...
-            '\n\t\t',strjoin(missingVarsInFile,', ')]))
+        warning(sprintf('\n\tVariables in variable mapping, but not in file:\n\t\t%s\n',...
+            strjoin(missingVarsInFile,', ')));
     end
     
-    %NOTE: Can make UI and OO
-
-    T.Properties.VariableNames =  varNamesInCode(inFile_inds);% varNamesInCode(ismember(varNamesInFile,varNamesInT));
+    T.Properties.VariableNames =  varNamesInCode(inFile_inds);
     

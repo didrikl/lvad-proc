@@ -27,11 +27,11 @@ function feats = make_feature_windows(T, feats, qc_event_type, plot_vars, search
         search_varName = {'accNorm_movStd_lvad_signal','accNorm_movRMS_lvad_signal'};      
     end
         
-    search_varName = check_var_input_from_table(T, search_varName);
-    sub1_y_var = check_var_input_from_table(T,sub1_y_var);
-    sub1_yy_var = check_var_input_from_table(T,sub1_yy_var);
-    sub2_y_var = check_var_input_from_table(T,sub2_y_var);
-    sub2_yy_var = check_var_input_from_table(T,sub2_yy_var);
+    search_varName = check_table_var_input(T, search_varName);
+    sub1_y_var = check_table_var_input(T,sub1_y_var);
+    sub1_yy_var = check_table_var_input(T,sub1_yy_var);
+    sub2_y_var = check_table_var_input(T,sub2_y_var);
+    sub2_yy_var = check_table_var_input(T,sub2_yy_var);
     
     % More specified window for the feature, to be adjusted in quality control.
     % Start with using the window to be equal to the precursor window

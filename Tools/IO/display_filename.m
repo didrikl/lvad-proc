@@ -12,7 +12,7 @@ function str = display_filename(names,path,msg,indent)
         msg = '';
     end
     if nargin<4
-        indent = '\t';
+        indent = '';
     end
     
     [names,path,msg] = convertStringsToChars(names,path,msg);

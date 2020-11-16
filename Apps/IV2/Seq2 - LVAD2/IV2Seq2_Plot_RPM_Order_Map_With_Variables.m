@@ -1,6 +1,6 @@
 %Init_IV2_Seq2
 close all
-clear check_var_input_from_table
+clear check_table_var_input
 
 % Graphics settings
 resolution = 300;

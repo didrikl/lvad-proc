@@ -22,7 +22,7 @@ powerlab_fileNames = fullfile('Recorded','PowerLab',powerlab_fileNames);
 
 testFs_sampleRate = 1000;
 
-testFs_PL = init_powerlab_raw_matfiles(powerlab_fileNames,raw_basePath);
+testFs_PL = init_labchart_mat_files(powerlab_fileNames,raw_basePath);
 testFs_notes = init_notes_xlsfile_v3_2(testFs_notes_fileName,raw_basePath);
 
 %% Pre-processing of data from IV2_Seq1
@@ -64,7 +64,7 @@ notes_filePath = fullfile(notes_subdir,IV2S1_notes_fileName);
 
 IV2S1_sampleRate = 1000;
 
-IV2S1_PL = init_powerlab_raw_matfiles(powerlab_fileNames,raw_basePath);
+IV2S1_PL = init_labchart_mat_files(powerlab_fileNames,raw_basePath);
 IV2S1_US = init_m3_raw_textfile(IV2S1_ultrasound_fileNames,raw_basePath);
 IV2S1_notes = init_notes_xlsfile_v3_2(notes_filePath);
 

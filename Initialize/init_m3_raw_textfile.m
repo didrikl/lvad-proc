@@ -2,7 +2,7 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
     
     %
     % TODO: Make one generic function to initialize blocks, that can be used for
-    % init_powerlab_raw_matfiles too
+    % init_labchart_mat_files too
     %
     
     if nargin==1, path = ''; end

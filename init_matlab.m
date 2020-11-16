@@ -10,7 +10,7 @@ addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 home
  
 % Close all figures
-close all;
+%close all;
 
 % Clear function so that persistent variables defined within these are cleared
 clear Save_Table Save_Figure

@@ -1,20 +1,23 @@
-function varName = check_var_output_to_table(signal, varName)
+function varName = check_table_var_output(signal, varName)
     
     persistent always_overwrite
     if isempty(always_overwrite), always_overwrite = false; end
-    persistent always_skip
-    if isempty(always_skip), always_skip = false; end
+    persistent always_keep
+    if isempty(always_keep), always_keep = false; end
     
     if ismember(varName,signal.Properties.VariableNames)
         
-        msg = sprintf('\tOutput variable: %s already exist',varName);
+        fprintf('\nOutput variable %s already exist\n',varName);
         
         if always_overwrite
-            varName = '';
+            warning(sprintf(['Always overwrite existing',...
+                    ' (Type "clear check_table_var_input" to reset)']));
             return
         end
-        if always_skip
+        if always_keep
             varName = '';
+            warning(sprintf(['Always keep existing',...
+                    ' (Type "clear check_table_var_input" to reset)']));
             return
         end
         
@@ -25,23 +28,19 @@ function varName = check_var_output_to_table(signal, varName)
             'Overwrite, always'
             'Abort'
             };
-        response = ask_list_ui(opts,msg);
+        response = ask_list_ui(opts,'');
         
         if response==1
              varName = '';
              
         elseif response==2
-            always_skip = true;
+            always_keep = true;
             varName = '';
-            fprintf('\n\tExisting variable is kept');
-            fprintf('\n\t(Type "clear check_var_output_to_table" to reset.)\n')
             
         elseif response==3
             
         elseif response==4
-            always_skip = true;
-            fprintf('\n\tExisting variable is always overwritten');
-            fprintf('\n\t(Type "clear check_var_output_to_table" to reset.)\n')
+            always_overwrite = true;
             
         elseif response==5
             abort; 

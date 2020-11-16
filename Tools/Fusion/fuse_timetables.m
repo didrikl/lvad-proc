@@ -21,14 +21,24 @@ function T = fuse_timetables(T1,T2,varargin)
         fprintf('\n')
         T_name = inputname(1);
         if isempty(T_name), T_name = 'First (left) table'; end
-        warning([class(T1),' ',inputname(1),' is not sorted in time.'])
+        warning([class(T1),' ',T_name,' is not sorted in time.'])
     end
     if not(issorted(T2))
         fprintf('\n')
         T_name = inputname(2);
         if isempty(T_name), T_name = 'Second (right) table'; end
-        warning([class(T2),' ',inputname(2),' is not sorted in time.'])
+        warning([class(T2),' ',T_name,' is not sorted in time.'])
     end
+    
+%     isOverlapInT2 = T2.time<=T1.time(end);
+%     %tf = overlapsrange(T1,T2);
+%     %if any(tf)
+%     if any(isOverlapInT2)
+%         fprintf('\n')
+%         warning('Overlapping ranges ignored when fusing timetables')
+%         %T2(tf,:) = [];
+%         T2(isOverlapInT2,:) = [];
+%     end
     
     T = synchronize(T1,T2,varargin{:});
     

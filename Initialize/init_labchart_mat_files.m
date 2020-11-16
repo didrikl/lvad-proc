@@ -1,4 +1,4 @@
-function B = init_powerlab_raw_matfiles(fileNames,path,varMap)
+function B = init_labchart_mat_files(fileNames,path,varMap)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
     % as mat file from PowerLab's LabChart program.
@@ -11,9 +11,8 @@ function B = init_powerlab_raw_matfiles(fileNames,path,varMap)
     %
     % See also timetable
     
-   
     if nargin==1, path = ''; end
-    filePaths = fullfile(path,fileNames);
+    [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path);
     
     % Default viewing format of timestamps (not very important)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
@@ -21,90 +20,94 @@ function B = init_powerlab_raw_matfiles(fileNames,path,varMap)
     % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
     % for accelerometer a parent class and child class for cardiaccs. Could be
     % useful if different digital sampling boxes are used.
-    if nargin<3
-        varMap = {
-            % LabChart name  Matlab name  Target fs  Type        Continuity
-            'Trykk1'         'affP'       1000,      'single'    'continuous'
-            'Trykk2'         'effP'       1000,      'single'    'continuous'
-            'SensorAAccX'    'accA_x'     1000,      'numeric'   'continuous'
-            'SensorAAccY'    'accA_y'     1000,      'numeric'   'continuous'
-            'SensorAAccZ'    'accA_z'     1000,      'numeric'   'continuous'
-            'SensorBAccX'    'accB_x'     1000,      'numeric'   'continuous'
-            'SensorBAccY'    'accB_y'     1000,      'numeric'   'continuous'
-            'SensorBAccZ'    'accB_z'     1000,      'numeric'   'continuous'
-            };
+    
+    welcome('Initializing LabChart .mat files')
+    
+    % Initialization of Powerlab block(s), with support for block consisting 
+    % of having paralell files (with different LabChart channels)
+    nFiles = numel(fileNames);
+    B = cell(nFiles,1);
+    for i=1:nFiles
+        fprintf('\n<strong>File (no %d/%d): </strong>',i,nFiles)
+        display_filename(fileNames{i},paths{i});
+        
+        % if cell of parallell files
+        B{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
+        
+        if i>1
+            %[B,isPar] = check_parallell_ranges(B,i,fileNames);
+            [~, isOverlap] = overlapsrange(B{i},B{i-1});
+            if all(isOverlap)
+                B{i}=[B{i-1},B{i}];
+                B{i-1} = [];
+            end
+        end
+        
     end
     
-    welcome('Initializing PowerLab')
-    
-    % Initialization of Powerlab block file(s)
-    B = cell(numel(fileNames),1);
-    for i=1:numel(fileNames)
-        
-        fileNames{i} = ensure_filename_extension(fileNames{i}, 'mat');
-        display_filename(fileNames{i});
-        B{i} = read_signal_file(filePaths{i},timestampFmt);
-        
-        % TODO: Check for overlap with already read data, in case double saving
-        % from LabChart. Ask to cut data in newest file from the start, or to
-        % remove file
-        
+    B = B(not(cellfun(@isempty,B)));
+    nBlocks = numel(B);
+    for i=1:nBlocks
+        % Check for overlapping ranges of already initialized files
+        B = check_overlapping_blocks(B,i,fileNames);
+             
+        % Keep only user-specified variables 
         [B{i},inFile_inds] = map_varnames(B{i}, varMap(:,1), varMap(:,2));
-        varMap = varMap(inFile_inds,:);
-        
-        % Storing info about sensors (metadata for each variable)
-        B{i} = addprop(B{i},'SensorSampleRate','variable');
-        channels_in_use = ismember(B{i}.Properties.VariableNames,varMap(:,2));
-        B{i}.Properties.CustomProperties.SensorSampleRate(channels_in_use) = varMap{:,3};
-        
-%         % Gather 3 components as one variable (convenient when all 3 components
-%         % are arguments in combination with other inputs, and also when viewing)
-%         B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
-%         B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
-%         B{i} = spatial_comp_as_vector(B{i},{'gyrA_x','gyrA_y','gyrA_z'},'gyrA');
-%         B{i} = spatial_comp_as_vector(B{i},{'gyrB_x','gyrB_y','gyrB_z'},'gyrB');
-        
-        % All variables shall be treated as continous and measured in data fusion
-        B{i} = addprop(B{i},'Measured','variable');
-        B{i}.Properties.CustomProperties.Measured(:) = true;
-        B{i}.Properties.VariableContinuity = varMap(:,5);
-        
-        B{i}.Properties.DimensionNames{1} = 'time'; 
-        B{i}.Properties.DimensionNames{2} = 'variables'; 
+
+        % User-specified metadata for how data fusion shall be done 
+        B{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
         
         % Convert to specified numeric format (e.g. pressure as single)
-        B{i} = convert_columns(B{i},varMap(:,4));
-        
-    end   
+        B{i} = convert_columns(B{i},varMap(inFile_inds,3));
 
+        % Gather 3 components as one variable (convenient when all 3 components
+        % are arguments in combination with other inputs, and also when viewing)
+        %B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
+        %B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
+        
+    end
+      
+function B = check_overlapping_blocks(B,i,fileNames)
+    for ii=1:i-1
+        [isOverlap,overlapRows] = overlapsrange(B{i},B{ii});
+        if any(isOverlap)
+            overlap_range = string(...
+                B{ii}.time(find(overlapRows,1,'last'))...
+                -B{ii}.time(find(overlapRows,1,'first')));
+            warning(sprintf([...
+                '\n\tFile overlaps %s (%d time samples) with file %s.',...
+                '\n\tOverlapping ranges are only keep from the first file'],...
+                overlap_range,nnz(overlapRows),fileNames{ii}));
+            B{ii}(overlapRows,:) = [];
+        end
+    end
+
+
+function T = read_signal_file_into_table(filePath,timestamp_fmt)    
     
-function T_block = read_signal_file(filePath,timestamp_fmt)    
-    
+    % New waitbar for each file; progress updates per column
+    % TODO: Change to multiwaitbar in calling function, and handle passed as
+    % function argument
+    [~,fileName,~] = fileparts(filePath);
+    progress = 0;
+    h_wait = waitbar(progress,['Initializing: ',strrep(fileName,'_','\_'),'.mat']);
     
     % Read data with variable organized and accessible in a struct d
     raw = load('-mat', filePath);
     
-    % Parse raw metadata that are needed
+    % Parse metadata that are needed to construct a table
     [n_vars,n_intervals] = size(raw.datastart);
     varnames = genvarname(string(raw.titles));
-    %[col_unit,interv_units] = make_unit_string_arr(raw);
-    interv_lengths = raw.dataend-raw.datastart;
     interv_start_timestamps = datetime(raw.blocktimes,...
         'ConvertFrom','datenum',...
         'Format',timestamp_fmt,...
         'TimeZone','Europe/Oslo');
-    % NOTE: Furhter development could include reading/parsing comments made
-    %       in PowerLab. 
     
-    % TODO: Change to multiwaitbar in calling function, and handle passed as
-    % function argument
+    interv_lengths = raw.dataend-raw.datastart;
     wait_complete = sum(sum(interv_lengths));
-    wait_progress = 0;
-    [~,fileName,~] = fileparts(filePath);
-    h_wait = waitbar(wait_progress,['Initializing: ',strrep(fileName,'_','\_'),'.mat']);
     
     for j=1:n_vars
-        
+       
         % Make each variable recorded as a timetable
         col = timetable;
         
@@ -116,10 +119,13 @@ function T_block = read_signal_file(filePath,timestamp_fmt)
                 'intervals for variable ',varnames{j}])
         end
         
+        % Let each interval per column (variable) be a timetable to allow for
+        % different samplerates among the different intervals
         for i=1:n_intervals
             
-            % Append column with new interval. There is no need to resample if
-            % the sample rates for each interval is not constant.
+            % Append column with new interval. There is no need to resample,
+            % if the sample rates for each interval is not constant do no not 
+            % result in unequal column lenght in output table. 
             col_interv = raw.data(raw.datastart(j,i):raw.dataend(j,i))';
             col_interv = timetable(col_interv,...
                 'SampleRate',raw.samplerate(j,i),...
@@ -128,11 +134,11 @@ function T_block = read_signal_file(filePath,timestamp_fmt)
             col = [col;col_interv];
             
             % Update progress represented in no of samples in the interval
-            wait_progress = wait_progress+(interv_lengths(j,i)/wait_complete);
-            waitbar(wait_progress,h_wait);
+            progress = progress+(interv_lengths(j,i)/wait_complete);
+            waitbar(progress,h_wait);
             
         end
-        
+               
         % Setting variable behaviour for merging and resampling (as in the
         % function append_signal_variable_column used below
         col.Properties.VariableContinuity = {'continuous'};
@@ -140,29 +146,36 @@ function T_block = read_signal_file(filePath,timestamp_fmt)
         % Append signal with new column. This requires that the samplerate for
         % each variable to be the same (at each separate interval).
         if j>1
-            T_block = append_signal_variable_column(T_block,col,...
+            T = append_signal_variable_column(T,col,...
                 raw.samplerate(j-1,:),raw.samplerate(j,:),varnames{j});
         else
-            T_block = col;
+            T = col;
         end
 
     end
     
-    % Variable metadata
-    % TODO: Move to calling code, and check for consistency for all blocks, for
-    % which units and descriptions are stored in userdata cell array.
-    %T_block.Properties.VariableUnits = col_unit;
-    T_block.Properties.VariableDescriptions = cellstr(raw.titles);
-        
-    % Store various/unstructured info (start with initializing standard info)
-    T_block.Properties.UserData = make_init_userdata(filePath);
-    T_block.Properties.UserData.Headers = cellstr(raw.titles);
-    %T_block.Properties.UserData.ColumnUnits = col_unit;
-    T_block.Properties.UserData.IntervalStartTimes = interv_start_timestamps;
-    %T_block.Properties.UserData.IntervalUnits = interv_units;
+    % Parse metadata to will be stored as table metadata
+    [col_unit,interv_units] = make_unit_string_arr(raw);
+    T.Properties.Description = 'PowerLab data recorded in LabChart';
+    T.Properties.DimensionNames{1} = 'time'; 
+    T.Properties.DimensionNames{2} = 'variables';
+    T.Properties.VariableUnits = cellstr(col_unit);
+    T.Properties.VariableDescriptions = cellstr(raw.titles);
+    T.Properties.UserData = make_init_userdata(filePath);
+    T.Properties.UserData.Headers = cellstr(raw.titles);
+    T.Properties.UserData.ColumnUnits = col_unit;
+    T.Properties.UserData.IntervalStartTimes = interv_start_timestamps;
+    T.Properties.UserData.IntervalUnits = interv_units;
+    T.Properties.UserData.Comments = make_comments_table(raw,T);
     
     close2(h_wait)
-  
+ 
+function comments = make_comments_table(raw,T)
+    comments = table;
+    comments.channel = raw.com(:,1);
+    comments.time = T.time(raw.com(:,3));
+    comments.text = raw.comtext;
+       
 function signal = append_signal_variable_column(signal,col,...
         signal_samplerates, col_samplerates, varname)
     % Compare signal and new variable column samplerates at each recording
@@ -174,9 +187,9 @@ function signal = append_signal_variable_column(signal,col,...
             && height(signal)==height(col)
         signal(:,varname) = col;
     else
-        % TODO: Consider using retime if samplerate differs, before appending.
+        % NOTE: Consider using retime if samplerate differs, before appending.
         % This requires some procedure to decide which samplerate to use, e.g.
-        % max or min samplerate. Or, find a better method....
+        % max or min samplerate.
         signal = synchronize(signal,col);
     end
 
@@ -188,14 +201,14 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
     vars = cellstr(raw.titles);
       
     [n_vars,n_interv] = size(unittextmap);
-    interv_units = repmat("",n_vars,n_interv);
-    col_units = repmat("",n_vars,1);
+    interv_units = repmat('',n_vars,n_interv);
+    col_units = repmat('',n_vars,1);
     for j=1:n_vars
         
         % Look up unit for each interval, if given
         for i=1:n_interv  
             if unittextmap(j,i)>0
-                interv_units(j,i) = unittext(unittextmap(j,i));
+                interv_units{j,i} = strip(unittext(unittextmap(j,i)));
             end
         end
 
@@ -223,9 +236,9 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
             end
       
         else
-
+            
             % Use the uniquely found unit for all recording intervals
-            col_units(j) = unittext(var_unit_no);
+            col_units{j} = unittext(var_unit_no);
        
         end
     

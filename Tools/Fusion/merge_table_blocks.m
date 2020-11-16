@@ -19,7 +19,11 @@ function T = merge_table_blocks(varargin)
     end
     
     T = blocks{1};
-    
+    if numel(T)==1
+        warning('No table block merging. There is only one table block')
+    elseif numel(T)==0
+        warning('No table block merging. There are no table blocks')
+    end
     for i=2:numel(blocks)
     
         if isempty(blocks{i})
@@ -40,6 +44,9 @@ function T = merge_table_blocks(varargin)
                
         [T, blocks{i}] = fill_in_missing_cols(T, blocks{i});
         T = [T;blocks{i}];
+        
+        % Save some memory
+        blocks{i}=[];
         
     end
     

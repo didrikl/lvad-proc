@@ -1,4 +1,4 @@
-function varNames = check_var_input_from_table(T, varNames)
+function varNames = check_table_var_input(T, varNames)
     
     persistent always_skip
     if isempty(always_skip), always_skip = false; end
@@ -14,13 +14,14 @@ function varNames = check_var_input_from_table(T, varNames)
 
         if not(ismember(varNames{i},T.Properties.VariableNames))
             
-            msg = sprintf('\n\tVariable: %s does not exist',varNames{i});
+            if i==1, fprintf('\n'); end
+            fprintf('Variable %s does not exist\n',varNames{i});
             
             if always_skip
-                fprintf('\n\tMissing variable is always skipped');
-                fprintf('\n\t(type "clear check_var_input_from_table" to reset)\n')
+                warning(sprintf(['Always skipped',...
+                    ' (Type "clear check_table_var_input" to reset)']));
                 varNames{i} = '';
-                return
+                continue
             end
             
             opts = {
@@ -29,15 +30,13 @@ function varNames = check_var_input_from_table(T, varNames)
                 'Select another name for input variable'
                 'Abort'
                 };
-            response = ask_list_ui(opts,msg);
+            response = ask_list_ui(opts,'');
             
             if response==1
                 varNames{i} = '';
                 
             elseif response==2
                 always_skip = true;
-                fprintf('\n\tMissing variables are always skipped');
-                fprintf('\n\t(Type "clear check_var_input_from_table" to reset)\n');
                 varNames{i} = '';
                 
             elseif response==3

@@ -1,6 +1,6 @@
 %Init_IV2_Seq3
 close all
-clear check_var_input_from_table
+clear check_table_var_input
 
 % Calculation settings
 sampleRate = 700;

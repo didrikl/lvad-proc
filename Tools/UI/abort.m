@@ -42,5 +42,6 @@ function abort(confirm,open_dlgbox)
         errordlg(dlg_msg,'Execution aborted')
     end
 
+    close2 all
     error(dlg_msg)
     

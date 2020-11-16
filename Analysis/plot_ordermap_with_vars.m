@@ -164,7 +164,7 @@ function blocks = add_cats_bar(h_ax,T,bars)
 function [T,orderMapVar,plotVars] = check_input_data(T,orderMapVar,plotVars)
     
     % Check of input variable names
-    orderMapVar = check_var_input_from_table(T, orderMapVar);
+    orderMapVar = check_table_var_input(T, orderMapVar);
 
     % Check of input variable values
     nanRows = isnan(T.(orderMapVar));
@@ -178,6 +178,6 @@ function [T,orderMapVar,plotVars] = check_input_data(T,orderMapVar,plotVars)
     end
     
     for i=1:numel(plotVars)
-        plotVars{i} = check_var_input_from_table(T, plotVars{i});
+        plotVars{i} = check_table_var_input(T, plotVars{i});
     end
     

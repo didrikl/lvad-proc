@@ -1,9 +1,9 @@
 close all
-clear check_var_input_from_table
+clear check_table_var_input
 seq_no = 7;
 
 % Calculation settings
-sampleRate = 1500;
+sampleRate = 700;
 
 orderMapVar = 'accA_norm';
 mapColScale = [-90,-30];
@@ -13,7 +13,7 @@ circ_ylim = [-95,5];
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {12, 13};
+parts = {[13]};
 cbl_part = [];
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
@@ -23,7 +23,6 @@ for i=1:numel(parts)
     welcome(['Part(s) ',num2str(parts{i})],'iteration')
     
     [T,rpms] = make_plot_data(parts{i},S_parts,rpm{i},sampleRate,bl_part,cbl_part);
-    T2 = T(T.intervType=='Transitional',:);
     h_fig = plot_ordermap_with_vars(...
         T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim,mapOrderLim);
 
@@ -142,7 +141,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
     if nargin<5, mapColScale = []; end
     if nargin<6, mapOrderLim = [0, 6.25]; end
     [map,order,rpm,map_time] = make_rpm_order_map(T,orderMapVar,fs,...
-        'pumpSpeed', 0.01, 80); %
+        'pumpSpeed', 0.02, 80); %
     T.t = seconds(T.time-T.time(1))+map_time(1);
     
     flow_ax = 4;

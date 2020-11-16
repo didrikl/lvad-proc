@@ -27,6 +27,8 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
     % * Continuity is a status property, particularily useful when merging with 
     %   recorded data, c.f. timetable VariableContinuity documentation.  
     %   NB: Categoric type take a lot less memory to store
+    %   NOTE: Must be listed in the same order as in Excel file.
+    %   TODO: Make more flexible wrt. list order
     var_map = {...  
         % Name in Excel           Name Matlab code     Type          Continuity
         'Date'                    'date'             'cell'          'event'
@@ -38,7 +40,8 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'Part'                    'part'             'categorical'   'step' 
         'Interval'                'intervType'       'categorical'   'step'
         'Event'                   'event'            'categorical'   'step'
-        'Injected thrombus vol.'  'thrombusVol'      'categorical'   'step'
+        'Inject thrombus vol.'    'thrombusVol'      'int16',        'step'
+        'Inject thrombus type'    'trhombusType'     'categorical'   'step'
         'Pump speed'              'pumpSpeed'        'int16'         'step'
         'Balloon level'           'balloonLevel'     'categorical'   'step'
         'Balloon diameter'        'balloonDiam'      'categorical'   'step'
@@ -55,16 +58,16 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'Flow'                    'Q_noted'          'single'        'step'
         'Max art. p'              'p_maxArt'         'int16'         'step'
         'Min art. p'              'p_minArt'         'int16'         'step'
-        'Mean art. p'             'p_avgArt'         'int16'         'step'
+        'MAP'                     'MAP'              'int16'         'step'
         'Max pulm. p'             'p_maxPulm'        'int16'         'step'
         'Min pulm. p'             'p_minPulm'        'int16'         'step'
-        'Mean pulm. p'            'p_avgPulm'        'int16'         'step'
         'HR'                      'HR'               'int16'         'step'
         'CVP'                     'CVP'              'int16'         'step'
-        'Cont. CO'                'CO_cont'          'int16'         'step'
         'SvO2'                    'SvO2'             'int16'         'step'
-        'Thermo. CO'             'CO_thermo'        'int16'         'step'
-        'Planned'                 'plan_prep_notes'  'cell'          'event'
+        'Cont. CO'                'CO_cont'          'int16'         'step'
+        'Thermo. CO'              'CO_thermo'        'int16'         'step'
+        'Hema-tocrit'             'HCT'              'int16'         'step'
+        'Procedure'               'procedure'        'cell'          'event'
         'Experiment'              'exper_notes'      'cell'          'event'
         'Quality control'         'QC_notes'         'cell'          'event'
         'Interval annotation'     'annotation'       'cell'          'event'
@@ -84,7 +87,7 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'balloonDiam'
         'manometerCtrl'
         'Q_reduction'
-        %'Q_LVAD'
+        'Q_noted'
         'flowRedTarget'
         'affP_noted'
         'effP_noted'
@@ -92,16 +95,16 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
         'balDiamEst'
         'p_maxArt'
         'p_minArt'
-        'p_avgArt'
-        'p_maxPulm'
+        'MAP'
         'p_minPulm'
-        'p_avgPulm'
+        'p_maxPulm'
         'HR'
+        'HCT'
         'CVP'
         'CO_cont'
         'CO_thermo'
         'SvO2'
-        'plan_prep_notes'
+        'Procedure'
         'exper_notes'
         'QC_notes'
         };
@@ -214,10 +217,10 @@ function notes = init_notes_xlsfile_ver4(fileName, read_path)
     % TODO: Move to separate function, to avoid derived columns before
     % resampling and merging processes
     if all(isnan(notes.durTime))
-        parts = unique(notes.part);
-        parts = parts(not(cellfun(@isempty,parts)));
+        parts = unique(notes.part,'sorted');
+        parts = parts(not(isnan(parts)));
         for i=1:numel(parts)
-            part_inds = ismember(notes.part,parts{i});
+            part_inds = notes.part==parts(i);
             part_start = notes.time(find(part_inds,1,'first'));
             notes.durTime(part_inds) = notes.time(part_inds) - part_start;
         end

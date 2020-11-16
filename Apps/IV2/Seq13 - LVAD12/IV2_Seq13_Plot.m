@@ -1,5 +1,5 @@
 close all
-clear check_var_input_from_table
+clear check_table_var_input
 seq_no = 13;
 
 % Calculation settings

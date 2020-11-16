@@ -1,4 +1,4 @@
-function S = fuse_data(Notes,PL,US)
+function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
     % fuse_data Fuse notes and ultrasound into PowerLab data
     %
     %    S = fuse_data(notes,PL,US)
@@ -6,6 +6,7 @@ function S = fuse_data(Notes,PL,US)
     % See also merge_table_blocks, fuse_timetables
     
     if nargin<3, US = table; end
+    if nargin<4, InclInterRowsInFusion=false; end
     
     welcome('Data fusion')
     
@@ -25,17 +26,17 @@ function S = fuse_data(Notes,PL,US)
         fprintf('\n<strong>PowerLab file (no %d/%d): </strong>\nFilename: %s\n',...
             i,n_files,PL{i}.Properties.UserData.FileName)
 
-        [Blocks, block_inds] = determine_notes_block(Notes,PL{i},i,n_files,Blocks,block_inds);
+        [Blocks, block_inds] = determine_notes_block(Notes,PL{i},i,n_files,Blocks,block_inds,InclInterRowsInFusion);
         
         
         % Union merging PowerLab timetable with notes
-        %fprintf('\n\nFusion with notes')
-        %         waitbar((2*i-1)/(2*n_files),h_wait,...
-        %             sprintf('PowerLab file %d/%d: Fusion with notes',i,n_files));
-    
         if isempty(Blocks{i})
             warning('No notes for PowerLab file')
         else
+            
+            % Check for overlapping blocks
+            % ...
+            
             PL{i} = PL{i}(PL{i}.time>=Blocks{i}.time(1) & ...
                 PL{i}.time<=Blocks{i}.time(end),:);
         end
@@ -53,71 +54,139 @@ function S = fuse_data(Notes,PL,US)
             warning('No ultrasound data for PowerLab file')
             continue;
         end
-        %         waitbar(2*i/(2*n_files),h_wait,...
-        %             sprintf('PowerLab file %d/%d: Fusion with ultrasound',i,n_files));
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
         PL{i} = fuse_timetables(PL{i},US_block);
         
         fprintf(newline)
     end
     
-    S = merge_table_blocks(PL);
-    
+    try
+        S = merge_table_blocks(PL);
+    catch
+        warning('Out of memory. Trying now with a cell array split...')
+        S1 = merge_table_blocks(PL(1:floor(n_files/2)));
+        PL(1:floor(n_files/2)) = [];
+        S2 = merge_table_blocks(PL);
+        S = merge_table_blocks(S1,S2);
+        clear S1 s2
+    end
+        
     clear fuse_timetables
     %    close(h_wait)
     
 end
 
-function [Block,block_inds] = determine_notes_block(Notes,PL,i,n_files,Block,block_inds)
+function [B,block_inds] = determine_notes_block(Notes,PL_i,i,n_files,B,block_inds,InclInterRowsInFusion)
     
-    opts = {'Include time for data fusion', 'Ignore time for data fusion'};
-
-    % Include notes before/after PL was started/stopped
-    % TODO: Check for previous iteration if there are intermediate gaps
-    % in notes and include the gaps
-    block_step = 0;
+    % NOTE: Make block_inds, B and i persitent variables instead?
+    
+    % Extract notes block associated with PL file
+    block_step = NaN;
     if n_files==1
         block_inds{i} = 1:height(Notes);
     elseif i==1
-        block_inds{i} = find(Notes.time<=PL.time(end));
+        block_inds{i} = find(Notes.time<=PL_i.time(end));
     elseif i==n_files
-        block_inds{i} = find(Notes.time>=PL.time(1));
+        block_inds{i} = find(Notes.time>=PL_i.time(1));
     else
-        block_inds{i} = find(Notes.time>=PL.time(1) & Notes.time<=PL.time(end));
-        block_step = block_inds{i}(1)-block_inds{i-1}(end);
-        
+        block_inds{i} = find(Notes.time>=PL_i.time(1) & Notes.time<=PL_i.time(end));
+        if numel(block_inds{i})==0
+            warning('No notes found for PowerLab data')
+            block_step = 1;      
+        else
+            block_step = block_inds{i}(1)-block_inds{i-1}(end);
+        end
     end
-    if block_step>1
-        exclNotes = block_inds{i-1}(end):block_inds{i}(1);
-        warning(sprintf('\nIntermediate note row(s) not within in any PowerLab file time ranges:\n\n'));
-        disp(Notes(exclNotes,:))
-%         resp = ask_list_ui(opts,sprintf('\nWhat to do with these intermediate note rows?'),1);
-%         if resp==1
-%             Block{i-1} = Notes([block_inds{i-1},exclNotes],:);
-%             Block{i} = Notes([exclNotes,block_inds{i}],:);
-%         end
-    end
-    Block{i} = Notes(block_inds{i},:);
+    B{i} = Notes(block_inds{i},:);
     
-    % Ask to include before/after PL was started/stopped, to get the full
-    % span from PL
-    preDataNotes = Block{i}.time<PL.time(1);
-    if any(preDataNotes)
-        warning(sprintf('\nNotes timestamp(s) exist before first timestamp in PowerLab data\n\n'));
-        disp(Block{i}(preDataNotes,:))
-        resp = ask_list_ui(opts,sprintf('\nWhat to do with notes before PowerLab recording?'),1);
-        if resp==2
-            Block{i} = Block{i}(not(preDataNotes),:);
-        end
+    % Ask to keep or clip block, in case there are notes outside PL time range
+    if i==1
+        B{i} = check_for_notes_before_PL(B{i},PL_i);
+    elseif i==n_files
+        B{i} = check_for_notes_after_PL(B{i},PL_i);
     end
-    postDataNotes = Block{i}.time>PL.time(end);
-    if any(postDataNotes)
-        warning(sprintf('\nNotes timestamp(s) exist after last timestamp in PowerLab data\n\n'));
-        disp(Block{i}(postDataNotes,:))
-        resp = ask_list_ui(opts,sprintf('\nWhat to do with notes after PowerLab recording?'),1);
-        if resp==2
-            Block{i} = Block{i}(not(postDataNotes),:);
-        end
+    
+    % Handle intermediate notes, in case LabChart was paused or there are some
+    % PowerLab files not being initialized 
+    if block_step>1
+        intermediateNotes = block_inds{i-1}(end):block_inds{i}(1);
+        warning(sprintf('\nIntermediate note row(s) not within in any PowerLab file time ranges:\n\n'));
+        disp(Notes(intermediateNotes,:))
+
+        % Ask if they also should be included (default is to exclude)
+        % msg = sprintf('\nWhat to do with these intermediate note rows?')
+        % resp = ask_list_ui(opts,msg,2);
+        % if resp==1
+        %     B{i-1} = Notes([block_inds{i-1},intermediateNotes],:);
+        %     B{i} = Notes([intermediateNotes,block_inds{i}],:);
+        % end
     end
+    
+    % Handle notes that are accosiated/assigned with more than one PowerLab file
+    if block_step<1
+        overlappingBlocks = block_inds{i-1}(end):block_inds{i}(1);
+        warning(sprintf('\nNote row(s) accosiated to multiple (overlapping) PowerLab files:\n\n'));
+        disp(Notes(overlappingBlocks,:))
+
+    end
+    
+    
     
 end
+
+function B = check_for_notes_before_PL(B,PL)
+    % Ask to include notes before PL was started, to either get the full
+    % span from PL, or to include other than PowerLab data
+    
+    preDataNotes_ind = find(B.time<PL.time(1));
+    if numel(preDataNotes_ind)>0
+        
+        warning(sprintf(['\nThere are %d timestamp(s) in Notes earlier than '...
+            'first timestamp in PowerLab data\n\n'],numel(preDataNotes_ind)));
+        
+        nearestNote_ind = preDataNotes_ind(end);
+        B = ask_to_include(B,preDataNotes_ind,nearestNote_ind);
+        
+    end    
+end
+
+function B = check_for_notes_after_PL(B,PL)
+    % Ask to include notes after PL was stopped, to either get the full
+    % span from PL, or to include other than PowerLab data
+    
+    postDataNotes_ind = find(B.time<PL.time(1));
+    if numel(postDataNotes_ind)>0
+        
+        warning(sprintf(['\nThere are %d timestamp(s) in Notes later than '...
+            'last timestamp in PowerLab data\n\n'],numel(postDataNotes_ind)));
+        nearestNote_ind = postDataNote_ind(1);
+        B = ask_to_include(B,postDataNotes_ind,nearestNote_ind);
+        
+    end    
+   
+end
+
+function B = ask_to_include(B,outsideNotes_ind,nearestNote_ind)
+    
+    disp(B(outsideNotes_ind,:))
+    
+    opts = {'Include all timestamps', 'Ignore'};
+    default=1;
+    if numel(outsideNotes_ind)>1
+        opts = [opts,'Include only the nearest timestamp'];
+        default=3;
+    end
+    
+    msg = sprintf('\nWhat to do with notes outside PowerLab time range?');
+    resp = ask_list_ui(opts,msg,default);
+    if resp==3
+        outsideNotes_ind(nearestNote_ind) = [];
+        B(outsideNotes_ind,:) = [];
+    elseif resp==2
+        B(outsideNotes_ind,:) = [];
+    end
+        
+end
+    
+    
+    

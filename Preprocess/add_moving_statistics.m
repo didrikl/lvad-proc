@@ -43,7 +43,7 @@ function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
     T_parts = convert_to_single(T_parts, rmsNames);
     T_parts = convert_to_single(T_parts, stdNames);
 
-    clear check_var_output_to_table
+    clear check_table_var_output
     clear check_var_input_to_table
     
     

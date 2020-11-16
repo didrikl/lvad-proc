@@ -46,14 +46,14 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
-    'Trykk1'         'affP'       1000       'single'    'continuous'
-    'Trykk2'         'effP'       1000       'single'    'continuous'
-    'SensorAAccX'    'accA_x'     1000       'numeric'   'continuous'
-    'SensorAAccY'    'accA_y'     1000       'numeric'   'continuous'
-    'SensorAAccZ'    'accA_z'     1000       'numeric'   'continuous'
-    %'SensorBAccX'    'accB_x'     1000       'numeric'   'continuous'
-    %'SensorBAccY'    'accB_y'     1000       'numeric'   'continuous'
-    %'SensorBAccZ'    'accB_z'     1000       'numeric'   'continuous'
+    'Trykk1'         'affP'        'single'    'continuous'
+    'Trykk2'         'effP'        'single'    'continuous'
+    'SensorAAccX'    'accA_x'      'single'    'continuous'
+    'SensorAAccY'    'accA_y'      'single'    'continuous'
+    'SensorAAccZ'    'accA_z'      'single'    'continuous'
+    %'SensorBAccX'    'accB_x'      'single'    'continuous'
+    %'SensorBAccY'    'accB_y'      'single'    'continuous'
+    %'SensorBAccZ'    'accB_z'      'single'    'continuous'
     };
 
 systemM_varMap = {
@@ -73,7 +73,7 @@ welcome('Initializing data','module')
 if load_workspace({'S_parts','notes','feats'}); return; end
 
 % Read PowerLab data in files exported from LabChart
-PL = init_powerlab_raw_matfiles(powerlab_filePaths,'',powerlab_variable_map);
+PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
 US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
