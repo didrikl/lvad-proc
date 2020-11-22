@@ -32,14 +32,13 @@ function notes = qc_notes_ver4(notes)
     
 function notes = ask_to_reinit(notes)
     % Pause and let user make changes in Excel and re-initialize
-    input(sprintf('\nHit a key to open notes sheet --> '));
+    %input(sprintf('\nHit a key to open notes sheet --> '));
     filePath = notes.Properties.UserData.FilePath;
     fileName = notes.Properties.UserData.FileName;
     winopen(filePath);
-    
     opts = {
-        ['Re-initialize, with same filename (',fileName,')']
-        'Re-initialize, with new filename'
+        ['Re-initialize, same filename (',fileName,')']
+        'Re-initialize, new filename'
         'Ignore'
         'Abort'
         };
@@ -58,17 +57,30 @@ function notes = ask_to_reinit(notes)
     elseif answer==4
         abort;
     end
-
+    
 function isIrregularParts = check_irregular_parts(notes)
+    % Part categories must be positive integer in increasing order, as they are
+    % used in creating cell array of timetables for each part, for which the
+    % indices would correspond to the part numbering.
+    
     notes_parts = notes(notes.part~='-',:);
     parts = str2double(string(notes_parts.part));
+    
     irregularParts_ind = find(diff(parts)<0)+1;
     if any(irregularParts_ind)
         fprintf('\nIrregular decreasing parts numbering found:\n\n')
         notes_parts(irregularParts_ind,:)
     end
+    
+    nonPosInt_ind = find(mod(parts,1));
+    if any(nonPosInt_ind)
+        fprintf('\nNon positiv integer parts numbering found:\n\n')
+        notes_parts(nonPosInt_ind,:)
+    end
+    
     isIrregularParts = false(height(notes),1);
     isIrregularParts(irregularParts_ind) = true;
+    isIrregularParts(nonPosInt_ind) = true;
     
 function isNotChrono = check_chronological_time(notes)
     % Get and display note (set of) rows for which the time is not increasing

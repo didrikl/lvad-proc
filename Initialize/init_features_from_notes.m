@@ -5,6 +5,14 @@ function feats = init_features_from_notes(notes)
        
     welcome('Initializing feature table')
     
+    % TODO: Move add_event_range to notes_qc and/or init_feats
+    intervTypesToIncludeinEventRange = {'steady','baseline'};
+    try
+    notes = add_event_note_ranges(notes, intervTypesToIncludeinEventRange);
+    catch
+        warning('Something went wrong in creating the event interval ranges')
+    end
+    
     % Ignore columns not in use
     notes(:,all(ismissing(notes))) = [];
     

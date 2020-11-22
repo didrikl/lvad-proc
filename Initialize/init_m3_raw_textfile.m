@@ -6,7 +6,6 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
     %
     
     if nargin==1, path = ''; end
-    
     timeFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
     
     if nargin<3
@@ -24,23 +23,22 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
                     'EmboliTotalCount3'  'graftEmboliCount' 1          'single'  'step'       ''
             };
     end
-     
-    welcome('Initializing Spectrum M3')
     
-    if numel(fileNames)==0 
+    welcome('Initializing Spectrum M3')
+    [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path);
+    
+    if numel(fileNames)==0
         T = table;
+        warning('No ultrasound data initialized')
         return; 
     end
-    fileNames = cellstr(fileNames);
     
-    B = cell(numel(fileNames),1);
-    for i=1:numel(fileNames)
-        filePath = fullfile(path, fileNames{i});
-        filePath = ensure_filename_extension(filePath, 'wrf');
-        display_filename(filePath);
-    
-        B{i} = init_m3_raw_textfile_read_2sensors(filePath);
-        B{i}.Properties.UserData = make_init_userdata(filePath);
+    B = cell(numel(filePaths),1);
+    for i=1:numel(filePaths)
+        %filePath = ensure_filename_extension(filePaths{i}, 'wrf');
+        display_filename(filePaths{i});
+        B{i} = init_m3_raw_textfile_read_2sensors(filePaths{i});
+        B{i}.Properties.UserData = make_init_userdata(filePaths{i});
 
         B{i}.time = datetime(B{i}.('DateandTime'),...
             'InputFormat',"yyyy/MM/dd HH:mm:ss",...

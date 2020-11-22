@@ -1,64 +1,68 @@
-function B = init_labchart_mat_files(fileNames,path,varMap)
+function T = init_labchart_mat_files(fileNames,path,varMap)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
-    % as mat file from PowerLab's LabChart program.
+    % as .mat file from PowerLab's software LabChart.
     %
     % Convert from one single array of data to a (2-D) to a matlab timetable.
     % Additional metadata is parsed and stored with the timetable properties.
+    % Timestamps in the table are represented as datetime array object.
     %
     % Usage:
-    %     init_powerlab_raw_matfile(fileName,read_path)
+    %     T = init_powerlab_raw_matfile(fileName,read_path,varMap)
     %
-    % See also timetable
+    % See also timetable, datetime
     
-    if nargin==1, path = ''; end
-    [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path);
-    
-    % Default viewing format of timestamps (not very important)
-    timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
-
     % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
     % for accelerometer a parent class and child class for cardiaccs. Could be
     % useful if different digital sampling boxes are used.
     
+    if nargin==1, path = ''; end
+    
+    % Default viewing format of timestamps (not very important)
+    timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
+
     welcome('Initializing LabChart .mat files')
+    fileNames = ensure_filename_extension(fileNames, 'mat');
+    [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path);
     
     % Initialization of Powerlab block(s), with support for block consisting 
     % of having paralell files (with different LabChart channels)
     nFiles = numel(fileNames);
-    B = cell(nFiles,1);
+    T = cell(nFiles,1);
     for i=1:nFiles
         fprintf('\n<strong>File (no %d/%d): </strong>',i,nFiles)
-        display_filename(fileNames{i},paths{i});
+        display_filename(filePaths{i});
         
         % if cell of parallell files
-        B{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
+        T{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
         
-        if i>1
+        if i>1           
+            % Check if different parallell sets of channels exported belong to 
+            % same block interval
             %[B,isPar] = check_parallell_ranges(B,i,fileNames);
-            [~, isOverlap] = overlapsrange(B{i},B{i-1});
+            [~, isOverlap] = overlapsrange(T{i},T{i-1});
             if all(isOverlap)
-                B{i}=[B{i-1},B{i}];
-                B{i-1} = [];
+                T{i}=[T{i-1},T{i}];
+                T{i-1} = [];
             end
         end
         
     end
     
-    B = B(not(cellfun(@isempty,B)));
-    nBlocks = numel(B);
+    T = T(not(cellfun(@isempty,T)));
+    nBlocks = numel(T);
     for i=1:nBlocks
         % Check for overlapping ranges of already initialized files
-        B = check_overlapping_blocks(B,i,fileNames);
+        T = check_overlapping_blocks(T,i,fileNames);
              
         % Keep only user-specified variables 
-        [B{i},inFile_inds] = map_varnames(B{i}, varMap(:,1), varMap(:,2));
+        [T{i},inFile_inds] = map_varnames(T{i}, varMap(:,1), varMap(:,2));
 
         % User-specified metadata for how data fusion shall be done 
-        B{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
+        T{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
         
         % Convert to specified numeric format (e.g. pressure as single)
-        B{i} = convert_columns(B{i},varMap(inFile_inds,3));
+        T{i} = convert_columns(T{i},varMap(inFile_inds,3));
 
         % Gather 3 components as one variable (convenient when all 3 components
         % are arguments in combination with other inputs, and also when viewing)

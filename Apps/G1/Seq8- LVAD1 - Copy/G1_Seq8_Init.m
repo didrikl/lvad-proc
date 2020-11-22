@@ -109,7 +109,6 @@ S = fuse_data(notes,PL,US,InclInterRowsInFusion);
 
 % Lag sjekk: Hvis stor hopp mellom PL-filene, så spør om man vil fortsette
 % Pre-clip with boundaries of PL
-% Resampling av PL for fuse_data? Hvorfor ikke?
 %S = resample_signal(S, 700);
 
 % Just to visualize signal in RPM order plot also when pump is off. First pump
