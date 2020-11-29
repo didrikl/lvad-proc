@@ -7,7 +7,8 @@ function varName = check_table_var_output(signal, varName)
     
     if ismember(varName,signal.Properties.VariableNames)
         
-        fprintf('\nOutput variable %s already exist\n',varName);
+        msg = sprintf('\nOutput variable %s already exist\n',varName);
+        fprintf(msg);
         
         if always_overwrite
             warning(sprintf(['Always overwrite existing',...
@@ -28,7 +29,7 @@ function varName = check_table_var_output(signal, varName)
             'Overwrite, always'
             'Abort'
             };
-        response = ask_list_ui(opts,'');
+        response = ask_list_ui(opts,msg);
         
         if response==1
              varName = '';

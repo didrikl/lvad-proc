@@ -6,9 +6,19 @@ function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
     % Good practice could e.g. be to do some extra recording at start of
     % the part before doing interventions, which would avoid such gaps.
     
+    welcome('Calculating moving statistics')
+    
+    % NOTE: This could be OO:
+    if isempty(T_parts)
+        warning('Input data table %s is empty',inputname(1))
+        return
+    end
+    return_as_cell = iscell(T_parts);
+    if not(iscell(T_parts)), T_parts = {T_parts}; end
+       
     if nargin<2, varNames = {'accA_norm'}; end
     if nargin<3, statisticTypes = {'RMS','Std','Min','Max','Avg'}; end
-    
+
     rms_winDur = 1;
     std_winDur = 15;
     min_winDur = 5;
@@ -16,8 +26,7 @@ function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
     avg_winDur = 10;
     
     
-    welcome('Calculating moving statistics')
-    fprintf(['\nCalculations\n\tMoving RMS in %d sec windows',...
+    fprintf(['Calculations\n\tMoving RMS in %d sec windows',...
         '\n\tMoving SD in %d sec windows\n'],rms_winDur,std_winDur);
     stdNames = varNames+"_movStd";
     rmsNames = varNames+"_movRMS";
@@ -43,6 +52,8 @@ function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
     T_parts = convert_to_single(T_parts, rmsNames);
     T_parts = convert_to_single(T_parts, stdNames);
 
+    if not(return_as_cell), T_parts = T_parts{1}; end
+    
     clear check_table_var_output
     clear check_var_input_to_table
     

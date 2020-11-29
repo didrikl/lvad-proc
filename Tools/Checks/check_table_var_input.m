@@ -15,7 +15,8 @@ function varNames = check_table_var_input(T, varNames)
         if not(ismember(varNames{i},T.Properties.VariableNames))
             
             if i==1, fprintf('\n'); end
-            fprintf('Variable %s does not exist\n',varNames{i});
+            msg = sprintf('Variable %s does not exist\n',varNames{i});
+            fprintf(msg);
             
             if always_skip
                 warning(sprintf(['Always skipped',...
@@ -30,7 +31,7 @@ function varNames = check_table_var_input(T, varNames)
                 'Select another name for input variable'
                 'Abort'
                 };
-            response = ask_list_ui(opts,'');
+            response = ask_list_ui(opts,msg);
             
             if response==1
                 varNames{i} = '';
