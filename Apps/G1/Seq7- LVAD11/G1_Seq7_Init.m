@@ -72,13 +72,16 @@ PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
 
 US.time = US.time-hours(1);
+secsAhead = 5; % Just an estimate based on previous drifts
+US = adjust_for_linear_time_drift(US,secsAhead);
 
-secsAhead = 5;
-secsRecDur = height(US);
-driftPerSec = secsAhead/secsRecDur;
-driftCompensation = seconds(0:driftPerSec:secsAhead);
-driftCompensation = driftCompensation(1:height(US))';
-US.time = US.time-driftCompensation;
+
+% secsAhead = 5;
+% secsRecDur = height(US);
+% driftPerSec = secsAhead/secsRecDur;
+% driftCompensation = seconds(0:driftPerSec:secsAhead);
+% driftCompensation = driftCompensation(1:height(US))';
+% US.time = US.time-driftCompensation;
 
 % Read sequence notes made with Excel file template
 notes = init_notes_xlsfile_ver4(notes_filePath);
@@ -150,6 +153,7 @@ S_parts = add_moving_statistics(S_parts,{'accB_norm'});
 % Fpass = ([2200,2400,1800]/60)-1;
 % Fs = 700;
 % for i=1:3
+
 %     S_parts{i}.accA_normHighPass = highpass(S_parts{i}.accA_norm,Fpass(i),Fs);
 % end
 % S_parts = add_moving_statistics(S_parts,{'accA_normHighPass'});

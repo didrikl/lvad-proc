@@ -1,5 +1,11 @@
 function T = init_m3_raw_textfile(fileNames,path,varMap)
-    
+    % Initialize System M data
+    %
+    % Usage:
+    %     T = init_m3_raw_textfile(fileNames,path,varMap)
+    % varMap is used to set variable continuity, which is used when doing
+    % resampling by the retime function.
+        
     %
     % TODO: Make one generic function to initialize blocks, that can be used for
     % init_labchart_mat_files too
@@ -12,19 +18,19 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
         varMap = {
             ...
             % Name in Spectrum   Name in Matlab     SampleRate Type     Continuity   Units
-                    'ArterialflowLmin'   'graftQ'           1          'single' 'continuous' 'L/min'
+            'ArterialflowLmin'   'graftQ'           1          'single' 'continuous' 'L/min'
             %'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
             %'VenflowLmin'        'affQ'             1          'single' 'continuous' 'L/min'
             %'EmboliVolume1uLsec' 'affEmboliVol'     1          'single' 'continuous' 'uL/sec'
             %'EmboliTotalCount1'  'affEmboliCount'   1          'int16'  'step'       ''
             %'EmboliVolume2uLsec' 'effEmboliVol'     1          'single' 'continuous' 'uL/sec'
             %'EmboliTotalCount2'  'effEmboliCount'   1          'int16'  'step'       ''
-                    'EmboliVolume3uLsec' 'graftEmboliVol'   1          'single' 'continuous' 'uL/sec'
-                    'EmboliTotalCount3'  'graftEmboliCount' 1          'single'  'step'       ''
+            'EmboliVolume3uLsec' 'graftEmboliVol'   1          'single'  'step' 'uL/sec'
+            'EmboliTotalCount3'  'graftEmboliCount' 1          'single'  'step'       ''
             };
     end
     
-    welcome('Initializing Spectrum M3')
+    welcome('Initializing Spectrum System M data')
     [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path);
     
     if numel(fileNames)==0

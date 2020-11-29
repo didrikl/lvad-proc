@@ -1,6 +1,6 @@
 function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path)
     
-    return_as_char = not(iscell(fileNames));
+    return_as_cell = iscell(fileNames);
     
     path = cellstr(repmat(path,numel(fileNames),1));
     filePaths = cellstr(fullfile(path,fileNames));
@@ -46,7 +46,7 @@ function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,
         end
     end
     
-    if return_as_char && numel(fileNames)==1
+    if not(return_as_cell) && numel(fileNames)==1
         fileNames = fileNames{1};
         paths = paths{1};
         filePaths = filePaths{1};

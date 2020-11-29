@@ -11,6 +11,8 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
     welcome('Data fusion')
     
     if not(iscell(PL)),PL = {PL}; end
+    %return_as_cell = iscell(fileNames);
+    %if not(return_as_cell), fileNames = cellstr(fileNames); end
     
     % Loop over each stored PowerLab file
     %    h_wait = waitbar(0,'','Name','Data fusion...');
@@ -100,11 +102,9 @@ function [B,block_inds] = determine_notes_block(Notes,PL_i,i,n_files,B,block_ind
     B{i} = Notes(block_inds{i},:);
     
     % Ask to keep or clip block, in case there are notes outside PL time range
-    if i==1
-        B{i} = check_for_notes_before_PL(B{i},PL_i);
-    elseif i==n_files
-        B{i} = check_for_notes_after_PL(B{i},PL_i);
-    end
+    % (NB two separate if tests required, as both test conditions may be true.)
+    if i==1, B{i} = check_for_notes_before_PL(B{i},PL_i); end
+    if i==n_files, B{i} = check_for_notes_after_PL(B{i},PL_i); end
     
     % Handle intermediate notes, in case LabChart was paused or there are some
     % PowerLab files not being initialized 

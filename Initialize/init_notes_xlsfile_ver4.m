@@ -25,7 +25,8 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     %   variable name.
     % * Type is used for parsing data from Excel into notes Matlab table
     % * Continuity is a status property, particularily useful when merging with 
-    %   recorded data, c.f. timetable VariableContinuity documentation.  
+    %   recorded data, and for resampling using retime, c.f. the timetable 
+    %   VariableContinuity documentation.  
     %   NB: Categoric type take a lot less memory to store
     %   NOTE: Must be listed in the same order as in Excel file.
     %   TODO: Make more flexible wrt. list order

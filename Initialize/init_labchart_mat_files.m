@@ -10,7 +10,10 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
     % Usage:
     %     T = init_powerlab_raw_matfile(fileName,read_path,varMap)
     %
-    % See also timetable, datetime
+    % varMap is used to set variable continuity, which is used when doing
+    % resampling by the retime function.
+    %
+    % See also timetable, datetime, retime
     
     % NOTE: if OO, one could make each sensor described by a sensor class, e.g.
     % for accelerometer a parent class and child class for cardiaccs. Could be
@@ -22,6 +25,10 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
 
     welcome('Initializing LabChart .mat files')
+    
+    return_as_cell = iscell(fileNames);
+    if not(return_as_cell), fileNames = cellstr(fileNames); end
+    
     fileNames = ensure_filename_extension(fileNames, 'mat');
     [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path);
     
@@ -36,39 +43,67 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
         % if cell of parallell files
         T{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
         
+        % Gather different parallell partial sets of channels exported into same
+        % block table
         if i>1           
-            % Check if different parallell sets of channels exported belong to 
-            % same block interval
             %[B,isPar] = check_parallell_ranges(B,i,fileNames);
             [~, isOverlap] = overlapsrange(T{i},T{i-1});
             if all(isOverlap)
                 T{i}=[T{i-1},T{i}];
                 T{i-1} = [];
             end
+        else
+            isOverlap = false;
+        end
+        
+        % When block channel set is complete: Check intergrity, keep only
+        % what is specificed to keep and cast columns according to varMap
+        if i==nFiles || not(all(isOverlap))
+            
+            % Keep only user-specified variables
+            [T{i},inFile_inds] = map_varnames(T{i}, varMap(:,1), varMap(:,2));
+            
+            % User-specified metadata for how data fusion shall be done
+            T{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
+            
+            % Convert to specified numeric format (e.g. pressure as single)
+            T{i} = convert_columns(T{i},varMap(inFile_inds,3));
+            
+            % Gather 3 components as one variable (convenient when all 3 components
+            % are arguments in combination with other inputs, and also when viewing)
+            %B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
+        
         end
         
     end
     
+    % Remove cell spaces for partial channel sets
     T = T(not(cellfun(@isempty,T)));
+    
+    % Checks
+    % TODO: Move to separate function
     nBlocks = numel(T);
     for i=1:nBlocks
+        
+        % TODO: Check for file with less than one second recording (mistakenly
+        % exported from LabChart)
+        % opts = {'Re-initialize (after new file export),'Ignore','Abort'};
+        % msg = 'What to do?';
+        % warning('LabChart file containing less than 1 second of data')
+        % resp = asklist_ui(opts,msg',1)
+        % T(smallFile_ind) = init_labchart_mat_files(fileNames{smallFile_ind},path,varMap)
+        
+        % TODO: Check for cronological ordering
+        % ....
+        % ask to reorder
+        
         % Check for overlapping ranges of already initialized files
         T = check_overlapping_blocks(T,i,fileNames);
-             
-        % Keep only user-specified variables 
-        [T{i},inFile_inds] = map_varnames(T{i}, varMap(:,1), varMap(:,2));
-
-        % User-specified metadata for how data fusion shall be done 
-        T{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
         
-        % Convert to specified numeric format (e.g. pressure as single)
-        T{i} = convert_columns(T{i},varMap(inFile_inds,3));
-
-        % Gather 3 components as one variable (convenient when all 3 components
-        % are arguments in combination with other inputs, and also when viewing)
-        %B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
-        %B{i} = spatial_comp_as_vector(B{i},{'accB_x','accB_y','accB_z'},'accB');
-        
+    end
+    
+    if not(return_as_cell) 
+        T = T{1}; 
     end
       
 function B = check_overlapping_blocks(B,i,fileNames)

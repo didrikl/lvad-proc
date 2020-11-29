@@ -15,20 +15,28 @@ notes_subdir = 'Noted';
 powerlab_fileNames = {
     %'G1_Seq8 - F0.mat'      % Startup and stablizing
 %     'G1_Seq8 - F1_Sel1.mat'
-     'G1_Seq8 - F1_Sel2.mat'
-     'G1_Seq8 - F1_Sel3.mat'
+%     'G1_Seq8 - F1_Sel2.mat'
+%     'G1_Seq8 - F1_Sel3.mat'
 %%     'G1_Seq8 - F1 - [accA_x,accA_y,accA_z].mat'
 %     'G1_Seq8 - F1 - [accB_x,accB_y,accB_z].mat'
 %     'G1_Seq8 - F1 - [pGraft,ECG,pLV].mat'
-     'G1_Seq8 - F2 - [pGraft,ECG].mat'
-     'G1_Seq8 - F2 - [accA_x,accA_y,accA_z].mat'
+%     'G1_Seq8 - F2 - [pGraft,ECG].mat'
+%     'G1_Seq8 - F2 - [accA_x,accA_y,accA_z].mat'
 %     'G1_Seq8 - F2 - [accB_x,accB_y,accB_z].mat'
 %'G1_Seq8 - F2 - comtest2.mat'
-%    'G1_Seq8 - F3_Sel1.mat'      % 
-%     'G1_Seq8 - F3_Sel2.mat'      % 
-%      'G1_Seq8 - F3_Sel3.mat'      % 
-%      'G1_Seq8 - F3_Sel4.mat'      % 
-    }; 
+     'G1_Seq8 - F3_Sel1.mat'      % 
+      'G1_Seq8 - F3_Sel2.mat'      % 
+       'G1_Seq8 - F3_Sel3.mat'      % 
+       'G1_Seq8 - F3_Sel4.mat'      % 
+%       'G1_Seq8 - F3_Sel5.mat'      % 
+% 'G1_Seq8 - F3_Sel1 - [pGraft,pLV,ECG].mat'
+% 'G1_Seq8 - F3_Sel1 - [accA_x,accA_y,accA_z].mat'
+% 'G1_Seq8 - F3_Sel2 - [pGraft,pLV,ECG].mat'
+% 'G1_Seq8 - F3_Sel2 - [accA_x,accA_y,accA_z].mat'
+};
+
+%powerlab_fileNames = {'G1_Seq8 - F3_Sel1.txt'}      % 
+
 notes_fileName = 'G1_Seq8 - Notes ver4.13 - Rev3.xlsm';
 ultrasound_fileNames = {
     'ECM_2020_11_12__11_04_40.wrf'
@@ -44,14 +52,14 @@ powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerla
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
     'pGraft'         'p_graft'      'single'    'continuous'
-    'ECG'            'ecg'         'single'    'continuous'
+    'ecg'             'ecg'         'single'    'continuous'
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
-%      'SensorBAccX'    'accB_x'      'single'    'continuous'
-%      'SensorBAccY'    'accB_y'      'single'    'continuous'
-%      'SensorBAccZ'    'accB_z'      'single'    'continuous'
-%    'pMillarLV'      'pLV'         'single'    'continuous'
+      'SensorBAccX'    'accB_x'      'single'    'continuous'
+      'SensorBAccY'    'accB_y'      'single'    'continuous'
+      'SensorBAccZ'    'accB_z'      'single'    'continuous'
+    'pMillarLV'      'pLV'         'single'    'continuous'
     };
 
 systemM_varMap = {
@@ -69,6 +77,7 @@ welcome('Initializing data','module')
 if load_workspace({'S_parts','notes','feats'},proc_path); return; end
 
 % Read PowerLab data in files exported from LabChart
+%PL = init_powerlab_raw_txtfile(powerlab_filePaths,'',powerlab_variable_map);
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
