@@ -95,14 +95,15 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     
     welcome('Reading notes file')
     
-    fileName = ensure_filename_extension(fileName, 'xlsm');
-    filePath = check_file_name_and_path_input(fileName,path);
+    filePath = check_file_name_and_path_input(fileName,path,{'xlsm','xls','xlsx'});
     display_filename(filePath);
     notes_sheet = check_notes_sheet_name(filePath,notes_sheet);    
     
     notes = readtable(filePath,...
         'Sheet',notes_sheet,...
         'basic',true);
+    
+    % Read auxillary info
     varNamesInFile = table2cell(readtable(filePath,...
         'Sheet',notes_sheet,...
         'Range',varNames_range,...

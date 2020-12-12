@@ -59,7 +59,7 @@ function selection = ask_list_ui(options, question, default)
     
     % Splitting into cell array, so that enough space is made for the question
     % (prompt diaglouge).
-    prompt_string = strsplit(question,'\n');
+    prompt_string = strsplit(question,'\n',"CollapseDelimiters",false);
     
     disp(question);
 	fprintf('\t(User input required in popup window...)\n')   

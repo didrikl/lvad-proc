@@ -15,24 +15,30 @@ function notes = qc_notes_ver4(notes)
     welcome('Quality control of notes')
     
     % NOTE: If OO, then this is notes object property
-    mustHaveCats = {'part','intervType','event'};
+    mustHaveVars = {
+        %'part'
+        'intervType'
+        'event'
+        'pumpSpeed'
+        };
     
     isNotChrono = check_chronological_time(notes);
     [isNatPause, isNatPart] = check_missing_time(notes);
     isIrregParts = check_irregular_parts(notes);
-    isUndefCat = check_missing_essential_info(notes,mustHaveCats);
+    isUndefCat = check_missing_essential_info(notes,mustHaveVars);
     
     if any(isNotChrono | isNatPause | isNatPart | isUndefCat | isIrregParts)
-        notes = ask_to_reinit(notes);
+        notes = ask_to_reinit(notes, isNotChrono, isNatPause, isNatPart, isUndefCat, isIrregParts);
     else
         fprintf('\n\nAll good :-)')
     end
     
     fprintf('\nQuality control of notes done.\n')
     
-function notes = ask_to_reinit(notes)
+function notes = ask_to_reinit(notes, isNotChrono, isNatPause, isNatPart, isUndefCat, isIrregPart)
     % Pause and let user make changes in Excel and re-initialize
     %input(sprintf('\nHit a key to open notes sheet --> '));
+    
     filePath = notes.Properties.UserData.FilePath;
     fileName = notes.Properties.UserData.FileName;
     winopen(filePath);
@@ -42,7 +48,28 @@ function notes = ask_to_reinit(notes)
         'Ignore'
         'Abort'
         };
-    msg = sprintf('\nCheck and save as new notes file revision');
+    msg = '\nQuality control of notes found issues\n';
+    if any(isNotChrono)
+        msg=[msg,'\nNon-chronical timestamps at row(s): ',mat2str(find(isNotChrono))];
+    end
+    if any(isNatPause)
+        msg=[msg,'\nMissing timestamps at start of pauses at row(s): ',...
+            mat2str(find(isNatPause))];
+    end
+    if any(isNatPart)
+         msg=[msg,'\nMissing timestamps at within parts at row(s): ',...
+             mat2str(find(isNatPart))];
+    end
+    if any(isUndefCat)
+        msg=[msg,'\nMissing essential categoric info at row(s): ',...
+            mat2str(find(isUndefCat))];
+    end
+    if any(isIrregPart)
+        msg=[msg,'\nIrregular part numbering order at row(s): ',...
+            mat2str(find(isIrregPart))];
+    end
+    msg = sprintf([msg,'\n\nCheck and save as new notes file revision']);
+    
     answer = ask_list_ui(opts,msg,1);
     if answer==1
         notes = init_notes_xlsfile_ver4(filePath);
@@ -72,7 +99,7 @@ function isIrregularParts = check_irregular_parts(notes)
         notes_parts(irregularParts_ind,:)
     end
     
-    nonPosInt_ind = find(mod(parts,1));
+    nonPosInt_ind = find(mod(not(isnan(parts)),1));
     if any(nonPosInt_ind)
         fprintf('\nNon positiv integer parts numbering found:\n\n')
         notes_parts(nonPosInt_ind,:)
@@ -98,14 +125,16 @@ function isNotChrono = check_chronological_time(notes)
         fprintf('\nAll time stamps are chronological')
     end
 
-function [isNatPauseStart, isNatPart] = check_missing_time(notes)
+function [isNatPauseStart, isMissingTimestamp] = check_missing_time(notes)
     % Get and display essiential note rows with missing time stamps
     
     natPause_rows = find(isnat(notes.time) & notes.intervType=='Pause');
     first_part_row = find(notes.part~='-',1,'first');
     natPause_rows = natPause_rows(natPause_rows>first_part_row);
     natPauseStart_rows = natPause_rows(notes.intervType(natPause_rows-1)~='Pause');
+    isPart = notes.part~='-' & not(isundefined(notes.part));
     
+    % All pause intervals should start with a timestamp
     if any(natPauseStart_rows)
         fprintf('\nTimestamps missing for start of pauses:\n\n')
         missing_pause_timestamps = notes(natPauseStart_rows,:);
@@ -113,29 +142,25 @@ function [isNatPauseStart, isNatPart] = check_missing_time(notes)
     end
     isNatPauseStart = false(height(notes),1);
     isNatPauseStart(natPauseStart_rows)=true;
-    
-    isNatPart = isnat(notes.time) & notes.part~='-';
-    if any(isNatPart)
-        fprintf('\nTimestamps missing for Part notes:\n\n')
-        missing_part_timestamps = notes(isNatPart,:);
+       
+    % Check for missing timestamps at rows associated with a recording part,
+    % but not because of missing date info
+    isMissingTimestamp = isnat(notes.time) & isPart;
+    if any(isMissingTimestamp)
+        fprintf('\nTimestamps missing for part-defined rows:\n\n')
+        missing_part_timestamps = notes(isMissingTimestamp,:);
         disp(missing_part_timestamps)
     end
-    
-    if not(any(isnat(notes.time)))
-        fprintf('\nNo missing time stamps.')
-    end
+
     
 function isUndefCat = check_missing_essential_info(notes,mustHaveCats)
     % Get and display rows with missing essential categoric info
     
-    isUndefCat = any(isundefined(notes{:,mustHaveCats}),2);
+    isUndefCat = any(ismissing(notes(:,mustHaveCats)),2);
     if any(isUndefCat)
         fprintf('\n\nEssential categoric info missing:\n\n')
         missing_categories = notes(isUndefCat,:);
         disp(missing_categories)
-    else
-        fprintf('\nAll rows have essential categoric info')
     end
-        
-            
+    
     

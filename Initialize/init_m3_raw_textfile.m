@@ -32,7 +32,7 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
     
     welcome('Initializing Spectrum System M data')
     [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path);
-    
+
     if numel(fileNames)==0
         T = table;
         warning('No ultrasound data initialized')

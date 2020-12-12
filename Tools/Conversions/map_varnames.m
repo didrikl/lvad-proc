@@ -1,34 +1,30 @@
-function [T,inFile_inds] = map_varnames(T,fileMapVarNames,codeMapVarNames)
+function [T,inFile_inds,inFile_vars] = map_varnames(T,fileMapVars,codeMapVars)
     
-    varNamesInT = T.Properties.VariableNames;
+    varsInT = T.Properties.VariableNames;
     
     % Handle uncovered columns in map (i.e. extra columns in file are removed)
-    isMissingInMap = not(ismember(varNamesInT,fileMapVarNames));
+    isMissingInMap = not(ismember(varsInT,fileMapVars));
     if any(isMissingInMap)
         warning(sprintf([...
             '\n\tVariables found in file that are not listed in varaible ',...
-            'mapping:\n\t\t%s'],strjoin(varNamesInT(isMissingInMap),', ')));
-        T(:,isMissingInMap) = [];
+            'mapping:\n\t\t%s'],strjoin(varsInT(isMissingInMap),', ')));
     end
     
     % Update map when columns are missing in the file
-    varNamesInT = T.Properties.VariableNames;
-    inFile_inds = NaN(numel(fileMapVarNames,1));
-    for i=1:numel(fileMapVarNames)
-        inFile_ind = find(ismember(varNamesInT,fileMapVarNames{i}));
-        if inFile_ind
-            inFile_inds(i) = inFile_ind;
-        end
-    end
+    varsInT = T.Properties.VariableNames;
+    inFile_inds = find(ismember(fileMapVars,varsInT));
         
-    isMissingInFile = inFile_inds==0;
+    isMissingInFile = find(not(ismember(fileMapVars,varsInT)));
     if any(isMissingInFile)
-       warning(sprintf('\n\tVariables in variable mapping, but not in file:\n\t\t%s\n',...
-            strjoin(fileMapVarNames(isMissingInFile)+...
-            " (=> "+codeMapVarNames(isMissingInFile)+")",', ')));
+       warning(sprintf(...
+           '\n\tVariables in variable mapping, but not in file:\n\t\t%s\n',...
+            strjoin(fileMapVars(isMissingInFile)+...
+            " (=> "+codeMapVars(isMissingInFile)+")",', ')));
     end
 
     % Rearrange columns according to map listing oder
-    inFile_inds(inFile_inds==0)=[];
-    T = T(:,inFile_inds);
-    T.Properties.VariableNames = codeMapVarNames(inFile_inds);
+    inFile_inds= inFile_inds(not(inFile_inds==0));
+    inFile_vars = fileMapVars(inFile_inds);
+    
+    T = T(:,inFile_vars);
+    T.Properties.VariableNames = codeMapVars(inFile_inds);

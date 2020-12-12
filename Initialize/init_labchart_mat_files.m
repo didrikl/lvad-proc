@@ -29,13 +29,13 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
     return_as_cell = iscell(fileNames);
     if not(return_as_cell), fileNames = cellstr(fileNames); end
     
-    fileNames = ensure_filename_extension(fileNames, 'mat');
-    [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path);
+    [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path,'mat');
     
     % Initialization of Powerlab block(s), with support for block consisting 
     % of having paralell files (with different LabChart channels)
     nFiles = numel(fileNames);
     T = cell(nFiles,1);
+
     for i=1:nFiles
         fprintf('\n<strong>File (no %d/%d): </strong>',i,nFiles)
         display_filename(filePaths{i});
@@ -46,19 +46,24 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
         % Gather different parallell partial sets of channels exported into same
         % block table
         if i>1           
-            %[B,isPar] = check_parallell_ranges(B,i,fileNames);
+            %[T,isPar] = check_parallell_ranges(T,i,fileNames);
             [~, isOverlap] = overlapsrange(T{i},T{i-1});
             if all(isOverlap)
+           
+                % print info about overlap detection...
+                
                 T{i}=[T{i-1},T{i}];
                 T{i-1} = [];
             end
-        else
-            isOverlap = false;
         end
-        
-        % When block channel set is complete: Check intergrity, keep only
-        % what is specificed to keep and cast columns according to varMap
-        if i==nFiles || not(all(isOverlap))
+    end
+    
+    % Remove cell spaces for partial channel sets
+    T = T(not(cellfun(@isempty,T)));
+    
+    % When block channel set is complete: Check intergrity, keep only
+    % what is specificed to keep and cast columns according to varMap
+    for i=1:numel(T)
             
             % Keep only user-specified variables
             [T{i},inFile_inds] = map_varnames(T{i}, varMap(:,1), varMap(:,2));
@@ -73,13 +78,8 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
             % are arguments in combination with other inputs, and also when viewing)
             %B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
         
-        end
-        
     end
-    
-    % Remove cell spaces for partial channel sets
-    T = T(not(cellfun(@isempty,T)));
-    
+ 
     % Checks
     % TODO: Move to separate function
     nBlocks = numel(T);
@@ -98,7 +98,7 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
         % ask to reorder
         
         % Check for overlapping ranges of already initialized files
-        T = check_overlapping_blocks(T,i,fileNames);
+        %T = check_overlapping_blocks(T,i,fileNames);
         
     end
     

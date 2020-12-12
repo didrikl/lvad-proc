@@ -1,6 +1,13 @@
-function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path)
+function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path,ext)
+    
+    if nargin<3, ext = {}; end
     
     return_as_cell = iscell(fileNames);
+    
+    if not(isempty(ext))
+        fileNames = ensure_filename_extension(fileNames,ext);
+        ext = cellstr(ext);
+    end
     
     path = cellstr(repmat(path,numel(fileNames),1));
     filePaths = cellstr(fullfile(path,fileNames));
@@ -17,7 +24,7 @@ function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,
             rem_inds(i) = true;
         end
     end
-       
+    
     if any(rem_inds)
         msg = display_filename(fileNames(rem_inds),'','','\t\t');
         msg = strjoin(strsplit(erase(msg,newline),'\t'),'\n\t');
@@ -28,19 +35,34 @@ function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,
         if nargout==0
             warndlg(msg)
         else
-            [newFileNames,newPaths] = uigetfile(...
-                '','Browse for and select new files','Multiselect','on');
+            file_filter = make_ext_filter(ext);
+            title = 'Browse for and select new files';
+            [newFileNames,newPaths] = uigetfile(file_filter,title,...
+                'Multiselect','on');
             
             % If no new filenames/cancelled, remove missing file from list
             if not(iscell(newFileNames)) & not(newFileNames)
-                filePaths(rem_inds) = [];
-                fileNames(rem_inds) = [];
-                paths(rem_inds) = [];
-                fprintf('\nMissing files removed from list of files.\n')
+                opts = {
+                    'Remove missing from file specification'
+                    'Ignore'
+                    'Abort execution'
+                    };
+                resp = ask_list_ui(opts,'File selection cancelled',1);
+                if resp==1
+                    filePaths(rem_inds) = [];
+                    fileNames(rem_inds) = [];
+                    paths(rem_inds) = [];
+                    fprintf('\nMissing files removed from list of files.\n')
+                elseif resp==3
+                    abort
+                end
+
             else
-                paths = cellstr(newPaths);
                 fileNames = newFileNames;
-                filePaths = fullfile(newPaths,newFileNames)';
+                paths = newPaths;
+                if not(iscell(paths)), paths = {paths}; end
+                if not(iscell(fileNames)), fileNames = {fileNames}; end
+                filePaths = fullfile(newPaths,fileNames)';
                 display_filename(newFileNames,newPaths,'\nSelected files','\t');
             end
         end
@@ -51,3 +73,12 @@ function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,
         paths = paths{1};
         filePaths = filePaths{1};
     end
+    
+function ext_filter = make_ext_filter(ext)
+    
+    ext_filter = cell(numel(ext)+1,2);
+    for i=1:numel(ext)
+        ext_filter{i,1} = ['*.',ext{i}];
+        ext_filter{i,2} = ['(*.',ext{i},')'];
+    end
+    ext_filter(numel(ext)+1,:) = {'*.*',  'All Files (*.*)'};
