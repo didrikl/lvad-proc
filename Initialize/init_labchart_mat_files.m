@@ -274,9 +274,13 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
                 col_units(j) = string(input('Type unit --> ','s'));
             end
       
-        else
+        elseif var_unit_no==-1
             
-            % Use the uniquely found unit for all recording intervals
+            warning(['Variable unit not specified for variable ',vars{j},'.'])
+            col_units{j} = '';
+        
+        else
+            % All good; Use the uniquely found unit for all recording intervals
             col_units{j} = unittext(var_unit_no);
        
         end

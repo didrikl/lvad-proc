@@ -21,29 +21,38 @@ powerlab_fileNames = {
     % RPM interventions + baseline (incl startup and stablizing)
     %'G1_Seq11 - F1 [accA].mat'      
     %'G1_Seq11 - F1 [accB].mat'      
-    %'G1_Seq11 - F1 [pGraft,pLV,ECG].mat'
+    %'G1_Seq11 - F1 [pGraft,ECG,pLV].mat'
 
     % Catheter insertion
-    %'G1_Seq11 - F2 [accA].mat'      
-    %'G1_Seq11 - F2 [accB].mat'      
-    %'G1_Seq11 - F2 [pGraft,pLV,ECG].mat'      
+    'G1_Seq11 - F2 [accA].mat'      
+    'G1_Seq11 - F2 [accB].mat'      
+    'G1_Seq11 - F2 [pGraft,ECG,pLV].mat'      
     'G1_Seq11 - F3 [accA].mat'
     'G1_Seq11 - F3 [accB].mat'      
-    %'G1_Seq11 - F3 [pGraft,pLV,ECG].mat'      
+    'G1_Seq11 - F3 [pGraft,ECG,pLV].mat'      
     
      % Afterload clamping
-    'G1_Seq11 - F4 [accA].mat'      
-    'G1_Seq11 - F4 [accB].mat'      
-    %'G1_Seq11 - F4 [pGraft,pLV,ECG].mat'
+%     'G1_Seq11 - F4 [accA].mat'      
+%     'G1_Seq11 - F4 [accB].mat'      
+%     'G1_Seq11 - F4 [pGraft,ECG,pLV].mat'
     
     % Cather re-insertion
     % Balloon interventions
     'G1_Seq11 - F5 [accA].mat'      
     'G1_Seq11 - F5 [accB].mat'      
-    %'G1_Seq11 - F5 [pGraft,pLV,ECG].mat'
+    'G1_Seq11 - F5 [pGraft,ECG,pLV].mat'
     'G1_Seq11 - F7 [accA].mat'      
     'G1_Seq11 - F7 [accB].mat'      
-    %'G1_Seq11 - F7 [pGraft,pLV,ECG].mat'
+    'G1_Seq11 - F7 [pGraft,ECG,pLV].mat'
+    
+    % Trombus injections
+    'G1_Seq11 - F8 [accA].mat'      
+    'G1_Seq11 - F8 [accB].mat'      
+    'G1_Seq11 - F8 [pGraft,ECG,pLV].mat'
+    'G1_Seq11 - F9 [accA].mat'      
+    'G1_Seq11 - F9 [accB].mat'      
+    %'G1_Seq11 - F9 [pGraft,ECG,pLV].mat'
+    
     
     }; 
 notes_fileName = 'G1_Seq11 - Notes ver4.13 - Rev3.xlsm';
@@ -61,14 +70,14 @@ powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerla
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
     'pGraft'         'p_graft'      'single'    'continuous'
-    'ECG'            'ecg'         'single'    'continuous'
+%    'ECG'            'ecg'         'single'    'continuous'
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
-      'SensorBAccX'    'accB_x'      'single'    'continuous'
-      'SensorBAccY'    'accB_y'      'single'    'continuous'
-      'SensorBAccZ'    'accB_z'      'single'    'continuous'
-%    'pMillarLV'      'pLV'         'single'    'continuous'
+%      'SensorBAccX'    'accB_x'      'single'    'continuous'
+%      'SensorBAccY'    'accB_y'      'single'    'continuous'
+%      'SensorBAccZ'    'accB_z'      'single'    'continuous'
+    'pMillarLV'      'pLV'         'single'    'continuous'
     };
 
 systemM_varMap = {
