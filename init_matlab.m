@@ -41,3 +41,7 @@ warning('off','backtrace')
 %set(0,'DefaultFigureWindowStyle','normal')
 
 %set(0,'DefaultAxesColorOrder',brewermap(NaN,'Accent'))
+
+% Starting in R2018b, some pan interactions are enabled by default, regardless
+% of the pan mode. If you want to disable these default interactions, then use:
+set(groot,'defaultAxesCreateFcn','disableDefaultInteractivity(gca)')

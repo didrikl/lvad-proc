@@ -59,7 +59,7 @@ welcome('Initializing data','module')
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths);
+US = init_system_m_text_files(ultrasound_filePaths);
 
 % Read driveline accelerometer data
 CB_LVAD = init_cardibox_raw_txtfile(cb_lvad_filePaths,'','accA');

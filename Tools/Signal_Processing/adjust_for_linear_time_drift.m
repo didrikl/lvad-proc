@@ -12,6 +12,7 @@ function T = adjust_for_linear_time_drift(T,secsAhead,diffReadTime,inSyncTime)
     
     driftDur = seconds(diffReadTime-inSyncTime);
     driftRatePerSec = secsAhead/driftDur;
+    fprintf('Drift per second: %g\n\n',driftRatePerSec)
     
     % If T is a regular timetable, just update to a more accurate samplerate
     if istimetable(T) && isregular(T)

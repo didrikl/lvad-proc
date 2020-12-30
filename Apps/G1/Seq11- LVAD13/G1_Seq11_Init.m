@@ -19,23 +19,23 @@ notes_subdir = 'Noted';
 powerlab_fileNames = {
     
     % RPM interventions + baseline (incl startup and stablizing)
-    %'G1_Seq11 - F1 [accA].mat'      
-    %'G1_Seq11 - F1 [accB].mat'      
-    %'G1_Seq11 - F1 [pGraft,ECG,pLV].mat'
+    'G1_Seq11 - F1 [accA].mat'      
+    'G1_Seq11 - F1 [accB].mat'      
+    'G1_Seq11 - F1 [pGraft,ECG,pLV].mat'
 
     % Catheter insertion
-    'G1_Seq11 - F2 [accA].mat'      
-    'G1_Seq11 - F2 [accB].mat'      
-    'G1_Seq11 - F2 [pGraft,ECG,pLV].mat'      
-    'G1_Seq11 - F3 [accA].mat'
-    'G1_Seq11 - F3 [accB].mat'      
-    'G1_Seq11 - F3 [pGraft,ECG,pLV].mat'      
+%     'G1_Seq11 - F2 [accA].mat'      
+%     %'G1_Seq11 - F2 [accB].mat'      
+%     'G1_Seq11 - F2 [pGraft,ECG,pLV].mat'      
+%     'G1_Seq11 - F3 [accA].mat'
+%     %'G1_Seq11 - F3 [accB].mat'      
+%     'G1_Seq11 - F3 [pGraft,ECG,pLV].mat'      
     
-     % Afterload clamping
-%     'G1_Seq11 - F4 [accA].mat'      
-%     'G1_Seq11 - F4 [accB].mat'      
-%     'G1_Seq11 - F4 [pGraft,ECG,pLV].mat'
-    
+%      % Afterload clamping
+%      'G1_Seq11 - F4 [accA].mat'      
+%      'G1_Seq11 - F4 [accB].mat'      
+%      'G1_Seq11 - F4 [pGraft,ECG,pLV].mat'
+%     
     % Cather re-insertion
     % Balloon interventions
     'G1_Seq11 - F5 [accA].mat'      
@@ -51,11 +51,11 @@ powerlab_fileNames = {
     'G1_Seq11 - F8 [pGraft,ECG,pLV].mat'
     'G1_Seq11 - F9 [accA].mat'      
     'G1_Seq11 - F9 [accB].mat'      
-    %'G1_Seq11 - F9 [pGraft,ECG,pLV].mat'
+    'G1_Seq11 - F9 [pGraft,ECG,pLV].mat'
     
     
     }; 
-notes_fileName = 'G1_Seq11 - Notes ver4.13 - Rev3.xlsm';
+notes_fileName = 'G1_Seq11 - Notes ver4.15 - Rev4.xlsm';
 ultrasound_fileNames = {
     'ECM_2020_12_10__11_07_03.wrf'
 };
@@ -74,9 +74,9 @@ powerlab_variable_map = {
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
-%      'SensorBAccX'    'accB_x'      'single'    'continuous'
-%      'SensorBAccY'    'accB_y'      'single'    'continuous'
-%      'SensorBAccZ'    'accB_z'      'single'    'continuous'
+     'SensorBAccX'    'accB_x'      'single'    'continuous'
+     'SensorBAccY'    'accB_y'      'single'    'continuous'
+     'SensorBAccZ'    'accB_z'      'single'    'continuous'
     'pMillarLV'      'pLV'         'single'    'continuous'
     };
 
@@ -97,7 +97,7 @@ if load_workspace({'S_parts','notes','feats'},proc_path); return; end
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
+US = init_system_m_text_files(ultrasound_filePaths,'',systemM_varMap);
 secsAhead = 50;
 US = adjust_for_linear_time_drift(US,secsAhead);
 
@@ -159,7 +159,7 @@ S = fuse_data(notes,PL,US,InclInterRowsInFusion);
 % US(US.time<notes.time(3),:) = [];
 
 
-S_parts = split_into_parts(S);
+S_parts = split_into_parts(S, 500);
 
 
 S_parts = add_spatial_norms(S_parts,2, {'accA_x','accA_y','accA_z'}, 'accA_norm');
@@ -167,8 +167,8 @@ S_parts = add_moving_statistics(S_parts,{'accA_norm','accA_x','accA_y','accA_z'}
 
 S_parts = add_moving_statistics(S_parts,{'p_graft'});
 
-% S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
-% S_parts = add_moving_statistics(S_parts,{'accB_norm'});
+S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
+S_parts = add_moving_statistics(S_parts,{'accB_norm'});
 
 
 % Fpass = ([2200,2400,1800]/60)-1;

@@ -64,7 +64,7 @@ if load_workspace({'S_parts','notes','feats'},proc_path); return; end
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
+US = init_system_m_text_files(ultrasound_filePaths,'',systemM_varMap);
 
 % Read sequence notes made with Excel file template
 notes = init_notes_xlsfile_ver4(notes_filePath);

@@ -81,7 +81,7 @@ if load_workspace({'S_parts','notes','feats'},proc_path); return; end
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
+US = init_system_m_text_files(ultrasound_filePaths,'',systemM_varMap);
 
 secsAhead = 51;
 secsRecDur = seconds(US.time(end)-US.time(1)); %height(US);

@@ -1,8 +1,8 @@
-function T = init_m3_raw_textfile(fileNames,path,varMap)
+function T = init_system_m_text_files(fileNames,path,varMap)
     % Initialize System M data
     %
     % Usage:
-    %     T = init_m3_raw_textfile(fileNames,path,varMap)
+    %     T = init_system_m_text_files(fileNames,path,varMap)
     % varMap is used to set variable continuity, which is used when doing
     % resampling by the retime function.
         
@@ -43,7 +43,7 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
     for i=1:numel(filePaths)
         %filePath = ensure_filename_extension(filePaths{i}, 'wrf');
         display_filename(filePaths{i});
-        B{i} = init_m3_raw_textfile_read_2sensors(filePaths{i});
+        B{i} = init_system_m_text_files_read_2sensors(filePaths{i});
         B{i}.Properties.UserData = make_init_userdata(filePaths{i});
 
         B{i}.time = datetime(B{i}.('DateandTime'),...
@@ -88,12 +88,12 @@ function T = init_m3_raw_textfile(fileNames,path,varMap)
     
     T = merge_table_blocks(B);
     
-function T_block = init_m3_raw_textfile_read_2sensors(filePath)
+function T_block = init_system_m_text_files_read_2sensors(filePath)
    %IMPORTFILE Import data from a text file
-    %  signal = init_m3_raw_textfile_read_2sensors(FILE) reads data from 
+    %  signal = init_system_m_text_files_read_2sensors(FILE) reads data from 
     %  text file FILE for the default selection.  Returns the data as a table.
     %
-    %  signal = init_m3_raw_textfile_read_2sensors(FILE) reads data for the specified
+    %  signal = init_system_m_text_files_read_2sensors(FILE) reads data for the specified
     %  row interval(s) of text file FILENAME. 
     %
     %  See also READTABLE.
@@ -128,7 +128,7 @@ function T_block = init_m3_raw_textfile_read_2sensors(filePath)
     % Store various/unstructured info (start with initializing standard info)
     T_block.Properties.UserData.header = cellstr(opts.SelectedVariableNames);
     
-function signal = init_m3_raw_textfile_read_1sensor(fileName)
+function signal = init_system_m_text_files_read_1sensor(fileName)
     % Import read function based on Matlab's import tool code autogeneration.
     % Read columns of data as text, c.f. the TEXTSCAN documentation.
     

@@ -10,9 +10,7 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
     
     welcome('Data fusion')
     
-    if not(iscell(PL)),PL = {PL}; end
-    %return_as_cell = iscell(fileNames);
-    %if not(return_as_cell), fileNames = cellstr(fileNames); end
+    [returnAsCell,PL] = get_return_type(PL);
     
     % Loop over each stored PowerLab file
     %    h_wait = waitbar(0,'','Name','Data fusion...');
@@ -25,7 +23,7 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
     block_inds = cell(n_files,1);
     for i=1:n_files
         
-        fprintf('\n<strong>PowerLab file (no %d/%d): </strong>\nFilename: %s\n',...
+        fprintf('\n<strong>PowerLab block (no %d/%d): </strong>\nFilename: %s\n',...
             i,n_files,PL{i}.Properties.UserData.FileName)
 
         [Blocks, block_inds] = determine_notes_block(Notes,PL{i},i,n_files,Blocks,block_inds,InclInterRowsInFusion);

@@ -21,40 +21,33 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
     
     if nargin==1, path = ''; end
     
-    % Default viewing format of timestamps (not very important)
+    % Default viewing format of timestamps (Could be made OO)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
 
     welcome('Initializing LabChart .mat files')
     
-    return_as_cell = iscell(fileNames);
-    if not(return_as_cell), fileNames = cellstr(fileNames); end
-    
+    [returnAsCell,fileNames] = get_return_type(fileNames);
     [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path,'mat');
     
-    % Initialization of Powerlab block(s), with support for block consisting 
-    % of having paralell files (with different LabChart channels)
+    % Initialization of LabChart block(s), with support for block composed of 
+    % paralell files (with exported as different set of LabChart channels)
     nFiles = numel(fileNames);
     T = cell(nFiles,1);
-
     for i=1:nFiles
+        
         fprintf('\n<strong>File (no %d/%d): </strong>',i,nFiles)
         display_filename(filePaths{i});
         
-        % if cell of parallell files
         T{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
         
-        % Gather different parallell partial sets of channels exported into same
-        % block table
-        if i>1           
-            %[T,isPar] = check_parallell_ranges(T,i,fileNames);
-            [~, isOverlap] = overlapsrange(T{i},T{i-1});
-            if all(isOverlap)
-           
-                % print info about overlap detection...
-                
-                T{i}=[T{i-1},T{i}];
-                T{i-1} = [];
-            end
+        if height(T{i})<2
+            warning('File read contains one or zero rows of data.')
+            continue
+        end
+        
+        if i>1              
+            T(1:i) = handle_nonchronological_order(T(1:i));
+            [T{i},T{i-1}] = handle_overlapping_ranges(T{i},T{i-1},true);
         end
     end
     
@@ -79,48 +72,11 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
             %B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
         
     end
- 
-    % Checks
-    % TODO: Move to separate function
-    nBlocks = numel(T);
-    for i=1:nBlocks
-        
-        % TODO: Check for file with less than one second recording (mistakenly
-        % exported from LabChart)
-        % opts = {'Re-initialize (after new file export),'Ignore','Abort'};
-        % msg = 'What to do?';
-        % warning('LabChart file containing less than 1 second of data')
-        % resp = asklist_ui(opts,msg',1)
-        % T(smallFile_ind) = init_labchart_mat_files(fileNames{smallFile_ind},path,varMap)
-        
-        % TODO: Check for cronological ordering
-        % ....
-        % ask to reorder
-        
-        % Check for overlapping ranges of already initialized files
-        %T = check_overlapping_blocks(T,i,fileNames);
-        
-    end
     
-    if not(return_as_cell) 
+    if not(returnAsCell) 
         T = T{1}; 
     end
       
-function B = check_overlapping_blocks(B,i,fileNames)
-    for ii=1:i-1
-        [isOverlap,overlapRows] = overlapsrange(B{i},B{ii});
-        if any(isOverlap)
-            overlap_range = string(...
-                B{ii}.time(find(overlapRows,1,'last'))...
-                -B{ii}.time(find(overlapRows,1,'first')));
-            warning(sprintf([...
-                '\n\tFile overlaps %s (%d time samples) with file %s.',...
-                '\n\tOverlapping ranges are only keep from the first file'],...
-                overlap_range,nnz(overlapRows),fileNames{ii}));
-            B{ii}(overlapRows,:) = [];
-        end
-    end
-
 
 function T = read_signal_file_into_table(filePath,timestamp_fmt)    
     
@@ -240,14 +196,14 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
     vars = cellstr(raw.titles);
       
     [n_vars,n_interv] = size(unittextmap);
-    interv_units = repmat('',n_vars,n_interv);
+    interv_units = repmat('',n_interv,n_vars);
     col_units = repmat('',n_vars,1);
     for j=1:n_vars
         
         % Look up unit for each interval, if given
         for i=1:n_interv  
             if unittextmap(j,i)>0
-                interv_units{j,i} = strip(unittext(unittextmap(j,i)));
+                interv_units{i,j} = strip(unittext(unittextmap(j,i)));
             end
         end
 
@@ -259,24 +215,20 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
             
             % If different units at different intervals, then user must decide how
             % to handle this for the one column containing all recording intervals   
-            units_in_use = char(interv_units(var_unit_no(var_unit_no>0)));
-            options = {
-                units_in_use
-                'Ignore, use no units'
-                'Type new unit'
-                };
+            units_in_use = cellstr(unique([interv_units{:,j}]));%  char(interv_units(var_unit_no(var_unit_no>0));
+            options = [units_in_use,{'Set no unit','Type new unit'}];
             opt = ask_list_ui(options,'Set variable unit');
             if opt<=numel(options)-2
-                col_units(j) = unittext(opt);
+                col_units{j} = unittext(opt);
             elseif opt==numel(options)-1
-                col_units(j) = '';
+                col_units{j} = '';
             elseif opt==numel(options)
-                col_units(j) = string(input('Type unit --> ','s'));
+                col_units{j} = string(input('Type unit --> ','s'));
             end
       
         elseif var_unit_no==-1
             
-            warning(['Variable unit not specified for variable ',vars{j},'.'])
+            warning(['Unit not specified for variable ',vars{j},'.'])
             col_units{j} = '';
         
         else

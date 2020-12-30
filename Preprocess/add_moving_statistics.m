@@ -39,8 +39,9 @@ function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
     for i=1:numel(T_parts)
         
         if height(T_parts{i})==0, continue; end
-        fs = T_parts{i}.Properties.SampleRate;
-        
+        %fs = T_parts{i}.Properties.SampleRate;
+        [fs,T] = get_sampling_rate(T_parts{i});
+    
         T_parts{i} = calc_moving(T_parts{i},varNames,{'RMS'},fs*rms_winDur);
         T_parts{i} = calc_moving(T_parts{i},varNames,{'Std'},fs*std_winDur);
 %         T_parts{i} = calc_moving(T_parts{i},varNames,{'Min'},fs*min_winDur);

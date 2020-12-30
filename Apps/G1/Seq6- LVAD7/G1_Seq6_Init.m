@@ -1,8 +1,8 @@
 %% Initialze the processing environment and input file structure
 
 % Which experiment
-basePath = 'C:\Data\IVS\Didrik';
-sequence = 'Seq6 - LVAD7 - Pilot';
+basePath = 'D:\Data\IVS\Didrik';
+sequence = 'Seq6 - LVAD7';
 experiment_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq6 - LVAD7';
 
 % Directory structure
@@ -13,19 +13,20 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-%     'G1_Seq6 - F1_Sel1.mat'
-%     'G1_Seq6 - F1_Sel2.mat'
-%     'G1_Seq6 - F1_Sel3.mat'
-     'G1_Seq6 - F1_Sel4.mat'
-     'G1_Seq6 - F1_Sel5.mat'
-% %    'G1_Seq6 - F2_Sel1.mat'
-% %   'G1_Seq6 - F2_Sel2.mat'
-%     'G1_Seq6 - F2_Sel3.mat'
-    'G1_Seq6 - F2_Sel4.mat'
-    'G1_Seq6 - F2_Sel5.mat'
-   'G1_Seq6 - F2_Sel6.mat'
-    };
-notes_fileName = 'G1_Seq6 - Notes ver4.11 - Rev4.xlsm';
+     'G1_Seq6 - F1_Sel1 [accA].mat'
+     %'G1_Seq6 - F1_Sel1 [accB].mat'
+     'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
+     'G1_Seq6 - F1_Sel2 [accA].mat'
+%      'G1_Seq6 - F1_Sel2 [accB].mat'
+%      'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
+%      'G1_Seq6 - F2_Sel1 [accA].mat'
+%      'G1_Seq6 - F2_Sel1 [accB].mat'
+%      'G1_Seq6 - F2_Sel1 [pGraft,pLV,ECG].mat'
+%      'G1_Seq6 - F2_Sel2 [accA].mat'
+%      'G1_Seq6 - F2_Sel2 [accB].mat'
+%      'G1_Seq6 - F2_Sel2 [pGraft,pLV,ECG].mat'
+     };
+notes_fileName = 'G1_Seq6 - Notes ver4.15 - Rev6.xlsm';
 ultrasound_fileNames = {
     'ECM_2020_10_22__11_02_46.wrf'
 };
@@ -46,8 +47,8 @@ powerlab_variable_map = {
     'SensorBAccX'    'accB_x'      'single'    'continuous'
     'SensorBAccY'    'accB_y'      'single'    'continuous'
     'SensorBAccZ'    'accB_z'      'single'    'continuous'
-    %'ECG'            'ecg'         'single'    'continuous'
-    %'pMillarLV'    'pLV'         'single'    'continuous'
+    'ECG'            'ecg'         'single'    'continuous'
+    'pMillarLV'      'pLV'         'single'    'continuous'
     };
 
 systemM_varMap = {
@@ -60,22 +61,15 @@ systemM_varMap = {
 % * Read PowerLab data (PL) and ultrasound (US) files stored as into cell arrays
 % * Read notes from Excel file
 
-init_matlab
-welcome('Initializing data','module')
+welcome('Reading data','module')
+
 if load_workspace({'S_parts','notes','feats'},proc_path); return; end
 
 % Read PowerLab data in files exported from LabChart
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
-
-secsAhead = 47;
-secsRecDur = height(US);
-driftPerSec = secsAhead/secsRecDur;
-driftCompensation = seconds(0:driftPerSec:secsAhead);
-driftCompensation = driftCompensation(1:height(US))';
-US.time = US.time-driftCompensation;
+US = init_system_m_text_files(ultrasound_filePaths,'',systemM_varMap);
 
 % Read sequence notes made with Excel file template
 notes = init_notes_xlsfile_ver4(notes_filePath);
@@ -88,12 +82,16 @@ notes = init_notes_xlsfile_ver4(notes_filePath);
 %   of blocks into one table S
 % * Splitting into parts, each resampling to regular sampling intervals of given frequency
 
+welcome('Preprocessing data','module')
+
+secsAhead = 47.5;
+US = adjust_for_linear_time_drift(US,secsAhead);
+
+
 InclInterRowsInFusion = true;
 
 notes = qc_notes_ver4(notes);
 %feats = init_features_from_notes(notes);
-
-
 
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US,InclInterRowsInFusion);

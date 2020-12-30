@@ -1,6 +1,6 @@
 %close all
 clear check_table_var_input
-seq_no = 7;
+seq_no = 6;
 
 % Calculation settings
 sampleRate = 700;
@@ -13,7 +13,7 @@ circ_ylim = [-90,35];
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {16};
+parts = {2,3,4,5,6,7};
 %parts = {};
 cbl_part = [];
 

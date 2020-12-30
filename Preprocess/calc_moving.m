@@ -7,9 +7,6 @@ function T = calc_moving(T, varNames, statisticTypes, nSamples)
     statisticTypes = cellstr(statisticTypes);
     varNames = cellstr(varNames);
     
-    [fs,T] = get_sampling_rate(T);
-    if isnan(fs), return; end
-    
     for i=1:numel(varNames)
         
         for j=1:numel(statisticTypes)
@@ -57,8 +54,8 @@ function T = calc_moving(T, varNames, statisticTypes, nSamples)
            
             T.Properties.VariableContinuity(movVarName) = 'continuous';
             T.Properties.VariableDescriptions(movVarName) = {sprintf(...
-                'Moving %s\n\t%s\n\tSample rate: %d\n\tWindow lengths (samples)',...
-                descr,fs,nSamples)};
+                'Moving %s\n\t%s\n\tWindow lengths (samples)',...
+                descr,nSamples)};
             
             
         end

@@ -1,9 +1,9 @@
 %% Initialze the processing environment and input file structure
 
 % Which experiment
-basePath = 'C:\Data\IVS\Didrik';
-sequence = 'Seq7 - LVAD1';
-experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq7 - LVAD1';
+basePath = 'D:\Data\IVS\Didrik';
+sequence = 'IV2_Seq16';
+experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq16 - LVAD12 - Pump test';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -15,31 +15,13 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-    'IV2_Seq7 - F1.mat'
-    'IV2_Seq7 - F2.mat'
-    'IV2_Seq7 - F3.mat'
-    'IV2_Seq7 - F4.mat'
-    'IV2_Seq7 - F5.mat'
-    'IV2_Seq7 - F6.mat'
-    'IV2_Seq7 - F7.mat'
-    'IV2_Seq7 - F8.mat'
-    'IV2_Seq7 - F9.mat'
-    'IV2_Seq7 - F10.mat'
-    'IV2_Seq7 - F11.mat'
-    'IV2_Seq7 - F12.mat'
-    'IV2_Seq7 - F13.mat'
-    'IV2_Seq7 - F14.mat'
-    'IV2_Seq7 - F15.mat'
-    'IV2_Seq7 - F16.mat'
+    'IV2_Seq16 - F1.mat'
     };
-cardibox_fileNames = {
+cardibox_fileNames = { 
     };
-notes_fileName = 'IV2_Seq7 - Notes ver4.9 - Rev3.xlsm';
+notes_fileName = 'IV2_Seq16 - Notes ver4.9 - Rev1.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_08_19__13_04_02.wrf'
-    'ECM_2020_08_19__13_28_05.wrf'
-    'ECM_2020_08_20__12_11_36.wrf'
-    'ECM_2020_09_12__15_08_02.wrf'
+    'ECM_2020_11_04__17_57_52.wrf'
     };
 
 % Add subdir specification to filename lists
@@ -74,7 +56,7 @@ systemM_varMap = {
 
 init_matlab
 welcome('Initializing data','module')
-if load_workspace({'S_parts','notes','feats'}); return; end
+%if load_workspace({'S_parts','notes','feats'}); return; end
 
 % Read PowerLab data in files exported from LabChart
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
@@ -97,21 +79,31 @@ notes = init_notes_xlsfile_ver4(notes_filePath);
 % * Splitting into parts, each resampling to regular sampling intervals of given frequency
 
 notes = qc_notes_ver4(notes);
+
 %feats = init_features_from_notes(notes);
 
-clear S
+%clear S
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US);
 %clear PL US
 S_parts = split_into_parts(S);
 %clear S
 
+% S = add_spatial_norms(S,2);
+% S = add_moving_statistics(S);
+% S = add_moving_statistics(S,{'accA_x'});
+% S = add_moving_statistics(S,{'accA_y'});
+% S = add_moving_statistics(S,{'accA_z'});
+
 S_parts = add_spatial_norms(S_parts,2);
 S_parts = add_moving_statistics(S_parts);
 S_parts = add_moving_statistics(S_parts,{'accA_x'});
 S_parts = add_moving_statistics(S_parts,{'accA_y'});
 S_parts = add_moving_statistics(S_parts,{'accA_z'});
-S_parts = add_moving_statistics(S_parts,{'effP','affP'});
+%S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
+%S_parts = add_moving_statistics(S_parts,{'accB_norm'});
+
+%S_parts = add_moving_statistics(S_parts,{'effP','affP'});
 
 
 % TODO:

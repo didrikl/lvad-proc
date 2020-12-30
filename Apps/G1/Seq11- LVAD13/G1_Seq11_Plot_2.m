@@ -5,57 +5,48 @@ seq_no = 11;
 % Calculation settings
 sampleRate = 500;
 
-orderMapVar = 'accA_norm';
+orderMapVar = 'accA_norm_HP';
 mapColScale = [-85,-30];
+% orderMapVar = 'accB_y';
+% mapColScale = [-80,-45];
 mapOrderLim = [0,5.3];
-circ_ylim = [-90,35];
+circ_ylim = [-90,25];
            
 % % Extract data for these RPM values
-rpm = {[0,2400]};
+%rpm = {2400,2400,2200,2600};
+rpm = {2400,2400,2200,2600};
+rpm={};
 bl_part = [];
-parts = {[9:11]};
-%parts = {};
+parts = {5};
+% parts = {9:12};
+% parts = {13:15};
+%parts = {16:19};
 cbl_part = [];
 
-spline_filter = true;
-low_pass = true;
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
 if numel(rpm)==0, rpm = cell(numel(parts),1); end
     
 for i=1:numel(parts)
     welcome(['Part(s) ',num2str(parts{i})],'iteration')
-  
-%     T = merge_table_blocks(S_parts(parts{i}));
-%     T.dur = linspace(0,1/700*height(T),height(T))';
-%     [T,rpms] = make_plot_data2(T,rpm{i},sampleRate,bl_part,cbl_part);
-%      T.accA_norm = highpass(T.accA_norm,0.11,'Steepness',0.85,'StopbandAttenuation',60);
-%      T.accA_norm = lowpass(T.accA_norm,0.37,'Steepness',0.85,'StopbandAttenuation',60);
-%      T = calc_moving(T,'accA_norm',{'Std'},700*15);
-%      [T,rpms] = make_plot_data2(T,rpm{i},sampleRate,bl_part,cbl_part);
     
-[T,rpms] = make_plot_data(parts{i},S_parts,rpm{i},sampleRate,bl_part,cbl_part);
-         h_fig = plot_ordermap_with_vars(...
-           T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim,mapOrderLim);
+    [T,rpms] = make_plot_data(parts{i},S_parts,rpm{i},sampleRate,bl_part,cbl_part);
+    h_fig = plot_ordermap_with_vars(...
+        T,orderMapVar,sampleRate,bl_part,mapColScale,notes,circ_ylim,mapOrderLim);
 
-    save_path = 'C:\Data\IVS\Didrik\G1 - Simulated pre-pump and in situ thrombosis\Seq2 - LVAD2 - Pilot\Processed\Figures';
-    %save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
+    save_path = 'D:\Data\IVS\Didrik\G1 - Simulated pre-pump and in situ thrombosis\Seq11 - LVAD13\Processed\';
+    save_to_png(T,notes,h_fig,parts{i},orderMapVar,save_path,rpms,seq_no)
     
 end
-
 
 function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms, seq_no)
     resolution = 300;
     
-    catheter = string(notes.catheter(T.noteRow(...
-        find(T.balloonLevel=='1',1,'first'))));
-    if isempty(catheter)
-        catheter = "(No catheter)";
-    end
+    catheter = '11mm RHC';
     rpms = mat2str(rpms);
     
-    fig_name = sprintf('G1_Seq%d - RPM=%s - Catheter=%s - %s - Part=%s',...
-        seq_no,mat2str(rpms),catheter,orderMapVar,mat2str(parts));
+    fig_name = sprintf('G1_Seq%d - Part=%s - OrderMapVar %s HighPass - RPM=%s - Catheter=%s - %s',...
+        seq_no,mat2str(parts),orderMapVar,mat2str(rpms),catheter);
     set(h_fig,'Name',fig_name);
     
     save_figure([save_path,'\Figures'], fig_name, resolution)
@@ -65,6 +56,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
     % Extract relevant data, and baseline is always put first
     all_parts = [bl_part,sort([parts,cbl_part])];
     T = merge_table_blocks(S_parts(all_parts));
+    if isempty(T), warning('Empty table. Is data initialized?'); end
     T.dur = linspace(0,1/fs*height(T),height(T))';
     
     % If not given, find RPM values from all parts (that are not baseline parts)
@@ -72,9 +64,17 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         T2 = merge_table_blocks(S_parts(parts));
         rpm = unique(T2.pumpSpeed);
     end
-    T = T(ismember(T.pumpSpeed,int16(rpm)),:);
+    T = T(ismember(T.pumpSpeed,rpm),:);
     %T = T(not(contains(string(T.event),'clamp start')),:);
     
+    for i=1:numel(rpm)
+        if rpm(i)==0, continue; end
+        inds = T.pumpSpeed==rpm(i);
+        Fpass = (rpm(i)/60)-1;
+        T.accA_norm_HP(inds) = highpass(T.accA_norm(inds),Fpass,500);
+    end
+    T = add_moving_statistics(T,{'accA_norm_HP'});
+     
     % Keep only steady or baseline denoted row in the baseline parts
     T(contains(string(T.part),string([bl_part,cbl_part])) & ...
         not(contains(lower(string(T.intervType)),{'baseline','steady'})),:) = [];
@@ -82,8 +82,6 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
     if height(T)==0
         warning('No rows in data parts %s, with RPM=%s',...
             mat2str(all_parts),mat2str(rpm));
-    elseif height(T)<T.Properties.SampleRate
-        warning('Data table is shorter than one second')
     end
     
     blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
@@ -102,11 +100,6 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
     for k=1:height(blocks)
         range = blocks.start_inds(k):blocks.end_inds(k);
         
-        if numel(range)<T.Properties.SampleRate
-            warning('Interval between is shorter than one second')
-            continue
-        end
-    
         % This is a workaround for bug
         if numel(range)==1, continue; end
         % TODO: Fix issue with numel(range)==1 in find_cat_block_inds instead. 
@@ -193,7 +186,7 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
         'Color', [.85 .85 .85]};
     specs.bal_lev_bar = {
         'LineStyle','-',...
-        'LineWidth',8,...
+        'LineWidth',7,...
         'Marker','none',...
         'Color', [0.96,0.68,0.68]}; 
     specs.trans_lev_bar = {
@@ -246,10 +239,10 @@ function [h_fig,h_ax] = init_axes_layout
     ax_xPos = 0.075;
     ax_width = 0.72;
     ax_yGap = 0.0037;
-    bar_height = 0.070;
+    bar_height = 0.050;
     xLab_space = 0.035;
     
-    ax_height(3) = 0.48;
+    ax_height(3) = 0.5;
     ax_yPos(3) = xLab_space;
     
 %     ax_height(3) = 0.15;
@@ -279,67 +272,75 @@ function add_interv_bar(h,T,notes)
     ss_inds = get_steady_state_rows(T);
     
     %T.event = renamecats(T.event,{'Balloon volume change'},{'Volume change'});
-    event = removecats(removecats(T.event),{'-'});
+    eventCol = removecats(removecats(T.event),{'-'});
     %event = mergecats(event,categories(event),'Hands on');
-    plot(T.t,event,specs.event_bar{:})
+    events = categories(eventCol);
+    for i=1:numel(events)
+        events(i)
+        inds = ismember(T.event,events{i});
+        if nnz(inds)==0, continue; end
+        eventEnds = find(diff(inds)<0)-1;
+        eventStarts = find(diff(inds)>0)+1;
+        if inds(1), eventStarts = [1;eventStarts]; end
+        if inds(end), eventEnds = [eventEnds;1]; end
+        for j=1:numel(eventStarts)
+            block_rows = eventStarts(j):eventEnds(j);
+            plot(T.t(block_rows),eventCol(block_rows),specs.event_bar{:})
+        end
+    end
+%     catheter = string(notes.catheter(T.noteRow(...
+%         find(T.balloonLevel=='1',1,'first'))));
+catheter = '11mm RHC';
+    T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
+        'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
+     T.balloonLevel = renamecats(T.balloonLevel,'1',...
+         sprintf('Deflated balloon'));%sprintf('Deflated %s balloon',catheter));
+    T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
     
-% %     catheter = string(notes.catheter(T.noteRow(...
-% %         find(T.balloonLevel=='1',1,'first'))));
-% %     
-% %     %TODO: check if category exist instead of try and catch
-% %     try
-% %     T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
-% %         'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-% %     T.balloonLevel = renamecats(T.balloonLevel,'1',...
-% %         sprintf('Empty balloon'));%sprintf('Empty %s balloon',catheter));
-% %     catch
-% %     end
-% %     T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
-% %     
-% %     plot(T.t(ss_inds),T.balloonLevel(ss_inds),specs.trans_lev_bar{:})
-% %     t_ss = nan(height(T),1);
-% %     t_ss(ss_inds) = T.t(ss_inds);
-% %     plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
-% % 
-% %     h.YColor = [0 0 0];
-% %     
-% %     yyaxis left
-% %     
-% %     h.YTickLabel = [];
-% %     h.YColor = [0 0 0];
-% %     h.XAxisLocation = 'top';
-% %     
-% %     % TODO: Make this as separate function(?)
-% %     rpms = mat2str(double(string((get_cats(T,'pumpSpeed')))));
-% %     if not(strcmp(catheter,"-"))
-% %         titleStr = {...'\bfVibration','\rm|a_x, a_y, a_z|',...
-% %             '\bfRPM\rm',rpms,'\bfCatheter\rm',sprintf('%s',catheter)};
-% %     else
-% %        titleStr = {'\bfRPM\rm',rpms};
-% %        if any(contains(lower(string(event)),{'afferent','preload'}))
-% %            titleStr = [titleStr,{'\bfPreload\rm','Clamp'}];
-% %        end
-% %        if any(contains(lower(string(event)),{'efferent','afterload'}))
-% %            titleStr = [titleStr,{'\bfAfterload\rm','Clamp'}];
-% %        end
-% %     end
-% %     
-% %     annotation(gcf,'textbox',...
-% %         'Position',[0.8622 0.9 0.1277822 0.070402],...
-% %         'FitBoxToText','on',...
-% %         'BackgroundColor',[1 1 1],...
-% %         'String',titleStr,...
-% %         'FontSize',10.5);
-% %     
-% %     [bl_start_ind, bl_end_ind] = get_baseline_block(T);
-% % %     try
-% % %         text(double(T.t( floor(mean([bl_start_ind(1),bl_end_ind(1)])) )),0.5,...
-% % %             sprintf('%Baseline_{%d}',T.pumpSpeed(bl_start_ind)),...
-% % %         specs.baseline_title{:})
-% % %     catch
-% % %         text(0,0.5,'Baseline',...
-% % %             specs.baseline_title{:})
-% % %     end
+    plot(T.t(ss_inds),T.balloonLevel(ss_inds),specs.trans_lev_bar{:})
+    t_ss = nan(height(T),1);
+    t_ss(ss_inds) = T.t(ss_inds);
+    plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
+
+    h.YColor = [0 0 0];
+    
+    yyaxis left
+    
+    h.YTickLabel = [];
+    h.YColor = [0 0 0];
+    h.XAxisLocation = 'top';
+    
+    % TODO: Make this as separate function(?)
+    rpms = mat2str(double(string((get_cats(T,'pumpSpeed')))));
+    if not(strcmp(catheter,"-"))
+        titleStr = {...'\bfVibration','\rm|a_x, a_y, a_z|',...
+            '\bfRPM\rm',rpms,'\bfCatheter\rm',sprintf('%s',catheter)};
+    else
+       titleStr = {'\bfRPM\rm',rpms};
+       if any(contains(lower(string(eventCol)),{'afferent','preload'}))
+           titleStr = [titleStr,{'\bfPreload\rm','Clamp'}];
+       end
+       if any(contains(lower(string(eventCol)),{'efferent','afterload'}))
+           titleStr = [titleStr,{'\bfAfterload\rm','Clamp'}];
+       end
+    end
+    
+    annotation(gcf,'textbox',...
+        'Position',[0.8622 0.9 0.1277822 0.070402],...
+        'FitBoxToText','on',...
+        'BackgroundColor',[1 1 1],...
+        'String',titleStr,...
+        'FontSize',10.5);
+    
+    [bl_start_ind, bl_end_ind] = get_baseline_block(T);
+%     try
+%         text(double(T.t( floor(mean([bl_start_ind(1),bl_end_ind(1)])) )),0.5,...
+%             sprintf('%Baseline_{%d}',T.pumpSpeed(bl_start_ind)),...
+%         specs.baseline_title{:})
+%     catch
+%         text(0,0.5,'Baseline',...
+%             specs.baseline_title{:})
+%     end
     
 end
 
@@ -602,17 +603,17 @@ function add_circulation(h,T)
 %         'Color',[0.5781,0.5117,0.9453],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
 %         'HandleVisibility','off');
     
-%     plot(T.t,T.p_graft_shift,...
-%         'LineWidth',0.5,...
-%         'LineStyle','-',...
-%         'Color',[0.52,0.07,0.67, 0.05],...
-%         'HandleVisibility','off');
-%     T.p_graft_shift(not(ss_rows)) = nan;
-%     plot(T.t,T.p_graft_shift,...
-%         'LineWidth',0.75,...
-%         'LineStyle','-',...
-%         'Color',[0.52,0.07,0.67, 0.7],...
-%         'DisplayName','\itP\rm, graft');
+    plot(T.t,T.p_graft_shift,...
+        'LineWidth',0.5,...
+        'LineStyle','-',...
+        'Color',[0.52,0.07,0.67, 0.05],...
+        'HandleVisibility','off');
+    T.p_graft_shift(not(ss_rows)) = nan;
+    plot(T.t,T.p_graft_shift,...
+        'LineWidth',0.75,...
+        'LineStyle','-',...
+        'Color',[0.52,0.07,0.67, 0.7],...
+        'DisplayName','\itP\rm, graft');
     
     plot(T.t,T.Q_ultrasound_shift,...
         'LineWidth',0.5,...
@@ -776,91 +777,4 @@ end
     %h_ax(end).XMinorTick = 'on';
     %Minor = 60:60:xlims(2);
     %h_ax(end).XTickLabel = durs/60
-end
-
-function [T,rpm] = make_plot_data2(T,rpm,fs,bl_part,cbl_part)
-    % Extract relevant data, and baseline is always put first
-     
-    % If not given, find RPM values from all parts (that are not baseline parts)
-    if isempty(rpm)
-        rpm = unique(T.pumpSpeed);
-    end
-    T = T(ismember(T.pumpSpeed,rpm),:);
-    %T = T(not(contains(string(T.event),'clamp start')),:);
-    
-    % Keep only steady or baseline denoted row in the baseline parts
-    T(contains(string(T.part),string([bl_part,cbl_part])) & ...
-        not(contains(lower(string(T.intervType)),{'baseline','steady'})),:) = [];
-    
-    
-    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
-    
-    if isempty(bl_part)
-        bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
-    else
-        bl_inds = contains(string(T.part),string(bl_part)) & ...
-            ismember(lower(string(T.intervType)),{'baseline','steady-state'});
-    end
-    if nnz(bl_inds)==0
-        warning('No baseline intervals explicitly given in notes')
-        bl_inds = blocks.start_inds(1):blocks.end_inds(1);
-    end   
-        
-    for k=1:height(blocks)
-        range = blocks.start_inds(k):blocks.end_inds(k);
-        
-        if numel(range)<T.Properties.SampleRate
-            warning('Interval between is shorter than one second')
-            continue
-        end
-    
-        % This is a workaround for bug
-        if numel(range)==1, continue; end
-        % TODO: Fix issue with numel(range)==1 in find_cat_block_inds instead. 
-        
-        T.accA_x_rms(range) = rms(T.accA_x(range));
-        T.accA_x_std(range) = std(T.accA_x(range));
-        T.accA_y_std(range) = std(T.accA_y(range));
-        T.accA_z_std(range) = std(T.accA_z(range));
-        T.accA_norm_std(range) = std(T.accA_norm(range));
-        T.accA_norm_rms(range) = rms(T.accA_norm(range));
-%        T.accA_normHighPass_std(range) = std(T.accA_normHighPass(range));
-%        T.accA_normHighPass_rms(range) = rms(T.accA_normHighPass(range));
-        
-        freqx{k} = meanfreq(detrend(T.accA_x(range)),fs);
-        T.accA_x_mpf(range) = freqx{k};
-        T.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
-        freqy{k} = meanfreq(detrend(T.accA_y(range)),fs);
-        T.accA_y_mpf(range) = freqy{k};
-        T.accA_y_mpf_shift(range) = freqy{k} - freqy{1};
-        freqz{k} = meanfreq(detrend(T.accA_z(range)),fs);
-        T.accA_z_mpf(range) = freqz{k};
-        T.accA_z_mpf_shift(range) = freqz{k} - freqz{1};
-        freq{k} = meanfreq(detrend(T.accA_norm(range)),fs);
-        T.accA_norm_mpf(range) = freq{k};
-        T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
-        
-        Q = T.Q_graft;%mean([T.affQ,T.effQ],2);
-        T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
-        T.p_graft_shift = 100*(T.p_graft_movAvg-mean(T.p_graft(bl_inds),'omitnan'))/mean(T.p_graft(bl_inds),'omitnan');
-        T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
-        T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');
-        
-        T.accA_norm_std_shift = -100*(T.accA_norm_std-mean(T.accA_norm_std(bl_inds)))/mean(T.accA_norm_std(bl_inds));
-        T.accA_norm_movStd_shift = -100*(T.accA_norm_movStd-mean(T.accA_norm_movStd(bl_inds),'omitnan'))/mean(T.accA_norm_movStd(bl_inds),'omitnan');
-%        T.accA_normHighPass_std_shift = -100*(T.accA_normHighPass_std-mean(T.accA_normHighPass_std(bl_inds)))/mean(T.accA_normHighPass_std(bl_inds));
-%        T.accA_normHighPass_movStd_shift = -100*(T.accA_normHighPass_movStd-mean(T.accA_normHighPass_movStd(bl_inds),'omitnan'))/mean(T.accA_normHighPass_movStd(bl_inds),'omitnan');
-        T.accA_x_std_shift = -100*(T.accA_x_std-mean(T.accA_x_std(bl_inds)))/mean(T.accA_x_std(bl_inds));
-        T.accA_x_movStd_shift = -100*(T.accA_x_movStd-mean(T.accA_x_movStd(bl_inds),'omitnan'))/mean(T.accA_x_movStd(bl_inds),'omitnan');
-    
-        T.accA_norm_rms_shift = -100*(T.accA_norm_rms-mean(T.accA_norm_rms(bl_inds)))/mean(T.accA_norm_rms(bl_inds));
-        T.accA_norm_movRMS_shift = -100*(T.accA_norm_movRMS-mean(T.accA_norm_movRMS(bl_inds),'omitnan'))/mean(T.accA_norm_movRMS(bl_inds),'omitnan');
-        T.accA_x_rms_shift = -100*(T.accA_x_std-mean(T.accA_x_rms(bl_inds)))/mean(T.accA_x_rms(bl_inds));
-        T.accA_x_movRMS_shift = -100*(T.accA_x_movRMS-mean(T.accA_x_movRMS(bl_inds),'omitnan'))/mean(T.accA_x_movRMS(bl_inds),'omitnan');
-    
-    end
-    
-    %T = T(get_steady_state_rows(T),:);
-    T.Properties.SampleRate = fs;
-    
 end

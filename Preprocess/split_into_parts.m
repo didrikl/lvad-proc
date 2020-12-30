@@ -1,8 +1,8 @@
-function S_parts = split_into_parts(S)
+function S_parts = split_into_parts(S,maxSignalFreq)
         
     % Sample rate for re-sampling down to highest signal content frequency 
-    maxSignalFreq = 700;
-
+    if nargin<2, maxSignalFreq=ask_for_new_sample_rate; end
+    
     welcome('Splitting into resampled parts')
     h_wait = waitbar(0,'','Name','Preprocessing parts...');
     

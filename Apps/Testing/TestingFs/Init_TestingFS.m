@@ -65,7 +65,7 @@ notes_filePath = fullfile(notes_subdir,IV2S1_notes_fileName);
 IV2S1_sampleRate = 1000;
 
 IV2S1_PL = init_labchart_mat_files(powerlab_fileNames,raw_basePath);
-IV2S1_US = init_m3_raw_textfile(IV2S1_ultrasound_fileNames,raw_basePath);
+IV2S1_US = init_system_m_text_files(IV2S1_ultrasound_fileNames,raw_basePath);
 IV2S1_notes = init_notes_xlsfile_v3_2(notes_filePath);
 
 %% Pre-processing of data from IV2_Seq1

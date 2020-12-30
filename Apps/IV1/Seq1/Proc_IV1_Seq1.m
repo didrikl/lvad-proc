@@ -42,7 +42,7 @@ notes_filePath = 'C:\Data\IVS\Didrik\IV1_Seq1 - Thrombi injection into HVAD\Note
 notes = init_notes_xlsfile(notes_fileName,notes_filePath);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-%ultrasound = init_m3_raw_textfile(ultrasound_fileName,read_path);
+%ultrasound = init_system_m_text_files(ultrasound_fileName,read_path);
 
 features = init_features_from_notes(notes);
 

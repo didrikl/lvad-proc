@@ -4,7 +4,7 @@ function welcome(str, type)
     
     switch type
         case 'iteration'
-            fprintf('\n<strong>%s</strong>\n',str)
+            fprintf('\n<strong>%s</strong>',str)
         
         case 'function'
             line = repmat('-',1,numel(str)+2);

@@ -1,13 +1,13 @@
-function signal = init_m3_raw_textfile_read(fileName, startRow, endRow)
+function signal = init_system_m_text_files_read(fileName, startRow, endRow)
     %INIT_M3_RAW_TEXTFILE Import numeric data from a text file as a matrix.
-    %   signal = init_m3_raw_textfile_read(FILENAME) Reads data from text file FILENAME
+    %   signal = init_system_m_text_files_read(FILENAME) Reads data from text file FILENAME
     %   for the default selection.
     %
-    %   signal = init_m3_raw_textfile_read(FILENAME, STARTROW, ENDROW) Reads data from
+    %   signal = init_system_m_text_files_read(FILENAME, STARTROW, ENDROW) Reads data from
     %   rows STARTROW through ENDROW of text file FILENAME.
     %
     % Example:
-    %   signal = init_m3_raw_textfile_read('ECM_2019_06_28__15_58_28.wrf', 1, 15);
+    %   signal = init_system_m_text_files_read('ECM_2019_06_28__15_58_28.wrf', 1, 15);
     %
     %    See also TEXTSCAN.
     

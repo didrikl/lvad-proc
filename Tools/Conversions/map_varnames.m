@@ -1,6 +1,9 @@
 function [T,inFile_inds,inFile_vars] = map_varnames(T,fileMapVars,codeMapVars)
     
     varsInT = T.Properties.VariableNames;
+    welcome('Variable mapping','function')
+    fprintf('Varible expected to be found in file: %s\n',strjoin(fileMapVars))
+    %fprintf('Varible expected to be found in file: %s\n',strjoin(codeMapVars))
     
     % Handle uncovered columns in map (i.e. extra columns in file are removed)
     isMissingInMap = not(ismember(varsInT,fileMapVars));

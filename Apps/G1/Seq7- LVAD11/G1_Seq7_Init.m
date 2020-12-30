@@ -69,7 +69,7 @@ if load_workspace({'S_parts','notes','feats'},proc_path); return; end
 PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
-US = init_m3_raw_textfile(ultrasound_filePaths,'',systemM_varMap);
+US = init_system_m_text_files(ultrasound_filePaths,'',systemM_varMap);
 
 US.time = US.time-hours(1);
 secsAhead = 5; % Just an estimate based on previous drifts
