@@ -1,62 +1,58 @@
-function T_parts = add_moving_statistics(T_parts, varNames, statisticTypes)
-    % Function for IV2 model to add relevant variables
-    % TODO: Make this an IV2 object method
+function T_parts = add_moving_statistics(T_parts, varNames, statistics)
+    % Function for array of data timetables to add moving statistics.
+    %
+    % First values in each part will be NaN. A good practice could e.g. 
+    % therefore be to do some extra recording at start of the part before 
+    % doing interventions, which would avoid such gaps.
     
-    % Add moving statistics (first values in each part will be NaN)
-    % Good practice could e.g. be to do some extra recording at start of
-    % the part before doing interventions, which would avoid such gaps.
+    % TODO: Make this an model object method
+    
+    statSpecs = {
+        % supported win suffix
+        'rms',      1,  '_movRMS'
+        'var',      15, '_movVar'
+        'std',      15, '_movStd'
+        'min',      5,  '_movMin'
+        'max',      5,  '_movMax'
+        'avg',      10, '_movAvg'
+        };
+    
+    % Just for compatibility
+    if nargin<2, varNames = 'accA_norm'; end
+    if nargin<3, statistics = {'std'}; end
     
     welcome('Calculating moving statistics')
     
-    % NOTE: This could be OO:
+    [returnAsCell,T_parts] = get_cell(T_parts);
     if isempty(T_parts)
-        warning('Input data table %s is empty',inputname(1))
+        warning('Input data %s is empty',inputname(1))
         return
     end
-    return_as_cell = iscell(T_parts);
-    if not(iscell(T_parts)), T_parts = {T_parts}; end
-       
-    if nargin<2, varNames = {'accA_norm'}; end
-    if nargin<3, statisticTypes = {'RMS','Std','Min','Max','Avg'}; end
-
-    rms_winDur = 1;
-    std_winDur = 15;
-    min_winDur = 5;
-    max_winDur = 5;
-    avg_winDur = 10;
     
-    
-    fprintf(['Calculations\n\tMoving RMS in %d sec windows',...
-        '\n\tMoving SD in %d sec windows\n'],rms_winDur,std_winDur);
-    stdNames = varNames+"_movStd";
-    rmsNames = varNames+"_movRMS";
-    minNames = varNames+"_movMin";
-    maxNames = varNames+"_movMax";
-    avgNames = varNames+"_movAvg";
-    fprintf('Input\n\t%s\nOutput\n\tRMS: %s\n\tSD: %s\n',...
-        strjoin(varNames,', '),strjoin(rmsNames,', '),strjoin(stdNames,', '))
-    
-    for i=1:numel(T_parts)
-        
-        if height(T_parts{i})==0, continue; end
-        %fs = T_parts{i}.Properties.SampleRate;
-        [fs,T] = get_sampling_rate(T_parts{i});
-    
-        T_parts{i} = calc_moving(T_parts{i},varNames,{'RMS'},fs*rms_winDur);
-        T_parts{i} = calc_moving(T_parts{i},varNames,{'Std'},fs*std_winDur);
-%         T_parts{i} = calc_moving(T_parts{i},varNames,{'Min'},fs*min_winDur);
-%         T_parts{i} = calc_moving(T_parts{i},varNames,{'Max'},fs*max_winDur);
-        T_parts{i} = calc_moving(T_parts{i},varNames,{'Avg'},fs*avg_winDur);
-       
+    unsupported = not(ismember(statistics,statSpecs(:,1)));
+    if any(unsupported)
+        warning(sprintf('Unsupported stastitics types given:\n\t%s',...
+            strjoin(statistics(unsupported),', ')))
+        statSpecs(unsupported,:) = [];
     end
     
-    T_parts = convert_to_single(T_parts, rmsNames);
-    T_parts = convert_to_single(T_parts, stdNames);
+    nTypes = numel(statSpecs(:,1));
+    newVarNames = {};
+    for j=1:numel(varNames)  
+        fprintf('Variable %-10s:\n',varNames{j})
+        for i=1:nTypes
+            newVarNames{end+1} = [varNames{j},statSpecs{i,3}];
+            fprintf('\t%s, %g sec window: %s\n',statSpecs{i,1},...
+                statSpecs{i,2},newVarNames{end});
+        end
+    end  
 
-    if not(return_as_cell), T_parts = T_parts{1}; end
+    fnc = @calc_moving;
+
+    T_parts = add_in_parts(fnc,T_parts,varNames,newVarNames,...
+            statSpecs(:,1),statSpecs(:,2));
     
-    clear check_table_var_output
-    clear check_var_input_to_table
-    
-    
-    
+    T_parts = convert_to_single(T_parts, newVarNames);
+
+    if not(returnAsCell), T_parts = T_parts{1}; end
+   

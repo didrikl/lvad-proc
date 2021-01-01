@@ -87,44 +87,42 @@ welcome('Preprocessing data','module')
 secsAhead = 47.5;
 US = adjust_for_linear_time_drift(US,secsAhead);
 
-
-InclInterRowsInFusion = true;
-
 notes = qc_notes_ver4(notes);
 %feats = init_features_from_notes(notes);
 
+InclInterRowsInFusion = true;
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US,InclInterRowsInFusion);
 
-% Just to visualize signal in RPM order plot also when pump is off. First pump
-% speed after turning of LVAD is used as dummy RPM value. It should be clear
-% from the plot that the LVAD is off.
-% TODO: Move this into plot function. It is misleading to do this as
-% preprocessing. It is only for RPM order plotting.
-turnOn_ind = find(diff(S.pumpSpeed==0)==-1)+1;
-turnOff_ind = find(diff(S.pumpSpeed==0)==1)+1;
-
-% If notes starts with LVAD off, then include also this in turnOff_ind
-firstisOff_ind = find(S.pumpSpeed==0,1,'first');
-if not(ismember(firstisOff_ind,turnOff_ind))
-    turnOff_ind = [firstisOff_ind;turnOff_ind];
-end
-
-% Insert dummy RPM values for when LVAD is off in order to create spectrogram
-% using RPM order plot. (Dummy value is the first LVAD-on-RPM value.)
-for i=1:numel(turnOn_ind)
-    S.pumpSpeed(turnOff_ind(i):turnOff_ind-1) = S.pumpSpeed(turnOn_ind(i));
-end
-
-% Handle special case if notes ends with LVAD off 
-% (Dummy value is the last LVAD-on-RPM value.)
-if numel(turnOff_ind)==numel(turnOn_ind)+1
-    S.pumpSpeed(turnOff_ind(end):end) = turnOff_ind(end)-1;
-end
-   
-% Flow though graft before starting LVAD is ignored.
-US(US.time<notes.time(3),:) = [];
-
+% % Just to visualize signal in RPM order plot also when pump is off. First pump
+% % speed after turning of LVAD is used as dummy RPM value. It should be clear
+% % from the plot that the LVAD is off.
+% % TODO: Move this into plot function. It is misleading to do this as
+% % preprocessing. It is only for RPM order plotting.
+% turnOn_ind = find(diff(S.pumpSpeed==0)==-1)+1;
+% turnOff_ind = find(diff(S.pumpSpeed==0)==1)+1;
+% 
+% % If notes starts with LVAD off, then include also this in turnOff_ind
+% firstisOff_ind = find(S.pumpSpeed==0,1,'first');
+% if not(ismember(firstisOff_ind,turnOff_ind))
+%     turnOff_ind = [firstisOff_ind;turnOff_ind];
+% end
+% 
+% % Insert dummy RPM values for when LVAD is off in order to create spectrogram
+% % using RPM order plot. (Dummy value is the first LVAD-on-RPM value.)
+% for i=1:numel(turnOn_ind)
+%     S.pumpSpeed(turnOff_ind(i):turnOff_ind-1) = S.pumpSpeed(turnOn_ind(i));
+% end
+% 
+% % Handle special case if notes ends with LVAD off 
+% % (Dummy value is the last LVAD-on-RPM value.)
+% if numel(turnOff_ind)==numel(turnOn_ind)+1
+%     S.pumpSpeed(turnOff_ind(end):end) = turnOff_ind(end)-1;
+% end
+%    
+% % Flow though graft before starting LVAD is ignored.
+% US(US.time<notes.time(3),:) = [];
+% 
 
 S_parts = split_into_parts(S);
 

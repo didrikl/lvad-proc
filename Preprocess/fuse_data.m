@@ -10,7 +10,7 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
     
     welcome('Data fusion')
     
-    [returnAsCell,PL] = get_return_type(PL);
+    [returnAsCell,PL] = get_cell(PL);
     
     % Loop over each stored PowerLab file
     %    h_wait = waitbar(0,'','Name','Data fusion...');

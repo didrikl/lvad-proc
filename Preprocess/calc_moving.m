@@ -1,44 +1,62 @@
-function T = calc_moving(T, varNames, statisticTypes, nSamples)
+function T = calc_moving(T, varNames, newVarNames, statisticTypes, winLength)
     % CALC_MOVING Calculate moving stastistic in a timetable
     %   
     % See also dsp
     %
 
-    statisticTypes = cellstr(statisticTypes);
-    varNames = cellstr(varNames);
+    [~,varNames] = get_cell(varNames);
+    [~,statisticTypes] = get_cell(statisticTypes);
+    [fs,T] = get_sampling_rate(T);
+    nSamples = fs*winLength;
+        
+    % TODO: Develop get_cell to handle this:
+    %[~,nSamples] = get_cell(nSamples);
     
+    if numel(nSamples)==1 
+        nSamples = repmat(nSamples,numel(statisticTypes),1);
+    elseif numel(nSamples)~=numel(statisticTypes)
+        error(['Number of values in nSamples must be one or equal to number',... 
+            'the number of statistic types in statisticTypes'])
+    end
+
+%     if numel(newVarNames)~=numel(statisticTypes)
+%         error(['Number of output variable names in newVarNames must equal',...
+%             'the number of statistic types in statisticTypes'])
+%     end
+
+    unsupported = not(ismember(statisticTypes,...
+        {'rms','var','std','min','max','avg'}));
+    if any(unsupported)
+        warning(sprintf('Unsupported stastitics types given:\n\t%s',...
+            strjoin(statisticTypes(unsupported),', ')))
+    end
+        
     for i=1:numel(varNames)
         
         for j=1:numel(statisticTypes)
             
-            % NOTE: Could implement later a more robust check, but is dropped
-            % for now, since it is  much interaction and complications with it
-%             suffix = ['_','mov',statisticTypes{j}];                        
-%             [varName,movVarName] = check_calc_io(T,varNames{i},suffix);
-%             if isempty(movVarName), continue; end
-
-            movVarName = [varNames{i},'_','mov',statisticTypes{j}];
+            %movVarName = [varNames{i},'_','mov',statisticTypes{j}];
             vec = T.(varNames{i});
             
             switch lower(statisticTypes{j})
                 
                 case 'rms'
-                    MovObj = dsp.MovingRMS(nSamples);
+                    MovObj = dsp.MovingRMS(nSamples(i));
                     descr = 'root-mean-square';
                 case 'var'
-                    MovObj = dsp.MovingVariance(nSamples);
+                    MovObj = dsp.MovingVariance(nSamples(i));
                     descr = 'variance';
                 case 'std'
-                    MovObj = dsp.MovingStandardDeviation(nSamples);
+                    MovObj = dsp.MovingStandardDeviation(nSamples(i));
                     descr = 'standard deviation';
                 case 'min'
-                    MovObj = dsp.MovingMinimum(nSamples);
+                    MovObj = dsp.MovingMinimum(nSamples(i));
                     descr = 'moving minimum';
                 case 'max'
-                    MovObj = dsp.MovingMaximum(nSamples);
+                    MovObj = dsp.MovingMaximum(nSamples(i));
                     descr = 'moving maximum';
                 case 'avg'
-                    MovObj = dsp.MovingAverage(nSamples);
+                    MovObj = dsp.MovingAverage(nSamples(i));
                     descr = 'moving average';
                     
                 otherwise                  
@@ -46,7 +64,7 @@ function T = calc_moving(T, varNames, statisticTypes, nSamples)
                      
             end
             
-            T.(movVarName) = MovObj(vec);
+            T.(newVarNames{j}) = MovObj(vec);
             
             % Moving statistic samples before full window make less sence/can
             % cause confusion, hence setting these sample values as nan

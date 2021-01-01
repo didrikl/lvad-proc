@@ -1,4 +1,4 @@
-function [returnAsCell,entities] = get_return_type(entities)
+function [returnAsCell,entities] = get_cell(entities)
     
     returnAsCell = iscell(entities);
     

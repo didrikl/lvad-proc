@@ -26,7 +26,7 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
 
     welcome('Initializing LabChart .mat files')
     
-    [returnAsCell,fileNames] = get_return_type(fileNames);
+    [returnAsCell,fileNames] = get_cell(fileNames);
     [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path,'mat');
     
     % Initialization of LabChart block(s), with support for block composed of 
