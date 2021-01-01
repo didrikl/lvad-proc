@@ -3,13 +3,8 @@ function varNames = check_table_var_input(T, varNames)
     persistent always_skip
     if isempty(always_skip), always_skip = false; end
     
-    if not(iscell(varNames))
-        varNames = cellstr(varNames);
-        output_as_cell = false;
-    else
-        output_as_cell = true;
-    end
-    
+    [returnAsCell,varNames] = get_cell(varNames);
+
     for i=1:numel(varNames)
 
         if not(ismember(varNames{i},T.Properties.VariableNames))
@@ -53,6 +48,4 @@ function varNames = check_table_var_input(T, varNames)
         
     end
     
-    if not(output_as_cell) 
-        varNames = varNames{1}; 
-    end
+    if not(returnAsCell), varNames = varNames{1}; end

@@ -22,39 +22,47 @@ function T = resample_signal(T,sampleRate,method)
     % Method default settings
     if nargin<3, method = 'linear'; end
     
+    welcome('Resampling signal')
+    
+    [returnAsCell,T] = get_cell(T);
+
     fprintf('\nResampling:')
     fprintf('\n\tMethod: %s',method)
     fprintf('\n\tNew sample rate: %d',sampleRate)
     
-    % Resample to even sampling, before adding categorical data and more from notes
-    measured_cols = T.Properties.CustomProperties.Measured;
-    derived_cols = T.Properties.VariableContinuity=='continuous' & not(measured_cols);
-    resamp_cols = measured_cols | derived_cols;
-    %TODO: 
-    % int_resamp_cols = resamp_cols && isa(T{:,resamp_cols),'int16')
-    % T{:,int_resamp_cols} = single(T{:,int_resamp_cols});
-    % ...resample...
-    % T{:,int_resamp_cols} = int(T{:,int_resamp_cols});
-    merge_cols = not(resamp_cols);
-    merge_varNames = T.Properties.VariableNames(merge_cols);
-    resamp_varNames = T.Properties.VariableNames(resamp_cols);
-  
-    fprintf('\n\tRe-sampling: %s\n',strjoin(resamp_varNames,', '))
-    
-    % In case there are notes columns merged with signal, then these columns
-    % must be kept separately and then merged with signal after resampling
-    if any(merge_cols)
-        fprintf('\tRe-merging: %s\n',strjoin(merge_varNames,', '))
-        merge_varsTable = T(:,merge_varNames);
-   end
-    
-    % Resampling
-    T = retime(T(:,resamp_varNames),...
-        'regular',method,...
-        'SampleRate',sampleRate);
-
-    % Re-include notes info
-    if any(merge_cols)
-        T = fuse_timetables(T,merge_varsTable,...
-            'regular','SampleRate',sampleRate);
+    for i=1:numel(T)
+        % Resample to even sampling, before adding categorical data and more from notes
+        measured_cols = T{i}.Properties.CustomProperties.Measured;
+        derived_cols = T{i}.Properties.VariableContinuity=='continuous' & not(measured_cols);
+        resamp_cols = measured_cols | derived_cols;
+        %TODO:
+        % int_resamp_cols = resamp_cols && isa(T{:,resamp_cols),'int16')
+        % T{:,int_resamp_cols} = single(T{:,int_resamp_cols});
+        % ...resample...
+        % T{:,int_resamp_cols} = int(T{:,int_resamp_cols});
+        merge_cols = not(resamp_cols);
+        merge_varNames = T{i}.Properties.VariableNames(merge_cols);
+        resamp_varNames = T{i}.Properties.VariableNames(resamp_cols);
+        
+        fprintf('\n\tRe-sampling: %s\n',strjoin(resamp_varNames,', '))
+        
+        % In case there are notes columns merged with signal, then these columns
+        % must be kept separately and then merged with signal after resampling
+        if any(merge_cols)
+            fprintf('\tRe-merging: %s\n',strjoin(merge_varNames,', '))
+            merge_varsTable = T{i}(:,merge_varNames);
+        end
+        
+        % Resampling
+        T{i} = retime(T{i}(:,resamp_varNames),...
+            'regular',method,...
+            'SampleRate',sampleRate);
+        
+        % Re-include notes info
+        if any(merge_cols)
+            T{i} = fuse_timetables(T{i},merge_varsTable,...
+                'regular','SampleRate',sampleRate);
+        end
     end
+
+    if not(returnAsCell), T = T{1}; end

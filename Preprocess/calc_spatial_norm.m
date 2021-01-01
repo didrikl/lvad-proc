@@ -1,6 +1,10 @@
 function T = calc_spatial_norm(T,varNames,norm_varName,p)
     % Add spatial norms for recorded data in a timetable
     
+    % To be skipped, if empty output var name (e.g. in case existing
+    % varabible in timetable shall not be overwritten)
+    if isempty(norm_varName), return; end
+    
     % Default is, unless p is specified, the Eucledian distance norm (i.e. L2-norm)
     if nargin<4, p=2; end
     

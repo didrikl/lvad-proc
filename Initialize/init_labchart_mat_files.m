@@ -73,9 +73,7 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
         
     end
     
-    if not(returnAsCell) 
-        T = T{1}; 
-    end
+    if not(returnAsCell), T = T{1}; end
       
 
 function T = read_signal_file_into_table(filePath,timestamp_fmt)    
@@ -163,6 +161,10 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
     T.Properties.UserData.IntervalUnits = interv_units;
     T.Properties.UserData.Comments = make_comments_table(raw,T);
     
+    % All variables shall be treated as continous and measured in data fusion
+    T = addprop(T,'Measured','variable');
+    T.Properties.CustomProperties.Measured(:) = true;
+        
     close2(h_wait)
  
 function comments = make_comments_table(raw,T)

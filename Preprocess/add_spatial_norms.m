@@ -36,5 +36,6 @@ function T_parts = add_spatial_norms(T_parts, p, compNames, newVarName)
     T_parts = convert_to_single(T_parts,newVarName);
     
     if not(returnAsCell), T_parts = T_parts{1}; end
+    fprintf('\nDone.\n')
     
     

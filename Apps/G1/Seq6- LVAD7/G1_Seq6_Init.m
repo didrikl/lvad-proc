@@ -13,12 +13,12 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-     'G1_Seq6 - F1_Sel1 [accA].mat'
+%     'G1_Seq6 - F1_Sel1 [accA].mat'
      %'G1_Seq6 - F1_Sel1 [accB].mat'
-     'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
+%     'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
      'G1_Seq6 - F1_Sel2 [accA].mat'
 %      'G1_Seq6 - F1_Sel2 [accB].mat'
-%      'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
+      'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
 %      'G1_Seq6 - F2_Sel1 [accA].mat'
 %      'G1_Seq6 - F2_Sel1 [accB].mat'
 %      'G1_Seq6 - F2_Sel1 [pGraft,pLV,ECG].mat'
@@ -84,6 +84,8 @@ notes = init_notes_xlsfile_ver4(notes_filePath);
 
 welcome('Preprocessing data','module')
 
+fs_new = 500;
+
 secsAhead = 47.5;
 US = adjust_for_linear_time_drift(US,secsAhead);
 
@@ -91,8 +93,11 @@ notes = qc_notes_ver4(notes);
 %feats = init_features_from_notes(notes);
 
 InclInterRowsInFusion = true;
+
+%PL = resample_signal(PL, fs_new);
+
 % S = fuse_data_parfor(notes,PL,US);
-S = fuse_data(notes,PL,US,InclInterRowsInFusion);
+S = fuse_data(notes,PL,US);%,fs_new,InclInterRowsInFusion);
 
 % % Just to visualize signal in RPM order plot also when pump is off. First pump
 % % speed after turning of LVAD is used as dummy RPM value. It should be clear
@@ -124,16 +129,18 @@ S = fuse_data(notes,PL,US,InclInterRowsInFusion);
 % US(US.time<notes.time(3),:) = [];
 % 
 
-S_parts = split_into_parts(S);
+S_parts = split_into_parts(S,fs_new);
 
+
+%%
 
 S_parts = add_spatial_norms(S_parts,2, {'accA_x','accA_y','accA_z'}, 'accA_norm');
-S_parts = add_moving_statistics(S_parts,{'accA_norm','accA_x','accA_y','accA_z'});
+S_parts = add_moving_statistics(S_parts,{'accA_norm','accA_x','accA_y','accA_z'},{'rms','std'});
 
 S_parts = add_moving_statistics(S_parts,{'p_graft'});
 
-% S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
-% S_parts = add_moving_statistics(S_parts,{'accB_norm'});
+%S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
+S_parts = add_moving_statistics(S_parts,{'accB_norm'},{'rms','std'});
 
 
 % Fpass = ([2200,2400,1800]/60)-1;

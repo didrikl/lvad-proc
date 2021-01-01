@@ -50,7 +50,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
         'Balloon level'           'balloonLevel'     'categorical'   'step'
         %'Balloon diameter'        'balloonDiam'      'categorical'   'step'
         %'Manometer control'       'manometerCtrl'    'categorical'   'step'
-        %'Catheter type'           'catheter'         'categorical'   'unset'
+        'Catheter type'           'catheter'         'categorical'   'unset'
         %'Clamp flow red.'         'Q_reduction'      'categorical'   'step'
         %'Flow red. target'        'flowRedTarget'    'single'        'event'
         %'Balloon offset'          'balloonOffset'    'categorical'   'step'

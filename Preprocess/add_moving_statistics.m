@@ -39,20 +39,20 @@ function T_parts = add_moving_statistics(T_parts, varNames, statistics)
     nTypes = numel(statSpecs(:,1));
     newVarNames = {};
     for j=1:numel(varNames)  
-        fprintf('Variable %-10s:\n',varNames{j})
+        fprintf('Variable %s:\n',varNames{j})
         for i=1:nTypes
             newVarNames{end+1} = [varNames{j},statSpecs{i,3}];
-            fprintf('\t%s, %g sec window: %s\n',statSpecs{i,1},...
+            fprintf('\t%s, %3.3g sec window: %s\n',statSpecs{i,1},...
                 statSpecs{i,2},newVarNames{end});
         end
     end  
 
     fnc = @calc_moving;
-
     T_parts = add_in_parts(fnc,T_parts,varNames,newVarNames,...
-            statSpecs(:,1),statSpecs(:,2));
+            statSpecs(:,1),cell2mat(statSpecs(:,2)));
     
     T_parts = convert_to_single(T_parts, newVarNames);
 
     if not(returnAsCell), T_parts = T_parts{1}; end
+    fprintf('\nDone.\n')
    

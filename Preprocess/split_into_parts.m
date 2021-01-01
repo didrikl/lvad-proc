@@ -1,7 +1,7 @@
-function S_parts = split_into_parts(S,maxSignalFreq)
+function S_parts = split_into_parts(S,fs_parts)
         
     % Sample rate for re-sampling down to highest signal content frequency 
-    if nargin<2, maxSignalFreq=ask_for_new_sample_rate; end
+    if nargin<2, fs_parts=get_sampling_rate(S); end
     
     welcome('Splitting into resampled parts')
     h_wait = waitbar(0,'','Name','Preprocessing parts...');
@@ -14,7 +14,7 @@ function S_parts = split_into_parts(S,maxSignalFreq)
     for i=1:n_parts
         
         h_wait = waitbar(i/n_parts,h_wait,sprintf('Part %d/%d',i,n_parts));
-        fprintf('\n<strong>Part %d</strong> \n',i)
+        welcome(sprintf('Part %d',i),'iteration')
         
         S_parts{i} = S(S.part==string(i),:);
         if height(S_parts{i})==0
@@ -22,9 +22,10 @@ function S_parts = split_into_parts(S,maxSignalFreq)
             continue; 
         end
         
+        % In case part extraction results in gaps that prevents even sampling
         if isnan(S_parts{i}.Properties.SampleRate) || ...
-                S_parts{i}.Properties.SampleRate~=maxSignalFreq
-            S_parts{i} = resample_signal(S_parts{i}, maxSignalFreq);
+                S_parts{i}.Properties.SampleRate~=fs_parts
+            S_parts{i} = resample_signal(S_parts{i}, fs_parts);
         end
         
         % Remove possible first/last row(s) with undefined part after re-sampling
@@ -32,9 +33,7 @@ function S_parts = split_into_parts(S,maxSignalFreq)
         if isnan(S_parts{i}.Properties.SampleRate)
             [fs,S_parts{i}] = get_sampling_rate(S_parts{i});
         end
-        
-        fprintf('\n');
-    
+                
     end
     
     close2(h_wait)

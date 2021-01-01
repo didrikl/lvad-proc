@@ -1,24 +1,29 @@
-function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
+function S = fuse_data(Notes,PL,US,fs_new,InclInterRowsInFusion)
     % fuse_data Fuse notes and ultrasound into PowerLab data
     %
     %    S = fuse_data(notes,PL,US)
     %
-    % See also merge_table_blocks, fuse_timetables
+    % See also merge_table_blocks, fuse_timetables, syncronize
     
     if nargin<3, US = table; end
-    if nargin<4, InclInterRowsInFusion=false; end
-    
+    if nargin<4, fs_new = nan; end
+    if nargin<5, InclInterRowsInFusion=false; end
+      
     welcome('Data fusion')
     
-    [returnAsCell,PL] = get_cell(PL);
-    
-    % Loop over each stored PowerLab file
+    [~,PL] = get_cell(PL);
+    fuse_opts = {};
+    if not(isnan(fs_new)) 
+        fuse_opts = {'regular','SampleRate',fs_new};
+    end
+            
+
+    % Notes without timestamps can not be used in data fusion
+    Notes = Notes(not(isnat(Notes.time)),:);
+
+    % Loop over each stored LabChart file
     %    h_wait = waitbar(0,'','Name','Data fusion...');
     n_files = numel(PL);
-    
-    % Notes without timestamps can be used in data fusion
-    Notes = Notes(not(isnat(Notes.time)),:);
-    
     Blocks = cell(n_files,1);
     block_inds = cell(n_files,1);
     for i=1:n_files
@@ -31,7 +36,7 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
         
         % Union merging PowerLab timetable with notes
         if isempty(Blocks{i})
-            warning('No notes for PowerLab file')
+            warning('No notes for LabChart file')
         else
             
             % Check for overlapping blocks
@@ -42,9 +47,7 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
         end
         PL_i = PL{i};
         B_i = Blocks{i};
-        PL{i} = fuse_timetables(PL_i,B_i);
-        
-        
+        PL{i} = fuse_timetables(PL_i,B_i,fuse_opts{:});  
         
         % Ultrasound is clipped to time range of B and notes, only (i.e. not
         % clipping of B to achive a union of the two time ranges)
@@ -55,8 +58,8 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
             continue;
         end
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
-        PL{i} = fuse_timetables(PL{i},US_block);
-        
+        PL{i} = fuse_timetables(PL{i},US_block,fuse_opts{:});
+
         fprintf(newline)
     end
     
@@ -70,7 +73,7 @@ function S = fuse_data(Notes,PL,US,InclInterRowsInFusion)
         S = merge_table_blocks(S1,S2);
         clear S1 s2
     end
-        
+      
     clear fuse_timetables
     %    close(h_wait)
     

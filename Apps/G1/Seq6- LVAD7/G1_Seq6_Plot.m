@@ -3,7 +3,7 @@ clear check_table_var_input
 seq_no = 6;
 
 % Calculation settings
-sampleRate = 700;
+sampleRate = 500;
 
 orderMapVar = 'accA_norm';
 mapColScale = [-85,-30];
@@ -13,7 +13,7 @@ circ_ylim = [-90,35];
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {2,3,4,5,6,7};
+parts = {3};
 %parts = {};
 cbl_part = [];
 
@@ -272,7 +272,7 @@ function add_interv_bar(h,T,notes)
     event = removecats(removecats(T.event),{'-'});
     %event = mergecats(event,categories(event),'Hands on');
     plot(T.t,event,specs.event_bar{:})
-    
+    return
     catheter = string(notes.catheter(T.noteRow(...
         find(T.balloonLevel=='1',1,'first'))));
     T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
