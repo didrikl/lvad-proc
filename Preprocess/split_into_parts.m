@@ -6,22 +6,24 @@ function S_parts = split_into_parts(S,fs_parts)
     welcome('Splitting into resampled parts')
     h_wait = waitbar(0,'','Name','Preprocessing parts...');
     
-    parts = string(sort_nat(cellstr(unique(string(S.part(not(ismissing(S.part))))))));
-    parts(strcmp(parts,'-')) = [];
-    n_parts = max(double(parts));
+%     parts = string(sort_nat(cellstr(unique(string(S.part(not(ismissing(S.part))))))));
+%     parts(strcmp(parts,'-')) = [];
+%    n_parts = max(double(parts));
+    n_parts = max(double(string(categories(S.part))));
     
     S_parts = cell(n_parts,1); 
     for i=1:n_parts
         
         h_wait = waitbar(i/n_parts,h_wait,sprintf('Part %d/%d',i,n_parts));
-        welcome(sprintf('Part %d',i),'iteration')
+        welcome(sprintf('Part %d\n',i),'iteration')
         
         S_parts{i} = S(S.part==string(i),:);
         if height(S_parts{i})==0
             warning('No data');
             continue; 
         end
-        
+        fprintf('%s duration\n',string(S_parts{i}.time(end)-S_parts{i}.time(1)))
+
         % In case part extraction results in gaps that prevents even sampling
         if isnan(S_parts{i}.Properties.SampleRate) || ...
                 S_parts{i}.Properties.SampleRate~=fs_parts

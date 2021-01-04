@@ -34,53 +34,51 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     % stored in the notes table??
     varMap = {...  
         % Name in Excel           Name Matlab code     Type          Continuity
-        'Date'                    'date'             'cell'          'event'
-        'Timestamp'               'timestamp'        'cell'          'event'
-        'Elapsed time'            'durTime'          'duration'      'continuous'
+        'Date'                    'date'             'datetime'      'event'
+        'Timestamp'               'timestamp'        'double'        'event'
+        'Elapsed time'            'partDurTime'      'duration'      'unset'
         %'Timer'                   'timer'            'int16'         'event'
-        %'X-ray ser.'              'xraySer'          'int16'         'step'
+        'X-ray ser.'              'xraySer'          'int16'         'unset'
         %'Tag'                     'tag'              'cell'          'event'
         'Part'                    'part'             'categorical'   'step' 
         'Interval'                'intervType'       'categorical'   'step'
         'Event'                   'event'            'categorical'   'step'
-        'Par. tag'                'parTag'           'categorical'   'step'
-        %'Inject thrombus vol.'    'thrombusVol'      'int16',        'step'
-        %'Inject thrombus type'    'thrombusType'     'categorical'   'step'
+        'Par. tag'                'parTag'           'categorical'   'unset'
+        'Inject vol.'             'thrombusVol'      'int16',        'unset'
+        'Embolus type'            'thrombusType'     'categorical'   'unset'
         'Pump speed'              'pumpSpeed'        'int16'         'step'
         'Balloon level'           'balloonLevel'     'categorical'   'step'
-        %'Balloon diameter'        'balloonDiam'      'categorical'   'step'
-        %'Manometer control'       'manometerCtrl'    'categorical'   'step'
-        'Catheter type'           'catheter'         'categorical'   'unset'
-        %'Clamp flow red.'         'Q_reduction'      'categorical'   'step'
-        %'Flow red. target'        'flowRedTarget'    'single'        'event'
-        %'Balloon offset'          'balloonOffset'    'categorical'   'step'
-        %'Balloon diam. est.'      'balDiamEst'       'int16'         'step'
+        'Balloon diameter'        'balloonDiam'      'categorical'   'unset'
+        'Manometer control'       'manometerCtrl'    'categorical'   'unset'
+        'Catheter type'           'catheter'         'categorical'   'step'
+        'Flow red.'               'Q_RedPst'         'categorical'   'unset'
+        'Flow red. target'        'Q_RedTarget'      'single'        'unset'
+        'Balloon offset'          'balloonOffset'    'categorical'   'unset'
+        'Balloon diam. est.'      'balDiamEst'       'int16'         'unset'
         'Flow est.'               'Q_LVAD'           'single'        'step'
         'Power'                   'P_LVAD'           'single'        'step'
-        %'Flow'                    'Q_noted'          'single'        'step'
-        %'Max art. p'              'p_maxArt'         'int16'         'step'
-        %'Min art. p'              'p_minArt'         'int16'         'step'
-        %'MAP'                     'MAP'              'int16'         'step'
-        %'Max pulm. p'             'p_maxPulm'        'int16'         'step'
-        %'Min pulm. p'             'p_minPulm'        'int16'         'step'
-        %'HR'                      'HR'               'int16'         'step'
-        %'CVP'                     'CVP'              'int16'         'step'
-        %'SvO2'                    'SvO2'             'int16'         'step'
-        %'Cont. CO'                'CO_cont'          'int16'         'step'
-        %'Thermo. CO'              'CO_thermo'        'int16'         'step'
-        %'Hema-tocrit'             'HCT'              'int16'         'step'
-        %'Procedure'               'procedure'        'cell'          'event'
-        %'Experiment'              'exper_notes'      'cell'          'event'
-        %'Quality control'         'QC_notes'         'cell'          'event'
-        %'Interval annotation'     'annotation'       'cell'          'event'
+        'Flow'                    'Q_noted'          'single'        'unset'
+        'Max art. p'              'p_maxArt'         'int16'         'unset'
+        'Min art. p'              'p_minArt'         'int16'         'unset'
+        'MAP'                     'MAP'              'int16'         'unset'
+        'Max pulm. p'             'p_maxPulm'        'int16'         'unset'
+        'Min pulm. p'             'p_minPulm'        'int16'         'unset'
+        'HR'                      'HR'               'int16'         'unset'
+        'CVP'                     'CVP'              'int16'         'unset'
+        'SvO2'                    'SvO2'             'int16'         'unset'
+        'Cont. CO'                'CO_cont'          'int16'         'unset'
+        'Thermo. CO'              'CO_thermo'        'int16'         'unset'
+        'Hema-tocrit'             'HCT'              'int16'         'unset'
+        'Procedure'               'procedure'        'cell'          'event'
+        'Experiment'              'exper_notes'      'cell'          'event'
+        'Quality control'         'QC_notes'         'cell'          'event'
+        'Interval annotation'     'annotation'       'cell'          'event'
         };
 
     % Columns to omit (not never in use or always constant in the sequence)
     varNamesToRemove = {
         'date'
         'timestamp'
-        'durTime'
-        'timer'
         };
     
     % User-set definitions
@@ -98,9 +96,14 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     display_filename(filePath);
     notes_sheet = check_notes_sheet_name(filePath,notes_sheet);    
     
-    notes = readtable(filePath,...
-        'Sheet',notes_sheet,...
-        'basic',true);
+    opts = detectImportOptions(filePath,'VariableNamingRule','preserve');
+    catVarsInMap = varMap(ismember(varMap(:,3),'categorical'),1);
+    catVarsInFile = catVarsInMap(ismember(catVarsInMap,opts.VariableNames));
+    opts = setvartype(opts,catVarsInFile,'categorical');
+
+    notes = readtable(filePath,opts,...
+        'Sheet',notes_sheet...
+        );
     
     % Read auxillary info
     varNamesInFile = table2cell(readtable(filePath,...
@@ -139,7 +142,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     notes.Properties.VariableNames = varNamesInFile;
     
     % 2) do mapping with what this code expects to be present and what to keep
-    [notes, inFile_ind] =  map_varnames(notes, varMap(:,1), varMap(:,2));
+    [notes, inFile_ind] = map_varnames(notes, varMap(:,1), varMap(:,2));
     
     varNames_xls = varMap(inFile_ind,1);
     
@@ -169,15 +172,15 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     
     %% Parse information
     
-    notes = standardizeMissing(notes, missingValueRepr);
-    
+    notes = convert_columns(notes,varMap(inFile_ind,3));
+
     % Parse info time, date and dur
     notes = parse_time_cols(notes);
     notes = derive_time_col_not_filled(notes);
     
-    % Parse relevant columns, other than time columns
-    notes = convert_columns(notes,varMap(inFile_ind,3));
-
+    % Parse relevant columns, other than time columns 
+    notes = standardizeMissing(notes, missingValueRepr);
+    
     % Add note row id to be used for data fusion and looking up data
     notes = add_note_row_id(notes, nHeaderLines);
     
@@ -193,7 +196,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
     notes.noteRow = (1:height(notes))'+n_header_lines';
-    notes = movevars(notes, 'noteRow', 'Before', 'durTime');
+    notes = movevars(notes, 'noteRow', 'Before', 'partDurTime');
     notes.Properties.VariableContinuity('noteRow') = 'step';
        
 function notes_sheet = check_notes_sheet_name(filePath,notes_sheet)
@@ -215,21 +218,16 @@ function notes_sheet = check_notes_sheet_name(filePath,notes_sheet)
      notes.time = datetime(double(string(notes.timestamp)),...
          'ConvertFrom','datenum',...
          'TimeZone','Europe/Oslo');
-    notes.time.Day = notes.date.Day;
-    notes.time.Month = notes.date.Month;
-    notes.time.Year = notes.date.Year;
-     
-    % Represent time_elapsed as a total duration vector in seconds
-    if ismember('durTime',notes.Properties.VariableNames)
-        notes.durTime = seconds(notes.durTime);
-    else
-        notes.durTime = seconds(nan(height(notes),1));
-    end
+    
+     notes.date = datetime(notes.date);
+     notes.time.Day = notes.date.Day;
+     notes.time.Month = notes.date.Month;
+     notes.time.Year = notes.date.Year;
     
  function notes = derive_time_col_not_filled(notes)
     % Derive the time column that was not in use when filling out the notes
     
-    empty_dur_col = all(isnan(notes.durTime));
+    empty_dur_col = all(isnan(notes.partDurTime));
     empty_timestamp_col = all(isnat(notes.time));
     if empty_dur_col && empty_timestamp_col
         warning('No time info given')
@@ -240,10 +238,10 @@ function notes_sheet = check_notes_sheet_name(filePath,notes_sheet)
         for i=1:numel(parts_list)
             part_inds = parts_col==parts_list(i);
             part_start = notes.time(find(part_inds,1,'first'));
-            notes.durTime(part_inds) = notes.time(part_inds) - part_start;
+            notes.partDurTime(part_inds) = notes.time(part_inds) - part_start;
         end
     elseif empty_timestamp_col
-         notes.time = datetime(notes.durTime,...
+         notes.time = datetime(notes.partDurTime,...
              'ConvertFrom','epochtime',...
              'Epoch',notes.date(1));
     end

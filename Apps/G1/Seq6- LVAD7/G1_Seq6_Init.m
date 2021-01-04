@@ -13,12 +13,12 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-%     'G1_Seq6 - F1_Sel1 [accA].mat'
+     'G1_Seq6 - F1_Sel1 [accA].mat'
      %'G1_Seq6 - F1_Sel1 [accB].mat'
-%     'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
-     'G1_Seq6 - F1_Sel2 [accA].mat'
+     'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
+%     'G1_Seq6 - F1_Sel2 [accA].mat'
 %      'G1_Seq6 - F1_Sel2 [accB].mat'
-      'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
+%      'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
 %      'G1_Seq6 - F2_Sel1 [accA].mat'
 %      'G1_Seq6 - F2_Sel1 [accB].mat'
 %      'G1_Seq6 - F2_Sel1 [pGraft,pLV,ECG].mat'
@@ -85,6 +85,7 @@ notes = init_notes_xlsfile_ver4(notes_filePath);
 welcome('Preprocessing data','module')
 
 fs_new = 500;
+InclInterRowsInFusion = true;
 
 secsAhead = 47.5;
 US = adjust_for_linear_time_drift(US,secsAhead);
@@ -92,12 +93,10 @@ US = adjust_for_linear_time_drift(US,secsAhead);
 notes = qc_notes_ver4(notes);
 %feats = init_features_from_notes(notes);
 
-InclInterRowsInFusion = true;
-
-%PL = resample_signal(PL, fs_new);
+PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
-S = fuse_data(notes,PL,US);%,fs_new,InclInterRowsInFusion);
+S = fuse_data(notes,PL,US,fs_new,InclInterRowsInFusion);
 
 % % Just to visualize signal in RPM order plot also when pump is off. First pump
 % % speed after turning of LVAD is used as dummy RPM value. It should be clear

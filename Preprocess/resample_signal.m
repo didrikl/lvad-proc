@@ -58,10 +58,10 @@ function T = resample_signal(T,sampleRate,method)
             'regular',method,...
             'SampleRate',sampleRate);
         
-        % Re-include notes info
+        % Re-include notes info (using syncronize)
         if any(merge_cols)
             T{i} = fuse_timetables(T{i},merge_varsTable,...
-                'regular','SampleRate',sampleRate);
+                {'regular','SampleRate',sampleRate});
         end
     end
 

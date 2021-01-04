@@ -12,55 +12,43 @@ function S = fuse_data(Notes,PL,US,fs_new,InclInterRowsInFusion)
     welcome('Data fusion')
     
     [~,PL] = get_cell(PL);
-    fuse_opts = {};
-    if not(isnan(fs_new)) 
-        fuse_opts = {'regular','SampleRate',fs_new};
-    end
-            
-
+    fuse_opts = make_fuse_opts(fs_new);
+    
     % Notes without timestamps can not be used in data fusion
     Notes = Notes(not(isnat(Notes.time)),:);
 
     % Loop over each stored LabChart file
     %    h_wait = waitbar(0,'','Name','Data fusion...');
     n_files = numel(PL);
-    Blocks = cell(n_files,1);
-    block_inds = cell(n_files,1);
+    B = cell(n_files,1);
+    b_inds = cell(n_files,1);
     for i=1:n_files
         
-        fprintf('\n<strong>PowerLab block (no %d/%d): </strong>\nFilename: %s\n',...
-            i,n_files,PL{i}.Properties.UserData.FileName)
+        welcome(sprintf('\nPowerLab block (no %d/%d)',i,n_files),'iteration')
+        fprintf('\nFilename: %s\n',PL{i}.Properties.UserData.FileName)
 
-        [Blocks, block_inds] = determine_notes_block(Notes,PL{i},i,n_files,Blocks,block_inds,InclInterRowsInFusion);
+        % Merging LabChart timetable with notes
+        [B, b_inds] = determine_notes_block(Notes,PL{i},i,n_files,B,b_inds);       
+        PL{i} = PL{i}(PL{i}.time>=B{i}.time(1) & PL{i}.time<=B{i}.time(end),:);
         
-        
-        % Union merging PowerLab timetable with notes
-        if isempty(Blocks{i})
-            warning('No notes for LabChart file')
-        else
-            
-            % Check for overlapping blocks
-            % ...
-            
-            PL{i} = PL{i}(PL{i}.time>=Blocks{i}.time(1) & ...
-                PL{i}.time<=Blocks{i}.time(end),:);
-        end
-        PL_i = PL{i};
-        B_i = Blocks{i};
-        PL{i} = fuse_timetables(PL_i,B_i,fuse_opts{:});  
+        % Introducing better names, in case something goes wrong in
+        % fuse_timetables function
+        LabChart_i = PL{i};
+        Notes_block_i = B{i};   
+        PL{i} = fuse_timetables(LabChart_i,Notes_block_i,fuse_opts);
         
         % Ultrasound is clipped to time range of B and notes, only (i.e. not
         % clipping of B to achive a union of the two time ranges)
-        fprintf('\n\nFusion with ultrasound')
         if isempty(US) || height(US)==0
-            fprintf('\n');
-            warning('No ultrasound data for PowerLab file')
+            warning('No ultrasound data for LabChart block\n')
             continue;
         end
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
-        PL{i} = fuse_timetables(PL{i},US_block,fuse_opts{:});
-
-        fprintf(newline)
+        %LabChart_i = PL{i};
+        PL{i} = fuse_timetables( PL{i},US_block,fuse_opts);
+        
+        PL{i}{PL{i}.time>LabChart_i.time(end),LabChart_i.Properties.VariableNames}=NaN;
+        
     end
     
     try
@@ -76,42 +64,64 @@ function S = fuse_data(Notes,PL,US,fs_new,InclInterRowsInFusion)
       
     clear fuse_timetables
     %    close(h_wait)
+
+%    S.part = addcats(S.part,categories(notes.part));
     
 end
 
-function [B,block_inds] = determine_notes_block(Notes,PL_i,i,n_files,B,block_inds,InclInterRowsInFusion)
+function fuse_opts = make_fuse_opts(fs_new)
+    fuse_opts = {};
+    if not(isnan(fs_new)) 
+        fuse_opts = {'regular','SampleRate',fs_new};
+    end
+end
+
+function [B,b_inds] = determine_notes_block(Notes,PL_i,i,nBlocks,B,b_inds)
+    % Extract a notes block corresponding with (current) PL block
     
     % NOTE: Make block_inds, B and i persitent variables instead?
     
-    % Extract notes block associated with PL file
-    block_step = NaN;
-    if n_files==1
-        block_inds{i} = 1:height(Notes);
-    elseif i==1
-        block_inds{i} = find(Notes.time<=PL_i.time(end));
-    elseif i==n_files
-        block_inds{i} = find(Notes.time>=PL_i.time(1));
-    else
-        block_inds{i} = find(Notes.time>=PL_i.time(1) & Notes.time<=PL_i.time(end));
-        if numel(block_inds{i})==0
-            warning('No notes found for PowerLab data')
-            block_step = 1;      
-        else
-            block_step = block_inds{i}(1)-block_inds{i-1}(end);
-        end
-    end
-    B{i} = Notes(block_inds{i},:);
+    b_rowStep = 1;
     
-    % Ask to keep or clip block, in case there are notes outside PL time range
+    if nBlocks==1
+        % Use all note rows in "block unioun" if only one PL block
+        b_inds{i} = 1:height(Notes);
+
+    elseif i==1
+        % If first block: Include eventual preceeding notes as well
+        b_inds{i} = find(Notes.time<=PL_i.time(end));
+    
+    elseif i==nBlocks
+        % If last block: Include eventual proceeding notes as well
+        b_inds{i} = find(Notes.time>=PL_i.time(1));
+    
+    else  
+        % If intermediate block: Lookup notes row inds with "snap to nearest 
+        % second". Also, find number of rows from previous block, in which >1 
+        % indicates notes made without any LabChart recording.
+        tol = seconds(0.5);
+        b_inds{i} = find(Notes.time>=PL_i.time(withtol(PL_i.time(1),tol)) & ...
+            Notes.time<=PL_i.time(withtol(PL_i.time(end),tol)));
+        
+         if numel(b_inds{i})>0
+             lastNonEmptyBlock = find(cellfun(isempty(b_inds{1:i-1})),1,'last');
+             b_rowStep = b_inds{i}(1)-lastNonEmptyBlock(end);
+        end
+ 
+   end
+
+    B{i} = Notes(b_inds{i},:);
+    
+    % Display info if there are extra note row before or after LabChart data
     % (NB two separate if tests required, as both test conditions may be true.)
     if i==1, B{i} = check_for_notes_before_PL(B{i},PL_i); end
-    if i==n_files, B{i} = check_for_notes_after_PL(B{i},PL_i); end
+    if i==nBlocks, B{i} = check_for_notes_after_PL(B{i},PL_i); end
     
     % Handle intermediate notes, in case LabChart was paused or there are some
     % PowerLab files not being initialized 
-    if block_step>1
-        intermediateNotes = block_inds{i-1}(end):block_inds{i}(1);
-        warning(sprintf('\nIntermediate note row(s) not within in any PowerLab file time ranges:\n\n'));
+    if b_rowStep>1
+        intermediateNotes = b_inds{i-1}(end):b_inds{i}(1);
+        warning('\nIntermediate note row(s) no LabChart recording:\n\n');
         disp(Notes(intermediateNotes,:))
 
         % Ask if they also should be included (default is to exclude)
@@ -123,46 +133,41 @@ function [B,block_inds] = determine_notes_block(Notes,PL_i,i,n_files,B,block_ind
         % end
     end
     
-    % Handle notes that are accosiated/assigned with more than one PowerLab file
-    if block_step<1
-        overlappingBlocks = block_inds{i-1}(end):block_inds{i}(1);
-        warning(sprintf('\nNote row(s) accosiated to multiple (overlapping) PowerLab files:\n\n'));
+    % Handle notes accosiated with multiple (overlapping) LabChart blocks
+    if b_rowStep<1
+        overlappingBlocks = b_inds{i-1}(end):b_inds{i}(1);
+        warning('\nNote row(s) accosiated to multiple LabChart blocks:\n\n');
         disp(Notes(overlappingBlocks,:))
-
+        [B{i},B{i-1}] = handle_overlapping_ranges(B{i},B{i-1},false);
     end
     
-    
+    if isempty(B{i})
+        warning('No notes for LabChart block')
+    end
     
 end
 
 function B = check_for_notes_before_PL(B,PL)
-    % Ask to include notes before PL was started, to either get the full
-    % span from PL, or to include other than PowerLab data
     
     preDataNotes_ind = find(B.time<PL.time(1));
-    if numel(preDataNotes_ind)>0
-        
-        warning(sprintf(['\nThere are %d timestamp(s) in Notes earlier than '...
-            'first timestamp in PowerLab data\n\n'],numel(preDataNotes_ind)));
-        
-        nearestNote_ind = preDataNotes_ind(end);
-        B = ask_to_include(B,preDataNotes_ind,nearestNote_ind);
-        
+    if numel(preDataNotes_ind)>0    
+        warning(sprintf(['\nThere are %d rows in Notes before LabChart was',...
+            'recording data\n\n'],numel(preDataNotes_ind)));
+        disp(B(preDataNotes_ind,:))  
+        %B = B(preDataNotes_ind(end):end,:);
     end    
 end
 
 function B = check_for_notes_after_PL(B,PL)
-    % Ask to include notes after PL was stopped, to either get the full
-    % span from PL, or to include other than PowerLab data
     
-    postDataNotes_ind = find(B.time<PL.time(1));
-    if numel(postDataNotes_ind)>0
-        
-        warning(sprintf(['\nThere are %d timestamp(s) in Notes later than '...
-            'last timestamp in PowerLab data\n\n'],numel(postDataNotes_ind)));
-        nearestNote_ind = postDataNote_ind(1);
-        B = ask_to_include(B,postDataNotes_ind,nearestNote_ind);
-        
+    postDataNotes_ind = find(B.time>PL.time(end));
+    if numel(postDataNotes_ind)>0       
+        warning(sprintf(['\nThere are %d rows in Notes after LabChart was',...
+            'recording data\n\n'],numel(postDataNotes_ind)));
+        disp(B(postDataNotes_ind,:))
+        %B = B(1:postDataNotes_ind(1),:);
+        %TODO: If more than one post-rows: ask to only keep the nearest, none or
+        %all
     end    
    
 end

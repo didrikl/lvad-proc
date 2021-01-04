@@ -1,21 +1,23 @@
-function T = fuse_timetables(T1,T2,varargin)
+function T = fuse_timetables(T1,T2,syncOpts,dropSpec)
     % FUSE_TIMETABLES   Fuse two timetables that are syncronized and left joined
     %    FUSE_TIMETABLES(T1,T2) fuse data from T2 into T1. Data in T2 is 
     %    syncronized, so that non-matching timestamps will match.
     %
     % See also timetables, syncronize
     
-    drop_cols = determineColsToDrop(T2);
-    drop_varNames = T2.Properties.VariableNames(drop_cols);
-    merge_cols = not(drop_cols);
-    merge_varNames = T2.Properties.VariableNames(merge_cols);
-    overwrite_cols = determine_cols_to_overwrite(T1,merge_varNames);
-    overwrite_varNames = T1.Properties.VariableNames(overwrite_cols);
+    if nargin<3, syncOpts = {}; end
+    if nargin<4, dropSpec = {'unset','event'}; end
+
+    T2_dropCols = determineColsToDrop(T2,dropSpec);
+    T2_dropVarNames = T2.Properties.VariableNames(T2_dropCols);
+    T2_fuseVarNames = T2.Properties.VariableNames(not(T2_dropCols));
+    T2 = T2(:,T2_fuseVarNames);
     
-    display_info(merge_varNames,drop_varNames,overwrite_varNames)
+    T1_overwriteCols = determine_cols_to_overwrite(T1,T2_fuseVarNames);
+    T1_overwriteVarNames = T1.Properties.VariableNames(T1_overwriteCols);
+    T1(:,T1_overwriteCols) = [];
     
-    T1(:,overwrite_cols) = [];
-    T2 = T2(:,merge_varNames);
+    display_info(T2_fuseVarNames,T2_dropVarNames,T1_overwriteVarNames)
     
     if not(issorted(T1))
         fprintf('\n')
@@ -30,7 +32,7 @@ function T = fuse_timetables(T1,T2,varargin)
         warning([class(T2),' ',T_name,' is not sorted in time.'])
     end
 
-    T = synchronize(T1,T2,varargin{:});
+    T = synchronize(T1,T2,syncOpts{:});
     
 end
 
@@ -42,6 +44,7 @@ function display_info(merge_varNames,drop_varNames,overwrite_varNames)
     if not(isempty(overwrite_varNames))
         fprintf('\n\tOverwriting: %s\n',strjoin(overwrite_varNames,', '))
     end
+    fprintf(newline)
 end
 
 function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
@@ -87,12 +90,12 @@ function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
     
 end
 
-function colsToDrop = determineColsToDrop(T2)
+function colsToDrop = determineColsToDrop(T2,varContDropType)
     % Return logical array of new columns to drop before data fusion
     
     % Merge only data with specified variable continuity (which is used for
     % filling empty entries in non-matching rows when syncing).
-    colsToDrop = ismember(T2.Properties.VariableContinuity,{'unset','event'});
+    colsToDrop = ismember(T2.Properties.VariableContinuity,varContDropType);
     
     %colsToDrop = ask_user_for_handling_empty_cols(T2, colsToDrop);
     

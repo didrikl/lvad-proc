@@ -47,8 +47,7 @@ function T_parts = add_moving_statistics(T_parts, varNames, statistics)
         end
     end  
 
-    fnc = @calc_moving;
-    T_parts = add_in_parts(fnc,T_parts,varNames,newVarNames,...
+    T_parts = add_in_parts(@calc_moving,T_parts,varNames,newVarNames,...
             statSpecs(:,1),cell2mat(statSpecs(:,2)));
     
     T_parts = convert_to_single(T_parts, newVarNames);

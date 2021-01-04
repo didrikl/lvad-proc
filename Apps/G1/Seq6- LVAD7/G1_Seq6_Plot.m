@@ -13,7 +13,7 @@ circ_ylim = [-90,35];
 % % Extract data for these RPM values
 rpm = {};
 bl_part = [];
-parts = {3};
+parts = {10:11};
 %parts = {};
 cbl_part = [];
 
