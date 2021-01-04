@@ -5,6 +5,10 @@ function feats = init_features_from_notes(notes)
        
     welcome('Initializing feature table')
     
+% TODO:
+% Add MPF, std, RMS and other statistics/indices into feats
+% Revise categoric blocks, and put into feats
+
     % TODO: Move add_event_range to notes_qc and/or init_feats
     intervTypesToIncludeinEventRange = {'steady','baseline'};
     try
