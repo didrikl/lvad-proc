@@ -1,7 +1,7 @@
 %% Initialze the processing environment and input file structure
 
 % Which experiment
-basePath = 'C:\Data\IVS\Didrik';
+basePath = 'D:\Data\IVS\Didrik';
 sequence = 'IV2_Seq15';
 experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq15 - LVAD9 - Pump Test';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
@@ -48,6 +48,7 @@ systemM_varMap = {
     'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
     'VenflowLmin'        'affQ'             1          'single' 'continuous' 'L/min'
     };
+proc_path = fullfile(basePath,experiment_subdir,'Processed');
 
 %% Read data into Matlab
 % Initialize data into Matlab timetable format
@@ -85,16 +86,17 @@ notes = qc_notes_ver4(notes);
 %clear S
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US);
+S.p_graft = S.effP;
 %clear PL US
 S_parts = split_into_parts(S);
 %clear S
 
-S_parts = add_spatial_norms(S_parts,2);
-S_parts = add_moving_statistics(S_parts);
-S_parts = add_moving_statistics(S_parts,{'accA_x'});
-S_parts = add_moving_statistics(S_parts,{'accA_y'});
-S_parts = add_moving_statistics(S_parts,{'accA_z'});
-S_parts = add_moving_statistics(S_parts,{'effP','affP'});
+S_parts = add_spatial_norms(S_parts,2,{'accA_x','accA_y','accA_z'},'accA_norm');
+
+S_parts = add_moving_statistics(S_parts,{'accA_norm','accA_x','accA_y','accA_z'},{'std'});
+S_parts = add_moving_statistics(S_parts,{'p_graft'},{'min','max','avg'});
+
+
 
 
 % TODO:

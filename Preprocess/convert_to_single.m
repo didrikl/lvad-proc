@@ -1,4 +1,4 @@
-function T_parts = convert_to_single(T_parts, varNames)
+function T = convert_to_single(T, varNames)
     % Function for IV2 model to save memory in converting selected variables 
     % to single precission 
     % TODO: Make this an IV2 object method
@@ -26,15 +26,18 @@ function T_parts = convert_to_single(T_parts, varNames)
     
     % TODO: Make method for validating varName lists, with this code and code
     % for checking existence of variables in each signal part
+    [returnAsCell,T] = get_cell(T);
     varNames = cellstr(convertStringsToChars(varNames));
     
-    for i=1:numel(T_parts)
+    for i=1:numel(T)
         
         varNames_i = varNames(...
-            ismember(varNames,T_parts{i}.Properties.VariableNames));
+            ismember(varNames,T{i}.Properties.VariableNames));
       
         % Convert to single precision to save memory
         for j=1:numel(varNames_i)
-            T_parts{i}.(varNames_i{j}) = single(T_parts{i}.(varNames_i{j}));
+            T{i}.(varNames_i{j}) = single(T{i}.(varNames_i{j}));
         end
-    end     
+    end 
+    
+    if not(returnAsCell), T = T{1}; end

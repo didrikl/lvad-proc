@@ -5,8 +5,8 @@ seq_no = 11;
 % Calculation settings
 sampleRate = 500;
 
-orderMapVar = 'accA_norm_HP';
-mapColScale = [-85,-30];
+orderMapVar = 'v2';
+mapColScale = [-95,-40];
 % orderMapVar = 'accB_y';
 % mapColScale = [-80,-45];
 mapOrderLim = [0,5.3];
@@ -17,7 +17,7 @@ circ_ylim = [-90,25];
 rpm = {2400,2400,2200,2600};
 rpm={};
 bl_part = [];
-parts = {5};
+parts = {4};
 % parts = {9:12};
 % parts = {13:15};
 %parts = {16:19};
@@ -70,6 +70,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
     for i=1:numel(rpm)
         if rpm(i)==0, continue; end
         inds = T.pumpSpeed==rpm(i);
+        inds = inds & not(isnan(T.accA_norm));
         Fpass = (rpm(i)/60)-1;
         T.accA_norm_HP(inds) = highpass(T.accA_norm(inds),Fpass,500);
     end
@@ -113,18 +114,18 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
 %        T.accA_normHighPass_std(range) = std(T.accA_normHighPass(range));
 %        T.accA_normHighPass_rms(range) = rms(T.accA_normHighPass(range));
         
-        freqx{k} = meanfreq(detrend(T.accA_x(range)),fs);
-        T.accA_x_mpf(range) = freqx{k};
-        T.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
-        freqy{k} = meanfreq(detrend(T.accA_y(range)),fs);
-        T.accA_y_mpf(range) = freqy{k};
-        T.accA_y_mpf_shift(range) = freqy{k} - freqy{1};
-        freqz{k} = meanfreq(detrend(T.accA_z(range)),fs);
-        T.accA_z_mpf(range) = freqz{k};
-        T.accA_z_mpf_shift(range) = freqz{k} - freqz{1};
-        freq{k} = meanfreq(detrend(T.accA_norm(range)),fs);
-        T.accA_norm_mpf(range) = freq{k};
-        T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
+%        freqx{k} = meanfreq(detrend(T.accA_x(range)),fs);
+%        T.accA_x_mpf(range) = freqx{k};
+ %       T.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
+%        freqy{k} = meanfreq(detrend(T.accA_y(range)),fs);
+%        T.accA_y_mpf(range) = freqy{k};
+ %       T.accA_y_mpf_shift(range) = freqy{k} - freqy{1};
+ %       freqz{k} = meanfreq(detrend(T.accA_z(range)),fs);
+ %       T.accA_z_mpf(range) = freqz{k};
+  %      T.accA_z_mpf_shift(range) = freqz{k} - freqz{1};
+  %      freq{k} = meanfreq(detrend(T.accA_norm(range)),fs);
+   %     T.accA_norm_mpf(range) = freq{k};
+    %    T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
         
         Q = T.Q_graft;%mean([T.affQ,T.effQ],2);
         T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
@@ -139,10 +140,10 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         T.accA_x_std_shift = -100*(T.accA_x_std-mean(T.accA_x_std(bl_inds)))/mean(T.accA_x_std(bl_inds));
         T.accA_x_movStd_shift = -100*(T.accA_x_movStd-mean(T.accA_x_movStd(bl_inds),'omitnan'))/mean(T.accA_x_movStd(bl_inds),'omitnan');
     
-        T.accA_norm_rms_shift = -100*(T.accA_norm_rms-mean(T.accA_norm_rms(bl_inds)))/mean(T.accA_norm_rms(bl_inds));
-        T.accA_norm_movRMS_shift = -100*(T.accA_norm_movRMS-mean(T.accA_norm_movRMS(bl_inds),'omitnan'))/mean(T.accA_norm_movRMS(bl_inds),'omitnan');
-        T.accA_x_rms_shift = -100*(T.accA_x_std-mean(T.accA_x_rms(bl_inds)))/mean(T.accA_x_rms(bl_inds));
-        T.accA_x_movRMS_shift = -100*(T.accA_x_movRMS-mean(T.accA_x_movRMS(bl_inds),'omitnan'))/mean(T.accA_x_movRMS(bl_inds),'omitnan');
+%         T.accA_norm_rms_shift = -100*(T.accA_norm_rms-mean(T.accA_norm_rms(bl_inds)))/mean(T.accA_norm_rms(bl_inds));
+%         T.accA_norm_movRMS_shift = -100*(T.accA_norm_movRMS-mean(T.accA_norm_movRMS(bl_inds),'omitnan'))/mean(T.accA_norm_movRMS(bl_inds),'omitnan');
+%         T.accA_x_rms_shift = -100*(T.accA_x_std-mean(T.accA_x_rms(bl_inds)))/mean(T.accA_x_rms(bl_inds));
+%         T.accA_x_movRMS_shift = -100*(T.accA_x_movRMS-mean(T.accA_x_movRMS(bl_inds),'omitnan'))/mean(T.accA_x_movRMS(bl_inds),'omitnan');
     
     end
     

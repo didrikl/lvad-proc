@@ -1,6 +1,12 @@
-function welcome(str, type)
+function welcome(str, type, asSubFunc)
     
     if nargin<2, type = 'function'; end
+    if nargin<3, asSubFunc=false; end
+    
+    if asSubFunc
+        fprintf('\n')
+        return
+    end
     
     switch type
         case 'iteration'

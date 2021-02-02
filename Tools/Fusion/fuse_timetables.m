@@ -1,4 +1,4 @@
-function T = fuse_timetables(T1,T2,syncOpts,dropSpec)
+function T = fuse_timetables(T1,T2,syncOpts,contDropSpec)
     % FUSE_TIMETABLES   Fuse two timetables that are syncronized and left joined
     %    FUSE_TIMETABLES(T1,T2) fuse data from T2 into T1. Data in T2 is 
     %    syncronized, so that non-matching timestamps will match.
@@ -6,9 +6,10 @@ function T = fuse_timetables(T1,T2,syncOpts,dropSpec)
     % See also timetables, syncronize
     
     if nargin<3, syncOpts = {}; end
-    if nargin<4, dropSpec = {'unset','event'}; end
+    if nargin<4, contDropSpec = {'unset','event'}; end
+    if nargin<5, notSupported = {}; end
 
-    T2_dropCols = determineColsToDrop(T2,dropSpec);
+    T2_dropCols = determineColsToDrop(T2,contDropSpec);
     T2_dropVarNames = T2.Properties.VariableNames(T2_dropCols);
     T2_fuseVarNames = T2.Properties.VariableNames(not(T2_dropCols));
     T2 = T2(:,T2_fuseVarNames);
@@ -32,7 +33,46 @@ function T = fuse_timetables(T1,T2,syncOpts,dropSpec)
         warning([class(T2),' ',T_name,' is not sorted in time.'])
     end
 
-    T = synchronize(T1,T2,syncOpts{:});
+    try
+        T = synchronize(T1,T2,syncOpts{:});
+    catch ME
+        if strcmp(ME.identifier,'MATLAB:timetable:synchronize:NotMissingAware')
+            warning(ME.message)
+            
+            % First remove all unsupported columns
+            T1_notSupported = T1.Properties.VariableNames(...
+                varfun(@islogical,T1,'output','uniform'));
+            T2_notSupported = T2.Properties.VariableNames(...
+                varfun(@islogical,T2,'output','uniform'));
+            if not(isempty(T1_notSupported)) || not(isempty(T2_notSupported))
+                warning(sprintf('Variable are removed for data fusion:\n\t%s',...
+                    strjoin([T1_notSupported,T2_notSupported],', ')));
+                T2 = T2(:,not(ismember(T2.Properties.VariableNames,T2_notSupported)));
+                T1 = T1(:,not(ismember(T1.Properties.VariableNames,T1_notSupported)));
+            end
+            
+            % Temporarily handle integer columns as single
+            T2_intVarNames = T2.Properties.VariableNames(...
+                varfun(@isinteger,T2,'output','uniform'));
+            %T3 = T2(:,T2_intVarNames);
+            T2 = convert_to_single(T2,T2_intVarNames);
+            %T2 = T2(:,not(ismember(T2.Properties.VariableNames,T2_intVarNames)));
+            
+            T1_intVarNames = T1.Properties.VariableNames(...
+                varfun(@isinteger,T1,'output','uniform'));
+            %T4 = T1(:,T1_intVarNames);
+            T1 = convert_to_single(T1,T1_intVarNames);
+            %T1 = T1(:,not(ismember(T1.Properties.VariableNames,T1_intVarNames)));
+            
+            T = synchronize(T1,T2,syncOpts{:});
+            %T = synchronize(T1,T3);
+            %T = synchronize(T1,T4);
+            
+            % Convert back to integer
+            T = convert_to_int(T,[T1_intVarNames,T2_intVarNames]);
+            
+        end
+    end
     
 end
 
@@ -90,13 +130,27 @@ function colsToRemove = determine_cols_to_overwrite(T1,merge_varnames)
     
 end
 
-function colsToDrop = determineColsToDrop(T2,varContDropType)
+function [colsToDrop] = determineColsToDrop(T2,varContDropType)
     % Return logical array of new columns to drop before data fusion
     
     % Merge only data with specified variable continuity (which is used for
     % filling empty entries in non-matching rows when syncing).
     colsToDrop = ismember(T2.Properties.VariableContinuity,varContDropType);
     
+%     intVars = varfun(@isinteger,T2,'output','uniform');
+%     if any(intVars)
+%         fprintf('\t')
+%         warning('Integer variables is not supported for syncronize using ''fillwithmissing''')
+%         notSupported = [notSupported,intVars];
+%     %    ask_to_handle_int_vars()
+%     end
+%     
+%     logicalVars = varfun(@islogical,T2,'output','uniform');
+%     if any(logicalVars)
+%         warning('Logical variables is not supported for syncronize using ''fillwithmissing''')
+%         notSupported = [notSupported,intVars];
+%     end    
+%     
     %colsToDrop = ask_user_for_handling_empty_cols(T2, colsToDrop);
     
 end

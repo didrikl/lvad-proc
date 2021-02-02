@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'Seq6 - LVAD7';
-experiment_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq6 - LVAD7';
+experiment_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq6 - LVAD7';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -13,12 +13,12 @@ notes_subdir = 'Noted';
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-     'G1_Seq6 - F1_Sel1 [accA].mat'
-     'G1_Seq6 - F1_Sel1 [accB].mat'
-     'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
-     'G1_Seq6 - F1_Sel2 [accA].mat'
-     'G1_Seq6 - F1_Sel2 [accB].mat'
-     'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
+      'G1_Seq6 - F1_Sel1 [accA].mat'
+      'G1_Seq6 - F1_Sel1 [accB].mat'
+      'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
+      'G1_Seq6 - F1_Sel2 [accA].mat'
+      'G1_Seq6 - F1_Sel2 [accB].mat'
+      'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
      'G1_Seq6 - F2_Sel1 [accA].mat'
      'G1_Seq6 - F2_Sel1 [accB].mat'
      'G1_Seq6 - F2_Sel1 [pGraft,pLV,ECG].mat'
@@ -26,7 +26,8 @@ powerlab_fileNames = {
      'G1_Seq6 - F2_Sel2 [accB].mat'
      'G1_Seq6 - F2_Sel2 [pGraft,pLV,ECG].mat'
      };
-notes_fileName = 'G1_Seq6 - Notes ver4.15 - Rev6.xlsm';
+notes_fileName = 'G1_Seq6 - Notes ver4.16 - Rev8.xlsm';
+notes_spec_file = 'VarMap_G1_Notes_Ver4p16';
 ultrasound_fileNames = {
     'ECM_2020_10_22__11_02_46.wrf'
 };
@@ -56,6 +57,8 @@ systemM_varMap = {
     'VenflowLmin'        'Q_graft'          1          'single' 'continuous' 'L/min'
     };
 
+notes_varMapFile = 'VarMap_G1_Notes_Ver4p16';
+
 %% Read data into Matlab
 % Initialize data into Matlab timetable format
 % * Read PowerLab data (PL) and ultrasound (US) files stored as into cell arrays
@@ -72,7 +75,8 @@ PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 US = init_system_m_text_files(ultrasound_filePaths,'',systemM_varMap);
 
 % Read sequence notes made with Excel file template
-notes = init_notes_xlsfile_ver4(notes_filePath);
+notes = init_notes_xlsfile_ver4(notes_filePath,'',notes_varMapFile);
+notes = qc_notes_ver4(notes);
 
 
 %% Pre-processing
@@ -92,39 +96,33 @@ secsAhead = 47.5;
 
 US = adjust_for_linear_time_drift(US,secsAhead);
 
-notes = qc_notes_ver4(notes);
-
-PL = resample_signal(PL, fs_new);
+%PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 
-% QC of pressure
-% ol_ind = S_parts{5}.p_graft>3*S_parts{5}.p_graft_movAvg;
-% Store info: original data, along with row and col indices
 
-%%
+%% Process derived variables
 
-S_parts = add_spatial_norms(S_parts,2, {'accA_x','accA_y','accA_z'}, 'accA_norm');
-S_parts = add_moving_statistics(S_parts,{'accA_norm','accA_x','accA_y','accA_z'},{'rms','std'});
-S_parts = add_moving_statistics(S_parts,{'p_graft'});
+welcome('Processing derived variable','module')
 
-%S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
-S_parts = add_moving_statistics(S_parts,{'accB_norm'},{'rms','std'});
+S_parts = add_spatial_norms(S_parts,2,{'accA_x','accA_y','accA_z'},'accA_norm');
+S_parts = add_spatial_norms(S_parts,2,{'accB_x','accB_y','accB_z'},'accB_norm');
+% S_parts = add_spatial_norms(S_parts,2,{'i1','i2_shifted','i3_shifted'},'i_norm_shifted');
+% S_parts = add_spatial_norms(S_parts,2,{'v1','v2_shifted','v3_shifted'},'v_norm_shifted');
+%S_parts = remove_variables(S_parts,{'accB_x','accB_y','accB_z'});
 
+% Add highpass-filtered moving acc statistics
+S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_norm'},'accA_norm_HP',1,1);
+%S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_norm'},'accA_norm_1.5HP',1.5,0);
+S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_x','accA_y','accA_z'},{'accA_x_HP','accA_y_HP','accA_z_HP'},1,1);
+%S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_x','accA_y','accA_z'},{'accA_x_1.5HP','accA_y_1.5HP','accA_z_1.5HP'},1.5,0);
 
-% Fpass = ([2200,2400,1800]/60)-1;
-% Fs = 700;
-% for i=1:3
-%     S_parts{i}.accA_normHighPass = highpass(S_parts{i}.accA_norm,Fpass(i),Fs);
-% end
-% S_parts = add_moving_statistics(S_parts,{'accA_normHighPass'});
+% S_parts = add_moving_statistics(S_parts,{'accA_norm','accA_x','accA_y','accA_z'},{'std'});
+% S_parts = add_moving_statistics(S_parts,{'i1','v1','i_norm','v_norm'},{'std'});
+% S_parts = add_moving_statistics(S_parts,{'p_graft'},{'avg','max','min'});
+% S_parts = add_moving_statistics(S_parts,{'accB_norm'},{'std'});
 
 %feats = init_features_from_notes(notes);
-
-
-
-%ask_to_save({'S_parts','notes','feats'},sequence,proc_path);
-%ask_to_save({'S_parts','notes'},sequence,proc_path);

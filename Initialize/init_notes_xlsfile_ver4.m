@@ -1,4 +1,4 @@
-function notes = init_notes_xlsfile_ver4(fileName, path)
+function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     % 
     % Read named ranges from Notes Excel file. Ranges must be defined by Excel
     % name manager. (Named ranges make the Excel file more flexible w.r.t.
@@ -7,7 +7,9 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     % Column that consists of empty / undefined values are not stored in the
     % notes table
     
-    if nargin==1, path = ''; end
+    if nargin<2, path = ''; end  
+    if nargin<3, varMapFile = 'VarMap_G1_Notes_Ver4p16'; end
+    eval(varMapFile);
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
     % NOTE: Notes range defined in name manager is a bit confusing/ error prone
@@ -15,66 +17,12 @@ function notes = init_notes_xlsfile_ver4(fileName, path)
     notes_sheet = 'Recording notes';
     varsNames_controlled_range = 'Controlled_VarNames';
     varNames_measured_range = 'Measured_VarNames';
+    notes_range = 'Notes';
     varNames_range = 'Header_VarNames';
     varUnits_range = 'Header_VarUnits';
     experiment_info_sheet = 'Description';
     experiment_info_range = 'Experiment_Info';
     
-    % * Name in Excel: Must match the name in Excel, but can be changed easily.
-    % * Name Matlab code: Static variable name used in code. Must be valid a
-    %   variable name.
-    % * Type is used for parsing data from Excel into notes Matlab table
-    % * Continuity is a status property, particularily useful when merging with 
-    %   recorded data, and for resampling using retime, c.f. the timetable 
-    %   VariableContinuity documentation.  
-    %   NB: Categoric type take a lot less memory to store
-    %   NOTE: Must be listed in the same order as in Excel file.
-    %   TODO: Make more flexible wrt. list order
-    % TODO: Specific a list of variables for data fusion, while the rest is just
-    % stored in the notes table??
-    varMap = {...  
-        % Name in Excel           Name Matlab code     Type          Continuity
-        'Date'                    'date'             'datetime'      'event'
-        'Timestamp'               'timestamp'        'double'        'event'
-        'Elapsed time'            'partDurTime'      'duration'      'unset'
-        %'Timer'                   'timer'            'int16'         'event'
-        'X-ray ser.'              'xraySer'          'int16'         'unset'
-        %'Tag'                     'tag'              'cell'          'event'
-        'Part'                    'part'             'categorical'   'step' 
-        'Interval'                'intervType'       'categorical'   'step'
-        'Event'                   'event'            'categorical'   'step'
-        'Par. tag'                'parTag'           'categorical'   'unset'
-        'Inject vol.'             'thrombusVol'      'int16',        'unset'
-        'Embolus type'            'thrombusType'     'categorical'   'unset'
-        'Pump speed'              'pumpSpeed'        'int16'         'step'
-        'Balloon level'           'balloonLevel'     'categorical'   'step'
-        'Balloon diameter'        'balloonDiam'      'categorical'   'unset'
-        'Manometer control'       'manometerCtrl'    'categorical'   'unset'
-        'Catheter type'           'catheter'         'categorical'   'step'
-        'Flow red.'               'Q_RedPst'         'categorical'   'unset'
-        'Flow red. target'        'Q_RedTarget'      'single'        'unset'
-        'Balloon offset'          'balloonOffset'    'categorical'   'unset'
-        'Balloon diam. est.'      'balDiamEst'       'int16'         'unset'
-        'Flow est.'               'Q_LVAD'           'single'        'step'
-        'Power'                   'P_LVAD'           'single'        'step'
-        'Flow'                    'Q_noted'          'single'        'unset'
-        'Max art. p'              'p_maxArt'         'int16'         'unset'
-        'Min art. p'              'p_minArt'         'int16'         'unset'
-        'MAP'                     'MAP'              'int16'         'unset'
-        'Max pulm. p'             'p_maxPulm'        'int16'         'unset'
-        'Min pulm. p'             'p_minPulm'        'int16'         'unset'
-        'HR'                      'HR'               'int16'         'unset'
-        'CVP'                     'CVP'              'int16'         'unset'
-        'SvO2'                    'SvO2'             'int16'         'unset'
-        'Cont. CO'                'CO_cont'          'int16'         'unset'
-        'Thermo. CO'              'CO_thermo'        'int16'         'unset'
-        'Hema-tocrit'             'HCT'              'int16'         'unset'
-        'Procedure'               'procedure'        'cell'          'event'
-        'Experiment'              'exper_notes'      'cell'          'event'
-        'Quality control'         'QC_notes'         'cell'          'event'
-        'Interval annotation'     'annotation'       'cell'          'event'
-        };
-
     % Columns to omit (not never in use or always constant in the sequence)
     varNamesToRemove = {
         'date'

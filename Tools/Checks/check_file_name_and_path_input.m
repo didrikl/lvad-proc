@@ -1,5 +1,7 @@
 function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,path,ext)
     
+    % TODO: Check for duplicates in file list
+    
     if nargin<3, ext = {}; end
     
     return_as_cell = iscell(fileNames);

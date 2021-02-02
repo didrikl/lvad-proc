@@ -1,4 +1,4 @@
-function T = subs_dummy_rpm_when_LVAD_off(T)
+function T = subs_dummy_rpm_when_LVAD_off(T,fillType)
 % % Just to visualize signal in RPM order plot also when pump is off. First pump
 % % speed after turning of LVAD is used as dummy RPM value. It should be clear
 % % from the plot that the LVAD is off.

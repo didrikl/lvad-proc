@@ -21,8 +21,9 @@ function T_parts = add_in_parts(fnc,T_parts,inputVarNames,outputVarNames,varargi
     
     for i=1:numel(T_parts)
         
-        welcome(sprintf('Part %d\n',i),'iteration')
+        welcome(sprintf('Part %d',i),'iteration')
         if height(T_parts{i})==0
+            fprintf(newline)
             warning('Empty part')
             continue; 
         end
@@ -54,5 +55,10 @@ function T_parts = add_in_parts(fnc,T_parts,inputVarNames,outputVarNames,varargi
             T_parts{i},inputVarNamesChecked,outputVarNamesChecked,varargin{:});
         
     end
-
     clear check_table_var_output check_table_var_input
+
+    %dbs = dbstack;
+    %fprintf('\n%s done.\n',dbs(end).name);
+    fprintf('\nDone.\n'); 
+    
+    

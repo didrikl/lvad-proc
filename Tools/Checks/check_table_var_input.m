@@ -9,9 +9,8 @@ function varNames = check_table_var_input(T, varNames)
 
         if not(ismember(varNames{i},T.Properties.VariableNames))
             
-            if i==1, fprintf('\n'); end
-            msg = sprintf('Variable %s does not exist\n',varNames{i});
-            fprintf(msg);
+             msg = sprintf('\nVariable %s does not exist\n',varNames{i});
+             fprintf(msg);
             
             if always_skip
                 warning(sprintf(['Always skipped',...

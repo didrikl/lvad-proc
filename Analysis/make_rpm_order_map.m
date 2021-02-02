@@ -13,7 +13,10 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
     
     n_rows = check_table_height(T);
     [maxFreq,T] = check_sampling_rate(maxFreq,T);
-    if isnan(maxFreq) || n_rows==0, return; end
+    if isnan(maxFreq) || n_rows==0
+        fprintf('\nRPM order map not made\n')
+        return; 
+    end
     
     [rpm_varName,map_varName] = check_table_cols(T,rpm_varName,map_varName);
     T = check_missing_rpm_values(T,rpm_varName);
@@ -97,7 +100,7 @@ function T = check_rpm_as_zero_values(T,rpm_varName,map_varName)
             '\n\tCorresponding map values are set to zero.',...
             '\n\tRPM=1000 is made as dummy substitute values.'],...
             nnz(zeroSpeed),rpm_varName));
-        T.(rpm_varName)(zeroSpeed) = 1000;
+        T.(rpm_varName)(zeroSpeed) = 2400;
         T.(map_varName)(zeroSpeed) = 0;
     end
     

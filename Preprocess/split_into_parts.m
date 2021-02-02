@@ -3,7 +3,7 @@ function S_parts = split_into_parts(S,fs_parts)
     % Sample rate for re-sampling down to highest signal content frequency 
     if nargin<2, fs_parts=get_sampling_rate(S); end
     
-    welcome('Splitting into resampled parts')
+    welcome('Splitting into parts')
     h_wait = waitbar(0,'','Name','Preprocessing parts...');
     
 %     parts = string(sort_nat(cellstr(unique(string(S.part(not(ismissing(S.part))))))));

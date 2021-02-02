@@ -1,4 +1,4 @@
-function T_parts = add_moving_statistics(T_parts, varNames, statistics)
+function T_parts = add_moving_statistics(T_parts, varNames, statistics, newVarsNames)
     % Function for array of data timetables to add moving statistics.
     %
     % First values in each part will be NaN. A good practice could e.g. 
@@ -14,7 +14,7 @@ function T_parts = add_moving_statistics(T_parts, varNames, statistics)
         'std',      15, '_movStd'
         'min',      5,  '_movMin'
         'max',      5,  '_movMax'
-        'avg',      10, '_movAvg'
+        'avg',      15, '_movAvg'
         };
     
     % Just for compatibility
@@ -35,6 +35,8 @@ function T_parts = add_moving_statistics(T_parts, varNames, statistics)
             strjoin(statistics(unsupported),', ')))
         statSpecs(unsupported,:) = [];
     end
+    
+    statSpecs = statSpecs(ismember(statSpecs(:,1),statistics),:);
     
     nTypes = numel(statSpecs(:,1));
     newVarNames = {};

@@ -26,30 +26,32 @@ function T = resample_signal(T,sampleRate,method)
     
     [returnAsCell,T] = get_cell(T);
 
-    fprintf('\nResampling:')
-    fprintf('\n\tMethod: %s',method)
-    fprintf('\n\tNew sample rate: %d',sampleRate)
+    fprintf('Method: %s\n',method)
+    fprintf('New sample rate: %d\n',sampleRate)
     
     for i=1:numel(T)
+        
+        welcome(sprintf('Block (no %d/%d)',i,numel(T)),'iteration',not(returnAsCell));
+        
+        % Store variable name order
+        varNames = T{i}.Properties.VariableNames;
+        
         % Resample to even sampling, before adding categorical data and more from notes
         measured_cols = T{i}.Properties.CustomProperties.Measured;
         derived_cols = T{i}.Properties.VariableContinuity=='continuous' & not(measured_cols);
-        resamp_cols = measured_cols | derived_cols;
-        %TODO:
-        % int_resamp_cols = resamp_cols && isa(T{:,resamp_cols),'int16')
-        % T{:,int_resamp_cols} = single(T{:,int_resamp_cols});
-        % ...resample...
-        % T{:,int_resamp_cols} = int(T{:,int_resamp_cols});
+        isFloatCol = varfun(@isfloat,T{i},'output','uniform');
+        
+        resamp_cols = (measured_cols | derived_cols) & isFloatCol;
         merge_cols = not(resamp_cols);
         merge_varNames = T{i}.Properties.VariableNames(merge_cols);
         resamp_varNames = T{i}.Properties.VariableNames(resamp_cols);
         
-        fprintf('\n\tRe-sampling: %s\n',strjoin(resamp_varNames,', '))
+        fprintf('\nRe-sampling: %s\n',strjoin(resamp_varNames,', '))
         
         % In case there are notes columns merged with signal, then these columns
         % must be kept separately and then merged with signal after resampling
         if any(merge_cols)
-            fprintf('\tRe-merging: %s\n',strjoin(merge_varNames,', '))
+            fprintf('Re-merging: %s\n',strjoin(merge_varNames,', '))
             merge_varsTable = T{i}(:,merge_varNames);
         end
         
@@ -61,8 +63,12 @@ function T = resample_signal(T,sampleRate,method)
         % Re-include notes info (using syncronize)
         if any(merge_cols)
             T{i} = fuse_timetables(T{i},merge_varsTable,...
-                {'regular','SampleRate',sampleRate});
+                {'regular','SampleRate',sampleRate},{});
         end
+        
+        % Reorder columns to original order (excl. unsopprted)
+        T{i} = T{i}(:,varNames(...
+            ismember(varNames,T{i}.Properties.VariableNames)));
     end
 
     if not(returnAsCell), T = T{1}; end

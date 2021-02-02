@@ -65,10 +65,13 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         
         % Put in NaN instead of extrapolated values made by syncronize function
         % called in fuse_timetables
+        try
         PL{i}{PL{i}.time>LabChart_i.time(end),LabChart_i.Properties.VariableNames}=NaN;
         PL{i}{PL{i}.time<LabChart_i.time(1),LabChart_i.Properties.VariableNames}=NaN;
         PL{i}{PL{i}.time>US_block.time(end),US_block.Properties.VariableNames}=NaN;
         PL{i}{PL{i}.time<US_block.time(1),US_block.Properties.VariableNames}=NaN;
+        catch
+        end
     end
     
     try
@@ -144,7 +147,7 @@ function  B = check_for_overlapping_note_blocks(Notes,B,b_rowStep,b_rowInds,i)
     % Should rarely be the case; Initializing PL also checks for overlapping.
     if b_rowStep<1
         overlapping = b_rowInds{i-1}(end):b_rowInds{i}(1);
-        warning('\nNote row(s) accosiated to multiple LabChart blocks:\n\n');
+        warning(sprintf('\nNote row(s) accosiated to multiple LabChart blocks:\n\n'));
         disp(Notes(overlapping,:))
         [B{i},B{i-1}] = handle_overlapping_ranges(B{i},B{i-1},false);
     end
@@ -156,7 +159,7 @@ function B = check_for_gap_in_note_blocks(Notes,B,b_rowStep,b_inds,i,interNoteIn
 
     if b_rowStep>1 % i>1 is implied
         intermediateNotes = b_inds{i}(1)-b_rowStep:b_inds{i}(1);
-        warning('\nIntermediate note row(s) no LabChart recording:\n\n');
+        warning(sprintf('\nIntermediate note row(s) no LabChart recording:\n\n'));
         disp(Notes(intermediateNotes,:))
 
         switch interNoteInclSpec
@@ -179,15 +182,13 @@ function B = check_for_notes_outside_PL(B,PL,i,outsideNoteInclSpec)
     
     preDataNotes_ind = find(B.time<PL.time(1));
     if nnz(preDataNotes_ind)>0    
-        warning(sprintf(['\nThere are %d rows in Notes before LabChart was',...
-            'recording data\n\n'],nnz(preDataNotes_ind)));
+        warning(sprintf('There are Notes rows before LabChart started recording data\n'));
         disp(B(preDataNotes_ind,:))  
     end  
     
     postDataNotes_ind = find(B.time>PL.time(end));
     if nnz(postDataNotes_ind)>0       
-        warning(sprintf(['\nThere are %d rows in Notes after LabChart was',...
-            'recording data\n\n'],nnz(postDataNotes_ind)));
+        warning(sprintf('There are Notes rows after LabChart stopped recording data\n'));
         disp(B(postDataNotes_ind,:))
     end
     

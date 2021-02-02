@@ -50,23 +50,24 @@ function notes = ask_to_reinit(notes, isNotChrono, isNatPause, isNatPart, isUnde
         };
     msg = '\nQuality control of notes found issues\n';
     if any(isNotChrono)
-        msg=[msg,'\nNon-chronical timestamps at row(s): ',mat2str(find(isNotChrono))];
+        msg=[msg,'\nNon-chronical timestamps at row(s): ',...
+            mat2str(notes.noteRow(find(isNotChrono)))];
     end
     if any(isNatPause)
         msg=[msg,'\nMissing timestamps at start of pauses at row(s): ',...
-            mat2str(find(isNatPause))];
+            mat2str(notes.noteRow(find(isNatPause)))];
     end
     if any(isNatPart)
          msg=[msg,'\nMissing timestamps at within parts at row(s): ',...
-             mat2str(find(isNatPart))];
+             mat2str(notes.noteRow(find(isNatPart)))];
     end
     if any(isUndefCat)
         msg=[msg,'\nMissing essential categoric info at row(s): ',...
-            mat2str(find(isUndefCat))];
+            mat2str(notes.noteRow(find(isUndefCat)))];
     end
     if any(isIrregPart)
         msg=[msg,'\nIrregular part numbering order at row(s): ',...
-            mat2str(find(isIrregPart))];
+            mat2str(notes.noteRow(find(isIrregPart)))];
     end
     msg = sprintf([msg,'\n\nCheck and save as new notes file revision']);
     
