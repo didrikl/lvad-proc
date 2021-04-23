@@ -8,55 +8,53 @@ sampleRate = fs_new;
 
 mapSpec = {
     % Variable       Colorbar   y-lims
-%      'accA_norm',    [-80,-36], [0,5.2];
-%      'accA_norm_HP', [-80,-36], [0,5.2];
-%      'accA_x',       [-80,-36], [0,5.2];
-%       'accA_x_HP',    [-80,-36], [0,5.2];
-%       'accA_y',       [-80,-36], [0,5.2];
-%       'accA_y_HP',    [-80,-36], [0,5.2];
-%  %     'accA_y_1.5HP',    [-80,-36], [0,5.2];
-%       'accA_z',       [-80,-36], [0,5.2];
-%       'accA_z_HP',    [-80,-36], [0,5.2];
-%       'accB_norm',    [-75,-45], [0,5.2];
-%       'accB_x',       [-75,-45], [0,5.2];
-%      'accB_y',       [-75,-45], [0,5.2];
-      'accB_z',       [-75,-45], [0,5.2];
-       'i_norm',       [-75,-45], [0,2.3];
-       'v_norm',       [-75,-45], [0,2.3];
+    'accA_norm',    [-80,-36], [0,5.2];
+%     'accA_norm_HP', [-80,-36], [0,5.2];
+%     'accA_x',       [-80,-36], [0,5.2];
+%     'accA_x_HP',    [-80,-36], [0,5.2];
+%     'accA_y',       [-80,-36], [0,5.2];
+%     'accA_y_HP',    [-80,-36], [0,5.2];
+%     'accA_z',       [-80,-36], [0,5.2];
+%     'accA_z_HP',    [-80,-36], [0,5.2];
+%     'accB_norm',    [-75,-45], [0,5.2];
+%     'accB_x',       [-75,-45], [0,5.2];
+%     'accB_y',       [-75,-45], [0,5.2];
+%     'accB_z',       [-75,-45], [0,5.2];
+%     'i_norm',       [-75,-45], [0,2.3];
+%     'v_norm',       [-75,-45], [0,2.3];
     };
 
 graphSpec = {
     % MovStd var     y-lims
-%      'accA_norm',    [-85,20]
-%      'accA_norm_HP', [-85,20];
-%      'accA_x',       [-85,20];
-%      'accA_x_HP',    [-85,20];
-%      'accA_y',       [-85,20];
-%      'accA_y_HP',    [-85,20];
-% %     'accA_y_1.5HP',    [-85,20];
-%      'accA_z',       [-85,20];
-%      'accA_z_HP',    [-85,20];
-%     'accB_norm',    [-85,20]
-%      'accB_x',       [-85,20]
-%     'accB_y',       [-85,20]
-     'accB_z',       [-85,20]
-      'i_norm',       [-85,20]
-      'v_norm',       [-85,20]
-     };
-           
+    'accA_norm',    [-90,25]
+    'accA_norm_HP', [-90,25];
+    'accA_x',       [-90,25];
+    'accA_x_HP',    [-90,25];
+    'accA_y',       [-90,25];
+    'accA_y_HP',    [-90,25];
+    'accA_z',       [-90,25];
+    'accA_z_HP',    [-90,25];
+    'accB_norm',    [-90,25]
+    'accB_x',       [-90,25]
+    'accB_y',       [-90,25]
+    'accB_z',       [-90,25]
+    'i_norm',       [-90,25]
+    'v_norm',       [-90,25]
+    };
+
 % % Extract data for these RPM values
 %rpm = {2400,2400,2200,2600};
 rpm={};
 
 parts = {
-     [],   [2],  [],   '01. RPM changes'
-     [],   [8],  [],   '01. RPM changes - Second time'
-     [],   [3],  [],   '02. Graft clamping'
-     {},   [5],   [],  '03. Balloon inflation'
-     {},   [6],   [],  '04. Balloon inflation'
-     [],   [7],   [],  '05. Balloon inflation'
-     [],   [9],  [],   '06. Saline bolus injections'
-     };
+    [],   [2],  [],   '1. RPM changes'
+%     [],   [8],  [],   '1. RPM changes - Second time'
+%     [],   [3],  [],   '2. Graft clamping'
+%     {},   [5],  [],  '3. Balloon inflation'
+%     {},   [6],  [],  '4. Balloon inflation'
+%     [],   [7],  [],  '5. Balloon inflation'
+%     [],   [9],  [],   '6. Saline bolus injections'
+    };
 
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
@@ -68,12 +66,18 @@ for j=1:size(mapSpec,1)
         
         [T,rpms] = make_plot_data(parts{i,2},S_parts,rpm{i},sampleRate,parts{i,1},...
             parts{i,3},graphSpec{j,1});
-        h_fig = plot_ordermap_with_vars(...
+        [h_fig,h_ax] = plot_ordermap_with_vars(...
             T,mapSpec{j,1},sampleRate,parts{i,1},mapSpec{j,2},notes,graphSpec{j,2},mapSpec{j,3});
-
-        save_to_png(h_fig,parts{i,2},parts{i,4},mapSpec{j,1},...
-            proc_path,fig_subdir,rpms,seq_no,300)
+        
+        % TODO Move into plot-function
+        fig_name = make_fig_name_G1(h_fig,h_ax,...
+            parts{i,2},parts{i,4},mapSpec{j,1},rpms,seq_no);
+        
+        %save_to_png_G1(h_fig,proc_path,fig_subdir,300)
     end
+    
+    %close all
+
 end
 
 
@@ -102,8 +106,8 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     T = add_moving_statistics(T,{'p_graft'},{'avg'});
     
     % Keep only steady or baseline denoted row in the baseline parts
-%     T(contains(string(T.part),string([bl_part{1},cbl_part])) & ...
-%         not(contains(lower(string(T.intervType)),{'baseline'})),:) = [];
+    %     T(contains(string(T.part),string([bl_part{1},cbl_part])) & ...
+    %         not(contains(lower(string(T.intervType)),{'baseline'})),:) = [];
     
     if height(T)==0
         warning('No rows in data parts %s, with RPM=%s',...
@@ -115,36 +119,36 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
     else
-         bl_inds = contains(string(T.part),string(bl_part)) & ...
-             ismember(lower(string(T.intervType)),{'baseline','steady-state'});
+        bl_inds = contains(string(T.part),string(bl_part)) & ...
+            ismember(lower(string(T.intervType)),{'baseline','steady-state'});
     end
     if nnz(bl_inds)==0
         warning('No baseline intervals explicitly given in notes')
         bl_inds = blocks.start_inds(1):blocks.end_inds(1);
-    end   
-        
+    end
+    
     for k=1:height(blocks)
         range = blocks.start_inds(k):blocks.end_inds(k);
         
         % This is a workaround for bug
         if numel(range)==1, continue; end
-        % TODO: Fix issue with numel(range)==1 in find_cat_block_inds instead. 
+        % TODO: Fix issue with numel(range)==1 in find_cat_block_inds instead.
         
         T.accA_norm_std(range) = std(T.accA_norm(range));
         T.accA_norm_rms(range) = rms(T.accA_norm(range));
         
-%        freqx{k} = meanfreq(detrend(T.accA_x(range)),fs);
-%        T.accA_x_mpf(range) = freqx{k};
- %       T.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
-%        freqy{k} = meanfreq(detrend(T.accA_y(range)),fs);
-%        T.accA_y_mpf(range) = freqy{k};
- %       T.accA_y_mpf_shift(range) = freqy{k} - freqy{1};
- %       freqz{k} = meanfreq(detrend(T.accA_z(range)),fs);
- %       T.accA_z_mpf(range) = freqz{k};
-  %      T.accA_z_mpf_shift(range) = freqz{k} - freqz{1};
-  %      freq{k} = meanfreq(detrend(T.accA_norm(range)),fs);
-   %     T.accA_norm_mpf(range) = freq{k};
-    %    T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
+        %        freqx{k} = meanfreq(detrend(T.accA_x(range)),fs);
+        %        T.accA_x_mpf(range) = freqx{k};
+        %       T.accA_x_mpf_shift(range) = freqx{k} - freqx{1};
+        %        freqy{k} = meanfreq(detrend(T.accA_y(range)),fs);
+        %        T.accA_y_mpf(range) = freqy{k};
+        %       T.accA_y_mpf_shift(range) = freqy{k} - freqy{1};
+        %       freqz{k} = meanfreq(detrend(T.accA_z(range)),fs);
+        %       T.accA_z_mpf(range) = freqz{k};
+        %      T.accA_z_mpf_shift(range) = freqz{k} - freqz{1};
+        %      freq{k} = meanfreq(detrend(T.accA_norm(range)),fs);
+        %     T.accA_norm_mpf(range) = freq{k};
+        %    T.accA_norm_mpf_shift(range) = freq{k} - freq{1};
         
         Q = T.Q_graft;
         % TODO: Do as preprocessing for IV2:
@@ -161,9 +165,9 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
         % If ...
         T.orderMapVar_movStd_shift = -100*(T.([movStdVar,'_movStd'])-mean(T.([movStdVar,'_movStd'])(bl_inds),'omitnan'))/mean(T.([movStdVar,'_movStd'])(bl_inds),'omitnan');
         %T.orderMapVar_movRMS_shift = -100*(T.([movRMSVar,'_movRMS'])-mean(T.([movRMSVar,'_movRMS'])(bl_inds),'omitnan'))/mean(T.([movRMSVar,'_movRMS'])(bl_inds),'omitnan');
-
-%         T.accA_norm_std_shift = -100*(T.accA_norm_std-mean(T.accA_norm_std(bl_inds)))/mean(T.accA_norm_std(bl_inds));
-%         T.accA_norm_movStd_shift = -100*(T.accA_norm_movStd-mean(T.accA_norm_movStd(bl_inds),'omitnan'))/mean(T.accA_norm_movStd(bl_inds),'omitnan');
+        
+        %         T.accA_norm_std_shift = -100*(T.accA_norm_std-mean(T.accA_norm_std(bl_inds)))/mean(T.accA_norm_std(bl_inds));
+        %         T.accA_norm_movStd_shift = -100*(T.accA_norm_movStd-mean(T.accA_norm_movStd(bl_inds),'omitnan'))/mean(T.accA_norm_movStd(bl_inds),'omitnan');
         
     end
     
@@ -172,9 +176,9 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     
 end
 
-function [h_fig,map,order] = plot_ordermap_with_vars(...
+function [h_fig,h_ax,map,order] = plot_ordermap_with_vars(...
         T,orderMapVar,fs,bl_part,mapColScale,notes,circ_ylim,mapOrderLim)
-
+    
     if nargin<4, bl_part = []; end
     if nargin<5, mapColScale = []; end
     if nargin<6, mapOrderLim = [0, 6.25]; end
@@ -209,12 +213,12 @@ function [h_fig,map,order] = plot_ordermap_with_vars(...
         'LineStyle','-',...
         'LineWidth',7,...
         'Marker','none',...
-        'Color', [0.96,0.68,0.68]}; 
+        'Color', [0.96,0.68,0.68]};
     specs.trans_lev_bar = {
         'LineStyle',':',...
         'LineWidth',1.5,...
         'Marker','none',...
-        'Color', [.7 .7 .7]}; 
+        'Color', [.7 .7 .7]};
     specs.leg = {
         'EdgeColor','none',...
         'Box','off',...
@@ -266,8 +270,8 @@ function [h_fig,h_ax] = init_axes_layout
     ax_height(3) = 0.5;
     ax_yPos(3) = xLab_space;
     
-%     ax_height(3) = 0.15;
-%     ax_yPos(3) = ax_yPos(4)+ax_height(4)+ax_yGap;
+    %     ax_height(3) = 0.15;
+    %     ax_yPos(3) = ax_yPos(4)+ax_height(4)+ax_yGap;
     
     ax_height(2) = 1-ax_yPos(3)-ax_height(3)-ax_yGap-bar_height;
     ax_yPos(2) = ax_yPos(3)+ax_height(3)+ax_yGap;
@@ -310,7 +314,7 @@ function add_interv_bar(h,T,notes,mapVar)
         end
     end
     
-    try    
+    try
         T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
             'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
         T.balloonLevel = renamecats(T.balloonLevel,'1',...
@@ -323,7 +327,7 @@ function add_interv_bar(h,T,notes,mapVar)
     t_ss = nan(height(T),1);
     t_ss(ss_inds) = T.t(ss_inds);
     plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
-
+    
     h.YColor = [0 0 0];
     
     yyaxis left
@@ -335,7 +339,7 @@ function add_interv_bar(h,T,notes,mapVar)
     % TODO: Make this as separate function(?)
     rpms = mat2str(double(string((get_cats(T,'pumpSpeed')))));
     titleStr = {'\bfRPM\rm',rpms,'\bfVariable\rm',strrep(mapVar,'_','\_')};
- 
+    
     annotation(gcf,'textbox',...
         'Position',[0.8622 0.857 0.1277822 0.070402],...
         'FitBoxToText','on',...
@@ -344,14 +348,14 @@ function add_interv_bar(h,T,notes,mapVar)
         'FontSize',10.5);
     
     [bl_start_ind, bl_end_ind] = get_baseline_block(T);
-%     try
-%         text(double(T.t( floor(mean([bl_start_ind(1),bl_end_ind(1)])) )),0.5,...
-%             sprintf('%Baseline_{%d}',T.pumpSpeed(bl_start_ind)),...
-%         specs.baseline_title{:})
-%     catch
-%         text(0,0.5,'Baseline',...
-%             specs.baseline_title{:})
-%     end
+    %     try
+    %         text(double(T.t( floor(mean([bl_start_ind(1),bl_end_ind(1)])) )),0.5,...
+    %             sprintf('%Baseline_{%d}',T.pumpSpeed(bl_start_ind)),...
+    %         specs.baseline_title{:})
+    %     catch
+    %         text(0,0.5,'Baseline',...
+    %             specs.baseline_title{:})
+    %     end
     
 end
 
@@ -366,7 +370,7 @@ function add_order_map(h,map_time,order,map,rpm)
     end
     set(h,'ydir','normal');
     h.YLim = specs.mapOrderLim;
- 
+    
     add_colorbar(h,specs)
     add_ylabel('Harmonics',specs);
     add_linked_map_yyaxis(h,rpm,specs);
@@ -387,8 +391,8 @@ function [start_ind, end_ind] = get_baseline_block(T,bl_part)
             T.intervType(block.end_inds))),'baseline'));
         if numel(start_ind)>1
             fprintf('\nMultiple baseline intervals in signal part.\n')
-%             start_ind = start_ind(1);
-%             end_ind = end_ind(1);
+            %             start_ind = start_ind(1);
+            %             end_ind = end_ind(1);
             %TODO Ask for which one to use
         end
     end
@@ -408,8 +412,8 @@ function add_colorbar(h,specs)
     h_col.Label.String = {'Frequency';'amplitude (dB)'};
     h_leg = add_legend(h,{},'Spectrogram',specs);
     h_leg.Position = [0.8549524,sum(h_col.Position([2,4]))-0.005,0.1127575,0.043817];
-end    
-    
+end
+
 function add_baseline_xlines(h_ax,T,bl_part)
     
     if nargin<3, bl_part = []; end
@@ -434,7 +438,7 @@ function draw_xline_for_all_axes(h_ax,pos)
         xline(h_ax(j),pos,'LineWidth',0.5,'Color',[1 0 0 0]);
     end
 end
-    
+
 function add_ylabel(text_str,specs)
     h_yLab = ylabel(text_str,specs.yLab{:});
     h_yLab.Position(1) = specs.yLab_xPos;
@@ -462,7 +466,7 @@ function add_freqStats(h,T)
     specs = h.UserData;
     axes(h);
     hold on
-
+    
     fullColorRows = get_steady_state_rows(T) | contains(T.event,'Injection');
     
     plot(T.t(fullColorRows),T.accA_norm_mpf_shift(fullColorRows),...
@@ -482,7 +486,7 @@ function add_freqStats(h,T)
     plot(T.t(fullColorRows),T.accA_x_mpf_shift(fullColorRows),...
         'LineWidth',1.5,...
         'LineStyle',':',...
-        'Color',[0.39,0.56,0.15,0.7],... 
+        'Color',[0.39,0.56,0.15,0.7],...
         'HandleVisibility','off');
     T.accA_x_mpf_shift(not(fullColorRows)) = nan;
     plot(T.t,T.accA_x_mpf_shift,...
@@ -490,21 +494,21 @@ function add_freqStats(h,T)
         'LineStyle','-',...
         'DisplayName','MPF_x',...
         'Color',[0.39,0.56,0.15,0.9]);
-
-%     plot(T.t(ss_rows),T.accA_z_mpf_shift(ss_rows),...
-%         'LineWidth',1.5,...
-%         'LineStyle',':',...
-%         'HandleVisibility','off');...,'Color',[0.39,0.56,0.15,0.7]);
-%     T.accA_z_mpf_shift(not(ss_rows)) = nan;
-%     plot(T.t,T.accA_z_mpf_shift,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'DisplayName','MPF_y');...,'Color',[0.39,0.56,0.15,0.9]);
-
-%     
-%     h_yyLab = ylabel({'Rectangular';'Window RMS'},specs.yLab{:});
-%     h_yyLab.Position(1) = specs.yyLab_xPos;
-
+    
+    %     plot(T.t(ss_rows),T.accA_z_mpf_shift(ss_rows),...
+    %         'LineWidth',1.5,...
+    %         'LineStyle',':',...
+    %         'HandleVisibility','off');...,'Color',[0.39,0.56,0.15,0.7]);
+    %     T.accA_z_mpf_shift(not(ss_rows)) = nan;
+    %     plot(T.t,T.accA_z_mpf_shift,...
+    %         'LineWidth',2,...
+    %         'LineStyle','-',...
+    %         'DisplayName','MPF_y');...,'Color',[0.39,0.56,0.15,0.9]);
+    
+    %
+    %     h_yyLab = ylabel({'Rectangular';'Window RMS'},specs.yLab{:});
+    %     h_yyLab.Position(1) = specs.yyLab_xPos;
+    
     yrange = h.YLim(2)-h.YLim(1);
     h.YLim = [h.YLim(1)-0.1*yrange, h.YLim(2)+0.1*yrange];
     %h.YTick(end) = [];
@@ -512,7 +516,7 @@ function add_freqStats(h,T)
     h.Clipping = 'on';
     
     add_legend(h,{},'Frequency energy',specs);
-        
+    
     h.YGrid = 'on';
     h.GridAlpha = 0.1;
 end
@@ -538,24 +542,24 @@ function add_vibrations(h,T)
         'DisplayName','SD_x, steady-state',...
         'Color',[0.0156,0.3555, 0.7188]);
     add_ylabel('SD_x  (g)',specs);
- 
-%     plot(T.t,T.accA_z_movStd,...
-%         'LineWidth',0.5,...
-%         'LineStyle','-',...
-%         'DisplayName','SD_z, moving 1sec',...
-%         'Color',[0.46,0.66,0.79,0.3]);
-%     accA_z_std_ss = T.accA_z_std;
-%     accA_z_std_ss(not(ss_rows)) = nan;
-%     plot(T.t,accA_z_std_ss,....
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'DisplayName','SD_z, steady-state',...
-%         'Color',[0.0156,0.3555, 0.7188]);
-%    add_ylabel('SD_z  (g)',specs);
+    
+    %     plot(T.t,T.accA_z_movStd,...
+    %         'LineWidth',0.5,...
+    %         'LineStyle','-',...
+    %         'DisplayName','SD_z, moving 1sec',...
+    %         'Color',[0.46,0.66,0.79,0.3]);
+    %     accA_z_std_ss = T.accA_z_std;
+    %     accA_z_std_ss(not(ss_rows)) = nan;
+    %     plot(T.t,accA_z_std_ss,....
+    %         'LineWidth',2,...
+    %         'LineStyle','-',...
+    %         'DisplayName','SD_z, steady-state',...
+    %         'Color',[0.0156,0.3555, 0.7188]);
+    %    add_ylabel('SD_z  (g)',specs);
     
     yrange = h.YLim(2)-h.YLim(1);
     h.YLim = [h.YLim(1)-0.1*yrange, h.YLim(2)+0.1*yrange];
-    %h.YTick([1,end]) = []; 
+    %h.YTick([1,end]) = [];
     
     yyaxis right
     
@@ -572,13 +576,13 @@ function add_vibrations(h,T)
         'DisplayName','SD_{|x,y,z|}, steady-state',...
         'Color',[0.74,0.04,0.17]);
     
-    add_yylabel('SD_{|x,y,z|} (10^{-3} g)',specs);    
+    add_yylabel('SD_{|x,y,z|} (10^{-3} g)',specs);
     add_legend(h,{},'Vibration Intensity',specs);
     
     yrange = h.YLim(2)-h.YLim(1);
     h.YLim = [h.YLim(1)-0.1*yrange, h.YLim(2)+0.1*yrange];
     h.YTickLabel = string(h.YTick*1000);
-    h.YTick([1]) = []; 
+    h.YTick([1]) = [];
     
 end
 
@@ -589,40 +593,40 @@ function add_circulation(h,T)
     hold on
     
     fullColorRows = get_steady_state_rows(T) | contains(string(T.event),'Injection');
-         
-%     area_bal = pi*((double(string(T.balloonDiam))/2).^2);
-%     area_inlet = pi*(13.0/2)^2;
-%     area_red = 100*((area_inlet-area_bal)/area_inlet - 1);
-%     area_red_ss = area_red;
-%     area_red_ss(not(ss_rows)) = nan;
-%     if all(isnan(area_red_ss))
-%         areaRedVisability = 'off';
-%     else
-%         areaRedVisability = 'on';
-%     end
-%     plot(T.t,area_red_ss,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',[0.5781,0.5117,0.9453],...
-%         'DisplayName','Inlet area reduction',...);%[0.7188,0.6289,0.9297]);%[0.6055,0.1406, 0.4414, 0.85]);
-%         'HandleVisibility',areaRedVisability);
-%     plot(T.t(ss_rows),area_red(ss_rows),...
-%         'LineWidth',1,...
-%         'LineStyle',':',...
-%         'Color',[0.5781,0.5117,0.9453],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
-%         'HandleVisibility','off');
     
-%     plot(T.t,T.p_graft_shift,...
-%         'LineWidth',0.5,...
-%         'LineStyle','-',...
-%         'Color',[0.52,0.07,0.67, 0.05],...
-%         'HandleVisibility','off');
-%     T.p_graft_shift(not(fullColorRows)) = nan;
-%     plot(T.t,T.p_graft_shift,...
-%         'LineWidth',0.75,...
-%         'LineStyle','-',...
-%         'Color',[0.52,0.07,0.67, 0.7],...
-%         'DisplayName','\itP\rm, graft');
+    %     area_bal = pi*((double(string(T.balloonDiam))/2).^2);
+    %     area_inlet = pi*(13.0/2)^2;
+    %     area_red = 100*((area_inlet-area_bal)/area_inlet - 1);
+    %     area_red_ss = area_red;
+    %     area_red_ss(not(ss_rows)) = nan;
+    %     if all(isnan(area_red_ss))
+    %         areaRedVisability = 'off';
+    %     else
+    %         areaRedVisability = 'on';
+    %     end
+    %     plot(T.t,area_red_ss,...
+    %         'LineWidth',2,...
+    %         'LineStyle','-',...
+    %         'Color',[0.5781,0.5117,0.9453],...
+    %         'DisplayName','Inlet area reduction',...);%[0.7188,0.6289,0.9297]);%[0.6055,0.1406, 0.4414, 0.85]);
+    %         'HandleVisibility',areaRedVisability);
+    %     plot(T.t(ss_rows),area_red(ss_rows),...
+    %         'LineWidth',1,...
+    %         'LineStyle',':',...
+    %         'Color',[0.5781,0.5117,0.9453],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
+    %         'HandleVisibility','off');
+    
+    %     plot(T.t,T.p_graft_shift,...
+    %         'LineWidth',0.5,...
+    %         'LineStyle','-',...
+    %         'Color',[0.52,0.07,0.67, 0.05],...
+    %         'HandleVisibility','off');
+    %     T.p_graft_shift(not(fullColorRows)) = nan;
+    %     plot(T.t,T.p_graft_shift,...
+    %         'LineWidth',0.75,...
+    %         'LineStyle','-',...
+    %         'Color',[0.52,0.07,0.67, 0.7],...
+    %         'DisplayName','\itP\rm, graft');
     
     plot(T.t,T.Q_ultrasound_shift,...
         'LineWidth',0.5,...
@@ -636,46 +640,46 @@ function add_circulation(h,T)
         'Color',[0.04,0.37,0.37, 0.75],...
         'DisplayName','\itQ\rm, ultrasound');
     
-
     
     
-%     accA_x_std_shift_ss = T.accA_x_std_shift;
-%     accA_x_std_shift_ss(not(ss_rows)) = nan;
-% %     plot(T.t,T.accA_x_movStd_shift,...
-% %         'LineWidth',0.5,...
-% %         'LineStyle','-',...
-% %         'Color',[0.96,0.39,0.35,0.3],...
-% %         'DisplayName','SD*, moving 5sec');
-%     plot(T.t,accA_x_std_shift_ss,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',[0.74,0.04,0.17],...
-%         'DisplayName','SD*_x, steady-state');
-%     plot(T.t(ss_rows),accA_x_std_shift_ss(ss_rows),...
-%         'LineWidth',1.25,...
-%         'LineStyle',':',...
-%         'Color',[0.74,0.04,0.17,0.6],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
-%         'HandleVisibility','off');
     
-%     accA_norm_std_shift_ss = T.accA_norm_std_shift;
-%     accA_norm_std_shift_ss(not(ss_rows)) = nan;
-% %     plot(T.t,T.accA_norm_movStd_shift,...
-% %         'LineWidth',0.5,...
-% %         'LineStyle','-',...
-% %         'Color',[0.74,0.04,0.17,0.05],...
-% %         'DisplayName','SD*, moving 5sec');
-%     plot(T.t,accA_norm_std_shift_ss,...
-%         'LineWidth',2,...
-%         'LineStyle','-',...
-%         'Color',[0.74,0.04,0.17],...
-%         'DisplayName','-SD_{|\it\bfa\rm|}');
-%     plot(T.t(ss_rows),accA_norm_std_shift_ss(ss_rows),...
-%         'LineWidth',1.25,...
-%         'LineStyle',':',...
-%         'Color',[0.74,0.04,0.17,0.6],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
-%         'HandleVisibility','off');
+    %     accA_x_std_shift_ss = T.accA_x_std_shift;
+    %     accA_x_std_shift_ss(not(ss_rows)) = nan;
+    % %     plot(T.t,T.accA_x_movStd_shift,...
+    % %         'LineWidth',0.5,...
+    % %         'LineStyle','-',...
+    % %         'Color',[0.96,0.39,0.35,0.3],...
+    % %         'DisplayName','SD*, moving 5sec');
+    %     plot(T.t,accA_x_std_shift_ss,...
+    %         'LineWidth',2,...
+    %         'LineStyle','-',...
+    %         'Color',[0.74,0.04,0.17],...
+    %         'DisplayName','SD*_x, steady-state');
+    %     plot(T.t(ss_rows),accA_x_std_shift_ss(ss_rows),...
+    %         'LineWidth',1.25,...
+    %         'LineStyle',':',...
+    %         'Color',[0.74,0.04,0.17,0.6],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
+    %         'HandleVisibility','off');
     
-        
+    %     accA_norm_std_shift_ss = T.accA_norm_std_shift;
+    %     accA_norm_std_shift_ss(not(ss_rows)) = nan;
+    % %     plot(T.t,T.accA_norm_movStd_shift,...
+    % %         'LineWidth',0.5,...
+    % %         'LineStyle','-',...
+    % %         'Color',[0.74,0.04,0.17,0.05],...
+    % %         'DisplayName','SD*, moving 5sec');
+    %     plot(T.t,accA_norm_std_shift_ss,...
+    %         'LineWidth',2,...
+    %         'LineStyle','-',...
+    %         'Color',[0.74,0.04,0.17],...
+    %         'DisplayName','-SD_{|\it\bfa\rm|}');
+    %     plot(T.t(ss_rows),accA_norm_std_shift_ss(ss_rows),...
+    %         'LineWidth',1.25,...
+    %         'LineStyle',':',...
+    %         'Color',[0.74,0.04,0.17,0.6],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
+    %         'HandleVisibility','off');
+    
+    
     plot(T.t,T.orderMapVar_movStd_shift,...
         'LineWidth',1,...
         'LineStyle','-',...
@@ -687,7 +691,7 @@ function add_circulation(h,T)
         'LineStyle','-',...
         'Color',[0.74,0.04,0.17,0.65],...
         'DisplayName','SD_{|(x,y,z)|}^{*}, mov. 15sec');
-
+    
     
     P_LVAD_shift_ss = T.P_LVAD_shift;
     P_LVAD_shift_ss(not(fullColorRows)) = nan;
@@ -740,7 +744,7 @@ function add_circulation(h,T)
     h.GridAlpha = 0.1;
     
     add_legend(h,{},'Flow Modalities',specs);
-
+    
 end
 
 function h_leg = add_legend(h_ax,entries,titleString,specs)
@@ -749,7 +753,7 @@ function h_leg = add_legend(h_ax,entries,titleString,specs)
         h_leg = legend(specs.leg{:});
     else
         h_leg = legend(entries,specs.leg{:});
-    end    
+    end
     h_leg.AutoUpdate = 'off';
     title(h_leg,titleString,...
         specs.leg_title{:});
@@ -768,21 +772,21 @@ function adjust_axes(h_ax)
     set(h_ax(1:end-1),'XTickLabel',{});
     set(h_ax(1:end-1),'XTick',[]);
     set(h_ax,'FontSize',11)
-    set(h_ax,'YColor',[0 0 0]); 
+    set(h_ax,'YColor',[0 0 0]);
     h_ax(end).YTickLabel = cellstr(string(h_ax(end).YTick)+"%");
     xlims = xlim(h_ax(end));
-%    h_ax(end).XTick = seconds(120:120:xlims(2)-60);
-%    xtickformat(h_ax(end),'mm:ss')
-totHDur = diff(xlims)/60;
-if totHDur<30
-    h_ax(end).XTick = 60:60:xlims(2);
-elseif totHDur>=30 && totHDur<60
-    h_ax(end).XTick = 60:120:xlims(2);
-elseif totHDur>=60 && totHDur<120
-    h_ax(end).XTick = 60:180:xlims(2);
-elseif totHDur>=120 && totHDur<180
-    h_ax(end).XTick = 60:240:xlims(2);
-end
+    %    h_ax(end).XTick = seconds(120:120:xlims(2)-60);
+    %    xtickformat(h_ax(end),'mm:ss')
+    totHDur = diff(xlims)/60;
+    if totHDur<30
+        h_ax(end).XTick = 60:60:xlims(2);
+    elseif totHDur>=30 && totHDur<60
+        h_ax(end).XTick = 60:120:xlims(2);
+    elseif totHDur>=60 && totHDur<120
+        h_ax(end).XTick = 60:180:xlims(2);
+    elseif totHDur>=120 && totHDur<180
+        h_ax(end).XTick = 60:240:xlims(2);
+    end
     %h_ax(end).XMinorTick = 'on';
     %Minor = 60:60:xlims(2);
     %h_ax(end).XTickLabel = durs/60

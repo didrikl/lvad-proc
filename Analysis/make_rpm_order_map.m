@@ -28,6 +28,10 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
     %x = T.(map_varName);
     
     if nargout==0
+        is_neg_rpm = T.(rpm_varName)<0;
+        T.(rpm_varName)(is_neg_rpm) =  1000;
+        T.(map_varName)(is_neg_rpm) =  NaN;
+        
         rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
             'Amplitude','peak',...'power',...'rms',
             'OverlapPercent',overlap_pst,...

@@ -26,20 +26,20 @@ mapSpec = {
 
 graphSpec = {
     % MovStd var     y-lims
-    'accA_norm',    [-85,20]
-    'accA_norm_HP', [-85,20]
-    'accA_x',       [-85,20]
-    'accA_x_HP',    [-85,20]
-    'accA_y',       [-85,20]
-    'accA_y_HP',    [-85,20]
-    'accA_z',       [-85,20]
-    'accA_z_HP',    [-85,20]
-    'accB_norm',    [-85,20]
-    'accB_x',       [-85,20]
-    'accB_y',       [-85,20]
-    'accB_z',       [-85,20]
-    'i_norm',       [-85,20]
-    'v_norm',       [-85,20]
+    'accA_norm',    [-90,25]
+    'accA_norm_HP', [-90,25]
+    'accA_x',       [-90,25]
+    'accA_x_HP',    [-90,25]
+    'accA_y',       [-90,25]
+    'accA_y_HP',    [-90,25]
+    'accA_z',       [-90,25]
+    'accA_z_HP',    [-90,25]
+    'accB_norm',    [-90,25]
+    'accB_x',       [-90,25]
+    'accB_y',       [-90,25]
+    'accB_z',       [-90,25]
+    'i_norm',       [-90,25]
+    'v_norm',       [-90,25]
     };
            
 % % Extract data for these RPM values
@@ -47,15 +47,17 @@ graphSpec = {
 rpm={};
 
 parts = {
-    [],       [10],    [],   '01. RPM changes'
-    [],       [11],    [],   '02. Graft clamping'
-    [],       [7],     [],   '03. Balloon inflation'
-    [],       [8],     [],   '04. Balloon inflation'
-    [],       [9],     [],   '05. Balloon inflation'
-    [],       [12],    [],   '06. Saline bolus injections'
-    {12,122}, [13:15], [],   '06. Thrombus injections 1-3'
-    {14,134}, [16:18], [],   '06. Thrombus injections 4-6'
-    {18,159}, [19:22], [],   '06. Thrombus injections 7-10'
+    %[],       [2],     [],   '1. RPM changes - First time'
+    %[],       [3],     [],   '2. Graft clamping - First time'
+    [],       [10],    [],   '1. RPM changes'
+    [],       [11],    [],   '2. Graft clamping - Second time'
+    [],       [7],     [],   '3. Balloon inflation'
+    [],       [8],     [],   '4. Balloon inflation'
+    [],       [9],     [],   '5. Balloon inflation'
+    [],       [12],    [],   '6. Saline bolus injections'
+    {12,122}, [13:15], [],   '7. Thrombus injections 1-3'
+    {14,134}, [16:18], [],   '7. Thrombus injections 4-6'
+    {18,159}, [19:22], [],   '7. Thrombus injections 7-10'
     };
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
@@ -67,12 +69,17 @@ for j=1:size(mapSpec,1)
         
         [T,rpms] = make_plot_data(parts{i,2},S_parts,rpm{i},sampleRate,parts{i,1},...
             parts{i,3},graphSpec{j,1});
-        h_fig = plot_ordermap_with_vars(...
+        [h_fig,h_ax] = plot_ordermap_with_vars(...
             T,mapSpec{j,1},sampleRate,parts{i,1},mapSpec{j,2},notes,graphSpec{j,2},mapSpec{j,3});
-
-        save_to_png(h_fig,parts{i,2},parts{i,4},mapSpec{j,1},...
-            proc_path,fig_subdir,rpms,seq_no,300)
+        
+        % TODO Move into plot-function
+        fig_name = make_fig_name_G1(h_fig,h_ax,...
+            parts{i,2},parts{i,4},mapSpec{j,1},rpms,seq_no);
+        
+        save_to_png_G1(h_fig,proc_path,fig_subdir,300)
     end
+    
+    close all
 end
 
 
@@ -171,7 +178,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     
 end
 
-function [h_fig,map,order] = plot_ordermap_with_vars(...
+function [h_fig,h_ax,map,order] = plot_ordermap_with_vars(...
         T,orderMapVar,fs,bl_part,mapColScale,notes,circ_ylim,mapOrderLim)
 
     if nargin<4, bl_part = []; end

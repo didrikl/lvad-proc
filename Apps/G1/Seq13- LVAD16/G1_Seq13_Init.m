@@ -14,44 +14,44 @@ powerlab_subdir = 'Recorded\PowerLab';
 ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
-% Which files to input from input directory 
+% Which files to input from input directory
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-powerlab_fileNames = {    
-     'G1_Seq13 - F1 [accA].mat'      
-     'G1_Seq13 - F1 [accB].mat'      
-     'G1_Seq13 - F1 [pGraft,ECG,pLV].mat'
-     'G1_Seq13 - F1 [V1,V2,V3].mat'
-     'G1_Seq13 - F1 [I1,I2,I3].mat'
-     'G1_Seq13 - F2 [accA].mat'      
-     'G1_Seq13 - F2 [accB].mat'      
-     'G1_Seq13 - F2 [pGraft,ECG,pLV].mat'      
-     'G1_Seq13 - F2 [V1,V2,V3].mat'
-     'G1_Seq13 - F2 [I1,I2,I3].mat'
+powerlab_fileNames = {
+    'G1_Seq13 - F1 [accA].mat'
+    'G1_Seq13 - F1 [accB].mat'
+    'G1_Seq13 - F1 [pGraft,ECG,pLV].mat'
+    'G1_Seq13 - F1 [V1,V2,V3].mat'
+    'G1_Seq13 - F1 [I1,I2,I3].mat'
+    'G1_Seq13 - F2 [accA].mat'
+    'G1_Seq13 - F2 [accB].mat'
+    'G1_Seq13 - F2 [pGraft,ECG,pLV].mat'
+    'G1_Seq13 - F2 [V1,V2,V3].mat'
+    'G1_Seq13 - F2 [I1,I2,I3].mat'
     'G1_Seq13 - F3 [accA].mat'
-     'G1_Seq13 - F3 [accB].mat'      
-     'G1_Seq13 - F3 [pGraft,ECG].mat'      
-     'G1_Seq13 - F3 [V1,V2,V3].mat'
-     'G1_Seq13 - F3 [I1,I2,I3].mat'
-     'G1_Seq13 - F4 [accA].mat'      
-     'G1_Seq13 - F4 [accB].mat'      
-     'G1_Seq13 - F4 [pGraft,ECG].mat'
-     'G1_Seq13 - F4 [V1,V2,V3].mat'
-     'G1_Seq13 - F4 [I1,I2,I3].mat'
-     'G1_Seq13 - F5 [accA].mat'      
-     'G1_Seq13 - F5 [accB].mat'      
-     'G1_Seq13 - F5 [pGraft,ECG].mat'
+    'G1_Seq13 - F3 [accB].mat'
+    'G1_Seq13 - F3 [pGraft,ECG].mat'
+    'G1_Seq13 - F3 [V1,V2,V3].mat'
+    'G1_Seq13 - F3 [I1,I2,I3].mat'
+    'G1_Seq13 - F4 [accA].mat'
+    'G1_Seq13 - F4 [accB].mat'
+    'G1_Seq13 - F4 [pGraft,ECG].mat'
+    'G1_Seq13 - F4 [V1,V2,V3].mat'
+    'G1_Seq13 - F4 [I1,I2,I3].mat'
+    'G1_Seq13 - F5 [accA].mat'
+    'G1_Seq13 - F5 [accB].mat'
+    'G1_Seq13 - F5 [pGraft,ECG].mat'
     'G1_Seq13 - F5 [V1,V2,V3].mat'
     'G1_Seq13 - F5 [I1,I2,I3].mat'
-     'G1_Seq13 - F6 [accA].mat'      
-     'G1_Seq13 - F6 [accB].mat'      
-     'G1_Seq13 - F6 [pGraft,ECG].mat'
-     'G1_Seq13 - F6 [V1,V2,V3].mat'
-     'G1_Seq13 - F6 [I1,I2,I3].mat'
-    }; 
-notes_fileName = 'G1_Seq13 - Notes ver4.15 - Rev2.xlsm';
+    'G1_Seq13 - F6 [accA].mat'
+    'G1_Seq13 - F6 [accB].mat'
+    'G1_Seq13 - F6 [pGraft,ECG].mat'
+    'G1_Seq13 - F6 [V1,V2,V3].mat'
+    'G1_Seq13 - F6 [I1,I2,I3].mat'
+    };
+notes_fileName = 'G1_Seq13 - Notes ver4.16 - Rev3.xlsm';
 ultrasound_fileNames = {
     'ECM_2021_01_14__11_41_52.wrf'
-};
+    };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
@@ -118,18 +118,16 @@ interNoteInclSpec = 'nearest';
 outsideNoteInclSpec = 'nearest';
 
 secsAhead = 40;
+US.time = US.time + seconds(1); % Making a much better fit
 US = adjust_for_linear_time_drift(US,secsAhead);
 
-PL = resample_signal(PL, fs_new);
+%PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 
-% QC of pressure
-% ol_ind = S_parts{5}.p_graft>3*S_parts{5}.p_graft_movAvg;
-% Keep original data, along with row and col indices
 
 %% Process derived variables
 
@@ -159,6 +157,5 @@ S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_x','accA_y','accA_z'}
 
 %% Saving and clean up
 
-%Save_For_FJP
+save_for_FJP(proc_path,S,notes,sequence)
 %ask_to_save({'S','notes'},sequence,proc_path);
-

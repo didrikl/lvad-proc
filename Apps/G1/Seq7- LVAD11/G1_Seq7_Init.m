@@ -144,4 +144,4 @@ S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_x','accA_y','accA_z'}
 %% Saving and clean up
 
 save_for_FJP(proc_path,S,notes,sequence)
-ask_to_save({'S','notes'},sequence,proc_path);
+%ask_to_save({'S','notes'},sequence,proc_path);

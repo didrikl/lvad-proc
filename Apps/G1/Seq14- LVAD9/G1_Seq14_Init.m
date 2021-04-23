@@ -7,7 +7,7 @@ welcome('Initializing user-input','module')
 % Which experiment
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'Seq14 - LVAD9';
-experiment_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq14 - LVAD9';
+experiment_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq14 - LVAD9';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -22,28 +22,28 @@ powerlab_fileNames = {
     'G1_Seq14 - F1 [pGraft,ECG,pLV].mat'
     'G1_Seq14 - F1 [V1,V2,V3].mat'
     'G1_Seq14 - F1 [I1,I2,I3].mat'
-    'G1_Seq14 - F2 [accA].mat'      
-    'G1_Seq14 - F2 [accB].mat'      
-    'G1_Seq14 - F2 [pGraft,ECG,pLV].mat'      
-    'G1_Seq14 - F2 [V1,V2,V3].mat'
-    'G1_Seq14 - F2 [I1,I2,I3].mat'
-     'G1_Seq14 - F3 [accA].mat'
-     'G1_Seq14 - F3 [accB].mat'      
-     'G1_Seq14 - F3 [pGraft,ECG,pLV].mat'      
-     'G1_Seq14 - F3 [V1,V2,V3].mat'
-     'G1_Seq14 - F3 [I1,I2,I3].mat'
-     'G1_Seq14 - F4 [accA].mat'      
-     'G1_Seq14 - F4 [accB].mat'      
-     'G1_Seq14 - F4 [pGraft,ECG,pLV].mat'
-     %'G1_Seq14 - F4 [V1,V2,V3].mat' % no recording
-     %'G1_Seq14 - F4 [I1,I2,I3].mat' % no recording
-     'G1_Seq14 - F5 [accA].mat'      
-     'G1_Seq14 - F5 [accB].mat'      
-     'G1_Seq14 - F5 [pGraft,ECG,pLV].mat'
-     'G1_Seq14 - F5 [V1,V2,V3].mat'
-     'G1_Seq14 - F5 [I1,I2,I3].mat'
+%     'G1_Seq14 - F2 [accA].mat'      
+%     'G1_Seq14 - F2 [accB].mat'      
+%     'G1_Seq14 - F2 [pGraft,ECG,pLV].mat'      
+%     'G1_Seq14 - F2 [V1,V2,V3].mat'
+%     'G1_Seq14 - F2 [I1,I2,I3].mat'
+%      'G1_Seq14 - F3 [accA].mat'
+%      'G1_Seq14 - F3 [accB].mat'      
+%      'G1_Seq14 - F3 [pGraft,ECG,pLV].mat'      
+%      'G1_Seq14 - F3 [V1,V2,V3].mat'
+%      'G1_Seq14 - F3 [I1,I2,I3].mat'
+%      'G1_Seq14 - F4 [accA].mat'      
+%      'G1_Seq14 - F4 [accB].mat'      
+%      'G1_Seq14 - F4 [pGraft,ECG,pLV].mat'
+%      %'G1_Seq14 - F4 [V1,V2,V3].mat' % no recording
+%      %'G1_Seq14 - F4 [I1,I2,I3].mat' % no recording
+%      'G1_Seq14 - F5 [accA].mat'      
+%      'G1_Seq14 - F5 [accB].mat'      
+%      'G1_Seq14 - F5 [pGraft,ECG,pLV].mat'
+%      'G1_Seq14 - F5 [V1,V2,V3].mat'
+%      'G1_Seq14 - F5 [I1,I2,I3].mat'
     }; 
-notes_fileName = 'G1_Seq14 - Notes ver4.15 - Rev2.xlsm';
+notes_fileName = 'G1_Seq14 - Notes ver4.16 - Rev3.xlsm';
 ultrasound_fileNames = {
     'ECM_2021_01_21__11_01_24.wrf'
     'ECM_2021_01_21__16_48_16.wrf'
@@ -115,17 +115,15 @@ outsideNoteInclSpec = 'nearest';
 
 secsAhead = 47;
 US = adjust_for_linear_time_drift(US,secsAhead);
+US.time = US.time + seconds(0.5); % Better fit
 
-PL = resample_signal(PL, fs_new);
+%PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 
-% QC of pressure
-% ol_ind = S_parts{5}.p_graft>3*S_parts{5}.p_graft_movAvg;
-% Keep original data, along with row and col indices
 
 %% Process derived variables
 
@@ -153,6 +151,5 @@ S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_x','accA_y','accA_z'}
 
 %% Saving and clean up
 
-%Save_For_FJP
+%save_for_FJP(proc_path,S,notes,sequence)
 %ask_to_save({'S','notes'},sequence,proc_path);
-

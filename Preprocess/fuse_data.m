@@ -31,16 +31,16 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
 
     % Loop over each stored LabChart file
     %    h_wait = waitbar(0,'','Name','Data fusion...');
-    n_files = numel(PL);
-    B = cell(n_files,1);
-    b_inds = cell(n_files,1);
-    for i=1:n_files
+    nBlocks = numel(PL);
+    B = cell(nBlocks,1);
+    b_inds = cell(nBlocks,1);
+    for i=1:nBlocks
         
-        welcome(sprintf('PowerLab block (no %d/%d)',i,n_files),'iteration')
+        welcome(sprintf('PowerLab block (no %d/%d)',i,nBlocks),'iteration')
         fprintf('\nFilename: %s\n',PL{i}.Properties.UserData.FileName)
 
         % Merging LabChart timetable with notes
-        [B, b_inds] = determine_notes_block(Notes,PL{i},i,n_files,B,b_inds,...
+        [B, b_inds] = determine_notes_block(Notes,PL{i},i,nBlocks,B,b_inds,...
             interNoteInclSpec,outsideNoteInclSpec);    
         if isempty(B{i})
             warning('No notes for LabChart block')
@@ -57,7 +57,7 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         % Ultrasound is clipped to time range of B and notes, only (i.e. not
         % clipping of B to achive a union of the two time ranges)
         if isempty(US) || height(US)==0
-            warning('No ultrasound data for LabChart block\n')
+            warning('No ultrasounic data for LabChart block\n')
             continue;
         end
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
@@ -66,10 +66,10 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         % Put in NaN instead of extrapolated values made by syncronize function
         % called in fuse_timetables
         try
-        PL{i}{PL{i}.time>LabChart_i.time(end),LabChart_i.Properties.VariableNames}=NaN;
-        PL{i}{PL{i}.time<LabChart_i.time(1),LabChart_i.Properties.VariableNames}=NaN;
-        PL{i}{PL{i}.time>US_block.time(end),US_block.Properties.VariableNames}=NaN;
-        PL{i}{PL{i}.time<US_block.time(1),US_block.Properties.VariableNames}=NaN;
+            PL{i}{PL{i}.time>LabChart_i.time(end),LabChart_i.Properties.VariableNames}=NaN;
+            PL{i}{PL{i}.time<LabChart_i.time(1),LabChart_i.Properties.VariableNames}=NaN;
+            PL{i}{PL{i}.time>US_block.time(end),US_block.Properties.VariableNames}=NaN;
+            PL{i}{PL{i}.time<US_block.time(1),US_block.Properties.VariableNames}=NaN;
         catch
         end
     end
@@ -78,8 +78,8 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         S = merge_table_blocks(PL);
     catch
         warning('Out of memory. Trying now with a cell array split...')
-        S1 = merge_table_blocks(PL(1:floor(n_files/2)));
-        PL(1:floor(n_files/2)) = [];
+        S1 = merge_table_blocks(PL(1:floor(nBlocks/2)));
+        PL(1:floor(nBlocks/2)) = [];
         S2 = merge_table_blocks(PL);
         S = merge_table_blocks(S1,S2);
         clear S1 s2
@@ -101,7 +101,7 @@ function [B,b_rowInds] = determine_notes_block(Notes,PL_i,i,nBlocks,B,b_rowInds,
         interNoteInclSpec,outsideNoteInclSpec)
     % Extract a notes block corresponding with (current) PL block
     
-    b_rowStep = 1;
+    blockRowGap = 1;
     
     if nBlocks==1
         % Use all note rows in "block unioun" if only one PL block
@@ -124,8 +124,8 @@ function [B,b_rowInds] = determine_notes_block(Notes,PL_i,i,nBlocks,B,b_rowInds,
             Notes.time<=PL_i.time(end)+tol);
         
          if numel(b_rowInds{i})>0
-             lastBlock = find(cellfun(@(c)not(isempty(c)),b_rowInds(1:i-1)),1,'last');
-             b_rowStep = b_rowInds{i}(1)-b_rowInds{lastBlock}(end);
+             prevBlock = find(cellfun(@(c)not(isempty(c)),b_rowInds(1:i-1)),1,'last');
+             blockRowGap = b_rowInds{i}(1)-b_rowInds{prevBlock}(end);
         end
  
    end
@@ -133,11 +133,13 @@ function [B,b_rowInds] = determine_notes_block(Notes,PL_i,i,nBlocks,B,b_rowInds,
     B{i} = Notes(b_rowInds{i},:);
     
     % Include more note rows outside the range of current PL block?
-    B{i} = check_for_notes_outside_PL(B{i},PL_i,i,outsideNoteInclSpec);
-    B = check_for_gap_in_note_blocks(Notes,B,b_rowStep,b_rowInds,i,interNoteInclSpec);
+    if i==1 || i==nBlocks
+        B{i} = check_for_notes_outside_PL(B{i},PL_i,outsideNoteInclSpec);
+    end
+    B = check_for_gap_in_note_blocks(Notes,B,blockRowGap,b_rowInds,i,interNoteInclSpec);
     
     % Exclude overlapping note rows
-    B = check_for_overlapping_note_blocks(Notes,B,b_rowStep,b_rowInds,i);
+    B = check_for_overlapping_note_blocks(Notes,B,blockRowGap,b_rowInds,i);
 
     
 end
@@ -157,6 +159,8 @@ function B = check_for_gap_in_note_blocks(Notes,B,b_rowStep,b_inds,i,interNoteIn
     % Handle intermediate notes, in case LabChart was paused or there are some
     % PowerLab files not being initialized
 
+    
+    
     if b_rowStep>1 % i>1 is implied
         intermediateNotes = b_inds{i}(1)-b_rowStep:b_inds{i}(1);
         warning(sprintf('\nIntermediate note row(s) no LabChart recording:\n\n'));
@@ -175,20 +179,19 @@ function B = check_for_gap_in_note_blocks(Notes,B,b_rowStep,b_inds,i,interNoteIn
     end
 end
 
-function B = check_for_notes_outside_PL(B,PL,i,outsideNoteInclSpec)
+function B = check_for_notes_outside_PL(B,PL_i,outsideNoteInclSpec)
     
-    % Check is only relevant for non-intermediate blocks
-    if not(i==1 || i==numel(PL)), return; end
-    
-    preDataNotes_ind = find(B.time<PL.time(1));
+    preDataNotes_ind = find(B.time<PL_i.time(1));
     if nnz(preDataNotes_ind)>0    
-        warning(sprintf('There are Notes rows before LabChart started recording data\n'));
+        fprintf('\n')
+        warning(sprintf('\n\tThere are Notes rows before LabChart data starts\n'));
         disp(B(preDataNotes_ind,:))  
     end  
     
-    postDataNotes_ind = find(B.time>PL.time(end));
+    postDataNotes_ind = find(B.time>PL_i.time(end));
     if nnz(postDataNotes_ind)>0       
-        warning(sprintf('There are Notes rows after LabChart stopped recording data\n'));
+        fprintf('\n')
+        warning(sprintf('\n\tThere are Notes rows after LabChart data starts\n'));
         disp(B(postDataNotes_ind,:))
     end
     
@@ -201,10 +204,10 @@ function B = check_for_notes_outside_PL(B,PL,i,outsideNoteInclSpec)
                 B(preDataNotes_ind(1:end-1),:) = [];
             end    
         case 'all'
-            % Do nothing. (NOTE: Could alert for a long duration)
+            % Do nothing. 
+            % NOTE: Could alert for a long duration
         case 'none'
-            B(preDataNotes_ind,:) = [];
-            B(postDataNotes_ind,:) = [];
+            B([preDataNotes_ind;postDataNotes_ind],:) = [];            
     end
     
 end

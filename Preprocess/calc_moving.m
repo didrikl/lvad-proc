@@ -4,7 +4,7 @@ function T = calc_moving(T, varNames, newVarNames, statisticTypes, winLength)
     % See also dsp
     %
 
-    supported_types = {'rms','var','std','min','max','avg'};
+    supported_types = {'rms','var','std','min','max','avg','med'};
     
     [~,varNames] = get_cell(varNames);
     [~,statisticTypes] = get_cell(statisticTypes);
@@ -46,22 +46,25 @@ function T = calc_moving(T, varNames, newVarNames, statisticTypes, winLength)
                 
                 case 'rms'
                     MovObj = dsp.MovingRMS(nSamples);
-                    descr = 'root-mean-square';
+                    descr = 'Moving root-mean-square';
                 case 'var'
                     MovObj = dsp.MovingVariance(nSamples);
-                    descr = 'variance';
+                    descr = 'Moving variance';
                 case 'std'
                     MovObj = dsp.MovingStandardDeviation(nSamples);
-                    descr = 'standard deviation';
+                    descr = 'Moving standard deviation';
                 case 'min'
                     MovObj = dsp.MovingMinimum(nSamples);
-                    descr = 'moving minimum';
+                    descr = 'Moving minimum';
                 case 'max'
                     MovObj = dsp.MovingMaximum(nSamples);
-                    descr = 'moving maximum';
+                    descr = 'Moving maximum';
                 case 'avg'
                     MovObj = dsp.MovingAverage(nSamples);
-                    descr = 'moving average';                   
+                    descr = 'Moving average';
+                case 'med'
+                    MovObj = dsp.MovingMedian(nSamples);
+                    descr = 'Moving median';
                 otherwise                  
                     error(['Statistic type ',statisticTypes{i},'not supported.'])
                      
@@ -75,9 +78,16 @@ function T = calc_moving(T, varNames, newVarNames, statisticTypes, winLength)
            
             T.Properties.VariableContinuity(newVarNames{i,j}) = 'continuous';
             T.Properties.VariableDescriptions(newVarNames{i,j}) = {sprintf(...
-                'Moving %s\n\t%s\n\tWindow lengths (samples)',...
-                descr,nSamples)};
-                  
+                '%s\n\tWindow size (samples): %d\n\tWindow size (sec): %d',...
+                descr,nSamples,winLength(i))};
+            if not(isprop(T.Properties.CustomProperties,'MovingWindowSamples'))
+                T = addprop(T,'MovingWindowSamples','variable');
+            end
+            if not(isprop(T.Properties.CustomProperties,'MovingWindowSeconds'))
+                T = addprop(T,'MovingWindowSeconds','variable');
+            end
+            T.Properties.CustomProperties.MovingWindowSamples(newVarNames{i,j}) = nSamples;
+            T.Properties.CustomProperties.MovingWindowSeconds(newVarNames{i,j}) = winLength(i);
         end
         
     end

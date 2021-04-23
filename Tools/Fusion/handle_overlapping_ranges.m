@@ -16,6 +16,7 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
             disp('Time range is indentical with previous file')
             if parMerge
                 disp('Previous file is merged into current file')
+                [TT_prev,TT_cur] = handle_duplicate_varnames(TT_prev,TT_cur);
                 TT_cur=[TT_prev,TT_cur];
             end
             TT_prev = [];
@@ -26,7 +27,7 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
                 'incorporated within current file''s timerange, ',...
                 'but current file contains additional timestamps. ',...
                 'Overlapping rows in current file is deleted'])
-            TT_cur(isOverlapRows) = [];
+            TT_cur(isOverlapRows,:) = [];
             
         elseif all(isOverlapRows)
             
@@ -34,7 +35,7 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
                 'incorporated within previous file timerange, but ',...
                 'previous file contains additional timestamps. ',...
                 'Overlapping rows in previous file is deleted'])
-            TT_prev(isOverlapRows_prev) = [];
+            TT_prev(isOverlapRows_prev,:) = [];
             
         else
             

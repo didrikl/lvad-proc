@@ -1,23 +1,17 @@
-function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics, hWidth)
+function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics, hWidth, constFreq, cfWidth)
     % Add harmonics filtered varibles
     %
     
-    if nargin<2
-        varNames = {
-            'accA_norm'
-            'accA_norm_movRMS'
-            'accA_norm_movStd'
-            }; 
-    end
+    
     if nargin<3, harmonics = [1]; end
     if nargin<4, hWidth = 0.5; end
-    
+    if nargin<5, constFreq = []; end
+    if nargin<6, cfWidth = 0.5; end
     if isempty(harmonics), return; end
     
-    welcome('Adding filtered variables')
- 
-    
-    newVarNames = varNames+"_["+mat2str(harmonics)+"]hFilt";
+    welcome('Adding hamonic notch filter variables')
+     
+    newVarNames = varNames+"_nf";
     fprintf('Input\n\t%s\n',strjoin(varNames,', '))
     fprintf('Output\n\t%s\n',strjoin(newVarNames,', '))
  
@@ -45,17 +39,21 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
         for j=1:numel(rpm_vals)
             
             hFreq = harmonics*(double(rpm_vals(j))/60);
-            hFilt = make_multiple_notch_filter(hFreq,fs,hWidth);
+            allFreq = [hFreq,constFreq];
+            BW = [repmat(hWidth,1,numel(harmonics)),...
+                repmat(cfWidth,1,numel(constFreq))];
+            hFilt = make_multiple_notch_filter(allFreq,fs,BW);
             block_inds = start_inds(j):end_inds(j);
             
             for k=1:numel(varNames)
                 var = varNames{k};
                 newVar = newVarNames{k};
-                T.(newVar) = nan(height(T),1);             
+                if j==1, T.(newVar) = nan(height(T),1); end         
                 
                 % Remove first rows with nan in some variables
                 nan_inds = isnan(T.(var)(block_inds));
                 inds = block_inds(not(nan_inds));
+                %ignoreNaN = true;
                 T(inds,:) = filter_notches(T(inds,:),hFilt,var,newVar);
                 
             end

@@ -14,39 +14,39 @@ powerlab_subdir = 'Recorded\PowerLab';
 ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
-% Which files to input from input directory 
+% Which files to input from input directory
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-powerlab_fileNames = {    
-    'G1_Seq12 - F1 [accA].mat'      
-    'G1_Seq12 - F1 [accB].mat'      
+powerlab_fileNames = {
+    'G1_Seq12 - F1 [accA].mat'
+    'G1_Seq12 - F1 [accB].mat'
     'G1_Seq12 - F1 [pGraft,ECG,pLV].mat'
     'G1_Seq12 - F1 [V1,V2,V3].mat'
     'G1_Seq12 - F1 [I1,I2,I3].mat'
-    'G1_Seq12 - F2 [accA].mat'      
-    'G1_Seq12 - F2 [accB].mat'      
-    'G1_Seq12 - F2 [pGraft,ECG,pLV].mat'      
+    'G1_Seq12 - F2 [accA].mat'
+    'G1_Seq12 - F2 [accB].mat'
+    'G1_Seq12 - F2 [pGraft,ECG,pLV].mat'
     'G1_Seq12 - F2 [V1,V2,V3].mat'
     'G1_Seq12 - F2 [I1,I2,I3].mat'
     'G1_Seq12 - F3 [accA].mat'
-     'G1_Seq12 - F3 [accB].mat'      
-    'G1_Seq12 - F3 [pGraft,ECG,pLV].mat'      
+    'G1_Seq12 - F3 [accB].mat'
+    'G1_Seq12 - F3 [pGraft,ECG,pLV].mat'
     'G1_Seq12 - F3 [V1,V2,V3].mat'
     'G1_Seq12 - F3 [I1,I2,I3].mat'
-    'G1_Seq12 - F4 [accA].mat'      
-    'G1_Seq12 - F4 [accB].mat'      
+    'G1_Seq12 - F4 [accA].mat'
+    'G1_Seq12 - F4 [accB].mat'
     'G1_Seq12 - F4 [pGraft,ECG,pLV].mat'
     'G1_Seq12 - F4 [V1,V2,V3].mat'
     'G1_Seq12 - F4 [I1,I2,I3].mat'
-    'G1_Seq12 - F5 [accA].mat'      
-    'G1_Seq12 - F5 [accB].mat'      
+    'G1_Seq12 - F5 [accA].mat'
+    'G1_Seq12 - F5 [accB].mat'
     'G1_Seq12 - F5 [pGraft,ECG,pLV].mat'
     'G1_Seq12 - F5 [V1,V2,V3].mat'
     'G1_Seq12 - F5 [I1,I2,I3].mat'
-    }; 
-notes_fileName = 'G1_Seq12 - Notes ver4.15 - Rev5.xlsm';
+    };
+notes_fileName = 'G1_Seq12 - Notes ver4.16 - Rev6.xlsm';
 ultrasound_fileNames = {
     'ECM_2021_01_07__12_08_22.wrf'
-};
+    };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
@@ -63,16 +63,16 @@ powerlab_variable_map = {
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
-     'SensorBAccX'    'accB_x'      'single'    'continuous'
-     'SensorBAccY'    'accB_y'      'single'    'continuous'
-     'SensorBAccZ'    'accB_z'      'single'    'continuous'
-      'V1'             'v1'          'single'    'continuous'
-      'V2'             'v2'          'single'    'continuous'
-      'V3'             'v3'          'single'    'continuous'
-      'I1'             'i1'          'single'    'continuous'
-      'I2'             'i2'          'single'    'continuous'
-      'I3'             'i3'          'single'    'continuous'
-     };
+    'SensorBAccX'    'accB_x'      'single'    'continuous'
+    'SensorBAccY'    'accB_y'      'single'    'continuous'
+    'SensorBAccZ'    'accB_z'      'single'    'continuous'
+    'V1'             'v1'          'single'    'continuous'
+    'V2'             'v2'          'single'    'continuous'
+    'V3'             'v3'          'single'    'continuous'
+    'I1'             'i1'          'single'    'continuous'
+    'I2'             'i2'          'single'    'continuous'
+    'I3'             'i3'          'single'    'continuous'
+    };
 
 systemM_varMap = {
     % Name in Spectrum   Name in Matlab     SampleRate Type     Continuity   Units
@@ -115,22 +115,13 @@ outsideNoteInclSpec = 'nearest';
 secsAhead = 52;
 US = adjust_for_linear_time_drift(US,secsAhead);
 
-PL = resample_signal(PL, fs_new);
+%PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
 
-% nShift = floor(fs_new/(40*3));
-% S.v2_shifted = [nan(nShift,1);S.v2(nShift+1:end)];
-% S.v3_shifted = [nan(2*nShift,1);S.v3(2*nShift+1:end)];
-% S.i2_shifted = [nan(nShift,1);S.i2(nShift+1:end)];
-% S.i3_shifted = [nan(2*nShift,1);S.i3(2*nShift+1:end)];
-
 S_parts = split_into_parts(S,fs_new);
 
-% QC of pressure
-% ol_ind = S_parts{5}.p_graft>3*S_parts{5}.p_graft_movAvg;
-% Keep original data, along with row and col indices
 
 %% Process derived variables
 
@@ -160,6 +151,5 @@ S_parts = add_highpass_RPM_filter_variables(S_parts,{'accA_x','accA_y','accA_z'}
 
 %% Saving and clean up
 
-%Save_For_FJP
+save_for_FJP(proc_path,S,notes,sequence)
 %ask_to_save({'S','notes'},sequence,proc_path);
-

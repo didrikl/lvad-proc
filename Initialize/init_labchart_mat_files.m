@@ -98,7 +98,7 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
     
     interv_lengths = raw.dataend-raw.datastart;
     wait_complete = sum(sum(interv_lengths));
-    
+    start_appending = false;
     for j=1:n_vars
        
         % Make each variable recorded as a timetable
@@ -119,13 +119,15 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
             % Append column with new interval. There is no need to resample,
             % if the sample rates for each interval is not constant do no not 
             % result in unequal column lenght in output table. 
-            col_interv = raw.data(raw.datastart(j,i):raw.dataend(j,i))';
-            col_interv = timetable(col_interv,...
-                'SampleRate',raw.samplerate(j,i),...
-                'VariableNames',varnames(j),...
-                'StartTime',interv_start_timestamps(i));
-            col = [col;col_interv];
-            
+            if not(raw.datastart(j,i)==-1)  
+                col_interv_inds = raw.datastart(j,i):raw.dataend(j,i);
+                col_interv = raw.data(col_interv_inds)';
+                col_interv = timetable(col_interv,...
+                    'SampleRate',raw.samplerate(j,i),...
+                    'VariableNames',varnames(j),...
+                    'StartTime',interv_start_timestamps(i));
+                col = [col;col_interv];
+            end
             % Update progress represented in no of samples in the interval
             progress = progress+(interv_lengths(j,i)/wait_complete);
             waitbar(progress,h_wait);
@@ -134,15 +136,20 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
                
         % Setting variable behaviour for merging and resampling (as in the
         % function append_signal_variable_column used below
-        col.Properties.VariableContinuity = {'continuous'};
         
         % Append signal with new column. This requires that the samplerate for
         % each variable to be the same (at each separate interval).
-        if j>1
+        if isempty(col)
+            warning(sprintf('Empty column for variable %s',varnames{j}))
+            continue
+        end
+        col.Properties.VariableContinuity = {'continuous'};
+        if start_appending
             T = append_signal_variable_column(T,col,...
                 raw.samplerate(j-1,:),raw.samplerate(j,:),varnames{j});
         else
             T = col;
+            start_appending = true;
         end
 
     end
@@ -220,6 +227,7 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
             units_in_use = cellstr(unique([interv_units{:,j}]));%  char(interv_units(var_unit_no(var_unit_no>0));
             options = [units_in_use,{'Set no unit','Type new unit'}];
             opt = ask_list_ui(options,'Set variable unit');
+            opt=numel(options)-1;
             if opt<=numel(options)-2
                 col_units{j} = unittext(opt);
             elseif opt==numel(options)-1

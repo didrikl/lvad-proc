@@ -8,38 +8,38 @@ sampleRate = fs_new;
 
 mapSpec = {
     % Variable       Colorbar   y-lims
-%     'accA_norm',    [-80,-36], [0,5.2];
-%     'accA_norm_HP', [-80,-36], [0,5.2];
-%     'accA_x',       [-80,-36], [0,5.2];
-%     'accA_x_HP',    [-80,-36], [0,5.2];
-%     'accA_y',       [-80,-36], [0,5.2];
-%     'accA_y_HP',    [-80,-36], [0,5.2];
-%     'accA_z',       [-80,-36], [0,5.2];
-%     'accA_z_HP',    [-80,-36], [0,5.2];
-%     'accB_norm',    [-75,-45], [0,5.2];
+%    'accA_norm',    [-80,-36], [0,5.2];
+    'accA_norm_HP', [-80,-36], [0,5.2];
+    'accA_x',       [-80,-36], [0,5.2];
+    'accA_x_HP',    [-80,-36], [0,5.2];
+    'accA_y',       [-80,-36], [0,5.2];
+    'accA_y_HP',    [-80,-36], [0,5.2];
+    'accA_z',       [-80,-36], [0,5.2];
+    'accA_z_HP',    [-80,-36], [0,5.2];
+    'accB_norm',    [-75,-45], [0,5.2];
     'accB_x',       [-75,-45], [0,5.2];
     'accB_y',       [-75,-45], [0,5.2];
     'accB_z',       [-75,-45], [0,5.2];
-%     'i_norm',       [-75,-45], [0,2.3];
-%     'v_norm',       [-75,-45], [0,2.3];
+    'i_norm',       [-75,-45], [0,2.3];
+    'v_norm',       [-75,-45], [0,2.3];
     };
 
 graphSpec = {
     % MovStd var     y-lims
-%     'accA_norm',    [-85,20]
-%     'accA_norm_HP', [-85,20];
-%     'accA_x',       [-85,20];
-%     'accA_x_HP',    [-85,20];
-%     'accA_y',       [-85,20];
-%     'accA_y_HP',    [-85,20];
-%     'accA_z',       [-85,20];
-%     'accA_z_HP',    [-85,20];
-%     'accB_norm',    [-85,20]
-    'accB_x',       [-85,20]
-    'accB_y',       [-85,20]
-    'accB_z',       [-85,20]
-%     'i_norm',       [-85,20]
-%     'v_norm',       [-85,20]
+ %   'accA_norm',    [-90,25]
+    'accA_norm_HP', [-90,25];
+    'accA_x',       [-90,25];
+    'accA_x_HP',    [-90,25];
+    'accA_y',       [-90,25];
+    'accA_y_HP',    [-90,25];
+    'accA_z',       [-90,25];
+    'accA_z_HP',    [-90,25];
+    'accB_norm',    [-90,25]
+    'accB_x',       [-90,25]
+    'accB_y',       [-90,25]
+    'accB_z',       [-90,25]
+    'i_norm',       [-90,25]
+    'v_norm',       [-90,25]
      };
            
 % % Extract data for these RPM values
@@ -47,15 +47,16 @@ graphSpec = {
 rpm={};
 
 parts = {
-    [],       [2],   [], '01. RPM changes'
-    [],       [7],   [], '02. Graft clamping'
-    [],       [4],   [], '03. Balloon inflation'
-    [],       [5],   [], '04. Balloon inflation'
-    [],       [6],   [], '05. Balloon inflation'
-    [],       [8],   [], '06. Saline bolus injections'
-    {8,101},  9:11,  [], '06. Thrombus injections 1-3'
-    {11,121}, 12:14, [], '06. Thrombus injections 4-6'
-    {14,143}, 15:18, [], '06. Thrombus injections 7-10'
+    [],       [2],   [], '1. RPM changes'
+    [],       [7],   [], '2. Graft clamping'
+    [],       [4],   [], '3. Balloon inflation'
+    [],       [5],   [], '4. Balloon inflation'
+    [],       [6],   [], '5. Balloon inflation'
+    [],       [8],   [], '6. Saline bolus injections'
+    {8,101},  9:11,  [], '7. Thrombus injections 1-3'
+    {11,121}, 12:14, [], '7. Thrombus injections 4-6'
+    {14,143}, 15:18, [], '7. Thrombus injections 7-10'
+    {15,149}, 16:19, [], '7. Thrombus injections 8-11'
     };
 
 
@@ -68,12 +69,17 @@ for j=1:size(mapSpec,1)
         
         [T,rpms] = make_plot_data(parts{i,2},S_parts,rpm{i},sampleRate,parts{i,1},...
             parts{i,3},graphSpec{j,1});
-        h_fig = plot_ordermap_with_vars(...
+        [h_fig,h_ax] = plot_ordermap_with_vars(...
             T,mapSpec{j,1},sampleRate,parts{i,1},mapSpec{j,2},notes,graphSpec{j,2},mapSpec{j,3});
-
-        save_to_png(h_fig,parts{i,2},parts{i,4},mapSpec{j,1},...
-            proc_path,fig_subdir,rpms,seq_no,300)
+        
+        % TODO Move into plot-function
+        fig_name = make_fig_name_G1(h_fig,h_ax,...
+            parts{i,2},parts{i,4},mapSpec{j,1},rpms,seq_no);
+        
+        save_to_png_G1(h_fig,proc_path,fig_subdir,300)
     end
+    
+    close all
 end
 
 
@@ -172,7 +178,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     
 end
 
-function [h_fig,map,order] = plot_ordermap_with_vars(...
+function [h_fig,h_ax,map,order] = plot_ordermap_with_vars(...
         T,orderMapVar,fs,bl_part,mapColScale,notes,circ_ylim,mapOrderLim)
 
     if nargin<4, bl_part = []; end

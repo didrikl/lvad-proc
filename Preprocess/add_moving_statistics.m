@@ -8,14 +8,26 @@ function T_parts = add_moving_statistics(T_parts, varNames, statistics, newVarsN
     % TODO: Make this an model object method
     
     statSpecs = {
-        % supported win suffix
-        'rms',      1,  '_movRMS'
-        'var',      15, '_movVar'
-        'std',      15, '_movStd'
-        'min',      5,  '_movMin'
-        'max',      5,  '_movMax'
-        'avg',      15, '_movAvg'
+        % Supported   Win len (sec) Suffix
+        'rms',        1,            '_movRMS'
+        'var',        10,           '_movVar'
+        'std',        10,            '_movStd'
+        'min',        5,            '_movMin'
+        'max',        5,            '_movMax'
+        'avg',        10,           '_movAvg'
+        'med'         10,           '_movMed'
         };
+    
+%     statSpecs = {
+%         % supported win (sec) suffix
+%         'rms',      60,  '_movRMS'
+%         'var',      15, '_movVar'
+%         'std',      60*5, '_movStd'
+%         'min',      5,  '_movMin'
+%         'max',      5,  '_movMax'
+%         'avg',      60*5, '_movAvg'
+%         'med',      60*5, '_movMed'
+%         };
     
     % Just for compatibility
     if nargin<2, varNames = 'accA_norm'; end

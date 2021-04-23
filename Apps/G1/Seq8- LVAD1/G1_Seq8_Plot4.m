@@ -1,7 +1,7 @@
 close all
 clear check_table_var_input
 seq_no = 8;
-fig_subdir = 'Figures for QA - test';
+fig_subdir = 'Figures for QA';
 
 % Calculation settings
 sampleRate = fs_new;

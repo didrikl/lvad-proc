@@ -21,7 +21,10 @@ function T_parts = add_in_parts(fnc,T_parts,inputVarNames,outputVarNames,varargi
     
     for i=1:numel(T_parts)
         
-        welcome(sprintf('Part %d',i),'iteration')
+        if numel(T_parts)>1
+            welcome(sprintf('Part %d',i),'iteration')
+        end
+        
         if height(T_parts{i})==0
             fprintf(newline)
             warning('Empty part')

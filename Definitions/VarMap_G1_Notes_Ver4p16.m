@@ -19,7 +19,7 @@
         %'Timer'                   'timer'            'int16'         'event'
         %'X-ray series'            'xraySer'          'int16'         'step'
         %'Hand notes'             'handNotesTag'      'cell'          'step'
-        'Protocol Analysis'       'protTag'           'cell'         'step'
+        'Analysis'                'analysisTag'      'categorical'   'step'
         'Part'                    'part'             'categorical'   'step' 
         'Interval'                'intervType'       'categorical'   'step'
         'Event'                   'event'            'categorical'   'step'
