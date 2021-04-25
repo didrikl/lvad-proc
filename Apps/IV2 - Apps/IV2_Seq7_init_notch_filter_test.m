@@ -2,7 +2,7 @@
 
 % Which experiment
 basePath = 'D:\Data\IVS\Didrik';
-experiment_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq19 - LVAD13';
+experiment_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq7 - LVAD1';
 proc_path = fullfile(basePath,experiment_subdir,'Processed');
 
 % Directory structure
@@ -12,51 +12,62 @@ notes_subdir = 'Noted';
 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 powerlab_fileNames = {
-    'IV2_Seq19 - F1 [pEff,pAff].mat'
-    'IV2_Seq19 - F1 [accA].mat'
-    'IV2_Seq19 - F1 [accB].mat'
-%     % 'IV2_Seq19 - F2 [pEff,pAff].mat' % Overlapping with F3 block
-%     % 'IV2_Seq19 - F2 [accA].mat'      % Overlapping with F3 block
-%     % 'IV2_Seq19 - F2 [accB].mat'      % Overlapping with F3 block
-     'IV2_Seq19 - F3 [accA].mat'
-     'IV2_Seq19 - F3 [accB].mat'
-     'IV2_Seq19 - F3 [pEff,pAff].mat'
-     'IV2_Seq19 - F4 [accA].mat'
-     'IV2_Seq19 - F4 [accB].mat'
-     'IV2_Seq19 - F4 [pEff,pAff].mat'
-% %     'IV2_Seq19 - F5 [accA].mat'      % Overlapping with F6 block
-% %     'IV2_Seq19 - F5 [accB].mat'      % Overlapping with F6 block
-% %     'IV2_Seq19 - F5 [pEff,pAff].mat' % Overlapping with F6 block
-      'IV2_Seq19 - F6 [accA].mat'
-      'IV2_Seq19 - F6 [accB].mat'
-      'IV2_Seq19 - F6 [pEff,pAff].mat'
-     'IV2_Seq19 - F7 [pEff,pAff].mat'
-     'IV2_Seq19 - F7 [accA].mat'
-     'IV2_Seq19 - F7 [accB].mat'
-     'IV2_Seq19 - F8 [pEff,pAff].mat'
-     'IV2_Seq19 - F8 [accA].mat'
-     'IV2_Seq19 - F8 [accB].mat'
-     'IV2_Seq19 - F9 [pEff,pAff].mat'
-     'IV2_Seq19 - F9 [accA].mat'
-     'IV2_Seq19 - F9 [accB].mat'
-      'IV2_Seq19 - F10 [pEff,pAff].mat'
-      'IV2_Seq19 - F10 [accA].mat'
-      'IV2_Seq19 - F10 [accB].mat'
-     'IV2_Seq19 - F11 [pEff,pAff].mat'
-     'IV2_Seq19 - F11 [accA].mat'
-     'IV2_Seq19 - F11 [accB].mat'
-     'IV2_Seq19 - F12 [pEff,pAff].mat'
-     'IV2_Seq19 - F12 [accA].mat'
-     'IV2_Seq19 - F12 [accB].mat'
-     'IV2_Seq19 - F13 [pEff,pAff].mat'
-     'IV2_Seq19 - F13 [accA].mat'
-     'IV2_Seq19 - F13 [accB].mat'
+    'IV2_Seq7 - F1 [pEff,pAff].mat'
+    'IV2_Seq7 - F1 [accA].mat'
+    'IV2_Seq7 - F1 [accB].mat'
+    'IV2_Seq7 - F2 [pEff,pAff].mat'
+    'IV2_Seq7 - F2 [accA].mat'
+    'IV2_Seq7 - F2 [accB].mat'
+    'IV2_Seq7 - F3 [accA].mat'
+    'IV2_Seq7 - F3 [accB].mat'
+    'IV2_Seq7 - F3 [pEff,pAff].mat'
+    'IV2_Seq7 - F4 [accA].mat'
+    'IV2_Seq7 - F4 [accB].mat'
+    'IV2_Seq7 - F4 [pEff,pAff].mat'
+    'IV2_Seq7 - F5 [accA].mat'
+    'IV2_Seq7 - F5 [accB].mat'
+    'IV2_Seq7 - F5 [pEff,pAff].mat'
+    'IV2_Seq7 - F6 [accA].mat'
+    'IV2_Seq7 - F6 [accB].mat'
+    'IV2_Seq7 - F6 [pEff,pAff].mat'
+    'IV2_Seq7 - F7 [pEff,pAff].mat'
+    'IV2_Seq7 - F7 [accA].mat'
+    'IV2_Seq7 - F7 [accB].mat'
+    'IV2_Seq7 - F8 [pEff,pAff].mat'
+    'IV2_Seq7 - F8 [accA].mat'
+    'IV2_Seq7 - F8 [accB].mat'
+    'IV2_Seq7 - F9 [pEff,pAff].mat'
+    'IV2_Seq7 - F9 [accA].mat'
+    'IV2_Seq7 - F9 [accB].mat'
+    'IV2_Seq7 - F10 [pEff,pAff].mat'
+    'IV2_Seq7 - F10 [accA].mat'
+    'IV2_Seq7 - F10 [accB].mat'
+    'IV2_Seq7 - F11 [pEff,pAff].mat'
+    'IV2_Seq7 - F11 [accA].mat'
+    'IV2_Seq7 - F11 [accB].mat'
+    'IV2_Seq7 - F12 [pEff,pAff].mat'
+    'IV2_Seq7 - F12 [accA].mat'
+    'IV2_Seq7 - F12 [accB].mat'
+    'IV2_Seq7 - F13 [pEff,pAff].mat'
+    'IV2_Seq7 - F13 [accA].mat'
+    'IV2_Seq7 - F13 [accB].mat'
+    'IV2_Seq7 - F14 [pEff,pAff].mat'
+    'IV2_Seq7 - F14 [accA].mat'
+    'IV2_Seq7 - F14 [accB].mat'
+    'IV2_Seq7 - F15 [pEff,pAff].mat'
+    'IV2_Seq7 - F15 [accA].mat'
+    'IV2_Seq7 - F15 [accB].mat'
+    'IV2_Seq7 - F16 [pEff,pAff].mat'
+    'IV2_Seq7 - F16 [accA].mat'
+    'IV2_Seq7 - F16 [accB].mat'
     };
-notes_fileName = 'IV2_Seq19 - Notes ver4.9 - Rev1.xlsm';
+notes_fileName = 'IV2_Seq7 - Notes ver4.9 - Rev4.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_12_05__16_12_22.wrf'
-    'ECM_2020_12_07__14_54_33.wrf'
-    'ECM_2020_12_08__13_31_21.wrf'
+    'ECM_2020_08_19__13_04_02.wrf'
+    'ECM_2020_08_19__13_28_05.wrf'
+    'ECM_2020_08_20__12_11_36.wrf'
+    'ECM_2020_09_12__15_08_02.wrf'
+    
     };
 
 % Add subdir specification to filename lists
@@ -99,10 +110,11 @@ PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
 US1 = init_system_m_text_files(ultrasound_filePaths(1),'',systemM_varMap);
 US2 = init_system_m_text_files(ultrasound_filePaths(2),'',systemM_varMap);
 US3 = init_system_m_text_files(ultrasound_filePaths(3),'',systemM_varMap);
+US4 = init_system_m_text_files(ultrasound_filePaths(4),'',systemM_varMap);
 
 % Read sequence notes made with Excel file template
 notes = init_notes_xlsfile_ver4(notes_filePath,'','VarMap_IV2_Notes_Ver4p9');
-
+notes = qc_notes_ver4(notes);
 
 %% Pre-processing
 % * QC/pre-fixing data
@@ -115,13 +127,12 @@ welcome('Preprocessing data','module')
 
 fs_new = 750;
 
-US1 = adjust_for_linear_time_drift(US1,8);
-US2 = adjust_for_linear_time_drift(US2,36);
-US3 = adjust_for_linear_time_drift(US3,30);
-US = [US1;US2;US3];
+US1 = adjust_for_linear_time_drift(US1,3);
+US2 = adjust_for_linear_time_drift(US2,33.5);
+US3 = adjust_for_linear_time_drift(US3,46);
+US4 = adjust_for_linear_time_drift(US4);
+US = [US1;US2;US3;US4];
 US = aggregate_effQ_and_affQ(US);
-
-notes = qc_notes_ver4(notes);
 
 PL = resample_signal(PL, fs_new);
 PL = add_spatial_norms(PL,2,{'accA_x','accA_y','accA_z'},'accA_norm');
@@ -135,4 +146,5 @@ S_parts = split_into_parts(S,fs_new);
 
 S_parts = add_harmonics_filtered_variables(S_parts, {'accA_norm',}, 1:5, 1);
 S_parts = add_harmonics_filtered_variables(S_parts, {'accA_x','accA_y','accA_z'}, 1:5, 1);
-S_parts = add_harmonics_filtered_variables(S_parts, {'accB_norm',}, 1:5, 1);
+
+

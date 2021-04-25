@@ -38,7 +38,7 @@ function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,
             warndlg(msg)
         else
             file_filter = make_ext_filter(ext);
-            title = 'Browse for and select new files';
+            title = 'Browse for and select new file(s)';
             [newFileNames,newPaths] = uigetfile(file_filter,title,...
                 'Multiselect','on');
             
@@ -60,6 +60,7 @@ function [filePaths,fileNames,paths] = check_file_name_and_path_input(fileNames,
                 end
 
             else
+                % TODO: Do not replace, but correct/append file list
                 fileNames = newFileNames;
                 paths = newPaths;
                 if not(iscell(paths)), paths = {paths}; end

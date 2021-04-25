@@ -1,6 +1,6 @@
 %close all
 clear check_table_var_input
-seq_no = 12;
+seq_no = 7;
 fig_subdir = 'Figures\Filter comparison';
 
 % Calculation settings
@@ -16,13 +16,12 @@ mapSpec = {
     'accA_y_nf',    [-80,-36], [0,5.2];
     'accA_z',       [-80,-36], [0,5.2];
     'accA_z_nf',    [-80,-36], [0,5.2];
-%     'accB_norm',    [-75,-45], [0,5.2];
-%     'accB_norm_nf',    [-75,-45], [0,5.2];
+    'accB_norm',    [-75,-45], [0,5.2];
     };
 
 graphSpec = {
     % MovStd var     y-lims
-   'accA_norm',    [-90,20]
+    'accA_norm',    [-90,20]
     'accA_norm_nf', [-90,20];
     'accA_x',       [-90,20];
     'accA_x_nf',    [-90,20];
@@ -30,55 +29,57 @@ graphSpec = {
     'accA_y_nf',    [-90,20];
     'accA_z',       [-90,20];
     'accA_z_nf',    [-90,20];
-%     'accB_norm',    [-90,20]
-%     'accB_norm_nf', [-90,20]
+    'accB_norm',    [-90,20]
     };
 
 % % Extract data for these RPM values
 rpm={};
 parts = {
-     {},   [30,31],  [],  '00. RPM step test'
-    {},   [1],      [],  '01. RPM changes'
-    
-    {},   [2],      [],  '02. 4.5x20mm balloon inflation'
-    {},   [3],      [],  '03. 4.5x20mm balloon inflation'
-    {},   [4],      [],  '04. 4.5x20mm Balloon inflation'
-    {},   [5],      [],  '05. 4.5x20mm Balloon inflation'
-    
-    {},   [6],   [],  '06. 6x20mm balloon inflation'
-    {},   [7],   [],  '07. 6x20mm balloon inflation'
-    {},   [8],   [],  '08. 6x20mm Balloon inflation'
-    {},   [9],   [],  '09. 6x20mm Balloon inflation'
-    
-    {},   [10],   [], '10. 8x30mm balloon inflation'
-    {},   [11],   [], '11. 8x30mm balloon inflation'
-    {},   [12],   [], '12. 8x 30mm Balloon inflation'
-    {},   [13],   [], '13. 8x30mm Balloon inflation'
-    
-    {},   [16],  [],  '14. 11mm balloon inflation'
-    {},   [17],  [],  '15. 11mm balloon inflation'
-    {},   [18],  [],  '16. 11mm Balloon inflation'
-    {},   [19],  [],  '17. 11mm Balloon inflation'
-    
-     {},         [20],  [],  '18. RPM changes, before afterload clamping'
-     {20,187},   [21],  [],  '19. Afterload clamping'
-     {20,185},   [22],  [],  '20. Afterload clamping'
-     {20,183},   [23],  [],  '21. Afterload clamping'
-     {20,181},   [24],  [],  '22. Afterload clamping'
+     {},   [1],   [],  '01. RPM changes'
      
-     {},         [25],  [],  '23. RPM changes, before preload clamping'
-     {25,233},   [26],  [],  '24. Preload clamping'
-     {25,231},   [27],  [],  '25. Preload clamping'
-     {25,229},   [28],  [],  '26. Preload clamping'
-     {},         [32],  [],  '27. Preload clamping'
-    
+     {},   [33],   [],  '02. 4.5x20mm balloon inflation'
+     {},   [34],   [],  '03. 4.5x20mm balloon inflation'
+     {},   [35],   [],  '04. 4.5x20mm Balloon inflation'
+     {},   [36],   [],  '04. 4.5x20mm Balloon inflation - Bonus retake'
+     {},   [37],   [],  '05. 4.5x20mm Balloon inflation'
+     
+     {},   [6],   [],  '06. 6x20mm balloon inflation'
+     {},   [7],   [],  '07. 6x20mm balloon inflation'
+     {},   [8],   [],  '08. 6x20mm Balloon inflation'
+     {},   [9],   [],  '09. 6x20mm Balloon inflation'
+     
+     {},   [10],   [], '10. 8x30mm balloon inflation'
+     {},   [11],   [], '11. 8x30mm balloon inflation'
+     {},   [12],   [], '12. 8x30mm Balloon inflation'
+     {},   [13],   [],  '13. 8x30mm Balloon inflation'
+     
+     {},   [16],  [],  '14. 11mm balloon inflation'
+     {},   [17],  [],  '15. 11mm balloon inflation'
+     {},   [18],  [],  '16. 11mm Balloon inflation'
+     {},   [19],  [],  '17. 11mm Balloon inflation'
+     
+     {},         [20],  [],  '18. RPM changes, before afterload clamping'
+     {20,182},   [21],  [],  '19. Afterload clamping'
+     {20,180},   [22],  [],  '20. Afterload clamping'
+     {20,178},   [23],  [],  '21. Afterload clamping'
+     {20,176},   [24],  [],  '22. Afterload clamping'
+     
+     {},         [25],   [],  '23. RPM changes, before preload clamping'
+     {25,226},   [26],   [],  '24. Preload clamping'
+     {25,224},   [27],   [],  '25. Preload clamping'
+     {25,222},   [28],   [],  '26. Preload clamping'
+     {25,220},   [29],   [],  '27. Preload clamping'
+     
+     {},         [30,31],  [],  '00. RPM step test'
+     
+     {1,10},     [2],   [],  'xx. 4x20mm balloon inflation'
+     {1,8},      [3],   [],  'xx. 4x20mm balloon inflation'
+     {1,6},      [4],   [],  'xx. 4x20mm Balloon inflation'
+     {1,4},      [5],   [],  'xx. 4x20mm Balloon inflation'
     };
 
-% rpm = {2200};
-% parts = {{},    [1,14,15,20,25,30],  [],  '00. Baselines'};
-
-
-
+rpm = {3100};
+parts = {{},    [1,14,15,20,25,30,32,38],  [],  '00. Baselines'};
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
 if numel(rpm)==0, rpm = cell(numel(parts),1); end
@@ -100,7 +101,7 @@ for j=1:size(mapSpec,1)
     end
     
     close all
-
+    
 end
 
 
@@ -108,7 +109,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     % Extract relevant data, and baseline is always put first
     if numel(bl_part)==2
         BL = T{bl_part{1}}(T{bl_part{1}}.noteRow==bl_part{2},:);
-        T = merge_table_blocks([{BL};T(sort([parts,cbl_part]))]);
+        T = merge_table_blocks([{BL};T(parts);T(cbl_part)]);
     else
         T = merge_table_blocks(T(parts));
     end

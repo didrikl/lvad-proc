@@ -1,15 +1,18 @@
 function T = resample_signal(T,sampleRate,method)
     %RESAMPLE_SIGNAL resamples timetable 
-    % Resampling timetable T. Columns that have the true value in a 
-    % T.Properties.CustomProperties.Measured or any (derived) continious 
-    % variable are re-samples. Remaining variables are set aside and
-    % fused into the resampled table by the fuse_timetables function, for 
-    % which the T.Properties.VariableContinuity dictates how the fusion process
-    % is done.
+    %  Resampling or retiming timetable T.
     %
+    %  Ensures non-regular timetables as reguluar by Matlab's retime function, 
+    %  and resampled whenever required. 
+    %
+    %  Columns that have true assigned to T.Properties.CustomProperties.Measured 
+    %  or any (derived) continious variable are re-sampled. Remaining variables 
+    %  are set aside and fused into the resampled table by the fuse_timetables 
+    %  function, according to T.Properties.VariableContinuity.
+    %  
     % Input:
     %  T: Timetable
-    %  sampleRate: New sample rate.
+    %  sampleRate: New or current sample rate.
     %  method (optional): Method, as supported by Matlab's retime function
     %
     % Examples:

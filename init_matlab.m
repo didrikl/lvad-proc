@@ -7,7 +7,9 @@ addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 %% Clearing of memory and command line
 
 % Make command window empty (but keeping command history in memory)
+fprintf(repmat('\n',1,20))
 home
+
  
 % Close all figures
 %close all;

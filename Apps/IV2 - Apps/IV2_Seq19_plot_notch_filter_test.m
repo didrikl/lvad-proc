@@ -9,29 +9,29 @@ sampleRate = fs_new;
 mapSpec = {
     % Variable       Colorbar   y-lims
     'accA_norm',    [-80,-36], [0,5.2];
-    %'accA_norm_nf', [-80,-36], [0,5.2];
+    'accA_norm_nf', [-80,-36], [0,5.2];
     'accA_x',       [-80,-36], [0,5.2];
-    %'accA_x_nf',    [-80,-36], [0,5.2];
+    'accA_x_nf',    [-80,-36], [0,5.2];
     'accA_y',       [-80,-36], [0,5.2];
-    %'accA_y_nf',    [-80,-36], [0,5.2];
+    'accA_y_nf',    [-80,-36], [0,5.2];
     'accA_z',       [-80,-36], [0,5.2];
-    %'accA_z_nf',    [-80,-36], [0,5.2];
-    %'accB_norm',    [-75,-45], [0,5.2];
-    %'accB_norm_nf', [-75,-45], [0,5.2];
+    'accA_z_nf',    [-80,-36], [0,5.2];
+    'accB_norm',    [-75,-45], [0,5.2];
+    'accB_norm_nf', [-75,-45], [0,5.2];
     };
 
 graphSpec = {
     % MovStd var     y-lims
     'accA_norm',    [-90,20]
-    %'accA_norm_nf', [-90,20];
+    'accA_norm_nf', [-90,20];
     'accA_x',       [-90,20];
-    %'accA_x_nf',    [-90,20];
+    'accA_x_nf',    [-90,20];
     'accA_y',       [-90,20];
-    %'accA_y_nf',    [-90,20];
+    'accA_y_nf',    [-90,20];
     'accA_z',       [-90,20];
-    %'accA_z_nf',    [-90,20];
-    %'accB_norm',    [-90,20]
-    %'accB_norm_nf', [-90,20]
+    'accA_z_nf',    [-90,20];
+    'accB_norm',    [-90,20]
+    'accB_norm_nf', [-90,20]
     };
 
 % % Extract data for these RPM values
@@ -67,11 +67,11 @@ parts = {
 %        {22,225},   [24],  [],  '21. Preload clamping'
 %        {22,223},   [25],  [],  '22. Preload clamping'
 %        {22,221},   [26],  [],  '23. Preload clamping'
-};
+%};
 
-% {},         [1,2,17,22,27],  [],  '00. Baselines, 2200'
-%     };
-% rpm={2200};
+%          {},         [1,2,12,17,22,27],  [],  '00. Baselines'
+%      };
+% rpm={3100};
 
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
@@ -128,7 +128,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     
     if height(T)==0
         warning('No rows in data parts %s, with RPM=%s',...
-            mat2str(all_parts),mat2str(rpm));
+            mat2str(parts),mat2str(rpm));
     end
     
     blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});

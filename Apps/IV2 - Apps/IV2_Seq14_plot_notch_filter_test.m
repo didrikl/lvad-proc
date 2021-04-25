@@ -1,6 +1,6 @@
 %close all
 clear check_table_var_input
-seq_no = 12;
+seq_no = 14;
 fig_subdir = 'Figures\Filter comparison';
 
 % Calculation settings
@@ -16,13 +16,12 @@ mapSpec = {
     'accA_y_nf',    [-80,-36], [0,5.2];
     'accA_z',       [-80,-36], [0,5.2];
     'accA_z_nf',    [-80,-36], [0,5.2];
-%     'accB_norm',    [-75,-45], [0,5.2];
-%     'accB_norm_nf',    [-75,-45], [0,5.2];
+    'accB_norm',    [-75,-45], [0,5.2];
     };
 
 graphSpec = {
     % MovStd var     y-lims
-   'accA_norm',    [-90,20]
+    'accA_norm',    [-90,20]
     'accA_norm_nf', [-90,20];
     'accA_x',       [-90,20];
     'accA_x_nf',    [-90,20];
@@ -30,54 +29,52 @@ graphSpec = {
     'accA_y_nf',    [-90,20];
     'accA_z',       [-90,20];
     'accA_z_nf',    [-90,20];
-%     'accB_norm',    [-90,20]
-%     'accB_norm_nf', [-90,20]
+    'accB_norm',    [-90,20]
     };
 
 % % Extract data for these RPM values
 rpm={};
+
 parts = {
-     {},   [30,31],  [],  '00. RPM step test'
-    {},   [1],      [],  '01. RPM changes'
+    {},   [30,31],   [],  '0. RPM step test'
+    {},   [1],   [],  '1. RPM changes'
     
-    {},   [2],      [],  '02. 4.5x20mm balloon inflation'
-    {},   [3],      [],  '03. 4.5x20mm balloon inflation'
-    {},   [4],      [],  '04. 4.5x20mm Balloon inflation'
-    {},   [5],      [],  '05. 4.5x20mm Balloon inflation'
+    {},   [2],   [],  '2. 4.5x20mm balloon inflation'
+    {},   [3],   [],  '3. 4.5x20mm balloon inflation'
+    {},   [4],   [],  '4. 4.5x20mm Balloon inflation'
+    {},   [5],   [],  '5. 4.5x20mm Balloon inflation'
     
-    {},   [6],   [],  '06. 6x20mm balloon inflation'
-    {},   [7],   [],  '07. 6x20mm balloon inflation'
-    {},   [8],   [],  '08. 6x20mm Balloon inflation'
-    {},   [9],   [],  '09. 6x20mm Balloon inflation'
+    {},   [6],   [],  '6. 6x20mm balloon inflation'
+    {},   [7],   [],  '7. 6x20mm balloon inflation'
+    {},   [8],   [],  '8. 6x20mm Balloon inflation'
+    {},   [9],   [],  '9. 6x20mm Balloon inflation'
     
-    {},   [10],   [], '10. 8x30mm balloon inflation'
-    {},   [11],   [], '11. 8x30mm balloon inflation'
-    {},   [12],   [], '12. 8x 30mm Balloon inflation'
-    {},   [13],   [], '13. 8x30mm Balloon inflation'
+    {},   [12],   [], '10. 8x30mm balloon inflation'
+    {},   [13],   [], '11. 8x30mm balloon inflation'
+    {},   [14],   [], '12. 8x30mm Balloon inflation'
+    {},   [15],   [],  '13. 8x30mm Balloon inflation'
     
     {},   [16],  [],  '14. 11mm balloon inflation'
     {},   [17],  [],  '15. 11mm balloon inflation'
     {},   [18],  [],  '16. 11mm Balloon inflation'
     {},   [19],  [],  '17. 11mm Balloon inflation'
     
-     {},         [20],  [],  '18. RPM changes, before afterload clamping'
-     {20,187},   [21],  [],  '19. Afterload clamping'
-     {20,185},   [22],  [],  '20. Afterload clamping'
-     {20,183},   [23],  [],  '21. Afterload clamping'
-     {20,181},   [24],  [],  '22. Afterload clamping'
-     
-     {},         [25],  [],  '23. RPM changes, before preload clamping'
-     {25,233},   [26],  [],  '24. Preload clamping'
-     {25,231},   [27],  [],  '25. Preload clamping'
-     {25,229},   [28],  [],  '26. Preload clamping'
-     {},         [32],  [],  '27. Preload clamping'
+    {},         [20],  [],  '18. RPM changes, before afterload clamping'
+    {20,183},   [21],  [],  '19. Afterload clamping'
+    {20,181},   [22],  [],  '20. Afterload clamping'
+    {20,179},   [23],  [],  '21. Afterload clamping'
+    {20,177},   [24],  [],  '22. Afterload clamping'
+    
+    {},         [25],  [],  '23. RPM changes, before preload clamping'
+    {25,229},   [26],  [],  '24. Preload clamping'
+    {25,227},   [27],  [],  '25. Preload clamping'
+    {25,225},   [28],  [],  '26. Preload clamping'
+    {25,223},   [29],  [],  '27. Preload clamping'
     
     };
 
-% rpm = {2200};
-% parts = {{},    [1,14,15,20,25,30],  [],  '00. Baselines'};
-
-
+ parts = {{},    [1,10,11,20,25,30],  [],  '00. Baselines'};
+ rpm={3100};
 
 
 if numel(rpm)==1, rpm = repmat(rpm,numel(parts),1); end
@@ -100,7 +97,7 @@ for j=1:size(mapSpec,1)
     end
     
     close all
-
+    
 end
 
 

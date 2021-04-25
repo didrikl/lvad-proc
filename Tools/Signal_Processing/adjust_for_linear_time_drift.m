@@ -7,12 +7,18 @@ function T = adjust_for_linear_time_drift(T,secsAhead,diffReadTime,inSyncTime)
         return
     end
     
-    if nargin<4, diffReadTime = T.time(end); end
-    if nargin<5, inSyncTime = T.time(1); end
-    
-    driftDur = seconds(diffReadTime-inSyncTime);
-    driftRatePerSec = secsAhead/driftDur;
-    fprintf('Drift per second: %g\n\n',driftRatePerSec)
+    if nargin<3, diffReadTime = T.time(end); end
+    if nargin<4, inSyncTime = T.time(1); end
+    if nargin<2
+        % Driften taken as avergae from drift overview Excel sheet
+        driftRatePerSec = 0.002007175;
+        fprintf('Drift per second: %g (apriori, not measured)\n\n',...
+            driftRatePerSec)
+    else
+        driftDur = seconds(diffReadTime-inSyncTime);
+        driftRatePerSec = secsAhead/driftDur;
+        fprintf('Drift per second: %g\n\n',driftRatePerSec)
+    end
     
     % If T is a regular timetable, just update to a more accurate samplerate
     if istimetable(T) && isregular(T)

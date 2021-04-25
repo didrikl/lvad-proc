@@ -28,9 +28,9 @@ powerlab_fileNames = {
     'IV2_Seq12 - F14.mat'
     'IV2_Seq12 - F15.mat'
     'IV2_Seq12 - F16.mat'
-%     'IV2_Seq12 - F17.mat'
+    'IV2_Seq12 - F17.mat'
     };
-notes_fileName = 'IV2_Seq12 - Notes ver4.9 - Rev3.xlsm';
+notes_fileName = 'IV2_Seq12 - Notes ver4.9 - Rev4.xlsm';
 ultrasound_fileNames = {
     'ECM_2020_09_08__13_18_56.wrf'
     'ECM_2020_09_09__11_46_35.wrf'
@@ -50,9 +50,9 @@ powerlab_variable_map = {
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
-    %'SensorBAccX'    'accB_x'      'single'    'continuous'
-    %'SensorBAccY'    'accB_y'      'single'    'continuous'
-    %'SensorBAccZ'    'accB_z'      'single'    'continuous'
+%     'SensorBAccX'    'accB_x'      'single'    'continuous'
+%     'SensorBAccY'    'accB_y'      'single'    'continuous'
+%     'SensorBAccZ'    'accB_z'      'single'    'continuous'
     };
 
 systemM_varMap = {
@@ -93,7 +93,7 @@ welcome('Preprocessing data','module')
 
 fs_new = 750;
 
-US1 = adjust_for_linear_time_drift(US1,21.5);
+US1 = adjust_for_linear_time_drift(US1,20.5);
 US2 = adjust_for_linear_time_drift(US2,62);
 US3 = adjust_for_linear_time_drift(US3,3.5);
 US = [US1;US2;US3];
@@ -102,6 +102,21 @@ US = aggregate_effQ_and_affQ(US);
 notes = qc_notes_ver4(notes);
 
 PL = resample_signal(PL, fs_new);
+
+PL_files_with_time_offset = {...
+    'IV2_Seq12 - F7.mat'
+    'IV2_Seq12 - F8.mat'
+    'IV2_Seq12 - F9.mat'
+    'IV2_Seq12 - F10.mat'
+    'IV2_Seq12 - F11.mat'
+    'IV2_Seq12 - F12.mat'
+    'IV2_Seq12 - F13.mat'
+    'IV2_Seq12 - F14.mat'
+    'IV2_Seq12 - F15.mat'
+    'IV2_Seq12 - F16.mat'
+    'IV2_Seq12 - F17.mat'};
+PL = adjust_for_constant_time_offset(PL,PL_files_with_time_offset,seconds(60));
+
 PL = add_spatial_norms(PL,2,{'accA_x','accA_y','accA_z'},'accA_norm');
 %PL = add_spatial_norms(PL,2,{'accB_x','accB_y','accB_z'},'accB_norm');
 
@@ -112,5 +127,5 @@ S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
 S_parts = split_into_parts(S,fs_new);
 
 S_parts = add_harmonics_filtered_variables(S_parts, {'accA_norm',}, 1:5, 1);
-S_parts = add_harmonics_filtered_variables(S_parts, {'accA_x','accA_y','accA_z'}, 1:5, 1);
-%S_parts = add_harmonics_filtered_variables(S_parts, {'accB_norm',}, 1:5, 1);
+S_parts = add_harmonics_filtered_variables(S_parts, {'accA_x','accA_y','accA_z'}, 1);
+%S_parts = add_harmonics_filtered_variables(S_parts, {'accB_norm',}, 1);

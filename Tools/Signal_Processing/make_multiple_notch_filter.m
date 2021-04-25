@@ -12,7 +12,7 @@ function hd = make_multiple_notch_filter(notches,fs,notch_width,filterOrder)
     end
 
     if numel(notch_width)==1 
-        notch_width = repmat(notch_width,numel(notch),1);
+        notch_width = repmat(notch_width,numel(notches),1);
     end
     for i=1:numel(notches)      
         f{i} = fdesign.notch('N,F0,BW',filterOrder,notches(i),notch_width(i),fs);
