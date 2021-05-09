@@ -24,7 +24,7 @@ function ask_to_save(varList,id_tag,save_path)
         'Format','uuuu.MM.dd HHmmss');
     saveTimeString = char(string(saveTime));
     if not(strcmp(id_tag,''))
-        workspace_fileName = [id_tag,' - Workspace ',saveTimeString,'.mat'];
+        workspace_fileName = [id_tag,' - ',join("'"+varList+"'",','),' - ',saveTimeString,'.mat'];
     else
         workspace_fileName = ['Workspace - ',saveTimeString,'.mat'];
     end
@@ -34,7 +34,8 @@ function ask_to_save(varList,id_tag,save_path)
          'Save as ... '
          'No'
         };
-    response = ask_list_ui(opts,msg);
+    %response = ask_list_ui(opts,msg);
+    response=1;
     if response==2
         workspace_file = input(sprintf('\n\tGive filename --> '),'s');
         [~,name,~] = fileparts(workspace_file);

@@ -1,7 +1,8 @@
 function T = adjust_for_linear_time_drift(T,secsAhead,diffReadTime,inSyncTime)
     
-    welcome('Adjusting for linear drift')
-    
+    % TODO: Make this as input...
+    defDriftRatePerSec = 0.002007175;
+        
     if isempty(T)
         warning('Input data table %s is empty',inputname(1))
         return
@@ -9,9 +10,10 @@ function T = adjust_for_linear_time_drift(T,secsAhead,diffReadTime,inSyncTime)
     
     if nargin<3, diffReadTime = T.time(end); end
     if nargin<4, inSyncTime = T.time(1); end
-    if nargin<2
+    
+    if isempty(secsAhead)
         % Driften taken as avergae from drift overview Excel sheet
-        driftRatePerSec = 0.002007175;
+        driftRatePerSec = defDriftRatePerSec;
         fprintf('Drift per second: %g (apriori, not measured)\n\n',...
             driftRatePerSec)
     else

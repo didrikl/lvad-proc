@@ -1,4 +1,4 @@
-function T = init_labchart_mat_files(fileNames,path,varMap)
+function T = init_labchart_mat_files(fileNames,path,varMapFile)
     % INIT_POWERLAB_RAW_MATFILE
     % Read and parse data (blocks of data stored in separate files) exported 
     % as .mat file from PowerLab's software LabChart.
@@ -20,6 +20,7 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
     % useful if different digital sampling boxes are used.
     
     if nargin==1, path = ''; end
+    eval(varMapFile);
     
     % Default viewing format of timestamps (Could be made OO)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
@@ -37,6 +38,8 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
         
         fprintf('\n<strong>File (no %d/%d): </strong>',i,nFiles)
         display_filename(filePaths{i});
+        cancel = multiWaitbar('Reading .mat files',(i-1)/nFiles);  
+        if confirm_waitbar_cancel(cancel,'Reading .mat files'), break; end
         
         T{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
         
@@ -49,6 +52,9 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
             T(1:i) = handle_nonchronological_order(T(1:i));
             [T{i},T{i-1}] = handle_overlapping_ranges(T{i},T{i-1},true);
         end
+        
+        
+         
     end
     
     % Remove cell spaces for partial channel sets
@@ -74,16 +80,10 @@ function T = init_labchart_mat_files(fileNames,path,varMap)
     end
     
     if not(returnAsCell), T = T{1}; end
-      
-
+    multiWaitbar('Reading .mat files',1,'CanCancel','off');  
+        
 function T = read_signal_file_into_table(filePath,timestamp_fmt)    
     
-    % New waitbar for each file; progress updates per column
-    % TODO: Change to multiwaitbar in calling function, and handle passed as
-    % function argument
-    [~,fileName,~] = fileparts(filePath);
-    progress = 0;
-    h_wait = waitbar(progress,['Initializing: ',strrep(fileName,'_','\_'),'.mat']);
     
     % Read data with variable organized and accessible in a struct d
     raw = load('-mat', filePath);
@@ -96,8 +96,6 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
         'Format',timestamp_fmt,...
         'TimeZone','Europe/Oslo');
     
-    interv_lengths = raw.dataend-raw.datastart;
-    wait_complete = sum(sum(interv_lengths));
     start_appending = false;
     for j=1:n_vars
        
@@ -128,9 +126,6 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
                     'StartTime',interv_start_timestamps(i));
                 col = [col;col_interv];
             end
-            % Update progress represented in no of samples in the interval
-            progress = progress+(interv_lengths(j,i)/wait_complete);
-            waitbar(progress,h_wait);
             
         end
                
@@ -150,10 +145,10 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
         else
             T = col;
             start_appending = true;
-        end
-
+        end       
+        
     end
-    
+       
     % Parse metadata to will be stored as table metadata
     [col_unit,interv_units] = make_unit_string_arr(raw);
     T.Properties.Description = 'PowerLab data recorded in LabChart';
@@ -171,9 +166,8 @@ function T = read_signal_file_into_table(filePath,timestamp_fmt)
     % All variables shall be treated as continous and measured in data fusion
     T = addprop(T,'Measured','variable');
     T.Properties.CustomProperties.Measured(:) = true;
-        
-    close2(h_wait)
- 
+
+    
 function comments = make_comments_table(raw,T)
     comments = table;
     comments.channel = raw.com(:,1);
@@ -248,3 +242,5 @@ function [col_units,interv_units] = make_unit_string_arr(raw)
         end
     
     end
+
+ 

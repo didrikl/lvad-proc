@@ -1,4 +1,4 @@
-function raw = add_cardiaccs_raw_variable_properties(raw)
+function raw = add_cardibox_raw_variable_properties(raw)
     
     raw.Properties.VariableDescriptions{'t'} = 'The Current Unix Timestamp';
     raw.Properties.VariableDescriptions{'adc'} = 'External analog input';

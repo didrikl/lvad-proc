@@ -8,7 +8,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     % notes table
     
     if nargin<2, path = ''; end  
-    if nargin<3, varMapFile = 'VarMap_G1_Notes_Ver4p16'; end
+    %if nargin<3, varMapFile = 'VarMap_G1_Notes_Ver4p16'; end
     eval(varMapFile);
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
@@ -117,6 +117,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
         cellstr(strrep(string(varUnits(inFile_ind)),'NaN',''));
     notes.Properties.UserData = make_init_userdata(filePath);
     notes.Properties.UserData.Experiment_Info = experimentInfo;
+    notes.Properties.UserData.VarMapFile = varMapFile;
     
     %% Parse information
     
@@ -143,7 +144,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
-    notes.noteRow = (1:height(notes))'+n_header_lines';
+    notes.noteRow = int16((1:height(notes))' + n_header_lines');
     notes = movevars(notes, 'noteRow', 'Before', 'partDurTime');
     notes.Properties.VariableContinuity('noteRow') = 'step';
        

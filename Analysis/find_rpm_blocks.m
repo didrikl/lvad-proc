@@ -14,8 +14,7 @@ function [start_inds, end_inds, rpm_vals] = find_rpm_blocks(T)
     rpm_vals = T.pumpSpeed(start_inds);
     if numel(rpm_vals)>1
         fprintf(['Multiple blocks of RPM in signal part:\n\tRPM values: ',...
-            '%s\n\tSignal part: %s\n'],...
-            mat2str(unique(rpm_vals)),strjoin(get_cats(T,'part',true),', '));      
+            '%s\n'],mat2str(unique(rpm_vals)));      
     end
     
     nan_rpm = isnan(rpm_vals);

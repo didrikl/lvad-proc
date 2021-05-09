@@ -16,8 +16,20 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
             disp('Time range is indentical with previous file')
             if parMerge
                 disp('Previous file is merged into current file')
+                
                 [TT_prev,TT_cur] = handle_duplicate_varnames(TT_prev,TT_cur);
+                prev_filename = string(TT_prev.Properties.UserData.FileName);
+                cur_filename = string(TT_cur.Properties.UserData.FileName);
+                prev_filepath = string(TT_prev.Properties.UserData.FilePath);
+                cur_filepath = string(TT_cur.Properties.UserData.FilePath);
+                
                 TT_cur=[TT_prev,TT_cur];
+                
+                TT_cur.Properties.UserData.FileName = cellstr(...
+                    [prev_filename,cur_filename]);
+                TT_cur.Properties.UserData.FilePath = cellstr(...
+                    [prev_filepath,cur_filepath]);
+                
             end
             TT_prev = [];
             

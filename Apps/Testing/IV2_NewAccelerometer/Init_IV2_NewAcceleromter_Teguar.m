@@ -14,7 +14,7 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-powerlab_fileNames = {
+labChart_fileNames = {
     'IV2_NewAccelerometer_Teguar_ch1-2.mat'
     };
 cb_driveline_fileNames = {
@@ -32,7 +32,7 @@ ultrasound_fileNames = {
 read_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer\Recorded';
 save_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer\Processed';
 ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
+powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
 cb_driveline_filePaths = fullfile(basePath,experiment_subdir,cb_driveline_subdir,cb_driveline_fileNames);
 cb_lvad_filePaths = fullfile(basePath,experiment_subdir,cb_lvad_subdir,cb_lvad_fileNames);
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);

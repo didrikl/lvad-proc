@@ -1,6 +1,6 @@
 % Liste med filnavn
 path = 'C:\yourPath'; % Du må kanskje bytte ut '\' med '/'
-powerlab_fileNames = {
+labChart_fileNames = {
      'filename1.mat'
      'filename2.mat'
     };

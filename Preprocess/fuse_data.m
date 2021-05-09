@@ -22,7 +22,7 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     if nargin<6, outsideNoteInclSpec = 'nearest'; end
         
     welcome('Data fusion')
-    
+            
     [~,PL] = get_cell(PL);
     fuse_opts = make_fuse_opts(fs_new);
     
@@ -30,18 +30,18 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     Notes = Notes(not(isnat(Notes.time)),:);
 
     % Loop over each stored LabChart file
-    %    h_wait = waitbar(0,'','Name','Data fusion...');
     nBlocks = numel(PL);
     B = cell(nBlocks,1);
     b_inds = cell(nBlocks,1);
     for i=1:nBlocks
         
         welcome(sprintf('PowerLab block (no %d/%d)',i,nBlocks),'iteration')
-        fprintf('\nFilename: %s\n',PL{i}.Properties.UserData.FileName)
-
+        display_block_varnames(PL{i})
+        multiWaitbar('Data fusion',(i-1)/nBlocks);
+        
         % Merging LabChart timetable with notes
         [B, b_inds] = determine_notes_block(Notes,PL{i},i,nBlocks,B,b_inds,...
-            interNoteInclSpec,outsideNoteInclSpec);    
+            interNoteInclSpec,outsideNoteInclSpec);
         if isempty(B{i})
             warning('No notes for LabChart block')
         else   
@@ -60,6 +60,7 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
             warning('No ultrasounic data for LabChart block\n')
             continue;
         end
+        display_block_varnames(US)       
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
         PL{i} = fuse_timetables( PL{i},US_block,fuse_opts);
         
@@ -72,9 +73,12 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
             PL{i}{PL{i}.time<US_block.time(1),US_block.Properties.VariableNames}=NaN;
         catch
         end
+        
+        
     end
     
     try
+        multiWaitbar('Merging table blocks into one timetable','Busy');
         S = merge_table_blocks(PL);
     catch
         warning('Out of memory. Trying now with a cell array split...')
@@ -84,9 +88,10 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         S = merge_table_blocks(S1,S2);
         clear S1 s2
     end
-      
+    multiWaitbar('Merging table blocks into one timetable','Close');
+    multiWaitbar('Data fusion',1);
+          
     clear fuse_timetables
-    %    close(h_wait)
     
 end
 
@@ -149,7 +154,8 @@ function  B = check_for_overlapping_note_blocks(Notes,B,b_rowStep,b_rowInds,i)
     % Should rarely be the case; Initializing PL also checks for overlapping.
     if b_rowStep<1
         overlapping = b_rowInds{i-1}(end):b_rowInds{i}(1);
-        warning(sprintf('\nNote row(s) accosiated to multiple LabChart blocks:\n\n'));
+        fprintf('\n')
+        warning(sprintf('\nNote row(s) accosiated to multiple LabChart blocks\n\n'));
         disp(Notes(overlapping,:))
         [B{i},B{i-1}] = handle_overlapping_ranges(B{i},B{i-1},false);
     end
@@ -163,7 +169,8 @@ function B = check_for_gap_in_note_blocks(Notes,B,b_rowStep,b_inds,i,interNoteIn
     
     if b_rowStep>1 % i>1 is implied
         intermediateNotes = b_inds{i}(1)-b_rowStep:b_inds{i}(1);
-        warning(sprintf('\nIntermediate note row(s) no LabChart recording:\n\n'));
+        fprintf('\n')
+        warning(sprintf('\n\tIntermediate note row(s) no LabChart recording\n\n'));
         disp(Notes(intermediateNotes,:))
 
         switch interNoteInclSpec

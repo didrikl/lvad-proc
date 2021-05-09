@@ -11,6 +11,12 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     
     welcome('Adding hamonic notch filter variables')
      
+    [returnAsCell,T_parts] = get_cell(T_parts);
+    if isempty(T_parts)
+        warning('Input data %s is empty',inputname(1))
+        return
+    end
+    
     newVarNames = varNames+"_nf";
     fprintf('Input\n\t%s\n',strjoin(varNames,', '))
     fprintf('Output\n\t%s\n',strjoin(newVarNames,', '))
@@ -64,3 +70,5 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     end
 
     T_parts = convert_to_single(T_parts, newVarNames);
+
+    if not(returnAsCell), T_parts = T_parts{1}; end

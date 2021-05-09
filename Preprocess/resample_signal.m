@@ -25,16 +25,24 @@ function T = resample_signal(T,sampleRate,method)
     % Method default settings
     if nargin<3, method = 'linear'; end
     
-    welcome('Resampling signal')
+    welcome('Resample/retime signal')
     
     [returnAsCell,T] = get_cell(T);
 
     fprintf('Method: %s\n',method)
     fprintf('New sample rate: %d\n',sampleRate)
     
-    for i=1:numel(T)
+    nBlocks = numel(T);
+    for i=1:nBlocks
         
         welcome(sprintf('Block (no %d/%d)',i,numel(T)),'iteration',not(returnAsCell));
+        multiWaitbar('Resample/retime signal',(i-1)/nBlocks);
+        display_block_varnames(T{i})
+        
+        if isempty(T{i})
+            warning('Empty timetable.');
+            continue;
+        end
         
         % Store variable name order
         varNames = T{i}.Properties.VariableNames;
@@ -74,4 +82,5 @@ function T = resample_signal(T,sampleRate,method)
             ismember(varNames,T{i}.Properties.VariableNames)));
     end
 
+    multiWaitbar('Resample/retime signal',1);
     if not(returnAsCell), T = T{1}; end

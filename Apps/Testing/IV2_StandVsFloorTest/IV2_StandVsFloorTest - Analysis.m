@@ -13,7 +13,7 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-powerlab_fileNames = {
+labChart_fileNames = {
     'IV2_Seq3 - StandVsFloorTest.mat'
     };
 notes_fileName = 'IV2_StandVsFloorTest - Notes ver3.7 - Rev0.xlsm';
@@ -23,7 +23,7 @@ ultrasound_fileNames = {
 % Add subdir specification to filename lists
 [read_path, save_path] = init_io_paths(sequence,basePath);
 ultrasound_filePaths  = fullfile(basePath,experiment_subdir,spectrum_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
+powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {

@@ -14,15 +14,15 @@ init_matlab
 % Which experiment
 raw_basePath    = 'C:\Data\IVS\Didrik\Temp\recordingTesting';
 testFs_notes_fileName = 'Noted\testFs - Notes ver3.5 - Rev1.xlsm';
-powerlab_fileNames = {
+labChart_fileNames = {
     'testingFS - B1.mat' % 1000 Hz
     'testingFS - B2.mat' % 2000 Hz
     };
-powerlab_fileNames = fullfile('Recorded','PowerLab',powerlab_fileNames);
+labChart_fileNames = fullfile('Recorded','PowerLab',labChart_fileNames);
 
 testFs_sampleRate = 1000;
 
-testFs_PL = init_labchart_mat_files(powerlab_fileNames,raw_basePath);
+testFs_PL = init_labchart_mat_files(labChart_fileNames,raw_basePath);
 testFs_notes = init_notes_xlsfile_v3_2(testFs_notes_fileName,raw_basePath);
 
 %% Pre-processing of data from IV2_Seq1
@@ -38,7 +38,7 @@ IV2_Seq1_subdir    = 'IV2_Seq2 - Water simulated HVAD thrombosis - Pre-pump - Pi
 spectrum_subdir = 'Spectrum\Blocks';
 notes_subdir = 'Noted';
 
-powerlab_fileNames = {
+labChart_fileNames = {
     'IV2_Seq2 - B1.mat'
      'IV2_Seq2 - B2.mat' 
       'IV2_Seq2 - B3.mat' 
@@ -59,12 +59,12 @@ IV2S1_ultrasound_fileNames = {
 
 [raw_basePath, proc_basePath] = init_io_paths(IV2_Seq1_subdir);
 IV2S1_ultrasound_fileNames  = fullfile(spectrum_subdir,IV2S1_ultrasound_fileNames);
-powerlab_fileNames = fullfile('PowerLab',powerlab_fileNames);
+labChart_fileNames = fullfile('PowerLab',labChart_fileNames);
 notes_filePath = fullfile(notes_subdir,IV2S1_notes_fileName);
 
 IV2S1_sampleRate = 1000;
 
-IV2S1_PL = init_labchart_mat_files(powerlab_fileNames,raw_basePath);
+IV2S1_PL = init_labchart_mat_files(labChart_fileNames,raw_basePath);
 IV2S1_US = init_system_m_text_files(IV2S1_ultrasound_fileNames,raw_basePath);
 IV2S1_notes = init_notes_xlsfile_v3_2(notes_filePath);
 

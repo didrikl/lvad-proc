@@ -15,7 +15,7 @@ cb_lvad_subdir = 'Recorded\Cardibox - LVAD';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-powerlab_fileNames = {
+labChart_fileNames = {
 %      'IV2_NewAccelerometer2_PowerLab - F1.mat'
 %      'IV2_NewAccelerometer2_PowerLab - F2.mat'
 %      'IV2_NewAccelerometer2_PowerLab - F3_Sel1.mat'
@@ -46,7 +46,7 @@ cb_lvad_fileNames = {
 read_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer2\Recorded';
 save_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer2\Processed';
 ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,powerlab_fileNames);
+powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
 notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
 cb_driveline_filePaths = fullfile(basePath,experiment_subdir,cb_driveline_subdir,cb_driveline_fileNames);
 cb_lvad_filePaths = fullfile(basePath,experiment_subdir,cb_lvad_subdir,cb_lvad_fileNames);
