@@ -1,4 +1,4 @@
-function save_for_FJP(proc_path,S)
+function save_for_FJP(proc_path,S,notes,sequence)
     
     S.Properties.SampleRate = 4000;
     %S_FJP = add_spatial_norms(S,2,{'accA_x','accA_y','accA_z'},'accA_norm');
@@ -19,11 +19,12 @@ function save_for_FJP(proc_path,S)
     saveTime = datetime(now,...
         'ConvertFrom','datenum',...
         'Format','uuuu-MM-dd HHmm');
-    saveTimeString = char(string(saveTime));
     
     S_fileName = sprintf('G1_%s - Signal timetable for FJP - %s.mat',seqNo,saveTime);
     save(fullfile(proc_path,S_fileName),'S')
     
     Notes_fileName = sprintf('G1_%s - Notes for FJP - %s.mat',seqNo,saveTime);
     save(fullfile(proc_path,Notes_fileName),'notes')
+    
+
     
