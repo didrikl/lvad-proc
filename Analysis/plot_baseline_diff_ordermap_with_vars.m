@@ -96,10 +96,10 @@ function add_stacked_plot(P2)
     
 function add_balLev_text_bar(P2,order)
     barWidth=18;
-    balLevCats = categories(P2.balloonLevel);
+    balLevCats = categories(P2.balloonLev);
     barYPos = max(order)-0.2;
     for i=1:numel(balLevCats)
-        balLev_time = P2.dur(P2.balloonLevel==balLevCats(i));
+        balLev_time = P2.dur(P2.balloonLev==balLevCats(i));
         if numel(balLev_time)==0, continue; end
         balLev_line = repmat(barYPos,1,numel(balLev_time));
         h_plot = plot(balLev_time,balLev_line,'LineWidth',barWidth);

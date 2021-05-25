@@ -38,25 +38,29 @@ function S_parts = split_into_parts(S,fs)
             S_parts{i} = retime(S_parts{i},'regular','nearest','SampleRate',fs);
             
             for j=1:numel(gap_starts)
-                fprintf(['\nRecorded balues in the regular table are set as ',...
+                fprintf(['\nRecorded values in the regular table are set as ',...
                     'missing within gap between \n\tStart:%s\n\tEnd: %s\n\n'],...
                     gap_start_time(j),gap_end_time(j));
                 gap_times = timerange(gap_start_time(j),gap_end_time(j));
                 vars_as_missing = ...
                     not(ismember(S_parts{i}.Properties.VariableNames,...
-                    {'Q','noteRow'}));
+                    {'Q','noteRow','part'}));
                 S_parts{i}{gap_times,vars_as_missing} = missing;
             end
             
         end
-            S_parts{i}.pumpSpeed = int16(S_parts{i}.pumpSpeed);
-
-        
-        % Remove possible first/last row(s) with undefined part after re-sampling
-%         S_parts{i}(isundefined(S_parts{i}.part),:) = [];
-%         if isnan(S_parts{i}.Properties.SampleRate)
-%             [fs,S_parts{i}] = get_sampling_rate(S_parts{i});
-%         end
+        S_parts{i}.pumpSpeed = int16(S_parts{i}.pumpSpeed);
+       
+        % Remove possible first/last row(s) with undefined values after re-sampling
+        c_vars = S_parts{i}(:,S_parts{i}.Properties.VariableContinuity=='continuous');
+        not_nan_start_ind = find(not(all(ismissing(c_vars),2)),1,'first');
+        if not_nan_start_ind>1
+            S_parts{i}(1:not_nan_start_ind-1,:) = [];
+        end
+        not_nan_end_ind = find(not(all(ismissing(c_vars),2)),1,'last');
+        if not_nan_end_ind<height(S_parts{i})
+             S_parts{i}(not_nan_end_ind+1:end,:) = [];
+        end
         
         % Remove excessive info to save memory
         %S_parts{i}.part = [];

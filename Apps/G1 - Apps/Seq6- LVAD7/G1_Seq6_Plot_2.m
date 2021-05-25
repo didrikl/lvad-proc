@@ -100,7 +100,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
             mat2str(all_parts),mat2str(rpm));
     end
     
-    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
+    blocks = find_cat_block_inds(T,{'balloonLev','intervType'});
     
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
@@ -301,18 +301,18 @@ function add_interv_bar(h,T,notes,mapVar)
     end
     
     try    
-        T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
+        T.balloonLev = mergecats(T.balloonLev,{'2','3','4','5'},...
             'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-        T.balloonLevel = renamecats(T.balloonLevel,'1',...
+        T.balloonLev = renamecats(T.balloonLev,'1',...
             sprintf('Deflated balloon'));%sprintf('Deflated %s balloon',catheter));
-        T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
+        T.balloonLev = removecats(removecats(T.balloonLev),{'-'});
     catch
     end
     
-    plot(T.t(ss_inds),T.balloonLevel(ss_inds),specs.trans_lev_bar{:})
+    plot(T.t(ss_inds),T.balloonLev(ss_inds),specs.trans_lev_bar{:})
     t_ss = nan(height(T),1);
     t_ss(ss_inds) = T.t(ss_inds);
-    plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
+    plot(t_ss,T.balloonLev,specs.bal_lev_bar{:})
 
     h.YColor = [0 0 0];
     

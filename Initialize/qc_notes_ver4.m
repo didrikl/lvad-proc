@@ -1,4 +1,4 @@
-function notes = qc_notes_ver4(notes)
+function notes = qc_notes_ver4(notes,id_specs)
     % QC_NOTES_VER4 checks notes file intergrity.
     %
     % Checks and displays rows of notes file that have 
@@ -16,21 +16,26 @@ function notes = qc_notes_ver4(notes)
     
     % NOTE: If OO, then this is notes object property
     mustHaveVars = {
-        %'part'
         'intervType'
         'event'
         'pumpSpeed'
         };
+       
+    if nargin<2
+        warning('No ID parameter specfications given, thus not checked');
+        id_specs = table; 
+    end
     
     notChrono = check_chronological_time(notes);
     [natPause, isNatPart] = check_missing_time(notes);
     irregParts = check_irregular_parts(notes);
     undefCat = check_missing_essential_info(notes,mustHaveVars);
-    irregIDs = check_analysis_ids(notes);
     
-    if any(notChrono | natPause | isNatPart | undefCat | irregParts | irregIDs)
-        notes = ask_to_reinit(notes,...
-            notChrono, natPause, isNatPart, undefCat, irregParts, irregIDs);
+    irregRowsWithID = check_analysis_ids(notes,id_specs);
+    
+    if any(notChrono | natPause | isNatPart | undefCat | irregParts | irregRowsWithID)
+        notes = ask_to_reinit(notes, notChrono, natPause, isNatPart, ...
+            undefCat, irregParts, irregRowsWithID);
     else
         fprintf('\n\nAll good :-)')
     end
@@ -38,19 +43,77 @@ function notes = qc_notes_ver4(notes)
     fprintf('\nQuality control of notes done.\n')
 
     
-function irregIDs = check_analysis_ids(Notes)
+function irregID = check_analysis_ids(Notes, ids_specs)
     % Verify event and intervType are always respectively '-' and 'Steady-state'
-    % TODO: Move into Notes QC function
+    
+    if height(ids_specs)==0
+        irregID = false(height(Notes),1);
+        return; 
+    end
+    
     analyse_events = {'-'};
     Notes.analysis_id = standardizeMissing(Notes.analysis_id,'-');
     id_inds = not(ismissing(Notes.analysis_id));
 
-    %analysis_events = Notes.event(id_inds);
+    % Any id-rows not as steady-state/baseline?
+    % unique(Notes.intervType(id_inds))
+
+    irregID = not(ismember(Notes.event,analyse_events)) & id_inds;
+
+    % TODO: Factorize the following checks into separate functions
+    % QC of ids compared to id_specs...
+    if height(ids_specs)>0
     
-    %unique(Notes.intervType(id_inds))
-
-    irregIDs = not(ismember(Notes.event,analyse_events)) & id_inds;
-
+        % Any missing?
+        misIDs = not(ismember(ids_specs.analysis_id,Notes.analysis_id(id_inds)))...
+            & not(ids_specs.contingency);
+        if any(misIDs)
+            fprintf('\n\nMissing analysis IDs defined as:\n\n');
+            disp(ids_specs(misIDs,:))
+        end
+    
+        % Any duplicates?
+        [~, dups] = find_cellstr_duplicates(cellstr(Notes.analysis_id(id_inds)));
+        if not(isempty(dups))
+            dup_inds = ismember(Notes.analysis_id,dups);
+            fprintf('\n')
+            warning(sprintf('\n\tDuplicate IDs:\n\t\t%s',...
+                strjoin(unique(dups),'\n\t\t')))
+            irregID = irregID | dup_inds;
+        end
+            
+        % Any ID tags not listed in specfication file?
+        extraIDs = not(ismember(Notes.analysis_id,ids_specs.analysis_id)) & id_inds;
+        if any(extraIDs)
+            fprintf('\n\nExtra analysis IDs that are not defined:\n\n');
+            disp(Notes(extraIDs,:)) 
+        end
+            
+        % Non-matching ID parameters with those in specfication file?
+        for i=1:height(ids_specs)
+            idNote_inds = Notes.analysis_id==ids_specs.analysis_id(i);
+            id_specs = ids_specs(i,:);
+            isOK(i) = check_id_parameter_consistency_IV2(Notes(idNote_inds,:),id_specs);
+                      
+            if numel(unique(Notes.bl_id(idNote_inds)))>1
+                warning('There are disparate baseline IDs in Notes with same Analysis ID')
+            end
+            
+        end
+        if any(not(isOK))
+            opts = struct('WindowStyle','non-modal','Interpreter','none');
+            msg = sprintf('ID parameter issues detected in Notes.\n\n%s\n',...
+                display_filename(Notes.Properties.UserData.FilePath));
+            warndlg(msg,'Warning, Notes',opts)
+        end
+        
+    end  
+    
+    if any(irregID)
+        fprintf('\nNote rows with analysis ID irregularities:\n\n')
+        disp(Notes(irregID,:));
+    end
+              
 function notes = ask_to_reinit(notes, isNotChrono, isNatPause, isNatPart, ...
         isUndefCat, isIrregPart, irregIDs)
     % Pause and let user make changes in Excel and re-initialize
@@ -86,8 +149,7 @@ function notes = ask_to_reinit(notes, isNotChrono, isNatPause, isNatPart, ...
             mat2str(notes.noteRow(find(isIrregPart)))];
     end
     if any(irregIDs)
-        msg=[msg,'\nIrregular events (possibly because IDs are put at ',...
-            'wrong rows for analysis at row(s): ',...
+        msg=[msg,'\nIrregular analysis IDs or corresponding event entries at row(s): ',...
             mat2str(notes.noteRow(find(irregIDs)))];
     end
     

@@ -18,7 +18,8 @@ function T = add_highpass_RPM_filter_variables(T,varNames,newVarNames,...
     fnc = @filter_data;   
     T = add_in_parts(fnc,T,varNames,newVarNames,harmCut,cutFreqShift);
     T = convert_to_single(T,newVarNames);
-     
+    T.Properties.VariableContinuity(newVarNames) = 'continuous';
+         
     if not(returnAsCell), T = T{1}; end
     
 function T = filter_data(T,varNames,newVarNames,hamonic_cut,cut_freq_shift)

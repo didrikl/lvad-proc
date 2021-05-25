@@ -179,7 +179,7 @@ powerlab_variable_map = {
     'PmpAccX'        'pump_acc_x'  'single'    'continuous'
     'PmpAccY'        'pump_acc_y'  'single'    'continuous'
     'PmpAccZ'        'pump_acc_z'  'single'    'continuous'
-    'PumpSpeed'      'pump_speed'  'single'    'continuous'
+    'pumpSpeed'      'pump_speed'  'single'    'continuous'
     'PumpCurrent'    'pump_curr'   'single'    'continuous'
     'PumpVoltage'    'pump_volt'   'single'    'continuous'
     'EACCX'          'e_acc_x'     'single'    'continuous'

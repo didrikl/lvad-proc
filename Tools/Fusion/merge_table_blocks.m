@@ -18,30 +18,38 @@ function T = merge_table_blocks(varargin)
         blocks = varargin;
     end
     
-    T = blocks{1};
-    if numel(T)==1
+    if numel(blocks)==1
         warning('No table block merging. There is only one table block')
-    elseif numel(T)==0
+    elseif numel(blocks)==0
         warning('No table block merging. There are no table blocks')
     end
-    for i=2:numel(blocks)
     
+    T = blocks{1};
+    ii=0;
+    for i=1:numel(blocks)
+    
+        if i==1+ii 
+            if isempty(blocks{i})
+                ii = ii+1;
+            else
+                T = blocks{i};
+            end
+            continue; 
+        end
+        
         if isempty(blocks{i})
             warning(sprintf(['\n\tBlock no. %s is empty\n',i]))
             continue;
+        elseif not(istable(blocks{i})) || not(istimetable(blocks{i}))
+            warning(sprintf(['\n\tBlock no. %s is not a table\n',i]))
+            continue;
         end
-        
         T.Properties.UserData.Blocks{i} = blocks{i}.Properties.UserData;
         
         if istimetable(blocks{i})
             T.Properties.UserData.Blocks{i}.SampleRate = blocks{i}.Properties.SampleRate;
         end
-        
-        if i==1 
-            T = blocks{1};
-            continue; 
-        end
-               
+              
         [T, blocks{i}] = fill_in_missing_cols(T, blocks{i});
         T = [T;blocks{i}];
         

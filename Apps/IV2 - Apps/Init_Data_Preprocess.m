@@ -16,7 +16,7 @@ S_parts = split_into_parts(S,fs_new);
 S_parts = add_spatial_norms(S_parts,2,{'accA_x','accA_y','accA_z'},'accA_norm');
 %S_parts = add_spatial_norms(S_parts,2,{'accB_x','accB_y','accB_z'},'accB_norm');
 S_parts = add_harmonics_filtered_variables(S_parts,...
-    {'accA_norm','accA_x','accA_y','accA_z'}, 1:5, 1);
+    {'accA_norm','accA_x','accA_y','accA_z'}, 1:6, [1,1,1,2.5,1,1]);
 
 S = merge_table_blocks(S_parts);
-S = reduce_to_analysis(S);
+S = reduce_to_analysis_IV2(S,Notes,id_specs);

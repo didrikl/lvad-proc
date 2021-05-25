@@ -27,7 +27,7 @@
         'Inject vol.'             'thrombusVol'      'int16',        'unset'
         'Embolus type'            'thrombusType'     'categorical'   'unset'
         'Pump speed'              'pumpSpeed'        'int16'         'step'
-        'Balloon level'           'balloonLevel'     'categorical'   'step'
+        'Balloon level'           'balloonLev'     'categorical'   'step'
         'Balloon diameter'        'balloonDiam'      'single'        'unset'
         'Manometer control'       'manometerCtrl'    'categorical'   'unset'
         'Catheter type'           'catheter'         'categorical'   'unset'%'step'

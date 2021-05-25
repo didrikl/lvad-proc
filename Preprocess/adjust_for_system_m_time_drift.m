@@ -4,7 +4,8 @@ function T = adjust_for_system_m_time_drift(T,secsAhead,varargin)
     
     % TODO:
     % Check that numel(secsAhead) must correspond to numel(T)
-    % Check also for diffReadTime,inSyncTime given as varargin
+    
+    defDriftRatePerSec = 0.002012984;
     
     for i=1:numel(T)
         
@@ -13,6 +14,6 @@ function T = adjust_for_system_m_time_drift(T,secsAhead,varargin)
             continue
         end
 
-        T{i} = adjust_for_linear_time_drift(T{i},secsAhead{i},varargin{:});
+        T{i} = adjust_for_linear_time_drift(T{i},secsAhead{i},defDriftRatePerSec,varargin{:});
 
     end

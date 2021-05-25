@@ -1,21 +1,16 @@
 % Which experiment
 seq = 'IV2_Seq6';
-experiment_subdir = 'D:\Data\IVS\Didrik\IV2 - Data\Seq6 - LVAD8';
+experiment_subdir = 'Seq6 - LVAD8';
 
 % Output folder structure
 proc_subdir = 'Processed\';
-proc_plot_subdir = 'Processed\Figures';
+proc_plot_subdir = 'Figures';
 proc_stats_subdir = 'Processed\Statistics';
 
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
 ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
-
-% Input file structure map
-labChart_varMapFile = 'VarMap_LabChart_IV2';
-systemM_varMapFile = 'VarMap_SystemM_IV2';
-notes_varMapFile = 'VarMap_Notes_IV2_v1';
 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
 labChart_fileNames = {
@@ -62,10 +57,8 @@ US_drifts = {[], 24.5};
 
 %% Initialize Data
 
-Init_Environment
+Environment_Init_IV2
 Init_Data_Raw
 Init_Data_Preprocess
-Init_Data_Roundup
 Init_Data_Save
-
-
+Init_Data_Roundup

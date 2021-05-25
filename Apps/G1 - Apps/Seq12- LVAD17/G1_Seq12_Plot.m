@@ -48,7 +48,7 @@ function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms, seq_no)
     resolution = 300;
     
     catheter = string(notes.catheter(T.noteRow(...
-        find(T.balloonLevel=='1',1,'first'))));
+        find(T.balloonLev=='1',1,'first'))));
     if isempty(catheter)
         catheter = "(No catheter)";
     end
@@ -86,7 +86,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         warning('Data table is shorter than one second')
     end
     
-    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
+    blocks = find_cat_block_inds(T,{'balloonLev','intervType'});
     
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
@@ -284,22 +284,22 @@ function add_interv_bar(h,T,notes)
     plot(T.t,event,specs.event_bar{:})
     
 % %     catheter = string(notes.catheter(T.noteRow(...
-% %         find(T.balloonLevel=='1',1,'first'))));
+% %         find(T.balloonLev=='1',1,'first'))));
 % %     
 % %     %TODO: check if category exist instead of try and catch
 % %     try
-% %     T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
+% %     T.balloonLev = mergecats(T.balloonLev,{'2','3','4','5'},...
 % %         'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-% %     T.balloonLevel = renamecats(T.balloonLevel,'1',...
+% %     T.balloonLev = renamecats(T.balloonLev,'1',...
 % %         sprintf('Empty balloon'));%sprintf('Empty %s balloon',catheter));
 % %     catch
 % %     end
-% %     T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
+% %     T.balloonLev = removecats(removecats(T.balloonLev),{'-'});
 % %     
-% %     plot(T.t(ss_inds),T.balloonLevel(ss_inds),specs.trans_lev_bar{:})
+% %     plot(T.t(ss_inds),T.balloonLev(ss_inds),specs.trans_lev_bar{:})
 % %     t_ss = nan(height(T),1);
 % %     t_ss(ss_inds) = T.t(ss_inds);
-% %     plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
+% %     plot(t_ss,T.balloonLev,specs.bal_lev_bar{:})
 % % 
 % %     h.YColor = [0 0 0];
 % %     
@@ -793,7 +793,7 @@ function [T,rpm] = make_plot_data2(T,rpm,fs,bl_part,cbl_part)
         not(contains(lower(string(T.intervType)),{'baseline','steady'})),:) = [];
     
     
-    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
+    blocks = find_cat_block_inds(T,{'balloonLev','intervType'});
     
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});

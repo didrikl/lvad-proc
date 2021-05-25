@@ -1,4 +1,4 @@
-function fileName = make_valid_fileName(fileName)
+function fileName = make_valid_filename(fileName)
     
     illegal_char_list = '[/\*:?"<>|]';
     replacement_char = '_';

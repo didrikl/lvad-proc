@@ -1,22 +1,22 @@
 %close all
 clear check_table_var_input
 seq_no = 9;
-fig_subdir = 'Figures\Filter comparison';
-
+fig_subdir = 'Figures\Filter comparison - 2.5Hz notch at 4th harmonic';
+fig_path = fullfile(data_basePath,experiment_subdir,fig_subdir);
 % Calculation settings
 sampleRate = fs_new;
 
 mapSpec = {
     % Variable       Colorbar   y-lims
-    'accA_norm',    [-80,-36], [0,5.2];
-    'accA_norm_nf', [-80,-36], [0,5.2];
-    'accA_x',       [-80,-36], [0,5.2];
-    'accA_x_nf',    [-80,-36], [0,5.2];
-    'accA_y',       [-80,-36], [0,5.2];
-    'accA_y_nf',    [-80,-36], [0,5.2];
-    'accA_z',       [-80,-36], [0,5.2];
-    'accA_z_nf',    [-80,-36], [0,5.2];
-    'accB_norm',    [-75,-45], [0,5.2];
+    'accA_norm',    [-80,-36], [0,6.2];
+    'accA_norm_nf', [-80,-36], [0,6.2];
+    'accA_x',       [-80,-36], [0,6.2];
+    'accA_x_nf',    [-80,-36], [0,6.2];
+    'accA_y',       [-80,-36], [0,6.2];
+    'accA_y_nf',    [-80,-36], [0,6.2];
+    'accA_z',       [-80,-36], [0,6.2];
+    'accA_z_nf',    [-80,-36], [0,6.2];
+    %'accB_norm',    [-75,-45], [0,5.2];
     };
 
 graphSpec = {
@@ -29,36 +29,36 @@ graphSpec = {
     'accA_y_nf',    [-90,20];
     'accA_z',       [-90,20];
     'accA_z_nf',    [-90,20];
-    'accB_norm',    [-90,20]
+    %'accB_norm',    [-90,20]
     };
 
 % % Extract data for these RPM values
 rpm={};
 parts = {
-%     {},   [1],   [],  '01. RPM changes'
-%     
-%     {},   [2],   [],  '02. 4.5x20mm balloon inflation'
-%     {},   [3],   [],  '03. 4.5x20mm balloon inflation'
-%     {},   [4],   [],  '04. 4.5x20mm Balloon inflation'
-%     {},   [5],   [],  '05. 4.5x20mm Balloon inflation'
-%     
-%     {},   [6],   [],  '06. 6x20mm balloon inflation'
-%     {},   [7],   [],  '07. 6x20mm balloon inflation'
-%     {},   [20],   [],  '08. 6x20mm Balloon inflation'
-%     {},   [21],   [],  '09. 6x20mm Balloon inflation'
-%     
-%     {},   [8],   [], '10. 8x30mm balloon inflation'
-%     {},   [9],   [], '11. 8x30mm balloon inflation'
-%     {},   [10],   [], '12. 8x30mm Balloon inflation'
-%     {},   [11],   [],  '13. 8x30mm Balloon inflation'
-%     
-%     {},   [12],  [],  '14. 11mm balloon inflation - first attempt, old balloon'
-%     {},   [13],  [],  '15. 11mm balloon inflation - first attempt, old balloon'
-%     {},   [16],  [],  '14. 11mm balloon inflation'
-%     {},   [17],  [],  '15. 11mm balloon inflation'
-%     {},   [18],  [],  '16. 11mm Balloon inflation'
-%     {},   [19],  [],  '17. 11mm Balloon inflation'
-%     
+     {},   [1],   [],  '01. RPM changes'
+    
+    {},   [2],   [],  '02. 4.5x20mm balloon inflation'
+    {},   [3],   [],  '03. 4.5x20mm balloon inflation'
+    {},   [4],   [],  '04. 4.5x20mm Balloon inflation'
+    {},   [5],   [],  '05. 4.5x20mm Balloon inflation'
+    
+    {},   [6],   [],  '06. 6x20mm balloon inflation'
+    {},   [7],   [],  '07. 6x20mm balloon inflation'
+    {},   [20],   [],  '08. 6x20mm Balloon inflation'
+    {},   [21],   [],  '09. 6x20mm Balloon inflation'
+    
+    {},   [8],   [], '10. 8x30mm balloon inflation'
+    {},   [9],   [], '11. 8x30mm balloon inflation'
+    {},   [10],   [], '12. 8x30mm Balloon inflation'
+    {},   [11],   [],  '13. 8x30mm Balloon inflation'
+    
+    %{},   [12],  [],  '14. 11mm balloon inflation - first attempt, old balloon'
+    %{},   [13],  [],  '15. 11mm balloon inflation - first attempt, old balloon'
+    {},   [16],  [],  '14. 11mm balloon inflation'
+    {},   [17],  [],  '15. 11mm balloon inflation'
+    {},   [18],  [],  '16. 11mm Balloon inflation'
+    {},   [19],  [],  '17. 11mm Balloon inflation'
+     
     {},         [22],  [],  '18. RPM changes, before afterload clamping'
     {22,215},   [23],  [],  '19. Afterload clamping'
     {22,213},   [24],  [],  '20. Afterload clamping'
@@ -92,8 +92,7 @@ for j=1:size(mapSpec,1)
         % TODO Move into plot-function
         fig_name = make_fig_name_IV2(h_fig,h_ax,...
             parts{i,2},parts{i,4},mapSpec{j,1},rpms,seq_no);
-        
-        save_to_png_G1(h_fig,proc_path,fig_subdir,300)
+        save_to_png_G1(h_fig,fig_path,fig_subdir,300)
     end
     
     close all
@@ -134,7 +133,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
             mat2str(parts),mat2str(rpm));
     end
     
-    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
+    blocks = find_cat_block_inds(T,{'balloonLev','intervType'});
     
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
@@ -333,18 +332,18 @@ function add_interv_bar(h,T,notes,mapVar)
     end
     
     try
-        T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
+        T.balloonLev = mergecats(T.balloonLev,{'2','3','4','5'},...
             'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-        T.balloonLevel = renamecats(T.balloonLevel,'1',...
+        T.balloonLev = renamecats(T.balloonLev,'1',...
             sprintf('Deflated balloon'));%sprintf('Deflated %s balloon',catheter));
-        T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
+        T.balloonLev = removecats(removecats(T.balloonLev),{'-'});
     catch
     end
     
-    plot(T.t(ss_inds),T.balloonLevel(ss_inds),specs.trans_lev_bar{:})
+    plot(T.t(ss_inds),T.balloonLev(ss_inds),specs.trans_lev_bar{:})
     t_ss = nan(height(T),1);
     t_ss(ss_inds) = T.t(ss_inds);
-    plot(t_ss,T.balloonLevel,specs.bal_lev_bar{:})
+    plot(t_ss,T.balloonLev,specs.bal_lev_bar{:})
     
     h.YColor = [0 0 0];
     

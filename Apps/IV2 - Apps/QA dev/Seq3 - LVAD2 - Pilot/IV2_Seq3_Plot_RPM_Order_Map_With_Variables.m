@@ -43,7 +43,7 @@ function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms)
     resolution = 300;
     
     catheter = string(notes.catheter(T.noteRow(...
-        find(T.balloonLevel=='1',1,'first'))));
+        find(T.balloonLev=='1',1,'first'))));
     if isempty(catheter)
         catheter = "(No catheter)";
     end
@@ -85,7 +85,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
             contains(lower(string(T.intervType)),{'baseline','steady'});
     end
     
-    blocks = find_cat_block_inds(T,{'balloonLevel','intervType'});
+    blocks = find_cat_block_inds(T,{'balloonLev','intervType'});
     for k=1:height(blocks)
         range = blocks.start_inds(k):blocks.end_inds(k);
         T.accA_x_std(range) = std(T.accA_x(range));
@@ -244,19 +244,19 @@ function add_interv_bar(h,T,notes)
     plot(T.t,event,specs.event_bar{:})
     
     catheter = string(notes.catheter(T.noteRow(...
-        find(T.balloonLevel=='1',1,'first'))));
-    T.balloonLevel = mergecats(T.balloonLevel,{'2','3','4','5'},...
+        find(T.balloonLev=='1',1,'first'))));
+    T.balloonLev = mergecats(T.balloonLev,{'2','3','4','5'},...
         'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-    T.balloonLevel = renamecats(T.balloonLevel,'1',...
+    T.balloonLev = renamecats(T.balloonLev,'1',...
         sprintf('Empty balloon'));%sprintf('Empty %s balloon',catheter));
-    T.balloonLevel = removecats(removecats(T.balloonLevel),{'-'});
+    T.balloonLev = removecats(removecats(T.balloonLev),{'-'});
     
-    blocks = find_cat_blocks(T,{'balloonLevel','event'},700);
+    blocks = find_cat_blocks(T,{'balloonLev','event'},700);
     for i=1:min(numel(blocks.start_inds),numel(blocks.end_inds))
        inds = false(height(T),1);
        inds(blocks.start_inds(i):blocks.end_inds(i)) = true;
        inds = inds & ss_inds;
-       plot(T.t(inds),T.balloonLevel(inds),specs.bal_lev_bar{:})
+       plot(T.t(inds),T.balloonLev(inds),specs.bal_lev_bar{:})
     end
     
 %    h.YColor = [0 0 0];

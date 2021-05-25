@@ -17,7 +17,6 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     notes_sheet = 'Recording notes';
     varsNames_controlled_range = 'Controlled_VarNames';
     varNames_measured_range = 'Measured_VarNames';
-    notes_range = 'Notes';
     varNames_range = 'Header_VarNames';
     varUnits_range = 'Header_VarUnits';
     experiment_info_sheet = 'Description';
@@ -45,7 +44,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     notes_sheet = check_notes_sheet_name(filePath,notes_sheet);    
     
     opts = detectImportOptions(filePath,'VariableNamingRule','preserve');
-    catVarsInMap = varMap(ismember(varMap(:,3),'categorical'),1);
+    catVarsInMap = varMap(ismember(varMap(:,3),'categorical'),1); %#ok<USENS>
     catVarsInFile = catVarsInMap(ismember(catVarsInMap,opts.VariableNames));
     opts = setvartype(opts,catVarsInFile,'categorical');
 

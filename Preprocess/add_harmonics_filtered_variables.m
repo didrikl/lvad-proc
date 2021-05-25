@@ -1,12 +1,13 @@
-function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics, hWidth, constFreq, cfWidth)
+function T_parts = add_harmonics_filtered_variables(...
+        T_parts, varNames, harmonics, harmonicsWidth, fixedFreq, fixedFreqWidth)
     % Add harmonics filtered varibles
     %
     
     
     if nargin<3, harmonics = [1]; end
-    if nargin<4, hWidth = 0.5; end
-    if nargin<5, constFreq = []; end
-    if nargin<6, cfWidth = 0.5; end
+    if nargin<4, harmonicsWidth = 0.5; end
+    if nargin<5, fixedFreq = []; end
+    if nargin<6, fixedFreqWidth = 0.5; end
     if isempty(harmonics), return; end
     
     welcome('Adding hamonic notch filter variables')
@@ -15,6 +16,13 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
     if isempty(T_parts)
         warning('Input data %s is empty',inputname(1))
         return
+    end
+    
+    if numel(harmonicsWidth)==1 && numel(harmonics)>1
+        harmonicsWidth = repmat(harmonicsWidth,1,numel(harmonics));
+    end
+    if numel(fixedFreqWidth)==1 && numel(fixedFreq)>1
+        fixedFreqWidth = repmat(fixedFreqWidth,1,numel(fixedFreq));
     end
     
     newVarNames = varNames+"_nf";
@@ -45,9 +53,8 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
         for j=1:numel(rpm_vals)
             
             hFreq = harmonics*(double(rpm_vals(j))/60);
-            allFreq = [hFreq,constFreq];
-            BW = [repmat(hWidth,1,numel(harmonics)),...
-                repmat(cfWidth,1,numel(constFreq))];
+            allFreq = [hFreq,fixedFreq];
+            BW = [harmonicsWidth,fixedFreqWidth];     
             hFilt = make_multiple_notch_filter(allFreq,fs,BW);
             block_inds = start_inds(j):end_inds(j);
             
@@ -65,6 +72,7 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, harmonics
             end
             
         end
+        T.Properties.VariableContinuity(newVarNames) = 'continuous';
         T_parts{i} = T;
         
     end

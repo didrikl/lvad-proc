@@ -16,7 +16,7 @@ barVars = {
     %'intervType'      brewermap(20,'Pastel2');
     'pumpSpeed'       brewermap(20,'Paired');
     'Q_reduction'   brewermap(10,'BuPu');%'YlGnBu');
-    'balloonLevel'    brewermap(10,'RdPu');
+    'balloonLev'    brewermap(10,'RdPu');
     };
 % Muting of non-comparable data (due to wrong setting in LabChart) in baseline
 S_parts{1}.gyrA = nan(height(S_parts{1}),3);

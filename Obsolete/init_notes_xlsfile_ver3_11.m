@@ -46,7 +46,7 @@ function notes = init_notes_xlsfile_ver3_9(fileName, read_path)
         'Speed change rate'       'speedChangeRate'    'categorical'   'step'
         'Dose'                    'dose'               'categorical'   'step'
         'Pump speed'              'pumpSpeed'          'int16'         'step'
-        'Balloon level'           'balloonLevel'       'categorical'   'step'
+        'Balloon level'           'balloonLev'       'categorical'   'step'
         'Balloon diameter'        'balloonDiam'        'categorical'   'step'
         'Balloon offset'          'balloonOffset'      'categorical'   'step'
         'Catheter type'           'catheter'           'categorical'   'unset'

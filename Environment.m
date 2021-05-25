@@ -1,24 +1,4 @@
 
-%% Path
-
-% Load source code paths into Matlab path
-addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
-        
-
-%% Import colors used for processing UI
-Colors_For_Processing
-
-
-%% Progress bars
-
-multiWaitbar('CloseAll');
-[~,hWait] = multiWaitbar('Reading .mat files', 0,'CanCancel','on','Color',green);
-multiWaitbar('Resample/retime signal',0,'Color',green);
-multiWaitbar('Data fusion',0,'Color',green);
-multiWaitbar('Splitting into parts',0,'Color',green);
-hWait.Name = ['Init progress, ',seq]; 
-
-
 %% Clearing of memory and command line
 
 % Make command window empty (but keeping command history in memory)
@@ -26,12 +6,20 @@ fprintf(repmat('\n',1,20))
 home
 
 % Close all figures
-%close all;
+close all;
 
 % Clear function so that persistent variables defined within these are cleared
-clear Save_Table Save_Figure
-clear h_left_shade_sub1 h_left_shade_sub2 h_left_shade_zoom
-clear h_right_shade_sub1 h_right_shade_sub2 h_right_shade_zoom
+clear functions global
+if numel(who)>1
+    answer = questdlg('Clear all (workspace variables and more)?','Yes','No');
+    if strcmp(answer,'Yes'), clear variables; end
+end
+
+
+%% Path
+
+% Load source code paths into Matlab path
+addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 
 
 %% Information

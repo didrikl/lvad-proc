@@ -9,7 +9,7 @@ barVars = {
     %'part',           partBarColorSet;
     'pumpSpeed'       pumpSpeedColorSet;%brewermap(20,'Paired');
     'Q_reduction'   flowRedColorSet;% brewermap(10,'BuPu');%'YlGnBu');
-    'balloonLevel'    balLevColorSet;%brewermap(10,'RdPu');
+    'balloonLev'    balLevColorSet;%brewermap(10,'RdPu');
     'intervType'      intervTypeColorSet;%brewermap(10,'RdPu');
     };
 
@@ -98,7 +98,7 @@ function T = make_plot_data(parts,S_parts,rpm,...
         
         if height(T{j})==0, continue; end
         
-        bal_blocks = find_cat_blocks(T{j},{'balloonLevel'});
+        bal_blocks = find_cat_blocks(T{j},{'balloonLev'});
         for k=1:numel(bal_blocks.start_inds)
             range = bal_blocks.start_inds(k):bal_blocks.end_inds(k);
             T{j}.accA_xz_norm_std(range) = std(T{j}.accA_xz_norm(range));
@@ -114,7 +114,7 @@ function T = make_plot_data(parts,S_parts,rpm,...
         
         % Ignore balloon level 0 (same as level 1)
         T{j} = T{j}(T{j}.pumpSpeed==rpm,:);
-        T{j} = T{j}(T{j}.balloonLevel~='0',:);
+        T{j} = T{j}(T{j}.balloonLev~='0',:);
         
     end
     
