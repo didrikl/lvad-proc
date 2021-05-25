@@ -9,7 +9,7 @@ function [psds,f,pows] = make_psds(S_analysis,vars,id_specs)
     band_harm_lims = [1.25,2.75];%(fs/2)/(3100/60)-0.5];
     
     psds = cell(numel(seqs),1);
-    for j=6:numel(seqs)
+    for j=1:numel(seqs)
         
         seq = seqs{j};
         S = S_analysis.(seqs{j});

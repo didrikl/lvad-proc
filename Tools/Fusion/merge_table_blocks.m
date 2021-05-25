@@ -27,23 +27,27 @@ function T = merge_table_blocks(varargin)
     T = blocks{1};
     ii=0;
     for i=1:numel(blocks)
-    
+        
+        if isempty(blocks{i})
+            warning(sprintf('\n\tBlock no. %d is empty\n',i))
+        end
+        if not(istable(blocks{i})) && not(istimetable(blocks{i}))
+            warning(sprintf('\n\tBlock no. %d is not a table\n',i))
+        end
+
         if i==1+ii 
-            if isempty(blocks{i})
+            if isempty(blocks{i}) || ( not(istable(blocks{i})) && not(istimetable(blocks{i})) )
                 ii = ii+1;
             else
                 T = blocks{i};
             end
             continue; 
         end
-        
-        if isempty(blocks{i})
-            warning(sprintf(['\n\tBlock no. %s is empty\n',i]))
-            continue;
-        elseif not(istable(blocks{i})) || not(istimetable(blocks{i}))
-            warning(sprintf(['\n\tBlock no. %s is not a table\n',i]))
-            continue;
+       
+        if isempty(blocks{i}) || ( not(istable(blocks{i})) && not(istimetable(blocks{i})) )
+            continue
         end
+        
         T.Properties.UserData.Blocks{i} = blocks{i}.Properties.UserData;
         
         if istimetable(blocks{i})
@@ -95,7 +99,8 @@ function T = fill_cols(T, new_block, mis_vars)
         
     n_rows = height(T);
     for i=1:length(mis_vars)
-        val = new_block{1,i};
+        val = new_block{1,mis_vars{i}};
+        class(val)
         if isdatetime(val)
             fillCol = NaT(n_rows,1);
         elseif isnumeric(val)
@@ -108,12 +113,12 @@ function T = fill_cols(T, new_block, mis_vars)
             fillCol = cell(n_rows,1);
         elseif ischar(val)
             fillCol = char(n_rows,1);
-        elseif isstring
+        elseif isstring(val)
             fillCol = repmat("",n_rows,1);
         else
             error('\nNot implemented: Merging columns of class %s\n',class(val))
         end
-        
+
         T.(mis_vars{i}) = fillCol;
     end
 end

@@ -40,13 +40,13 @@ cont_vars = {...
     'Q','accA_norm','accA_x','accA_y','accA_z',...
     'accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'
     };
+
+stats = make_stats(S_analysis,note_vars,cont_vars,id_specs);
+tic
 bandPow_vars = {
     'accA_norm','accA_x','accA_y','accA_z',...
     'accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'
     };
-
-stats = make_stats(S_analysis,note_vars,cont_vars,id_specs);
-tic
 [psds,f,pows] = make_psds(S_analysis,bandPow_vars,id_specs);
 toc
 % T = join(stats,psds,'Keys',{'id','bl_id','analysis_id'});
