@@ -20,8 +20,11 @@ Notes = init_notes_xlsfile_ver4(notes_filePath,'',notes_varMapFile);
 
 %% Quality control and fixes
 
+welcome(['Quality control and fixes ',seq],'module')
+
 Notes = qc_notes_ver4(Notes,id_specs);
 
 US = adjust_for_system_m_time_drift(US,US_drifts);
 
+PL = swap_channel_names(PL,channelsToSwap,restrictBlockChannelSwap);
 

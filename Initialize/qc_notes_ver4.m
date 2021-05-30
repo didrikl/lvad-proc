@@ -27,14 +27,14 @@ function notes = qc_notes_ver4(notes,id_specs)
     end
     
     notChrono = check_chronological_time(notes);
-    [natPause, isNatPart] = check_missing_time(notes);
+    [natPause, natPart] = check_missing_time(notes);
     irregParts = check_irregular_parts(notes);
     undefCat = check_missing_essential_info(notes,mustHaveVars);
     
     irregRowsWithID = check_analysis_ids(notes,id_specs);
     
-    if any(notChrono | natPause | isNatPart | undefCat | irregParts | irregRowsWithID)
-        notes = ask_to_reinit(notes, notChrono, natPause, isNatPart, ...
+    if any(notChrono | natPause | natPart | undefCat | irregParts | irregRowsWithID)
+        notes = ask_to_reinit(notes, notChrono, natPause, natPart, ...
             undefCat, irregParts, irregRowsWithID);
     else
         fprintf('\n\nAll good :-)')
@@ -64,6 +64,16 @@ function irregID = check_analysis_ids(Notes, ids_specs)
     % QC of ids compared to id_specs...
     if height(ids_specs)>0
     
+        % check for any rows with analysis_id, but without baseline_id
+        % (Vice-versa, baseline_id without analysis_id is ok.)
+        misBaselineIds = ismissing(Notes.bl_id);
+        if any(misBaselineIds)
+            fprintf('\n')
+            warning(sprintf('\n\tMissing baseline IDs at rows %s\n',...
+                mat2str(Notes.noteRow(misBaselineIds))));
+            irregID = irregID | misBaselineIds;
+        end
+        
         % Any missing?
         misIDs = not(ismember(ids_specs.analysis_id,Notes.analysis_id(id_inds)))...
             & not(ids_specs.contingency);

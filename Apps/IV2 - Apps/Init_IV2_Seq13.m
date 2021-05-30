@@ -63,6 +63,8 @@ ultrasound_fileNames = {
 
 fs_new = 750;
 US_drifts = {52};
+channelsToSwap = {};
+restrictBlockChannelSwap = [];
 
 
 %% Initialize

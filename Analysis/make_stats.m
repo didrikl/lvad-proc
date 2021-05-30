@@ -5,6 +5,7 @@ function stats = make_stats(S_analysis,note_vars,meas_vars,id_specs)
     seqs = fieldnames(S_analysis);
     stats = cell(numel(seqs),1);
 
+   
     % NOTE: Code if parallellization
     %     data = cell(numel(seqs),1);
     %     for j=1:numel(seqs)
@@ -14,15 +15,36 @@ function stats = make_stats(S_analysis,note_vars,meas_vars,id_specs)
     for j=1:numel(seqs)
         seq = seqs{j}; 
         
-        stats_meas = groupsummary(S_analysis.(seq),{'analysis_id','bl_id'},...
-            {'mean','std','median',@(x)prctile(x,[25,75])},{meas_vars});
+        
+        % Remove rows with extra ids in data not listed in id spec file
+        extraIDs = not(ismember(S_analysis.(seq).analysis_id,id_specs.analysis_id));
+        S_analysis.(seq)(extraIDs,:) = [];
+        S_analysis.(seq).analysis_id = removecats(S_analysis.(seq).analysis_id); 
+        S_analysis.(seq).bl_id = removecats(S_analysis.(seq).bl_id); 
+        
+        S_analysis.(seq).group_id = categorical(...
+            string(S_analysis.(seq).analysis_id)+" - "+...
+            string(S_analysis.(seq).bl_id));
+        stats_meas = groupsummary(S_analysis.(seq),'group_id',...
+            {'mean','std','median',@(x)prctile(x,[25,75])},{meas_vars},...
+            'IncludeEmptyGroups',true);
+        group_id = split(string(stats_meas.group_id)," - ");
+        stats_meas.analysis_id = categorical(group_id(:,1));
+        stats_meas.bl_id = categorical(group_id(:,2));
+        stats_meas.group_id = [];
+        
         stats_note = groupsummary(S_analysis.(seq),'analysis_id',...
-            'mean',{note_vars});
-        stats{j} = join(stats_meas,stats_note,"Keys","analysis_id");
+            'mean',note_vars,...
+            'IncludeEmptyGroups',false);
+        
+        stats{j} = join(stats_meas,stats_note,"Keys","analysis_id");    
         stats{j} = join(stats{j},id_specs,"Keys","analysis_id");
         
         stats{j}.id = seq + "_" + string(stats{j}.idLabel);
         stats{j}.seq = repmat(string(seq),height(stats{j}),1);
+        
+        multiWaitbar('Making steady-state features',(j)/numel(seqs));
+
     end
    
     stats = merge_table_blocks(stats);
@@ -44,7 +66,6 @@ function stats = make_stats(S_analysis,note_vars,meas_vars,id_specs)
         {'mean','stdev','median','_25prct','_75prct'},'_');
     stats = movevars(stats,{'id','analysis_id','bl_id','seq','idLabel',...
         'categoryLabel','levelLabel','effectInterv','contingency','duration',...
-        'pumpSpeed','catheter','balloonDiam','balloonVolume','QRedTarget_pst'},...
+        'pumpSpeed','catheter','balloonLev','balloonDiam','balloonVolume','QRedTarget_pst'},...
         'Before',1);
     
-    stats = sortrows(stats);

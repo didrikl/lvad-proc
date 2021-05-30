@@ -20,14 +20,14 @@ notes_varMapFile = 'VarMap_Notes_IV2_v1';
 
 multiWaitbar('CloseAll');
 [~,hWait] = multiWaitbar('Reading .mat files', 0,'CanCancel','on','Color',ColorsProcessing.Green);
+if exist('seq','var')
+    hWait.Name = ['Progress, ',seq]; 
+end
 multiWaitbar('Resample/retime signal',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Data fusion',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Splitting into parts',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Reducing to analysis segments',0,'Color',ColorsProcessing.Green);
 
-if exist(seq,'var')
-    hWait.Name = ['Progress, Init ',seq]; 
-end
 
 %% Clearing of memory and command line
 

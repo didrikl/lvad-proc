@@ -14,10 +14,15 @@ function T = merge_table_blocks(varargin)
     
     if numel(varargin)==1
         blocks = varargin{1};
+        block_names = repmat(cellstr(inputname(1)),nargin,1);
     else 
         blocks = varargin;
+        for i=1:nargin
+            block_names{i} = inputname(i);
+        end
     end
     
+    if not(iscell(blocks)), blocks = {blocks}; end
     if numel(blocks)==1
         warning('No table block merging. There is only one table block')
     elseif numel(blocks)==0
@@ -29,10 +34,9 @@ function T = merge_table_blocks(varargin)
     for i=1:numel(blocks)
         
         if isempty(blocks{i})
-            warning(sprintf('\n\tBlock no. %d is empty\n',i))
-        end
-        if not(istable(blocks{i})) && not(istimetable(blocks{i}))
-            warning(sprintf('\n\tBlock no. %d is not a table\n',i))
+            warning(sprintf('\n\tBlock no. %d of %s is empty\n',i,block_names{i}))
+        elseif not(istable(blocks{i})) && not(istimetable(blocks{i}))
+            warning(sprintf('\n\tBlock no. %d of %s is not a table\n',i,block_names{i}))
         end
 
         if i==1+ii 
@@ -55,7 +59,7 @@ function T = merge_table_blocks(varargin)
         end
               
         [T, blocks{i}] = fill_in_missing_cols(T, blocks{i});
-        T = [T;blocks{i}];
+        T = [T;blocks{i}]; %#ok<AGROW>
         
         % Save some memory
         blocks{i}=[];

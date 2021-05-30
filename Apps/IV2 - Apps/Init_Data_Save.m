@@ -1,7 +1,7 @@
 % Store data
 % TODO: Make functions
     
-proc_path = fullfile(data_basePath,experiment_subdir,proc_subdir,'2.5Hz notch filter at 4th harmonic');
+proc_path = fullfile(data_basePath,experiment_subdir,proc_subdir);
 if not(exist(proc_path,'dir')), mkdir(proc_path); end
     
 welcome('Saving S_parts','function')

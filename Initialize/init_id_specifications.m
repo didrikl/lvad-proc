@@ -1,15 +1,15 @@
 function id_specs = init_id_specifications(workbookFile)
         
     % Set up the Import Options and import the data
-    opts = spreadsheetImportOptions("NumVariables", 12);
+    opts = spreadsheetImportOptions("NumVariables", 13);
     
     % Specify sheet and range
     opts.Sheet = "ID_Definitions_IV2";
-    opts.DataRange = "A2:L139";
+    opts.DataRange = "A2:M139";
     
     % Specify column names and types
-    opts.VariableNames = ["categoryLabel", "levelLabel",  "idLabel",     "analysis_id", "analysisDuration", "effectInterv", "contingency", "QRedTarget_pst", "pumpSpeed", "catheter",    "balloonDiam", "balloonVolume"];
-    opts.VariableTypes = ["categorical",   "categorical", "categorical", "categorical", "single",           "categorical",  "categorical", "categorical",    "int16",     "categorical", "categorical", "categorical"];
+    opts.VariableNames = ["categoryLabel", "levelLabel",  "idLabel",     "analysis_id", "analysisDuration", "effectInterv", "contingency", "QRedTarget_pst", "pumpSpeed", "catheter",    "balloonLev",  "balloonDiam", "balloonVolume"];
+    opts.VariableTypes = ["categorical",   "categorical", "categorical", "categorical", "single",           "categorical",  "categorical", "categorical",    "int16",     "categorical", "categorical", "categorical", "categorical"];
     
     % Specify variable properties
     opts = setvaropts(opts, ["categoryLabel", "levelLabel", "idLabel", "effectInterv", "contingency", "QRedTarget_pst", "catheter"], "EmptyFieldRule", "auto");

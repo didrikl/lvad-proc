@@ -111,6 +111,9 @@ PL_files_with_time_offset = {...
 %     'IV2_Seq12 - F16 [accB].mat'
     };
 
+channelsToSwap = {'accA_y','accA_z'};
+restrictBlockChannelSwap = [14:16];
+
 %% Initialize
 
 Environment_Init_IV2
