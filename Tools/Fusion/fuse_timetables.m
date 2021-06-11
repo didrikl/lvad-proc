@@ -7,8 +7,7 @@ function T = fuse_timetables(T1,T2,syncOpts,contDropSpec)
     
     if nargin<3, syncOpts = {}; end
     if nargin<4, contDropSpec = {'unset','event'}; end
-    if nargin<5, notSupported = {}; end
-
+    
     T2_dropCols = determineColsToDrop(T2,contDropSpec);
     T2_dropVarNames = T2.Properties.VariableNames(T2_dropCols);
     T2_fuseVarNames = T2.Properties.VariableNames(not(T2_dropCols));
@@ -71,7 +70,10 @@ function T = fuse_timetables(T1,T2,syncOpts,contDropSpec)
             % Convert back to integer
             T = convert_to_int(T,[T1_intVarNames,T2_intVarNames]);
             
+        else
+            error(ME.message)            
         end
+        
     end
     
 end

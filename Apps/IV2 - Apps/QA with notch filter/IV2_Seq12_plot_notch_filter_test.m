@@ -11,11 +11,11 @@ mapSpec = {
     'accA_norm',    [-80,-36], [0,5.2];
 %     'accA_norm_nf', [-80,-36], [0,5.2];
 %     'accA_x',       [-80,-36], [0,5.2];
-%     'accA_x_nf',    [-80,-36], [0,5.2];
+     'accA_x_nf',    [-80,-36], [0,5.2];
 %     'accA_y',       [-80,-36], [0,5.2];
-%     'accA_y_nf',    [-80,-36], [0,5.2];
+     'accA_y_nf',    [-80,-36], [0,5.2];
 %     'accA_z',       [-80,-36], [0,5.2];
-%     'accA_z_nf',    [-80,-36], [0,5.2];
+     'accA_z_nf',    [-80,-36], [0,5.2];
 %     'accB_norm',    [-75,-45], [0,5.2];
 %     'accB_norm_nf',    [-75,-45], [0,5.2];
     };
@@ -25,11 +25,11 @@ graphSpec = {
     'accA_norm',    [-90,20]
 %     'accA_norm_nf', [-90,20];
 %     'accA_x',       [-90,20];
-%     'accA_x_nf',    [-90,20];
+     'accA_x_nf',    [-90,20];
 %     'accA_y',       [-90,20];
-%     'accA_y_nf',    [-90,20];
+     'accA_y_nf',    [-90,20];
 %     'accA_z',       [-90,20];
-%     'accA_z_nf',    [-90,20];
+     'accA_z_nf',    [-90,20];
 %     'accB_norm',    [-90,20]
 %     'accB_norm_nf', [-90,20]
     };
@@ -58,18 +58,18 @@ parts = {
 %     {},   [16],  [],  '14. 11mm balloon inflation'
 %     {},   [17],  [],  '15. 11mm balloon inflation'
 %     {},   [18],  [],  '16. 11mm Balloon inflation'
-%     {},   [19],  [],  '17. 11mm Balloon inflation'
+     {},   [19],  [],  '17. 11mm Balloon inflation'
     
 %     {},         [20],  [],  '18. RPM changes, before afterload clamping'
-%     {20,186},   [21],  [],  '19. Afterload clamping'
-%     {20,184},   [22],  [],  '20. Afterload clamping'
-    {20,182},   [23],  [],  '21. Afterload clamping'
-%     {20,180},   [24],  [],  '22. Afterload clamping'
+%     {20,188},   [21],  [],  '19. Afterload clamping'
+%     {20,186},   [22],  [],  '20. Afterload clamping'
+%    {20,184},   [23],  [],  '21. Afterload clamping'
+%     {20,182},   [24],  [],  '22. Afterload clamping'
     
 %     {},         [25],  [],  '23. RPM changes, before preload clamping'
-%     {25,232},   [26],  [],  '24. Preload clamping'
-%     {25,230},   [27],  [],  '25. Preload clamping'
-%     {25,228},   [28],  [],  '26. Preload clamping'
+%     {25,234},   [26],  [],  '24. Preload clamping'
+%     {25,232},   [27],  [],  '25. Preload clamping'
+%     {25,230},   [28],  [],  '26. Preload clamping'
 %     {},         [32],  [],  '27. Preload clamping'
 %     
     };

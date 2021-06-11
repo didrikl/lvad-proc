@@ -12,6 +12,7 @@ function PL = swap_channel_names(PL,vars_to_swap,restrictBlockChannelSwap)
         vars_to_swap{1},vars_to_swap{2})
     
     for i=blocks
+        if isempty(PL{i}), continue; end
         var1 = PL{i}.(vars_to_swap{1});
         PL{i}.(vars_to_swap{1}) = PL{i}.(vars_to_swap{2});
         PL{i}.(vars_to_swap{2}) = var1;

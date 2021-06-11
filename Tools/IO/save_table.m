@@ -55,20 +55,22 @@ function [save_path, fileName] = save_table(fileName, save_path, data, filetype,
         ignore_saving_for_existing = false;
     end
     
-    [subfolder,fileName,ext] = fileparts(fileName);
-    if not(strcmpi(filetype,ext))
-        warning('Saving with new file extention according to given filetype');
-    end
     switch lower(filetype)
         case 'matlab'
-            fileName = [fileName,'.mat'];
+            ext = '.mat';
         case 'text'
-            fileName = [fileName,'.txt'];
+            ext = '.txt';
         case 'csv'
-            fileName = [fileName,'.csv'];
+            ext = '.csv';
         case 'spreadsheet'
-            fileName = [fileName,'.xls'];
+            ext = '.xls';
     end
+    [subfolder,fileName,extInName] = fileparts(fileName);
+    if not(strcmpi(extInName,ext))
+        fileName = [fileName,extInName];   
+    end
+    fileName = [fileName,ext];   
+    
     save_path = fullfile(save_path,subfolder);
     
     % Check if there is already an exsisting file with the same fileName in

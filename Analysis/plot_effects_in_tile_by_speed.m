@@ -1,4 +1,4 @@
-function h_fig = plot_effects(T,yVars,type)
+function h_fig = plot_effects_in_tile_by_speed(T,yVars,type)
     
     figSize = [1000,600];
     markers = {'o','square','diamond','hexagram'};
@@ -119,10 +119,10 @@ function h_fig = plot_effects(T,yVars,type)
         
         leg_entries = [
             string(speeds)'+""
-            erase(string(speeds)'+", "+string(balCats(2)),'PCI')
-            erase(string(speeds)'+", "+string(balCats(3)),'PCI')
-            erase(string(speeds)'+", "+string(balCats(4)),'PCI')
-            erase(string(speeds)'+", "+string(balCats(5)),'RHC')
+            erase(string(speeds)'+", "+string(balCats(1)),{'PCI, ','RHC, '})
+            erase(string(speeds)'+", "+string(balCats(2)),{'PCI, ','RHC, '})
+            erase(string(speeds)'+", "+string(balCats(3)),{'PCI, ','RHC, '})
+            erase(string(speeds)'+", "+string(balCats(4)),{'PCI, ','RHC, '})
             string(speeds)'+", afterload"
             string(speeds)'+", preload"
             ];
@@ -132,21 +132,7 @@ function h_fig = plot_effects(T,yVars,type)
         ylabel(strrep(var,'mean_',''),'Interpreter','none');
         xlabel('Balloon diameter (mm)','HorizontalAlignment','left');
         title(title_str,'Interpreter','none')
-        
-        %     annotation(h_fig,'textbox',...
-        %         [0.328134618916437,0.0075,0.447071992653811,0.0466],...
-        %         'String','Balloon diameter',...
-        %         'LineStyle','none',...
-        %         'FitBoxToText','off',...
-        %         'HorizontalAlignment','center');
-        %
-        %     annotation(h_fig,'textbox',...
-        %         [0.1089072543618,0.0075,0.220385674931129,0.0466],...
-        %         'String','Flow reduction',...
-        %         'LineStyle','none',...
-        %         'FitBoxToText','off',...
-        %         'HorizontalAlignment','center');
-         
+                 
         if not(isempty(yVars{j,2}))
             ylim(yVars{j,2})
         end

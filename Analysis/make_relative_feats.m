@@ -1,6 +1,7 @@
-function feats_rel = make_relative_feats(feats,vars)
+function F_rel = make_relative_feats(feats,vars)
+
     seqs = unique(feats.seq);
-    feats_rel = cell(numel(seqs),1);
+    F_rel = cell(numel(seqs),1);
     cols = startsWith(feats.Properties.VariableNames,vars+"_");
         
     for i=1:numel(seqs)
@@ -17,8 +18,8 @@ function feats_rel = make_relative_feats(feats,vars)
                     string(feats.bl_id(j)),string(seqs{i})));
                 feats_i_rel{j,cols} = (feats_i{j,cols}-NaN);
             
-            elseif contains(string(feats_i.categoryLabel(j)),'Nominal')
-                feats_i_rel{j,cols} = 0;%(feats_i{j,cols}-NaN);
+%             elseif contains(string(feats_i.categoryLabel(j)),'Nominal')
+%                 feats_i_rel{j,cols} = 0;%(feats_i{j,cols}-NaN);
             
             else
                 bl_vals = feats_i{bl_row,cols};
@@ -26,7 +27,8 @@ function feats_rel = make_relative_feats(feats,vars)
             end
             
         end
-        feats_rel{i} = feats_i_rel;
+        F_rel{i} = feats_i_rel;
     end
     
-    feats_rel = merge_table_blocks(feats_rel);
+    F_rel = merge_table_blocks(F_rel);
+    F_rel = sortrows(F_rel,'id','ascend');

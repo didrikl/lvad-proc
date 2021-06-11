@@ -22,7 +22,7 @@ Notes = init_notes_xlsfile_ver4(notes_filePath,'',notes_varMapFile);
 
 welcome(['Quality control and fixes ',seq],'module')
 
-Notes = qc_notes_ver4(Notes,id_specs);
+Notes = qc_notes_ver4(Notes,idSpecs);
 
 US = adjust_for_system_m_time_drift(US,US_drifts);
 

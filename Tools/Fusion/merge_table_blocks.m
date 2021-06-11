@@ -14,7 +14,7 @@ function T = merge_table_blocks(varargin)
     
     if numel(varargin)==1
         blocks = varargin{1};
-        block_names = repmat(cellstr(inputname(1)),nargin,1);
+        block_names = cellstr(repmat(inputname(1),numel(blocks),1));
     else 
         blocks = varargin;
         for i=1:nargin

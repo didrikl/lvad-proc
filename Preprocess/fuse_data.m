@@ -28,7 +28,11 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     
     % Notes without timestamps can not be used in data fusion
     Notes = Notes(not(isnat(Notes.time)),:);
-
+    
+    % Convert from int16, so that missing values may be used as "extrapolant"
+    notes_int_vars = get_varname_of_specific_type(Notes,'int16');
+    Notes{:,notes_int_vars} = single(Notes{:,notes_int_vars});
+        
     % Loop over each stored LabChart file
     nBlocks = numel(PL);
     B = cell(nBlocks,1);
@@ -48,10 +52,9 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
             PL{i} = PL{i}(PL{i}.time>=B{i}.time(1) & PL{i}.time<=B{i}.time(end),:);
         end
         
-        % Introducing better names, in case something goes wrong in
-        % fuse_timetables function
+        % Introducing better names, in case something goes wrong in LabChart_i        % fuse_timetables function
         LabChart_i = PL{i};
-        Notes_block_i = B{i};   
+        Notes_block_i = B{i};
         PL{i} = fuse_timetables(LabChart_i,Notes_block_i,fuse_opts);
         
         % Ultrasound is clipped to time range of B and notes, only (i.e. not
@@ -62,7 +65,7 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         end
         display_block_varnames(US)       
         US_block = US(US.time>=PL{i}.time(1) & US.time<=PL{i}.time(end),:);
-        PL{i} = fuse_timetables( PL{i},US_block,fuse_opts);
+        PL{i} = fuse_timetables( PL{i},US_block,fuse_opts );
         
         % Put in NaN instead of extrapolated values made by syncronize function
         % called in fuse_timetables
@@ -74,7 +77,8 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         catch
         end
         
-        
+        PL{i}{:,notes_int_vars} = single(PL{i}{:,notes_int_vars});
+        PL{i} = standardizeMissing(PL{i},-9999);
     end
     
     try
@@ -98,7 +102,10 @@ end
 function fuse_opts = make_fuse_opts(fs_new)
     fuse_opts = {};
     if not(isnan(fs_new)) 
-        fuse_opts = {'regular','SampleRate',fs_new};
+        fuse_opts = {'regular',...
+            'SampleRate',fs_new,...
+            %'EndValues',missing...
+            };
     end
 end
 

@@ -7,8 +7,8 @@ Colors_For_Processing
 
 data_basePath = 'D:\Data\IVS\Didrik\IV2 - Data';
 
-id_specs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\ID_Spefications_IV2.xlsx';
-id_specs = init_id_specifications(id_specs_path);
+idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\ID_Spefications_IV2.xlsx';
+idSpecs = init_id_specifications(idSpecs_path);
 
 % Input file structure map, store in folder named Definitions
 labChart_varMapFile = 'VarMap_LabChart_IV2';

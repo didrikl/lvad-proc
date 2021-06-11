@@ -128,6 +128,10 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     
     % Parse relevant columns, other than time columns 
     notes = standardizeMissing(notes, missingValueRepr);
+    num_vars = get_varname_of_specific_type(notes,'float');
+    no_interp_rows = notes.intervType~='Transitional' | ...
+        notes.part=='-' | ismissing(notes.part);
+    notes(no_interp_rows,num_vars) = fillmissing(notes(no_interp_rows,num_vars),'constant',-9999);
     
     % Add note row id to be used for data fusion and looking up data
     notes = add_note_row_id(notes, nHeaderLines);

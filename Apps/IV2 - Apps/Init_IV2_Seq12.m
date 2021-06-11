@@ -67,7 +67,7 @@ labChart_fileNames = {
     'IV2_Seq12 - F17 [accA].mat'
 %     'IV2_Seq12 - F17 [accB].mat'
     };
-notes_fileName = 'IV2_Seq12 - Notes IV2 v1.0 - Rev6.xlsm';
+notes_fileName = 'IV2_Seq12 - Notes IV2 v1.0 - Rev7.xlsm';
 ultrasound_fileNames = {
     'ECM_2020_09_08__13_18_56.wrf'
     'ECM_2020_09_09__11_46_35.wrf'
@@ -112,7 +112,7 @@ PL_files_with_time_offset = {...
     };
 
 channelsToSwap = {'accA_y','accA_z'};
-restrictBlockChannelSwap = [14:16];
+restrictBlockChannelSwap = [];
 
 %% Initialize
 

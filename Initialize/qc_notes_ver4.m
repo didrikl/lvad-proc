@@ -28,12 +28,14 @@ function notes = qc_notes_ver4(notes,id_specs)
     
     notChrono = check_chronological_time(notes);
     [natPause, natPart] = check_missing_time(notes);
+    misNum = check_missing_numeric_data(notes);
     irregParts = check_irregular_parts(notes);
     undefCat = check_missing_essential_info(notes,mustHaveVars);
     
     irregRowsWithID = check_analysis_ids(notes,id_specs);
     
-    if any(notChrono | natPause | natPart | undefCat | irregParts | irregRowsWithID)
+    if any(notChrono | natPause | natPart | undefCat | irregParts | ...
+            irregRowsWithID | misNum)
         notes = ask_to_reinit(notes, notChrono, natPause, natPart, ...
             undefCat, irregParts, irregRowsWithID);
     else
@@ -42,6 +44,11 @@ function notes = qc_notes_ver4(notes,id_specs)
     
     fprintf('\nQuality control of notes done.\n')
 
+function misNum = check_missing_numeric_data(notes)
+    notes = standardizeMissing(notes,-9999);
+    misNum = ismissing(notes(:,vartype('nunmeric'))),2;
+    find(misNum)
+    %notes==-9999
     
 function irregID = check_analysis_ids(Notes, ids_specs)
     % Verify event and intervType are always respectively '-' and 'Steady-state'
@@ -86,10 +93,8 @@ function irregID = check_analysis_ids(Notes, ids_specs)
         [~, dups] = find_cellstr_duplicates(cellstr(Notes.analysis_id(id_inds)));
         if not(isempty(dups))
             dup_inds = ismember(Notes.analysis_id,dups);
-            fprintf('\n')
-            warning(sprintf('\n\tDuplicate IDs:\n\t\t%s',...
-                strjoin(unique(dups),'\n\t\t')))
-            irregID = irregID | dup_inds;
+            fprintf('\n\n\tDuplicate IDs:\n\t\t%s\n\n',strjoin(unique(dups),'\n\t\t'))
+            disp(Notes(dup_inds,:)) 
         end
             
         % Any ID tags not listed in specfication file?
@@ -110,12 +115,18 @@ function irregID = check_analysis_ids(Notes, ids_specs)
             end
             
         end
+        
+        inCons = check_pump_speed_id_consistency(Notes);
+        isOK(i) = not(any(inCons));
+        irregID = irregID | inCons;
+            
         if any(not(isOK))
             opts = struct('WindowStyle','non-modal','Interpreter','none');
             msg = sprintf('ID parameter issues detected in Notes.\n\n%s\n',...
                 display_filename(Notes.Properties.UserData.FilePath));
             warndlg(msg,'Warning, Notes',opts)
         end
+        
         
     end  
     

@@ -1,21 +1,20 @@
-function T = change_variablename_prefix_to_suffix(T,prefixes,suffixes,separator)
+function T = change_variablename_prefix(T,prefixes,newPrefixes,separator)
 
 prefixes = cellstr(prefixes);
-if nargin<3 || isempty(suffixes), suffixes = prefixes; end
+newPrefixes = cellstr(newPrefixes);
 if nargin<4, separator = ''; end
-
 
 for i=1:numel(prefixes)
     vars = T.Properties.VariableNames(...
         startsWith(T.Properties.VariableNames,[prefixes{i},separator]));
     nCharsPrefix = length(prefixes{i});
     for j=1:numel(vars)
-        if nCharsPrefix == length(vars{j})+1
+        if nCharsPrefix == length(vars{j})+numel(separator)
             % variablename is same as prefix itself (incl separator) 
-            newVar = [separator,vars{j}(1:end-1)];
+            newVar = [newPrefixes,separator];
         else
             % strip prefix and add suffix
-            newVar = [vars{j}(nCharsPrefix+numel(separator)+1:end),separator,suffixes{i}];
+            newVar = [newPrefixes{i},separator,vars{j}(nCharsPrefix+numel(separator)+1:end)];
         end
         T.Properties.VariableNames{vars{j}} = newVar;          
     end
