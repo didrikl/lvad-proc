@@ -10,7 +10,7 @@ welcome('Save S_parts','function')
 multiWaitbar('Saving S_parts','Busy','Color',ColorsProcessing.Orange);        
 save_filePath = fullfile(proc_path,[seq,'_S_parts']);
 %parfeval(@save,0,fullfile(proc_path,[seq,'_S_parts']),'S_parts');
-save(save_filePath,'S_parts')
+save(fullfile(proc_path,[seq,'_S_parts']),'S_parts')
 display_filename([seq,'_S_parts.mat'],proc_path,'\nSaved to:','\t');
 multiWaitbar('Saving S_parts','Close');        
 

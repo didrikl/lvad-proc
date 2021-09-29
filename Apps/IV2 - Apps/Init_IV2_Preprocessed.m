@@ -16,10 +16,7 @@ sequences = {
     'IV2_Seq19','Seq19 - LVAD13\Processed'
     };
 Data = load_processed_sequences(sequences(:,1),...
-    fullfile(data_basePath,sequences(:,2),sequences(:,1)),'S');
-
-Data = load_processed_sequences(sequences(:,1),...
-    fullfile(data_basePath,sequences(:,2),sequences(:,1)),'S_parts');
+    fullfile(data_basePath,sequences(:,2),sequences(:,1)));
 
 % Load previously calculated features for analysis
 load(fullfile(feats_path,'Features'))
@@ -35,4 +32,5 @@ load(fullfile(stats_path,'Group stats tables - Relative'));
 load(fullfile(stats_path,'Results - p-values - Wilcoxon paired signed rank test'));
 load(fullfile(stats_path,'Results - Median and p-values - Wilcoxon paired signed rank test'));
 load(fullfile(stats_path,'Results - Selected median and p-values - Wilcoxon paired signed rank test'));
+
 multiWaitbar('CloseAll');

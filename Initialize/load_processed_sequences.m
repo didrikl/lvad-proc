@@ -8,7 +8,7 @@ function Data = load_processed_sequences(seqNames,seqFilePaths)
 	Data = load_data(Data,'S',seqFilePaths,seqNames);
 	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
 	
-function D = load_data(D,dataType,seqFilePaths,seqNames)
+function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 	
 	seqFilePaths = seqFilePaths+"_"+dataType+".mat";
 	nSeqs = numel(seqNames);
