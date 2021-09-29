@@ -52,8 +52,8 @@ function notes = init_notes_xlsfile_ver4_0(fileName, read_path)
         'Balloon offset'          'balloonOffset'      'categorical'   'step'
         'Catheter type'           'catheter'           'categorical'   'unset'
         'Clamp flow reduction'    'Q_reduction'      'categorical'   'step'
-        'Afferent pressure'       'affP_noted'         'single'        'event'
-        'Effenrent pressure'      'effP_noted'         'single'        'event'
+        'Afferent pressure'       'p_eff_noted'         'single'        'event'
+        'Effenrent pressure'      'p_aff_noted'         'single'        'event'
         'Flow estimate'           'Q_LVAD'            'single'        'step'
         'Power'                   'P_LVAD'        'single'        'step'
         'Reduced baseline flow'   'redBaseFlow'        'single'        'event'
@@ -72,8 +72,8 @@ function notes = init_notes_xlsfile_ver4_0(fileName, read_path)
         'speedChangeRate'
         'dose'
         'balloonOffset'
-        'affP_noted'
-        'effP_noted'
+        'p_eff_noted'
+        'p_aff_noted'
         };
     
     % TODO: For OO

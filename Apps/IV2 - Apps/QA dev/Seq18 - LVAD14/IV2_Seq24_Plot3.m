@@ -156,7 +156,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
         % TODO: Do as preprocessing for IV2:
         %T.Q_graft = mean([T.affQ,T.effQ],2);
         T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
-        T.p_graft = T.affP;
+        T.p_graft = T.p_eff;
         T.p_graft_shift = 100*(T.p_graft-mean(T.p_graft(bl_inds),'omitnan'))/mean(T.p_graft(bl_inds),'omitnan');
         T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
         T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');

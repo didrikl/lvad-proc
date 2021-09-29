@@ -113,24 +113,27 @@ function [save_path, fileName] = save_table(fileName, save_path, data, filetype,
                 
                 % Saving time tables is not supported in writetable,
                 % but will probably not make any difference
-                if istimetable(data)
+				if istimetable(data)
                     data = timetable2table(data);
-                end
-                writetable(data, filePath, 'FileType', filetype, varargin{:})
+				end
+				writetable(data, filePath, 'FileType', filetype, varargin{:})
                 
         end
         
         display_filename(fileName,save_path,'\nTable saved to file:');
              
     catch ME
-        
+        msg = sprintf('\nNo data saved for %s\n',display_filename(fileName,''));
         if strcmp(ME.identifier,'MATLAB:table:write:FileOpenInAnotherProcess')
-            warning('No data saved. File is open in another process.');
+            warning([msg,'File is open in another process.']);
         elseif strcmp(ME.identifier,'MATLAB:table:write:FileOpenError')
-            warning('No data saved. Could not open/create file for saving.');
-        else
-            warning('No data saved. Something went wrong.')
+            warning([msg,'Could not open/create file for saving.']);
+		elseif strcmp(ME.identifier,'MATLAB:table:write:DataExceedsSheetBounds')
+			disp(ME)
+			warning([msg,'Table has too many columns (max. 256) or rows to be saved as spreadsheet'])
+		else
             disp(ME)
+            warning(msg)
         end
         
     end

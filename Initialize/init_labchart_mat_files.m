@@ -25,7 +25,7 @@ function T = init_labchart_mat_files(fileNames,path,varMapFile)
     % Default viewing format of timestamps (Could be made OO)
     timestampFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
 
-    welcome('Initializing LabChart .mat files')
+    welcome('Initialize LabChart .mat files')
     
     [returnAsCell,fileNames] = get_cell(fileNames);
     [filePaths,fileNames,~] = check_file_name_and_path_input(fileNames,path,'mat');
@@ -36,9 +36,10 @@ function T = init_labchart_mat_files(fileNames,path,varMapFile)
     T = cell(nFiles,1);
     for i=1:nFiles
         
-        fprintf('\n<strong>File (no %d/%d): </strong>',i,nFiles)
-        display_filename(filePaths{i});
-        cancel = multiWaitbar('Reading .mat files',(i-1)/nFiles);  
+        fprintf('\n<strong>File (no %d/%d) </strong>',i,nFiles)
+        display_filename('',fileNames{i});
+        
+		cancel = multiWaitbar('Reading .mat files',(i-1)/nFiles);  
         if confirm_waitbar_cancel(cancel,'Reading .mat files'), break; end
         
         T{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
@@ -52,8 +53,6 @@ function T = init_labchart_mat_files(fileNames,path,varMapFile)
             T(1:i) = handle_nonchronological_order(T(1:i));
             [T{i},T{i-1}] = handle_overlapping_ranges(T{i},T{i-1},true);
         end
-        
-        
          
     end
     
@@ -63,23 +62,23 @@ function T = init_labchart_mat_files(fileNames,path,varMapFile)
     % When block channel set is complete: Check intergrity, keep only
     % what is specificed to keep and cast columns according to varMap
     for i=1:numel(T)
-            
-            % Keep only user-specified variables
-            [T{i},inFile_inds] = map_varnames(T{i}, varMap(:,1), varMap(:,2));
-            
-            % User-specified metadata for how data fusion shall be done
-            T{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
-            
-            % Convert to specified numeric format (e.g. pressure as single)
-            T{i} = convert_columns(T{i},varMap(inFile_inds,3));
-            
-            % Gather 3 components as one variable (convenient when all 3 components
-            % are arguments in combination with other inputs, and also when viewing)
-            %B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
-        
-    end
-    
-    if not(returnAsCell), T = T{1}; end
+		
+		% Keep only user-specified variables
+		[T{i},inFile_inds] = map_varnames(T{i}, varMap(:,1), varMap(:,2));
+		
+		% User-specified metadata for how data fusion shall be done
+		T{i}.Properties.VariableContinuity = varMap(inFile_inds,4);
+		
+		% Convert to specified numeric format (e.g. pressure as single)
+		T{i} = convert_columns(T{i},varMap(inFile_inds,3));
+		
+		% Gather 3 components as one variable (convenient when all 3 components
+		% are arguments in combination with other inputs, and also when viewing)
+		%B{i} = spatial_comp_as_vector(B{i},{'accA_x','accA_y','accA_z'},'accA');
+		
+	end
+	
+	if not(returnAsCell), T = T{1}; end
     multiWaitbar('Reading .mat files',1,'CanCancel','off');  
         
 function T = read_signal_file_into_table(filePath,timestamp_fmt)    

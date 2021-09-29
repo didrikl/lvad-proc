@@ -16,7 +16,7 @@ if numel(who)>1
 end
 
 
-%% Path
+%% Path for source code
 
 % Load source code paths into Matlab path
 addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
@@ -47,3 +47,5 @@ warning('off','backtrace')
 % Starting in R2018b, some pan interactions are enabled by default, regardless
 % of the pan mode. If you want to disable these default interactions, then use:
 set(groot,'defaultAxesCreateFcn','disableDefaultInteractivity(gca)')
+
+%set(groot,'DefaultFigureGraphicsSmoothing','on')

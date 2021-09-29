@@ -1,13 +1,13 @@
 
-%% Import colors used for processing UI
+%% Import definitions
 Colors_For_Processing
+Constants
+Paths
 
 
-%%
+%% Data categories and type
 
-data_basePath = 'D:\Data\IVS\Didrik\IV2 - Data';
-
-idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\ID_Spefications_IV2.xlsx';
+% Categoric overview of data segments to analyse 
 idSpecs = init_id_specifications(idSpecs_path);
 
 % Input file structure map, store in folder named Definitions
@@ -26,7 +26,7 @@ end
 multiWaitbar('Resample/retime signal',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Data fusion',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Splitting into parts',0,'Color',ColorsProcessing.Green);
-multiWaitbar('Reducing to analysis segments',0,'Color',ColorsProcessing.Green);
+multiWaitbar('Reducing to analysis ID segments',0,'Color',ColorsProcessing.Green);
 
 
 %% Clearing of memory and command line

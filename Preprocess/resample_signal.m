@@ -35,15 +35,10 @@ function T = resample_signal(T,sampleRate,method)
     nBlocks = numel(T);
     for i=1:nBlocks
         
-        welcome(sprintf('Block (no %d/%d)',i,numel(T)),'iteration',not(returnAsCell));
         multiWaitbar('Resample/retime signal',(i-1)/nBlocks);
-        display_block_varnames(T{i})
-        
-        if isempty(T{i})
-            warning('Empty timetable.');
-            continue;
-        end
-        
+		isEmpty = display_block_info(T{i},i,nBlocks,not(returnAsCell));
+        if isEmpty, continue; end
+		
         % Store variable name order
         varNames = T{i}.Properties.VariableNames;
         

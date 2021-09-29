@@ -6,18 +6,14 @@ function S_parts = split_into_parts(S,fs)
     welcome('Splitting into cell array of regular part tables')
     
     n_parts = max(double(string(categories(S.part))));
-    
     S_parts = cell(n_parts,1); 
     for i=1:n_parts
         
-        welcome(sprintf('Part %d\n',i),'iteration')
-        multiWaitbar('Splitting into parts',(i-1)/n_parts);
-
         S_parts{i} = S(S.part==string(i),:);
-        if height(S_parts{i})==0
-            warning('No data');
-            continue; 
-        end
+        multiWaitbar('Splitting into parts',(i-1)/n_parts);
+		isEmpty = display_block_info(S_parts{i},i,n_parts);
+        if isEmpty, continue; end
+		
         S_parts{i}.Properties.UserData = rmfield(S_parts{i}.Properties.UserData,'FileName');
         S_parts{i}.Properties.UserData = rmfield(S_parts{i}.Properties.UserData,'FilePath');
 

@@ -72,7 +72,7 @@ function selection = ask_list_ui(options, question, default)
         'ListSize',[width, height],...
         'InitialValue',init_val,...
         'Name','Input required');
-    
+	
     % Documenting user selection in command window
     print_ask_list_menu(options, default)
     fprintf('\t--> %d\n',selection)

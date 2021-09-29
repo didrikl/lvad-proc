@@ -33,8 +33,8 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
-    %'Trykk1'         'affP'        'single'    'continuous'
-    %'Trykk2'         'effP'        'single'    'continuous'
+    %'Trykk1'         'p_eff'        'single'    'continuous'
+    %'Trykk2'         'p_aff'        'single'    'continuous'
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
@@ -97,7 +97,7 @@ S_parts = add_moving_statistics(S_parts,{'accA_z'});
 S_parts = add_spatial_norms(S_parts, 2, {'accB_x','accB_y','accB_z'}, 'accB_norm');
 S_parts = add_moving_statistics(S_parts,{'accB_norm'});
 
-%S_parts = add_moving_statistics(S_parts,{'effP','affP'});
+%S_parts = add_moving_statistics(S_parts,{'p_aff','p_eff'});
 
 
 % TODO:

@@ -1,6 +1,6 @@
-function save_analysis_plots(h_figs,path,vars)
-    resolution = 300;
+function save_analysis_plots(h_figs,path,vars,resolution)
     
+	if nargin<3, resolution = 300; end   
     if nargin<2, vars = repmat('',numel,h_figs,1); end
     
     for i=1:numel(h_figs)

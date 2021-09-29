@@ -21,7 +21,7 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     if nargin<5, interNoteInclSpec = 'nearest'; end
     if nargin<6, outsideNoteInclSpec = 'nearest'; end
         
-    welcome('Data fusion')
+    welcome('Data fusion of PowerLab data with Notes and ultrasonic data')
             
     [~,PL] = get_cell(PL);
     fuse_opts = make_fuse_opts(fs_new);
@@ -39,9 +39,8 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     b_inds = cell(nBlocks,1);
     for i=1:nBlocks
         
-        welcome(sprintf('PowerLab block (no %d/%d)',i,nBlocks),'iteration')
-        display_block_varnames(PL{i})
         multiWaitbar('Data fusion',(i-1)/nBlocks);
+        display_block_info(PL{i},i,nBlocks,false,true);
         
         % Merging LabChart timetable with notes
         [B, b_inds] = determine_notes_block(Notes,PL{i},i,nBlocks,B,b_inds,...

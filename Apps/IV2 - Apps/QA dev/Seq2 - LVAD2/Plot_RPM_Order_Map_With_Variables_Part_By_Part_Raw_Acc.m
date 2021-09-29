@@ -58,7 +58,7 @@ for i=1:numel(intervention_parts)
     T.accA_z = T.accA(:,3);
     
     % Merging, so they will be plotted in same panel
-    T = mergevars(T,{'affP','effP'},'NewVariableName','P');
+    T = mergevars(T,{'p_eff','p_aff'},'NewVariableName','P');
     T = mergevars(T,{'affQ','effQ','Q_LVAD'},'NewVariableName','Q');
     %T = mergevars(T,{'accA_x','accA_y','accA_y'},'NewVariableName','accA');
 

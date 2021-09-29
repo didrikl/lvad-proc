@@ -37,7 +37,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
   
     %% Read from Excel file
     
-    welcome('Reading notes file')
+    welcome('Initialize Excel notes file')
     
     filePath = check_file_name_and_path_input(fileName,path,{'xlsm','xls','xlsx'});
     display_filename(filePath);

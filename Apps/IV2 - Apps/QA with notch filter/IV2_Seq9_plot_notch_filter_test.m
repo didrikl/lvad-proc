@@ -8,68 +8,68 @@ sampleRate = fs_new;
 
 mapSpec = {
     % Variable       Colorbar   y-lims
-    'accA_norm',    [-80,-36], [0,6.2];
+    %'accA_norm',    [-80,-36], [0,6.2];
     'accA_norm_nf', [-80,-36], [0,6.2];
-    'accA_x',       [-80,-36], [0,6.2];
-    'accA_x_nf',    [-80,-36], [0,6.2];
-    'accA_y',       [-80,-36], [0,6.2];
+    %'accA_x',       [-80,-36], [0,6.2];
+    %'accA_x_nf',    [-80,-36], [0,6.2];
+    %'accA_y',       [-80,-36], [0,6.2];
     'accA_y_nf',    [-80,-36], [0,6.2];
-    'accA_z',       [-80,-36], [0,6.2];
-    'accA_z_nf',    [-80,-36], [0,6.2];
+    %'accA_z',       [-80,-36], [0,6.2];
+    %'accA_z_nf',    [-80,-36], [0,6.2];
     %'accB_norm',    [-75,-45], [0,5.2];
     };
 
 graphSpec = {
     % MovStd var     y-lims
-    'accA_norm',    [-90,20]
+    %'accA_norm',    [-90,20]
     'accA_norm_nf', [-90,20];
-    'accA_x',       [-90,20];
-    'accA_x_nf',    [-90,20];
-    'accA_y',       [-90,20];
+    %'accA_x',       [-90,20];
+    %'accA_x_nf',    [-90,20];
+    %'accA_y',       [-90,20];
     'accA_y_nf',    [-90,20];
-    'accA_z',       [-90,20];
-    'accA_z_nf',    [-90,20];
+    %'accA_z',       [-90,20];
+    %'accA_z_nf',    [-90,20];
     %'accB_norm',    [-90,20]
     };
 
 % % Extract data for these RPM values
 rpm={};
 parts = {
-     {},   [1],   [],  '01. RPM changes'
+%      {},   [1],   [],  '01. RPM changes'
+%     
+%     {},   [2],   [],  '02. 4.5x20mm balloon inflation'
+%     {},   [3],   [],  '03. 4.5x20mm balloon inflation'
+%     {},   [4],   [],  '04. 4.5x20mm Balloon inflation'
+%     {},   [5],   [],  '05. 4.5x20mm Balloon inflation'
+%     
+%     {},   [6],   [],  '06. 6x20mm balloon inflation'
+     {},   [7],   [],  '07. 6x20mm balloon inflation'
+%     {},   [20],   [],  '08. 6x20mm Balloon inflation'
+%    {},   [21],   [],  '09. 6x20mm Balloon inflation'
     
-    {},   [2],   [],  '02. 4.5x20mm balloon inflation'
-    {},   [3],   [],  '03. 4.5x20mm balloon inflation'
-    {},   [4],   [],  '04. 4.5x20mm Balloon inflation'
-    {},   [5],   [],  '05. 4.5x20mm Balloon inflation'
-    
-    {},   [6],   [],  '06. 6x20mm balloon inflation'
-    {},   [7],   [],  '07. 6x20mm balloon inflation'
-    {},   [20],   [],  '08. 6x20mm Balloon inflation'
-    {},   [21],   [],  '09. 6x20mm Balloon inflation'
-    
-    {},   [8],   [], '10. 8x30mm balloon inflation'
-    {},   [9],   [], '11. 8x30mm balloon inflation'
-    {},   [10],   [], '12. 8x30mm Balloon inflation'
-    {},   [11],   [],  '13. 8x30mm Balloon inflation'
-    
-    %{},   [12],  [],  '14. 11mm balloon inflation - first attempt, old balloon'
-    %{},   [13],  [],  '15. 11mm balloon inflation - first attempt, old balloon'
-    {},   [16],  [],  '14. 11mm balloon inflation'
-    {},   [17],  [],  '15. 11mm balloon inflation'
-    {},   [18],  [],  '16. 11mm Balloon inflation'
-    {},   [19],  [],  '17. 11mm Balloon inflation'
-     
-    {},         [22],  [],  '18. RPM changes, before afterload clamping'
-    {22,215},   [23],  [],  '19. Afterload clamping'
-    {22,213},   [24],  [],  '20. Afterload clamping'
-    {22,211},   [25],  [],  '21. Afterload clamping'
-    {22,209},   [26],  [],  '22. Afterload clamping'
-    
-    {},         [27],   [],  '23. RPM changes, before preload clamping'
-    {27,258},   [28],   [],  '24. Preload clamping'
-    {27,256},   [29],   [],  '25. Preload clamping'
-    {27,254},   [30],   [],  '26. Preload clamping'
-    {27,252},   [31],   [],  '27. Preload clamping'
+%     {},   [8],   [], '10. 8x30mm balloon inflation'
+%     {},   [9],   [], '11. 8x30mm balloon inflation'
+%     {},   [10],   [], '12. 8x30mm Balloon inflation'
+%     {},   [11],   [],  '13. 8x30mm Balloon inflation'
+%     
+%     %{},   [12],  [],  '14. 11mm balloon inflation - first attempt, old balloon'
+%     %{},   [13],  [],  '15. 11mm balloon inflation - first attempt, old balloon'
+%     {},   [16],  [],  '14. 11mm balloon inflation'
+%     {},   [17],  [],  '15. 11mm balloon inflation'
+%     {},   [18],  [],  '16. 11mm Balloon inflation'
+%     {},   [19],  [],  '17. 11mm Balloon inflation'
+%      
+%     {},         [22],  [],  '18. RPM changes, before afterload clamping'
+%     {22,216},   [23],  [],  '19. Afterload clamping'
+%     {22,214},   [24],  [],  '20. Afterload clamping'
+%     {22,212},   [25],  [],  '21. Afterload clamping'
+%     {22,210},   [26],  [],  '22. Afterload clamping'
+%     
+%     {},         [27],   [],  '23. RPM changes, before preload clamping'
+%     {27,259},   [28],   [],  '24. Preload clamping'
+%     {27,257},   [29],   [],  '25. Preload clamping'
+%     {27,255},   [30],   [],  '26. Preload clamping'
+%     {27,253},   [31],   [],  '27. Preload clamping'
     
 %     {},         [32,33],  [],  '00. RPM step test'
     };
@@ -92,10 +92,10 @@ for j=1:size(mapSpec,1)
         % TODO Move into plot-function
         fig_name = make_fig_name_IV2(h_fig,h_ax,...
             parts{i,2},parts{i,4},mapSpec{j,1},rpms,seq_no);
-        save_to_png_G1(h_fig,fig_path,fig_subdir,300)
+        save_to_png_G1(h_fig,fig_path,'',300)
     end
     
-    close all
+    %close all
     
 end
 
@@ -122,7 +122,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     
     T.Properties.SampleRate = fs;
     T = add_moving_statistics(T,{movStdVar},{'std'});
-    T = add_moving_statistics(T,{'effP'},{'avg'});
+    T = add_moving_statistics(T,{'p_aff'},{'avg'});
     
     % Keep only steady or baseline denoted row in the baseline parts
     %     T(contains(string(T.part),string([bl_part{1},cbl_part])) & ...
@@ -171,7 +171,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
         
         Q = T.Q;
         T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
-        T.effP_shift = 100*(T.effP_movAvg-mean(T.effP(bl_inds),'omitnan'))/mean(T.effP(bl_inds),'omitnan');
+        T.p_aff_shift = 100*(T.p_aff_movAvg-mean(T.p_aff(bl_inds),'omitnan'))/mean(T.p_aff(bl_inds),'omitnan');
         T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
         T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');
         
@@ -632,13 +632,13 @@ function add_circulation(h,T,orderMapVar)
     %         'Color',[0.5781,0.5117,0.9453],...[0.7188,0.6289,0.9297,0.7],...[0.6055,0.1406, 0.4414,0.6],...
     %         'HandleVisibility','off');
     
-    %     plot(T.t,T.effP_shift,...
+    %     plot(T.t,T.p_aff_shift,...
     %         'LineWidth',0.5,...
     %         'LineStyle','-',...
     %         'Color',[0.52,0.07,0.67, 0.05],...
     %         'HandleVisibility','off');
-    %     T.effP_shift(not(fullColorRows)) = nan;
-    %     plot(T.t,T.effP_shift,...
+    %     T.p_aff_shift(not(fullColorRows)) = nan;
+    %     plot(T.t,T.p_aff_shift,...
     %         'LineWidth',0.75,...
     %         'LineStyle','-',...
     %         'Color',[0.52,0.07,0.67, 0.7],...

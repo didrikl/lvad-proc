@@ -46,8 +46,8 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
-    'Trykk1'         'affP'        'single'    'continuous'
-    'Trykk2'         'effP'        'single'    'continuous'
+    'Trykk1'         'p_eff'        'single'    'continuous'
+    'Trykk2'         'p_aff'        'single'    'continuous'
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
@@ -107,7 +107,7 @@ S_parts = add_moving_statistics(S_parts);
 S_parts = add_moving_statistics(S_parts,{'accA_x'});
 S_parts = add_moving_statistics(S_parts,{'accA_y'});
 S_parts = add_moving_statistics(S_parts,{'accA_z'});
-S_parts = add_moving_statistics(S_parts,{'effP','affP'});
+S_parts = add_moving_statistics(S_parts,{'p_aff','p_eff'});
 
 
 Fpass = 3.2*([2200,2200]/60)-1;

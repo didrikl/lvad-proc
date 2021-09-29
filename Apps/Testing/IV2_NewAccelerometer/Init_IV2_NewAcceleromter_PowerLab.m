@@ -29,8 +29,8 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity
-    'Trykk1'         'affP'       1500           'single'    'continuous'
-    'Trykk2'         'effP'       1500           'single'    'continuous'
+    'Trykk1'         'p_eff'       1500           'single'    'continuous'
+    'Trykk2'         'p_aff'       1500           'single'    'continuous'
     'SensorAAccX'    'accA_x'     1500            'numeric'   'continuous'
     'SensorAAccY'    'accA_y'     1500            'numeric'   'continuous'
     'SensorAAccZ'    'accA_z'     1500            'numeric'   'continuous'

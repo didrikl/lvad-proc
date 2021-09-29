@@ -14,12 +14,12 @@ function B = init_system_m_text_files(fileNames,path,varMapFile)
     
     timeFmt = 'dd-MMM-uuuu HH:mm:ss.SSSS';
  
-    welcome('Initializing Spectrum System M data')
+    welcome('Initialize Spectrum Medical Ultrasonic data')
 
     [filePaths,fileNames,path] = check_file_name_and_path_input(fileNames,path);
 
     if numel(fileNames)==0
-        warning('No ultrasound data initialized')
+        warning('No ultrasonic data initialized')
         return; 
     end
     
@@ -29,7 +29,6 @@ function B = init_system_m_text_files(fileNames,path,varMapFile)
         display_filename(filePaths{i});
         
         B{i} = init_system_m_text_files_read_2sensors(filePaths{i});
-        B{i}.Properties.UserData = make_init_userdata(filePaths{i});
         
         B{i}.time = datetime(B{i}.('DateandTime'),...
             'InputFormat',"yyyy/MM/dd HH:mm:ss",...
@@ -57,7 +56,7 @@ function B = init_system_m_text_files(fileNames,path,varMapFile)
         % All variables shall be treated as continous and measured in data fusion
         B{i} = addprop(B{i},'Measured','variable');
         B{i}.Properties.CustomProperties.Measured(:) = true;
-        B{i}.Properties.UserData = make_init_userdata(fileNames,path);
+        B{i}.Properties.UserData = make_init_userdata(fileNames{i},path);
         
         B{i}.Properties.VariableContinuity = varMap(:,5);
         

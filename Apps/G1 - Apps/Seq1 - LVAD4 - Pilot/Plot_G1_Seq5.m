@@ -118,7 +118,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part,cbl_part)
         T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
         
         Q = T.graftQ;
-        P = T.effP_movAvg;
+        P = T.p_aff_movAvg;
         T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
         T.P_shift = -100*(P-mean(P(bl_inds),'omitnan'))/mean(P(bl_inds),'omitnan');
         T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');

@@ -1,15 +1,7 @@
-
-%% Import colors used for processing UI
+%% Import definitions
 Colors_For_Processing
-
-
-%%
-
-data_basePath = 'D:\Data\IVS\Didrik\IV2 - Data\';
-analysis_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\Stats';
-
-idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\ID_Spefications_IV2.xlsx';
-idSpecs = init_id_specifications(idSpecs_path);
+Constants
+Paths
 
 
 %% Progress bars
@@ -17,7 +9,9 @@ idSpecs = init_id_specifications(idSpecs_path);
 multiWaitbar('CloseAll');
 multiWaitbar('Making steady-state features',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Making spectral densities',0,'Color',ColorsProcessing.Green);
-
+multiWaitbar('Loading processed S files',0,'Color',ColorsProcessing.Green);
+multiWaitbar('Loading processed S_parts files',0,'Color',ColorsProcessing.Green,'CanCancel','on');
+    
 
 %% Clearing of memory and command line
 

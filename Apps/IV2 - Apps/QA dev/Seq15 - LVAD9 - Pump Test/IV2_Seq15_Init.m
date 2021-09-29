@@ -33,8 +33,8 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
-    'Trykk1'         'affP'        'single'    'continuous'
-    'Trykk2'         'effP'        'single'    'continuous'
+    'Trykk1'         'p_eff'        'single'    'continuous'
+    'Trykk2'         'p_aff'        'single'    'continuous'
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'
     'SensorAAccZ'    'accA_z'      'single'    'continuous'
@@ -86,7 +86,7 @@ notes = qc_notes_ver4(notes);
 %clear S
 % S = fuse_data_parfor(notes,PL,US);
 S = fuse_data(notes,PL,US);
-S.p_graft = S.effP;
+S.p_graft = S.p_aff;
 %clear PL US
 S_parts = split_into_parts(S);
 %clear S

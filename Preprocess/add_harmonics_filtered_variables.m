@@ -1,16 +1,22 @@
-function T_parts = add_harmonics_filtered_variables(...
-        T_parts, varNames, harmonics, harmonicsWidth, fixedFreq, fixedFreqWidth)
-    % Add harmonics filtered varibles
-    %
-    
-    
-    if nargin<3, harmonics = [1]; end
-    if nargin<4, harmonicsWidth = 0.5; end
-    if nargin<5, fixedFreq = []; end
-    if nargin<6, fixedFreqWidth = 0.5; end
-    if isempty(harmonics), return; end
-    
-    welcome('Adding hamonic notch filter variables')
+function T_parts = add_harmonics_filtered_variables(T_parts, varNames, fs)
+    % Add harmonics filtered varibles by a combined notch filter
+    % 
+	% Inputs
+	% - T_parts: Cell array of timetables or timetable with signal data 
+	% - varNames: Cell array of varibles to filter
+	
+	% Array of harmonic numbers to filter, with respect to pump speed and
+	% corresponding notch widths
+	harmonics = 1:10;
+	harmonicsWidth = [1,1,1,2.5,1,1,1,1,1,1];
+	
+	% Hardcoded array of fixed frequencies and widths to be filtered,
+	% irrespective of pump speed.
+	% Note: Could be implemented as an peak-adaption part by part
+	fixFreq = [];
+	fixFreqWidth = 1;
+	
+    welcome('Add hamonic notch filtered variables')
      
     [returnAsCell,T_parts] = get_cell(T_parts);
     if isempty(T_parts)
@@ -18,27 +24,23 @@ function T_parts = add_harmonics_filtered_variables(...
         return
     end
     
-    if numel(harmonicsWidth)==1 && numel(harmonics)>1
-        harmonicsWidth = repmat(harmonicsWidth,1,numel(harmonics));
-    end
-    if numel(fixedFreqWidth)==1 && numel(fixedFreq)>1
-        fixedFreqWidth = repmat(fixedFreqWidth,1,numel(fixedFreq));
-    end
-    
     newVarNames = varNames+"_nf";
-    fprintf('Input\n\t%s\n',strjoin(varNames,', '))
-    fprintf('Output\n\t%s\n',strjoin(newVarNames,', '))
+    fprintf('\nInput\n\t%s\n',strjoin(varNames,', '))
+    fprintf('Output\n\t%s\n\n',strjoin(newVarNames,', '))
  
-    if not(isempty(gcp('nocreate')))
-        ...Parallell toolbox is started
+	% if parallell toolbox is started
+    %{
+	if not(isempty(gcp('nocreate')))
         ...run in parallell by parfor implementation
     end
-
+    %}
+	
     for i=1:numel(T_parts)
         
+		isEmpty = display_block_info(T_parts{i},i,numel(T_parts));
+		if isEmpty, continue; end
         T = T_parts{i};
-        if isempty(T), continue; end
-        
+		
         varsNotInPart = not(ismember(varNames,T.Properties.VariableNames));
         if any(varsNotInPart)
             error('\n\tPart %d does not contain input variables:\n\t\t%s',...
@@ -48,16 +50,19 @@ function T_parts = add_harmonics_filtered_variables(...
         T{:,newVarNames} = nan(height(T),numel(newVarNames));
         
         [fs,T] = get_sampling_rate(T);
-        [start_inds, end_inds, rpm_vals] = find_rpm_blocks(T);
+        [start_inds, end_inds, rpms] = find_rpm_blocks(T);
         
-        for j=1:numel(rpm_vals)
+        for j=1:numel(rpms)
             
-            hFreq = harmonics*(double(rpm_vals(j))/60);
-            allFreq = [hFreq,fixedFreq];
-            BW = [harmonicsWidth,fixedFreqWidth];     
+            hFreq = harmonics*(double(rpms(j))/60);
+			
+			% Design the filter based on all frequencies specified, and 
+			% corresponding notch widths,within the effective bandwidt
+		    allFreq = [hFreq(hFreq<fs/2),fixFreq(fixFreq<fs/2)];
+            BW = [harmonicsWidth(hFreq<fs/2),fixFreqWidth(fixFreq<fs/2)];     
             hFilt = make_multiple_notch_filter(allFreq,fs,BW);
-            block_inds = start_inds(j):end_inds(j);
             
+			block_inds = start_inds(j):end_inds(j);
             for k=1:numel(varNames)
                 var = varNames{k};
                 newVar = newVarNames{k};

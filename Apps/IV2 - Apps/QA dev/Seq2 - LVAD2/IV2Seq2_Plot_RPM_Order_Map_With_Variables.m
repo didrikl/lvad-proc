@@ -23,7 +23,7 @@ std_winLenSec = 10;
 orderMapVar = 'accA_norm';%,'accA_xz_norm_filt'};
 %orderMapVar = 'accA_x';%,'accA_xz_norm_filt'};
 plotVars = {
-        %{'affP','effP'}
+        %{'p_eff','p_aff'}
         %{'affQ','effQ','Q_LVAD'}
         %{'accA_norm_mpf'}
         {'accA_norm_movStd','accA_norm_std'}

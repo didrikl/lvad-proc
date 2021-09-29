@@ -39,8 +39,8 @@ notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileNam
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity
-    'Trykk1'         'affP'       1000           'single'    'continuous'
-    'Trykk2'         'effP'       1000           'single'    'continuous'
+    'Trykk1'         'p_eff'       1000           'single'    'continuous'
+    'Trykk2'         'p_aff'       1000           'single'    'continuous'
     %'SensorAAccX'    'accA_x'     700            'numeric'   'continuous'
     %'SensorAAccY'    'accA_y'     700            'numeric'   'continuous'
     %'SensorAAccZ'    'accA_z'     700            'numeric'   'continuous'
@@ -89,7 +89,7 @@ S_CB_parts = add_moving_statistics(S_CB_parts);
 S_CB_parts = add_moving_statistics(S_CB_parts,{'accA_x'});
 S_CB_parts = add_moving_statistics(S_CB_parts,{'accA_y'});
 S_CB_parts = add_moving_statistics(S_CB_parts,{'accA_z'});
-% %S_parts = add_moving_statistics(S_parts,{'effP','affP'});
+% %S_parts = add_moving_statistics(S_parts,{'p_aff','p_eff'});
 
 CB_DL.time = CB_DL.time + minutes(2) + seconds(59);
 S_CB_DL = fuse_data(notes,CB_DL,US);

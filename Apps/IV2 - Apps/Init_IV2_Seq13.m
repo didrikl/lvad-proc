@@ -4,11 +4,6 @@
 seq = 'IV2_Seq13';
 experiment_subdir = 'Seq13 - LVAD12';
 
-% Output folder structure
-proc_subdir = 'Processed\';
-proc_plot_subdir = 'Figures';
-proc_stats_subdir = 'Processed\Statistics';
-
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
 ultrasound_subdir = 'Recorded\SystemM';
@@ -61,10 +56,12 @@ ultrasound_fileNames = {
     'ECM_2020_09_11__12_30_59.wrf'
     };
 
-fs_new = 750;
+% Correction input
 US_drifts = {52};
-channelsToSwap = {};
-restrictBlockChannelSwap = [];
+accChannelToSwap = {};
+blocksForAccChannelSwap = [];
+pChannelToSwap = {'p_eff','p_aff'};
+pChannelSwapBlocks = [];
 
 
 %% Initialize

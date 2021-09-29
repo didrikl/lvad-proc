@@ -1,6 +1,6 @@
 function US = aggregate_effQ_and_affQ(US)
     
-    welcome('Aggregating afferent and efferent ultrasonic Q measurements','function')
+    welcome('Aggregate afferent and efferent ultrasonic data','function')
     
     US.Q = mean([US.effQ,US.affQ],2,'omitnan');
     if all(isnan(US.effQ))

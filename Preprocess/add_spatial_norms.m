@@ -2,7 +2,7 @@ function T_parts = add_spatial_norms(T_parts, p, compNames, newVarName)
     % Function for IV2 model to add relevant variables
     % TODO: Make this an model object method
     
-    welcome('Calculating spatial norms')
+    welcome('Calculate spatial norms')
     
     [returnAsCell,T_parts] = get_cell(T_parts);
     if isempty(T_parts)

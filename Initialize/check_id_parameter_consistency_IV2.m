@@ -1,8 +1,10 @@
 function isOK = check_id_parameter_consistency_IV2(S,idSpecs)
     
     isOK = true;
-    
-    speedInData = unique(S.pumpSpeed);
+    %idSpecs = standardizeMissing(idSpecs,'-');
+	%S = standardizeMissing(S,'-');
+	speedInData = unique(S.pumpSpeed);
+	speedInData = cast(speedInData,class(idSpecs.pumpSpeed));
     notListedSpeed = not(ismember(speedInData,idSpecs.pumpSpeed));
     if any(notListedSpeed)
         speedInData = unique(S.pumpSpeed);
@@ -17,17 +19,20 @@ function isOK = check_id_parameter_consistency_IV2(S,idSpecs)
     end
     
     if ismember('balloonLev',S.Properties.VariableNames)
-        idSpecs.balloonDiam(idSpecs.balloonDiam=='0') = '-';
-        
-        balLevInData = unique(S.balloonDiam);
-        notListedBalloon = not(ismember(balLevInData,idSpecs.balloonDiam));
+		idSpecs.balloonDiam = categorical(idSpecs.balloonDiam);
+		idSpecs.balloonDiam(idSpecs.balloonDiam=='0') = '-';
+        idSpecs.balloonDiam(isundefined(idSpecs.balloonDiam)) = '-';
+		
+        balDiamInData = unique(S.balloonDiam);
+		
+        notListedBalloon = not(ismember(balDiamInData,idSpecs.balloonDiam));
         if any(notListedBalloon)
             msg = sprintf(['Unlisted balloon diameters found.',...
                 '\n\tID: %s',...
                 '\n\tID balloon diameter spec.: ',...
                 '%s\n\tBalloon level in data: %s'],...
                 char(idSpecs.analysis_id),char(idSpecs.balloonDiam),...
-                strjoin(string(balLevInData),', '));
+                strjoin(string(balDiamInData),', '));
             warning(msg);
             isOK = false;
         end
@@ -49,7 +54,10 @@ function isOK = check_id_parameter_consistency_IV2(S,idSpecs)
     end
     
     if ismember('QRedTarget_pst',S.Properties.VariableNames)
-        QRedInData = unique(S.QRedTarget_pst);
+        idSpecs.QRedTarget_pst = categorical(idSpecs.QRedTarget_pst);
+        idSpecs.QRedTarget_pst(idSpecs.QRedTarget_pst=='0') = '-';
+        
+		QRedInData = unique(S.QRedTarget_pst);
         notListedInd = not(ismember(QRedInData,idSpecs.QRedTarget_pst));
         if any(notListedInd)
             warning(sprintf(['Unlisted flow reduction target found.',...
@@ -57,7 +65,7 @@ function isOK = check_id_parameter_consistency_IV2(S,idSpecs)
                 '\n\tID flow reduction target spec.: %s',...
                 '\n\tFlow reduction target in data: %s'],...
                 char(idSpecs.analysis_id),char(idSpecs.QRedTarget_pst),...
-                strjoin(string(catheterInData),', ')));
+                strjoin(string(QRedInData),', ')));
             isOK = false;
         end
     end

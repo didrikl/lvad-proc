@@ -3,11 +3,6 @@
 seq = 'IV2_Seq12';
 experiment_subdir = 'Seq12 - LVAD11';
 
-% Output folder structure
-proc_subdir = 'Processed\';
-proc_plot_subdir = 'Figures';
-proc_stats_subdir = 'Processed\Statistics';
-
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
 ultrasound_subdir = 'Recorded\SystemM';
@@ -74,8 +69,6 @@ ultrasound_fileNames = {
     'ECM_2020_09_10__15_40_40.wrf'
     };
 
-fs_new = 750;
-
 US_drifts = {20.5, 62, 3.5};
 PL_offset = seconds(60);
 PL_files_with_time_offset = {...
@@ -111,8 +104,12 @@ PL_files_with_time_offset = {...
 %     'IV2_Seq12 - F16 [accB].mat'
     };
 
-channelsToSwap = {'accA_y','accA_z'};
-restrictBlockChannelSwap = [];
+% Correction input
+accChannelToSwap = {'accA_y','accA_z'};
+blocksForAccChannelSwap = [];
+pChannelToSwap = {};
+pChannelSwapBlocks = [];
+
 
 %% Initialize
 
