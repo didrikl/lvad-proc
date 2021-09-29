@@ -9,7 +9,7 @@ US = merge_table_blocks(US);
 US = aggregate_effQ_and_affQ(US);
 
 PL = resample_signal(PL, fs_new);
-PL = calculate_pressure_gradient(PL,'p_eff','p_aff');
+PL = calculate_pressure_gradient(PL,'p_aff','p_eff');
 
 S = fuse_data(Notes,PL,US,fs_new,'nearest','none');
 S_parts = split_into_parts(S,fs_new);

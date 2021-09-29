@@ -20,7 +20,7 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
         display_filename(seqFilePath,'',['\nLoading processed ',dataType,' file']);
         try
             load(seqFilePath)
-            Data.S.([seq(1:7),sprintf('%.2d',str2double(seq(8:end)))]) = S;
+            Data.([seq(1:7),sprintf('%.2d',str2double(seq(8:end)))]).S = eval(dataType);
         catch err
             warning('File not loaded')
             disp(err)
