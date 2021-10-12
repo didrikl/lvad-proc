@@ -13,6 +13,7 @@ function format_axes_in_plot_NHA(h_ax,axSpec,axTickSpec)
 	for j=1:nCols
 		set(h_ax(nRows,j).XAxis,axTickSpec{:})
 	end
+
 	
 
 		

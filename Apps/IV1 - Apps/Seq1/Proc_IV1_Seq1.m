@@ -30,8 +30,8 @@ notes_filePath = 'C:\Data\IVS\Didrik\IV1_Seq1 - Thrombi injection into HVAD\Note
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)
 %lvad_signal = init_cardiaccs_raw_txtfile(lvad_signal_fileName,read_path);
 %lead_signal = init_cardiaccs_raw_txtfile(lead_signal_fileName,read_path);
-% save_table('lvad_signal.mat', save_path, lvad_signal, 'matlab');
-% save_table('lead_signal.mat', save_path, lead_signal, 'matlab');
+% save_data('lvad_signal.mat', save_path, lvad_signal, 'matlab');
+% save_data('lead_signal.mat', save_path, lead_signal, 'matlab');
 %lvad_signal = init_signal_proc_matfile('lvad_signal.mat', save_path);
 %lead_signal = init_signal_proc_matfile('lead_signal.mat', save_path);
 
@@ -77,7 +77,7 @@ lead_signal = clip_to_experiment(lead_signal,notes);
 % Manual assessment of each intervention segments
 features = make_feature_windows(signal, features);
 
-%save_table('signal_preproc.mat', save_path, signal, 'matlab');
+%save_data('signal_preproc.mat', save_path, signal, 'matlab');
 
 
 %%

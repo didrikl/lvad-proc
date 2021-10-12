@@ -26,8 +26,8 @@ for j=1:numel(speeds)
 		F_x(isnan(F_x)) = 0;
 		max_x_ind = F_x==max(F_x);
 		min_x_ind = F_x==min(F_x);
-		h_backLines(j,k) = plot(F_x,F_y,'LineWidth',0.5);
-		h_backLines(j,k).Color = [h_backLines(j).Color,0.3];
+		h_backLines(j,k) = plot(F_x,F_y,'LineWidth',0.6);
+		h_backLines(j,k).Color = [h_backLines(j).Color,0.4];
 	end
 end
 

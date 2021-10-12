@@ -8,7 +8,6 @@ function signal = init_signal_proc_matfile(fileName, read_path, varargin)
     %   signal = init_signal_file(fileName, read_path, varargin), where
     %   varargin optional inputs in the function load
     %
-    % See also load, save, save_table
     
     filePath = fullfile(read_path,fileName);
     display_filename(fileName,read_path,'\nReading signal with loading .mat file');

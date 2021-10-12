@@ -22,7 +22,7 @@ function [path, fileName, overwrite_all, ignore_all] = ...
     %   the output variables overwrite_all and ignore_all must persist in
     %   memory, e.g. declared as a persistent variables in the calling code.
     %
-    % See also uiputfile, save_table, save_figure
+    % See also uiputfile, save_data
 
     
     % Check existence of saving directory and create new if not existing

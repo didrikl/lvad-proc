@@ -77,6 +77,5 @@ function h_figs = plot_roc_curves_per_pooled_interventions(...
 		h_leg.Position(2) = h_ax(4).Position(2);
 		
 		set(h_ax(2:end),'YTickLabel',{})
-		
-		
+				
 	end

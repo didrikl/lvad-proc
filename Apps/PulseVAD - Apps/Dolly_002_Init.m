@@ -198,8 +198,8 @@ for i=1:11
     T = merge_table_blocks(PL);
     T = resample_signal(T, 500);
     T.time.Format = 'dd-MMM HH:mm:ss.SSS';
-%     save_table(['Day',num2str(i)], save_path, T, 'text');
-    save_table(['Day',num2str(i)], save_path, T, 'matlab');
+%     save_data(['Day',num2str(i)], save_path, T, 'text');
+    save_data(['Day',num2str(i)], save_path, T, 'matlab');
 end
 
 
@@ -271,17 +271,17 @@ T_stats.date.Format = 'dd-MMM';
 
 %% Save 
 
-save_table('Day1-11 - 10Hz', save_path, T_10Hz, 'matlab');
+save_data('Day1-11 - 10Hz', save_path, T_10Hz, 'matlab');
 
 T_10Hz_for_text_save = T_10Hz;
 T_10Hz_for_text_save.t = single(seconds(T_10Hz_for_text_save.time-T_10Hz_for_text_save.time(1)));
 T_10Hz_for_text_save = timetable2table(T_10Hz_for_text_save);
 T_10Hz_for_text_save.time = [];
 T_10Hz_for_text_save = movevars(T_10Hz_for_text_save, 't', 'Before', 'ecg');
-save_table(['Day1-11 - 10Hz'], save_path, T_10Hz_for_text_save, 'text');
+save_data(['Day1-11 - 10Hz'], save_path, T_10Hz_for_text_save, 'text');
 clear T_10Hz_for_text_save
 
-save_table('Day1-11 - Statistics - 1 hour intervals', save_path, T_stats, 'csv');
+save_data('Day1-11 - Statistics - 1 hour intervals', save_path, T_stats, 'csv');
 
 
 %% Moving avg + st.dev. and avg for regular intervals

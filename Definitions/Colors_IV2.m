@@ -34,6 +34,14 @@ Colors.Fig.Seqs.Speeds4 = [
 	%0.9814    0.8004    0.9813
 	];
 
+Colors.Fig.Cats.Components4 = [
+	% 37,52,148  % dark blue 
+	55,126,184 % blue for y 
+	%44,127,184 % medium blue for y
+	77,175,74  % green for x
+	152,78,163 % purple for z
+	255,127,0  % orange for norm
+	]/256;
 
 % TODO: Read all colormaps into 
 %Colors.Fig.Maps.Spectrogram = 

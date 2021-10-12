@@ -1,16 +1,16 @@
 %% Import definitions
 Colors_For_Processing
 Constants
-Paths
+Paths_IV2
 
 
 %% Progress bars
 
 multiWaitbar('CloseAll');
-multiWaitbar('Making steady-state features',0,'Color',ColorsProcessing.Green);
-multiWaitbar('Making spectral densities',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Loading processed S files',0,'Color',ColorsProcessing.Green);
 multiWaitbar('Loading processed S_parts files',0,'Color',ColorsProcessing.Green,'CanCancel','on');
+multiWaitbar('Making steady-state features',0,'Color',ColorsProcessing.Green);
+multiWaitbar('Making spectral densities',0,'Color',ColorsProcessing.Green);
     
 
 %% Clearing of memory and command line
@@ -23,7 +23,7 @@ home
 close all;
 
 % Clear function so that persistent variables defined within these are cleared
-clear Save_Table Save_Figure
+clear save_data
 
 
 %%

@@ -2,7 +2,7 @@
 %% Import definitions
 Colors_For_Processing
 Constants
-Paths
+Paths_IV2
 
 
 %% Data categories and type
@@ -39,7 +39,7 @@ fprintf(repmat('\n',1,25))
 %close all;
 
 % Clear function so that persistent variables defined within these are cleared
-clear Save_Table Save_Figure
+clear save_data
 clear h_left_shade_sub1 h_left_shade_sub2 h_left_shade_zoom
 clear h_right_shade_sub1 h_right_shade_sub2 h_right_shade_zoom
 

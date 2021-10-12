@@ -1,6 +1,6 @@
+% Load previously preprocessed and stored data
 
-%% Load previously preprocessed and stored data
-
+Environment_Analysis_IV2
 idSpecs = init_id_specifications(idSpecs_path);
 
 sequences = {
@@ -32,5 +32,7 @@ load(fullfile(stats_path,'Group stats tables - Relative'));
 load(fullfile(stats_path,'Results - p-values - Wilcoxon paired signed rank test'));
 load(fullfile(stats_path,'Results - Median and p-values - Wilcoxon paired signed rank test'));
 load(fullfile(stats_path,'Results - Selected median and p-values - Wilcoxon paired signed rank test'));
+load(fullfile(stats_path,'Results - AUC'));
+load(fullfile(stats_path,'Results - ROC curve info'));
 
 multiWaitbar('CloseAll');

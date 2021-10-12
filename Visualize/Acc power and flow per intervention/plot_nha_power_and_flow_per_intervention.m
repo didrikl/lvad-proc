@@ -35,10 +35,13 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 		};
 	%}
 	
-	legTit = {'Pump RPM'};
+	legTit = {'RPM'};
 	speeds = [2200,2500,2800,3100];
 	spec = get_specs_for_plot_NHA;
 	
+	figHeight = 1200;
+	mainXAxGap = 0.01;
+	mainYAxGap = mainXAxGap*(figHeight/figWidth);
 	nFigs = size(nhaVars,1);
 	nCols = numel(levelLabels(:,1));
 	nRows = 3;
@@ -47,7 +50,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 		
 		h_figs(v) = figure(spec.fig{:},...
 			'Name',sprintf('%s - %s as NHA',supTit,nhaVars{v,1}),...
-			'Position',[0,0,figWidth,1200]);
+			'Position',[0,0,figWidth,figHeight]);
 		
 		h_ax = gobjects(nRows,nCols);
 		for j=1:nCols
@@ -65,7 +68,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 			% Plot panel row 1 with flow rate data
 			% ---------------------------------------------------
 			h_ax(1,j) = subplot(nRows,nCols,j,'Nextplot','add',spec.subPlt{:});
-			if j==1, h_yax(1,1) = copyobj(h_ax(1,j),gcf); end
+			if j==1, h_yax(1) = copyobj(h_ax(1,j),gcf); end
 			
 			[~,h_qPts,h_qLines] = plot_group_and_individual_data(h_ax(1,j),...
 				G(G_inds,:),F(F_inds,:),speeds,xVar,xLims,yVar_row1,...
@@ -76,7 +79,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 			% Plot panel row 2 with LVAD power data
 			% ---------------------------------------------------
 			h_ax(2,j) = subplot(nRows,nCols,nCols+j,'Nextplot','add',spec.subPlt{:});
-			if j==1, h_yax(2,1) = copyobj(h_ax(2,j),gcf); end
+			if j==1, h_yax(2) = copyobj(h_ax(2,j),gcf); end
 			
 			[~,h_powPts,h_powLines] = plot_group_and_individual_data(h_ax(2,j),...
 				G(G_inds,:),F(F_inds,:),speeds,xVar,xLims,yVar_row2,...
@@ -85,8 +88,8 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 			% Panel row with 3 NHA data
 			% ---------------------------------------------------
 			h_ax(3,j) = subplot(nRows,nCols,2*nCols+j,'Nextplot','add',spec.subPlt{:});
-			if j==1, h_yax(3,1) = copyobj(h_ax(3,j),gcf); end
-			h_xax(1,j) = copyobj(h_ax(3,j),gcf);
+			if j==1, h_yax(3) = copyobj(h_ax(3,j),gcf); end
+			h_xax(j) = copyobj(h_ax(3,j),gcf);
 			
 			[h_nha,h_nhaPts,h_nhaLines] = plot_group_and_individual_data(h_ax(3,j),...
 				G(G_inds,:),F(F_inds,:),speeds,xVar,xLims,nhaVars(v,:),...
@@ -99,6 +102,9 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
  			
 		end
 		
+		h_leg = add_legend_to_plot_NHA(h_nha,speeds,spec.leg,spec.legTit,legTit);
+		h_leg.Position(1) = h_leg.Position(1)+0.1; 
+		h_leg.Position(2) = h_leg.Position(2)-mainYAxGap; 
 		
 		format_axes_in_plot_NHA(h_ax,spec.ax,spec.axTick)
 		
@@ -109,7 +115,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 			h_yLab(i).Position(1) = -0.15;
 		end
 		for j=1:nCols
- 			xPos = h_ax(1,j).Position(1)-0.06 + (j-1)*0.005;
+ 			xPos = h_ax(1,j).Position(1)-0.06 + (j-1)*(nCols/500-0.004);
   			yPos1 = h_ax(1,j).Position(2)-0.02;
   			yPos2 = h_ax(2,j).Position(2)+0.01;
   			yPos3 = h_ax(3,j).Position(2)+0.04;
@@ -126,42 +132,47 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 		%sgtitle(supTit,spec.supTit{:});
 		h_yLab = add_subYLabels_to_plot_NHA(h_yax,yLabels);
 		h_supLab = add_supLabel(xLab,spec.supXLab,'x');
-		h_leg = add_legend_to_plot_NHA(h_nha,speeds,spec.leg,spec.legTit,legTit);
-		h_leg.Position(1) = h_leg.Position(1)+0.107; 
 		h_supLab.Position(2) = h_supLab.Position(2)+0.05;
 		
-		% // Add the new axes:
+		format_axes_in_plot_NHA([h_xax,h_yax],spec.ax,spec.axTick)
+ 		set([h_xax,h_yax],'box','off')
+		set([h_xax,h_yax],'Color','none');
+		set([h_xax,h_yax],'YGrid','off');
+		set([h_xax,h_yax],'XGrid','off');
+		set(h_yax,'YColor',[0,0,0])
+		set(h_xax,'XColor',[0,0,0])
+		set(h_yax,'YColor',[0,0,0])
+		
+		% Make main axes offset
 		for i=1:3
 			h_yax(i).Position = h_ax(i,1).Position;
-			h_yax(i).Position(1) = h_yax(i).Position(1)-0.01;
+			h_yax(i).Position(1) = h_yax(i).Position(1)-mainYAxGap;
 			h_yax(i).XAxis.Visible = 'off';
 			h_yax(i).YLim = h_ax(i,1).YLim;
 		end
-		
-	    format_axes_in_plot_NHA(h_yax,spec.ax,spec.axTick)
-		set(h_yax,'Color','none');
-		set(h_yax,'YGrid','off');
-		set(h_yax,'XGrid','off');
-		set(h_yax,'YColor',[0,0,0])
-		
-		% Add the new axes:
- 		for j=1:numel(h_xax)
+		for j=1:numel(h_xax)
 			h_xax(j).YAxis.Visible = 'off';
  			h_xax(j).XLim = h_ax(3,j).XLim;
  			h_xax(j).XTick = h_ax(3,j).XTick;
  			h_xax(j).XTickLabel = h_ax(3,j).XTickLabel;
  			h_xax(1,j).Position = h_ax(3,j).Position;
- 			h_xax(1,j).Position(2) = h_xax(1,j).Position(2)-0.01;
+ 			h_xax(1,j).Position(2) = h_xax(1,j).Position(2)-mainXAxGap;
 		end
-		
-		format_axes_in_plot_NHA(h_xax,spec.ax,spec.axTick)
- 		set(h_xax,'Color','none');
- 		set(h_xax,'XGrid','off');
- 		set(h_xax,'YGrid','off');
- 		set(h_xax,'XColor',[0,0,0])
-		
-		
+		h_xax(end).Position(3) = h_ax(end,end).Position(3);
+
+  		%make_xy_halfframe(h_ax)
+
+
 		
 	end
 	
+end
+
+function make_xy_halfframe(h_ax)
+	set(h_ax,'box','off')
+	set(h_ax,'XColor',[0.95,0.95,0.95])
+	set(h_ax,'YColor',[0.95,0.95,0.95])
+	set(h_ax,'XTickLabel',{})
+	set(h_ax,'YTickLabel',{})
+	set(h_ax,'TickLength',[0,0])
 end

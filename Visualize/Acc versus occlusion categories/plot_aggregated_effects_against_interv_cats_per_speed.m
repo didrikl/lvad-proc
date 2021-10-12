@@ -1,8 +1,9 @@
-function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
-        T,yVars,type,T_err_neg,T_err_pos,F)
+function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
+        T,yVars,type,T_err_neg,T_err_pos,F,supTit)
     
     if nargin<5, T_err_pos = T_err_neg; end
-    specs = get_specs_for_plot_NHA
+    
+	specs = get_specs_for_plot_NHA;
     markers = {'o','pentagram','square','diamond','hexagram'};
     err_bar_specs = {
         'LineWidth',2,...
@@ -24,9 +25,7 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
         'RHC'
         };
     
-	T.QRedTarget_pst = double(string(T.QRedTarget_pst));
-	F.QRedTarget_pst = double(string(F.QRedTarget_pst));
-
+	% Which and order of control interventions
     %ctrl_levels = [80,60,40,20,10];
     ctrl_levels = [10,20,40,60,80];
     
@@ -43,9 +42,8 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
     
     for j=1:size(yVars,1)
         
-        title_str = ['Plot 2 ',type{2},' of ',type{1},' Changes in ',yVars{j}];
-        h_fig(j) = figure(...
-            'Name',title_str,...
+       h_fig(j) = figure(...
+            'Name',sprintf('%s - %s as NHA',supTit,yVars{j,1}),...
             'Position',[1.8,32.2,760.6,1038.4]);
         h_tiles = tiledlayout(numel(speeds),1,...
             'TileSpacing', 'tight',...
@@ -194,6 +192,10 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
             
         end
         
+		% Add annotations and formatting of lines, text and ticks
+		% ---------------------------------------------------
+		%sgtitle(supTit,spec.supTit{:});
+		
         leg_entries = [
             'No catheter'
             string(balCats(2))
