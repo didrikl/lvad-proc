@@ -5,21 +5,23 @@
 %Init_IV2_Preprocessed
 
 
-%% Calculate features of signal intervals denoted with an analysis ID tag
+%% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 Environment_Analysis_IV2
 idSpecs = init_id_specifications(idSpecs_path);
 
-F_all = make_stats(Data,...
-    {'Q_LVAD','P_LVAD'},...
-    {'p_eff','p_aff','pGrad','Q','accA_norm','accA_xynorm','accA_x','accA_y','accA_z',...
-    'accA_xynorm_nf','accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'},...
-    idSpecs);
-[F_all,psds] = make_power_spectra(Data,F_all,...
-    {'accA_norm','accA_x','accA_y','accA_z',...
-    'accA_xynorm_nf','accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'},...
-    idSpecs);
+% Make descriptive variable statistics of each intervention
+discrVars = {'Q_LVAD','P_LVAD'};
+meanVars = {'p_eff','pGrad','Q','accA_x','accA_y','accA_z','accA_xynorm_nf',...
+	'accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'};
+medianVars = {};
+F_all = make_intervention_stats(Data,discrVars,meanVars,medianVars,idSpecs);
 
+% Make band powers and periodograms of vibration variables of each intervention
+accVars = {'accA_x','accA_y','accA_z','accA_x_nf','accA_y_nf','accA_z_nf'};
+[F_all,psds] = make_power_spectra(Data,F_all,accVars,idSpecs,fs_new);
+
+% Make relative and delta differences from tagged baselines 
 F_rel_all = calc_relative_feats(F_all);
 F_del_all = calc_delta_diff_feats(F_all);
 
@@ -32,11 +34,11 @@ F_del = F_del_all(ismember(F_del_all.interventionType,{'Effect','Control'}),:);
 save_data('Features', feats_path, F, {'matlab','spreadsheet'});
 save_data('Features - All', feats_path, F_all, {'matlab','spreadsheet'});
 save_data('Features - Relative', feats_path, F_rel, {'matlab','spreadsheet'});
-save_data('Features - Delta', feats_path, F_rel, {'matlab','spreadsheet'});
+save_data('Features - Delta', feats_path, F_del, {'matlab','spreadsheet'});
 %save_data('Power spectra densities', feats_path, F_rel, 'matlab');
 
 multiWaitbar('CloseAll');
-
+clear discrVars meanVars medianVars accVars
 
 %% Make feature table for ROC analysis, with pooled diameter state vars
 
@@ -88,6 +90,9 @@ F_ROC_SPSS.D_11           = F(( F.interventionType=='Control' | F_ROC.balloonDia
 
 % Save as mat file and Excel files
 save_data('Features - ROC', feats_path, F_ROC, {'matlab','spreadsheet'});
+save_data('Features - ROC - SPSS', feats_path, F_ROC_SPSS, 'matlab');
+
+% Save as Excel files for analysis in SPSS
 save_data('Features - ROC - PCI 1', feats_path, F_ROC_SPSS.PCI1, 'spreadsheet');
 save_data('Features - ROC - PCI 2', feats_path, F_ROC_SPSS.PCI2, 'spreadsheet');
 save_data('Features - ROC - PCI 3', feats_path, F_ROC_SPSS.PCI3, 'spreadsheet');
@@ -105,7 +110,6 @@ save_data('Features - ROC - 11mm', feats_path, F_ROC_SPSS.D_11, 'spreadsheet');
 G = make_group_stats(F,idSpecs);
 G_rel = make_group_stats(F_rel,idSpecs);
 G_del = make_group_stats(F_del,idSpecs);
-% G_ROC = make_group_stats(F_ROC,idSpecs);
 
 % Save structs as .mat files
 save_data('Group stats tables', stats_path, G, 'matlab');
@@ -135,47 +139,57 @@ save_data('Group 75-percentile of features - Delta', stats_path, G_del.q3, 'spre
 % Calculate p values from Wilcoxens pair rank test
 
 pVars = {
+ 	'accA_x_pow'
+    'accA_y_pow'
+ 	'accA_z_pow'
 	'accA_x_nf_pow'
     'accA_y_nf_pow'
-	'accA_z_nf_pow'
+ 	'accA_z_nf_pow'
+	'accA_y_nf_stdev'
 	%'accA_xynorm_nf_pow'
-	'accA_norm_nf_pow'
-	%'accA_x_nf_bpow'
+	%'accA_norm_nf_pow'
 	%'accA_y_nf_bpow'
-	%'accA_xynorm_nf_bpow'
-	%'accA_norm_nf_bpow'
 	'Q_mean'
-	'Q_LVAD_mean'
+	%'Q_LVAD_mean'
 	'P_LVAD_mean'
-	'pGrad_mean'
-	'pGrad_stdev'
-	'p_aff_mean'
-	'p_eff_mean'
+	%'pGrad_mean'
+	%'pGrad_stdev'
+	%'p_aff_mean'
+	%'p_eff_stdev'
+	%'accA_y_h3pow'
 	};
 
 % Prepare data for paired statistical test, e.g. in SPSS
 W = unstack(F,pVars,'levelLabel',...
 	'GroupingVariables',{'seq','pumpSpeed'},...
 	'VariableNamingRule','preserve');
-	
-[P,R] = make_results_table_from_paired_signed_rank_test(W,G,pVars,'levelLabel');
-R_sel = R(ismember(R.levelLabel,{'Nominal','Inflated, 4.73 mm',...
-	'Inflated, 6.60 mm','Inflated, 8.52 mm','Inflated, 11 mm'}),:);
+% W_rel = unstack(F_rel,pVars,'levelLabel',...
+% 	'GroupingVariables',{'seq','pumpSpeed'},...
+% 	'VariableNamingRule','preserve');
 
 % Save each results table as .mat files and as Excel files
-save_data('Features - Paired for Wilcoxens signed rank test',stats_path, W, {'spreadsheet','matlab'});
+save_data('Features - Paired for Wilcoxens signed rank test',feats_path, W, {'spreadsheet','matlab'});
+%save_data('Features - Paired for Wilcoxens signed rank test - Relative',feats_path, W_rel, {'spreadsheet','matlab'});
+
+[P,R] = make_results_table_from_paired_signed_rank_test(W,G,pVars);
+%[P_rel,R_rel] = make_results_table_from_paired_signed_rank_test(W_rel,G_rel,pVars);
+
 save_data('Results - Median and p-values - Wilcoxon paired signed rank test', stats_path, R, {'spreadsheet','matlab'});
+%save_data('Results - Median and p-values - Wilcoxon paired signed rank test - Relative', stats_path, R_rel, {'spreadsheet','matlab'});
 save_data('Results - p-values - Wilcoxon paired signed rank test', stats_path, P, {'spreadsheet','matlab'});
-save_data('Results - Selected median and p-values - Wilcoxon paired signed rank test', stats_path, R_sel, {'spreadsheet','matlab'});
+%save_data('Results - p-values - Wilcoxon paired signed rank test - Relative', stats_path, P_rel, {'spreadsheet','matlab'});
 
 
 %% Calculate ROC curves and corresponding confidence intervals
 
 classifiers = {
+  	'accA_y_pow'
+ 	'accA_x_pow'
+ 	'accA_z_pow'
  	'accA_y_nf_pow'
-	'accA_x_nf_pow'
-	'accA_z_nf_pow'
-	'accA_xynorm_nf_pow'
+ 	'accA_x_nf_pow'
+ 	'accA_z_nf_pow'
+	%'accA_xynorm_nf_pow'
 	};
 
 % Input for states of pooled occlusions above a threshold

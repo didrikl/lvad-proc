@@ -1,8 +1,8 @@
 function F_rel = calc_relative_feats(F)
-	% Calculate absolute "delta" difference from corresponding baseline for
+	% Calculate relative difference from corresponding baseline for
 	% numeric columns in the feat table.
 	
-	welcome('Calculate relative1 differences of features','function')
+	welcome('Calculate relative differences of features','function')
 	
 	F_rel = make_feats_diff(F,@calc);
 	

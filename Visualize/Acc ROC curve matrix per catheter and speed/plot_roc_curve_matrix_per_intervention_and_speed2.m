@@ -10,11 +10,6 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(R,...
 	% Curves overlaid in each panels for:
 	% - NHA as classifier, component-wise
 
-	rowLabels = {
-		{'\bfCatheter 2\rm','27% areal occl.'}
-		{'\bfCatheter 3\rm','45% areal occl.'}
-		{'\bfCatheter 4\rm','75% areal occl.'}
-		};
 	speeds = [2200,2500,2800,3100];
 	classifier_labels = classifiers_to_use(:,2);
 	classifier_inds = find(ismember(R.classifiers,classifiers_to_use(:,1)));
@@ -25,12 +20,12 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(R,...
 	predStates = R.predStates;
 
 	spec = get_plot_specs;
-	figHeight = 850;%900; %955
+	figHeight = 900; %955
 	figWidth = 1180;
-	panelLength = 153;
+	panelLength = 155;
 	
 	% Offsets for common axes
-	mainAxGap = 10;
+	mainAxGap = 0.01;
 	
 	nRows = size(predStates,1);
 	nCols = numel(speeds);
@@ -69,20 +64,29 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(R,...
 
 		end
 
-		text(1.10,0.5,rowLabels{i},spec.text{:});
+		occl = num2str(min(round(unique(...
+			F.arealOccl_pst(F.(stateVar)==predStates{i,1})))));
+		text(1.10,0.5,{['\bf',occl,'%'],'\rmareal occl.'},spec.text{:});
 
 	end
 
+	set([h_ax(:);h_xax(:);h_yax(:)],'XTick',0:0.2:1);
+	set([h_ax(:);h_xax(:);h_yax(:)],'YTick',0:0.2:1);
 	
-	% Format axes
 	format_axes_in_plot_NHA(h_ax,spec.ax,spec.axTick);
 	format_axes_in_plot_NHA([h_xax,h_yax],spec.ax,spec.axTick);
 	set(h_ax,spec.rocAx{:})
-	[gap, h_ax] = position_panels(panelLength, h_ax);
-	offset_main_ax(h_ax,h_xax,h_yax,mainAxGap,mainAxGap);			
-	format_tick_labels(h_ax,h_xax, h_yax);
+			
+	[gap, h_ax] = position_roc_panels(panelLength, h_ax);
 
-	add_subtitles(h_ax,cellstr(string(speeds)+" RPM"),panelLength,gap,spec);
+	% Make main axes offset
+	offset_main_ax(h_ax,h_xax,h_yax,mainAxGap,mainAxGap);
+
+	add_shaded_boxes_and_titles(h_ax,cellstr(string(speeds)+" RPM"),...
+		panelLength,panelLength,gap,spec);
+			
+	format_tick_labels(h_xax, h_yax);
+
 
 	h_xlab = suplabel('1 - Specificity');
 	h_ylab = suplabel('Sensitivity','y');
@@ -92,7 +96,7 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(R,...
 	h_xlab.Position(2) = h_xlab.Position(2)+0.025;
 	
 	h_leg = legend(h_nha,classifier_labels,spec.leg{:},'Units','points');
-	h_leg.Position(1) = h_leg.Position(1) + 132;%figWidth-20;% h_ax(end,end).Position(1)+h_ax(end,end).Position(3)+12;
-	h_leg.Position(2) = 0;
+	h_leg.Position(1) = h_leg.Position(1) + 125;%figWidth-20;% h_ax(end,end).Position(1)+h_ax(end,end).Position(3)+12;
+	h_leg.Position(2) = 10;
   		
 			

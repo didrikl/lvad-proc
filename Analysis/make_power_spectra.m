@@ -1,13 +1,15 @@
-function [F,psds] = make_power_spectra(Data,F,vars,id_specs)
-    
-    welcome('Calculate power spectra','function')
+function [F,psds] = make_power_spectra(Data,F,vars,id_specs,fs)
+    % TODO: Split function into spectral desities pxx calculation function and
+	% another function for bandpower and mean-power-frequency based on pxx.
+    welcome('Make power spectra','function')
     
     psds = struct;
     speeds = unique(id_specs.pumpSpeed);
     seqs = fieldnames(Data);
-    fs = 750;
-    %band_harm_lims = [2.5,6.9];%(fs/2)/(3100/60)-0.5];
+    
+	%band_harm_lims = [2.5,6.9];%(fs/2)/(3100/60)-0.5];
     band_harm_lims = [1.10,2.9];%(fs/2)/(3100/60)-0.5];
+	third_harm_band_lims = [2.99,3.01];%(fs/2)/(3100/60)-0.5];
     
     pxx = cell(numel(seqs),1);
     for j=1:numel(seqs)
@@ -24,8 +26,9 @@ function [F,psds] = make_power_spectra(Data,F,vars,id_specs)
             if isempty(S_speed), continue; end
             
             band = band_harm_lims*(double(speeds(k))/60);
+			third_harm_band = third_harm_band_lims*(double(speeds(k))/60);
             psds_speed{k} = groupsummary(S_speed,{'analysis_id'},...
-                @(x)make_psd(x,fs,band),vars);
+                @(x)make_psd(x,fs,band,third_harm_band),vars);
             
         end
         
@@ -43,12 +46,14 @@ function [F,psds] = make_power_spectra(Data,F,vars,id_specs)
     for i=1:numel(vars)
         v = vars{i};
         T = splitvars(T,v,...
-            'NewVariableNames',v+["_pxx","_f","_mpf","_pow","_bmpf","_bpow"]);
+            'NewVariableNames',v+["_pxx","_f","_mpf","_pow","_bpow","_h3pow"]);
         T.(v+"_mpf") = cell2mat(T{:,v+"_mpf"});
         T.(v+"_pow") = cell2mat(T{:,v+"_pow"});
-        T.(v+"_bmpf") = cell2mat(T{:,v+"_bmpf"});
         T.(v+"_bpow") = cell2mat(T{:,v+"_bpow"});
-    end
+		if not(contains(v,'nf'))
+			T.(v+"_h3pow") = cell2mat(T{:,v+"_h3pow"});
+		end
+	end
      
     f = T.(vars{1}+"_f"){1};
     pxx = T(:,endsWith(T.Properties.VariableNames,...
@@ -61,10 +66,11 @@ function [F,psds] = make_power_spectra(Data,F,vars,id_specs)
     psds.f = f;
     psds.pow = pows;
     
-    F = join(F,psds.pow,'Keys',{'id','analysis_id'});
+	F = join(F,psds.pow,'Keys',{'id','analysis_id'});
     
-function c = make_psd(x,fs,band)
+function c = make_psd(x,fs,band,third_harm_band)
      [pxx,f] = periodogram(detrend(x),[],[],fs);
      [mpf,pow] = meanfreq(pxx,f);
-     [bmpf,bpow] = meanfreq(pxx,f,band);
-     c = {pxx,f,mpf,pow,bmpf,bpow};
+     [~,bpow] = meanfreq(pxx,f,band);
+	 h3pow = bandpower(pxx, f, third_harm_band, 'psd'); 
+     c = {pxx,f,mpf,pow,bpow,h3pow};

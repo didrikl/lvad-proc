@@ -1,9 +1,15 @@
+%% Path for source code
 
-%% Clearing of memory and command line
+% Load source code paths into Matlab path
+addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 
 % Make command window empty (but keeping command history in memory)
 fprintf(repmat('\n',1,20))
 home
+ls
+
+
+%% Clearing of memory
 
 % Close all figures
 close all;
@@ -14,12 +20,6 @@ if numel(who)>1
     answer = questdlg('Clear all (workspace variables and more)?','Yes','No');
     if strcmp(answer,'Yes'), clear variables; end
 end
-
-
-%% Path for source code
-
-% Load source code paths into Matlab path
-addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 
 
 %% Information
@@ -49,3 +49,4 @@ warning('off','backtrace')
 set(groot,'defaultAxesCreateFcn','disableDefaultInteractivity(gca)')
 
 %set(groot,'DefaultFigureGraphicsSmoothing','on')
+set(0, 'DefaultFigureRenderer', 'painters');

@@ -6,7 +6,8 @@ function F_diff = make_feats_diff(feats,fnc,nominalAsBaseline)
 	
 	seqs = unique(feats.seq);
     F_diff = cell(numel(seqs),1);
-    cols = get_varname_of_specific_type(feats,'numeric');
+	cols = get_varname_of_specific_type(feats,'numeric');
+	cols = cols(not(contains(cols,{'speed','Speed'})));
 	    
 	% Separate each sequence of feats to look for baseline reference values
     for i=1:numel(seqs)

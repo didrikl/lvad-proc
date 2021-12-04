@@ -4,29 +4,35 @@
 % Figure 3 in submission for ASAIO
 
 nhaVars = {
-     'accA_y_nf_pow',[0,0.008]
+%      'accA_x_nf_pow',[0,0.008]
+      'accA_y_nf_pow',[0,8]
+%      'accA_z_nf_pow',[0,0.008]
+%	 'accA_y_nf_stdev',[]
      %'accA_x_nf_bpow',[0,0.008]
      %'accA_norm_nf_pow',[0,0.008]
-     %'accA_norm_nf_bpow',[0,0.008]
-
+	 %'p_eff_mean',[55,100]
+	 %'pGrad_mean',[]
+	 %'Q_LVAD_mean',[0 8]
  };
 levelLabels = {
+%	'Inflated, 4.31 mm', 'Catheter 1'
 	'Inflated, 4.73 mm', 'Catheter 1'
+%	'Inflated, 6.00 mm', 'Catheter 2'
 	'Inflated, 6.60 mm', 'Catheter 2'
+%	'Inflated, 7.30 mm', 'Catheter 3'
 	'Inflated, 8.52 mm', 'Catheter 3'
-	%'Inflated, 9 mm',    'Catheter 4'
+%	'Inflated, 9 mm',    'Catheter 4'
 	%'Inflated, 10 mm',   'Catheter 4'
 	'Inflated, 11 mm',   'Catheter 4'
+	%'Inflated, 12 mm',   'Catheter 4'
 	};
 xVar = 'arealOccl_pst';
 xLims = [0,100];
-titleStr = 'Pendulating Mass in Inlet Conduit';
-xLab = 'Areal occlusion (%)';
-figWidth = 275*size(levelLabels,1);
+tit = 'Pendulating Mass in Inlet Conduit';
+xLab = 'Areal inflow occlusion (%)';
 
 close all
-plot_nha_power_and_flow_per_intervention(...
-	F,G.med,R,nhaVars,levelLabels,xVar,xLims,xLab,titleStr,figWidth);
+plot_nha_power_and_flow_per_intervention(F,G.med,R,nhaVars,levelLabels,xVar,xLims,xLab,tit,'effect');
 
 
 %% NHA, Q and P for afterload and prelod side by side 
@@ -37,17 +43,18 @@ plot_nha_power_and_flow_per_intervention(...
 close all
 
 nhaVars = {
-     %'accA_x_nf_bpow',[0,0.008]
-     'accA_y_nf_bpow',[0,0.008]
-     %'accA_z_nf_pow',[0,0.008]
-     %'accA_norm_nf_pow',[0,0.008]
-	 %'accA_norm_nf_bpow',[0,0.008]
+     %'accA_x_nf_bpow',[0,8]
+     %'accA_y_nf_bpow',[0,8]
+    'accA_y_nf_pow',[0 8]
+     %%'accA_z_nf_pow',[0,8]
+     %'accA_norm_nf_pow',[0,8]
+	 %'accA_norm_nf_bpow',[0,8]
 	 };
  
 % Level categories plotted together
 levelLabels = {
-	'Afterload', 'Outflow tube clamp'
-	'Preload',   'Inflow tube clamp'
+	'Afterload', 'Outflow clamp'
+	'Preload',   'Inflow clamp'
 	};
 
 % Levels in separate panels 
@@ -63,29 +70,27 @@ levelLabels = {
 	
 xVar = 'QRedTarget_pst';
 xLims = [0,100];
-figWidth = 950;
 xLab = 'Flow rate reduction targets (%)';
-titleStr = 'Control intervensions';
+tit = 'Control intervensions';
 
-plot_nha_power_and_flow_per_intervention(...
- 	F,G.med,R,nhaVars,levelLabels,xVar,xLims,xLab,titleStr,figWidth);
+plot_nha_power_and_flow_per_intervention(F,G.med,R,nhaVars,levelLabels,xVar,xLims,xLab,tit,'control');
 
 
-%% ROC curves for each pooled diameter states and each speed
+%% ROC curves for each diameter states and each speed
 % Overlaid classifier curves 
 % [no of states]x[no of speeds] panels 
 % Figure 4 in submission for ASAIO
 
 classifiers = {
- 	'accA_y_nf_pow', 'SBP_{\ity}';
-	'accA_x_nf_pow', 'SBP_{\itx}';
-	'accA_z_nf_pow', 'SBP_{\itz}';
-	...'accA_xynorm_nf_pow', 'SBP_{\it|xy|}';
+ 	'accA_y_nf_pow', 'NHA_{\ity}';
+	'accA_x_nf_pow', 'NHA_{\itx}';
+	'accA_z_nf_pow', 'NHA_{\itz}';
+	...'accA_xynorm_nf_pow', 'NHA_{\it|xy|}';
 	};
-titleStr = 'ROC Curves for Pendulating Mass States';
+tit = 'ROC Curves for Pendulating Mass States';
 
 close all
-plot_roc_curve_matrix_per_intervention_and_speed(ROC,F,classifiers,titleStr);
+plot_roc_curve_matrix_per_intervention_and_speed(ROC,F,classifiers,tit);
 
 %% ROC curves for each pooled diameter states
 % Overlaid each speed
@@ -107,10 +112,10 @@ predStates = {
 	'diam_11mm_or_more', '>= 11mm'
 	%'diam_12mm', '= 12mm'
 	};
-titleStr = 'ROC Curves for Pool of Pendulating Mass States';
+tit = 'ROC Curves for Pool of Pendulating Mass States';
 
 close all
-plot_roc_curves_per_pooled_interventions(F_ROC,classifiers,predStates,titleStr);
+plot_roc_curves_per_pooled_interventions(F_ROC,classifiers,predStates,tit);
 
 %% Absolute NHA versus flow scatter
 % Intervention type grouping by color
@@ -123,7 +128,8 @@ vars = {
    };
 
 close all
-h_figs = plot_scatter_acc_against_Q(F,vars);
+plot_scatter_acc_against_Q(F,vars);
+plot_scatter_relative_acc_and_Q_LVAD_against_Q(F,F_rel,vars);
 
 %% Individual effects aginst categories of Q red. and balloon occlusions
 % [no of speeds]x1panels
@@ -133,17 +139,25 @@ h_figs = plot_scatter_acc_against_Q(F,vars);
 vars = {
 	%'accA_x_nf_pow', [0,0.011]
 	'accA_y_nf_pow', [0,0.011]
-	%'accA_norm_nf_pow', [0,0.011]
 	%'accA_y_nf_bpow', [0,0.011]
-	%'accA_norm_nf_bpow', [0,0.011]
 	%'accA_y_nf_mpf', [90,210]
 	};
 
 close all
-plot_individual_effects_against_interv_cats_per_speed(vars,{'Absolute','Medians'},F,'Absolute median effects');
+plot_individual_effects_against_interv_cats_per_speed(...
+	vars,{'Absolute','Medians'},F,'Absolute median effects');
 
-%% TODO: Make plot of aggregates with errorbars
+%% Aggregated effects aginst categories of Q red. and balloon occlusions
+% [no of speeds]x1panels
+% Includes all diameters (incl. intermediate levels) 
+% D is numerical (unevenly distributed)
 
-% plot_individual_effects_against_interv_cats_per_speed(...
-% 	G.med,vars,{'Absolute','Medians'},G.q1,G.q3,F,'Absolute median effects');
-% 
+vars = {
+	%'accA_x_nf_pow', [0,0.011]
+	'accA_y_nf_pow', [0,0.011]
+	%'accA_y_nf_bpow', [0,0.011]
+	%'accA_y_nf_mpf', [90,210]
+	};
+
+close all
+plot_aggregate_effects_against_interv_cats_per_speed(G.med,vars,{'median','absolute'},G.q1,G.q3)

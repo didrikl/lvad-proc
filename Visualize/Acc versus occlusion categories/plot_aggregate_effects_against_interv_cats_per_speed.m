@@ -1,8 +1,9 @@
-function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
-        T,yVars,type,T_err_neg,T_err_pos,F)
+function h_fig = plot_aggregate_effects_against_interv_cats_per_speed(...
+        T,yVars,type,T_err_neg,T_err_pos)
     
     if nargin<5, T_err_pos = T_err_neg; end
-    specs = get_specs_for_plot_NHA
+    
+	specs = get_plot_specs;  
     markers = {'o','pentagram','square','diamond','hexagram'};
     err_bar_specs = {
         'LineWidth',2,...
@@ -13,7 +14,6 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
         'CapSize',8
         };
                  
-    speeds = [2200,2500,2800,3100];
     speeds = [2500,2800];
     
     balCats = {
@@ -25,15 +25,12 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
         };
     
 	T.QRedTarget_pst = double(string(T.QRedTarget_pst));
-	F.QRedTarget_pst = double(string(F.QRedTarget_pst));
-
+	
     %ctrl_levels = [80,60,40,20,10];
     ctrl_levels = [10,20,40,60,80];
     
     drop_inds = contains(string(T.analysis_id),'.1 #2') | T.contingency;
     T = T(not(drop_inds),:);
-    F_drop_inds = contains(string(F.analysis_id),'.1 #2') | F.contingency;
-    F = F(not(F_drop_inds),:);
     T_err_neg = T_err_neg(not(drop_inds),:);
     T_err_pos = T_err_pos(not(drop_inds),:);
     if strcmpi(type{2},'medians')
@@ -63,8 +60,6 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
                 
                 inds_i = T.categoryLabel==balCats(i) & T.pumpSpeed==speeds(s);
                 T_i = T(inds_i,:);
-                F_inds_i = F.categoryLabel==balCats(i) & F.pumpSpeed==speeds(s);
-                F_i = F(F_inds_i,:);
                 T_err_neg_i = T_err_neg(inds_i,:);
                 T_err_pos_i = T_err_pos(inds_i,:);
                 
@@ -79,20 +74,16 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
                 
                 x = double(string(T_i.balloonDiam));
                 x(isnan(x)) = 0;
-%                 h_err(end+1) = errorbar(x,T_i.(var),T_err_neg_i.(var),T_err_pos_i.(var),...
-%                      err_bar_specs{:},...
-%                      'Marker',markers{i}...
-%                      );
-				plot(F_i.balloonDiam,F_i.(var),...
-				'LineStyle','none','Marker','.','MarkerSize',20,'Color',h.ColorOrder(i,:))
-			
+                 h_err(end+1) = errorbar(x,T_i.(var),T_err_neg_i.(var),T_err_pos_i.(var),...
+                      err_bar_specs{:},...
+                      'Marker',markers{i}...
+                      );
+				
                 diams = [diams;x];
             end
             
             T_aft = T(T.categoryLabel=='Afterload increase',:);
-            F_aft = F(F.categoryLabel=='Afterload increase',:);
             T_pre = T(T.categoryLabel=='Preload decrease',:);
-            F_pre = F(F.categoryLabel=='Preload decrease',:);
             T_aft_err_neg = T_err_neg(T_err_neg.categoryLabel=='Afterload increase',:);
             T_pre_err_neg = T_err_neg(T_err_neg.categoryLabel=='Preload decrease',:);
             T_aft_err_pos = T_err_pos(T_err_pos.categoryLabel=='Afterload increase',:);
@@ -103,38 +94,28 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
             for m=1:M
                 T_aft.balloonDiam(T_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
                 T_pre.balloonDiam(T_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
-                F_aft.balloonDiam(F_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
-                F_pre.balloonDiam(F_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
             end
             
             T_aft_n = T_aft(T_aft.pumpSpeed==speeds(s),:);
-            F_aft_n = F_aft(F_aft.pumpSpeed==speeds(s),:);
             T_aft_n_err_neg = T_aft_err_neg(T_aft_err_neg.pumpSpeed==speeds(s),:);
             T_aft_n_err_pos = T_aft_err_pos(T_aft_err_pos.pumpSpeed==speeds(s),:);
             x = double(string(T_aft_n.balloonDiam));
             
-% 			h_err(end+1) = errorbar(x,T_aft_n.(var),T_aft_n_err_neg.(var),T_aft_n_err_pos.(var),...
-%                 err_bar_specs{:},...
-%                 'Marker',markers{1},...
-%                 'Color',[0,0,0]);
-            plot(F_aft_n.balloonDiam,F_aft_n.(var),...
-				'LineStyle','none','Marker','.','MarkerSize',20,'Color',[0,0,0,0.5])
-			
+			h_err(end+1) = errorbar(x,T_aft_n.(var),T_aft_n_err_neg.(var),T_aft_n_err_pos.(var),...
+                 err_bar_specs{:},...
+                 'Marker',markers{1},...
+                 'Color',[0,0,0]);
+            
             T_pre_n = T_pre(T_pre.pumpSpeed==speeds(s),:);
-            F_pre_n = F_pre(F_pre.pumpSpeed==speeds(s),:);
             T_pre_n_err_neg = T_pre_err_neg(T_pre_err_neg.pumpSpeed==speeds(s),:);
             T_pre_n_err_pos = T_pre_err_pos(T_pre_err_pos.pumpSpeed==speeds(s),:);
             x = double(string(T_pre_n.balloonDiam));
-            %T_pre_n.(var)
-			  
-%             h_err(end+1) = errorbar(x,T_pre_n.(var),T_pre_n_err_neg.(var),T_pre_n_err_pos.(var),...
-%                 err_bar_specs{:},...
-%                  'Marker',markers{1},...
-%                  'Color',[0.5,0.5,0.5]);
-            plot(F_pre_n.balloonDiam,F_pre_n.(var),...
-				'LineStyle','none','Marker','.',...
-				'MarkerSize',20,'Color',[0.5,0.5,0.5,0.5],'MarkerFaceColor',[0.5,0.5,0.5])
-			 
+              
+             h_err(end+1) = errorbar(x,T_pre_n.(var),T_pre_n_err_neg.(var),T_pre_n_err_pos.(var),...
+                 err_bar_specs{:},...
+                  'Marker',markers{1},...
+                  'Color',[0.5,0.5,0.5]);
+             
             xline([0.5,2.83],...
                 'LineWidth',0.75,...
                 'LineStyle','--'...
@@ -185,9 +166,8 @@ function h_fig = plot_effects_in_speed_tiles_with_errorbars_symmetric(...
             %h.YTickLabel = cellstr(string(100*str2double(h.YTickLabel))+"%");
             h.YTick(end) = [];
             
-            if not(s==4)
+            if not(s==numel(speeds))
                 h.XTickLabel = {};
-                %h.TickLength = [0,0];
             end
             h.TickLength = [0,0];
             h.FontSize = 10;

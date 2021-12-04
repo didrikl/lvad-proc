@@ -58,8 +58,8 @@ powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChar
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
-    'pGraft'         'p_graft'      'single'    'continuous'
-    'pMillarLV'      'p_LV'         'single'    'continuous'
+    'pGraft'         'p_graft'     'single'    'continuous'
+    'pMillarLV'      'p_LV'        'single'    'continuous'
     'ECG'            'ecg'         'single'    'continuous'
     'SensorAAccX'    'accA_x'      'single'    'continuous'
     'SensorAAccY'    'accA_y'      'single'    'continuous'

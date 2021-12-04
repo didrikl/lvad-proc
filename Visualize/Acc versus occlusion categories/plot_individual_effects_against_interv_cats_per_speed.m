@@ -1,7 +1,7 @@
 function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
 		yVars,type,F,supTit)
 
-	specs = get_specs_for_plot_NHA;
+	specs = get_plot_specs;
 	speeds = [2500,2800];
 
 	yLabel = 'Classifier values, \itD';

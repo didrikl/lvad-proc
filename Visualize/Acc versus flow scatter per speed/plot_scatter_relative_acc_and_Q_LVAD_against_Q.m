@@ -9,7 +9,7 @@ function h_figs = plot_scatter_relative_acc_and_Q_LVAD_against_Q(F,F_rel,vars)
         'LineWidth',0.4
         };
     
-    speeds = {'2200','2500','2800','3100'};
+    speeds = [2200,2500,2800,3100];
     
     for i=1:size(vars,1)
         var = vars{i,1};
@@ -23,9 +23,10 @@ function h_figs = plot_scatter_relative_acc_and_Q_LVAD_against_Q(F,F_rel,vars)
         
         h = tiledlayout(2,2,'Padding','tight','TileSpacing','tight');
         for j=1:numel(speeds)
+			
             h_ax(j) = nexttile;
             
-            rpm_ind = F_rel.pumpSpeed==speeds(j);
+            rpm_ind = F_rel.pumpSpeed==speeds(j)
             hold on
             h_ax(j).ColorOrderIndex = 4;
             scatter(F.Q_mean(ctrl_ind&rpm_ind),F_rel.Q_LVAD_mean(ctrl_ind&rpm_ind),...
@@ -51,7 +52,7 @@ function h_figs = plot_scatter_relative_acc_and_Q_LVAD_against_Q(F,F_rel,vars)
             xlim(h_ax(j),[1,7.3])
     
             ylims = ylim;
-            title(speeds{j}+" RPM",...
+            title(string(speeds(j))+" RPM",...
                 'FontWeight','normal',...
                 'Position',[mean(xlim),ylims(2)*0.92,0],...
                 'HorizontalAlignment','center');

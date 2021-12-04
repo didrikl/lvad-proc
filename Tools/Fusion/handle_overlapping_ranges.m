@@ -18,17 +18,22 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
 				fprintf('Previous file is merged into current file.')
 				
 				[TT_prev,TT_cur] = handle_duplicate_varnames(TT_prev,TT_cur);
+				
 				prev_filename = string(TT_prev.Properties.UserData.FileName);
 				cur_filename = string(TT_cur.Properties.UserData.FileName);
 				prev_filepath = string(TT_prev.Properties.UserData.FilePath);
 				cur_filepath = string(TT_cur.Properties.UserData.FilePath);
-				
+				prev_comments = TT_prev.Properties.UserData.Comments;
+				cur_comments = TT_cur.Properties.UserData.Comments;
+
 				TT_cur=[TT_prev,TT_cur];
 				
 				TT_cur.Properties.UserData.FileName = cellstr(...
 					[prev_filename,cur_filename]);
 				TT_cur.Properties.UserData.FilePath = cellstr(...
 					[prev_filepath,cur_filepath]);
+				TT_cur.Properties.UserData.Comments = unique(...
+					[prev_comments;cur_comments]);
 				
 			end
 			fprintf('\n')
@@ -41,6 +46,7 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
 				'but current file contains additional timestamps. ',...
 				'Overlapping rows in current file is deleted'])
 			TT_cur(isOverlapRows,:) = [];
+			[TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge);
 			
 		elseif all(isOverlapRows)
 			
@@ -49,6 +55,7 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
 				'previous file contains additional timestamps. ',...
 				'Overlapping rows in previous file is deleted'])
 			TT_prev(isOverlapRows_prev,:) = [];
+			[TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge);
 			
 		else
 			
@@ -58,6 +65,7 @@ function [TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge)
 				'Overlapping rows in current file is deleted'],...
 				nnz(isOverlapRows),height(TT_cur)));
 			TT_cur(isOverlapRow) = [];
+			[TT_cur,TT_prev] = handle_overlapping_ranges(TT_cur,TT_prev,parMerge);
 			
 		end
 		

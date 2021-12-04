@@ -3,7 +3,7 @@
 % * Read PowerLab data (PL) and ultrasound (US) files stored as into cell arrays
 % * Read notes from Excel file
 
-welcome(['Initialize data',seq],'module')
+welcome(['Initialize ',seq],'module')
 
 % Read PowerLab data in files exported from LabChart
 pl_filePaths = fullfile(data_basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);

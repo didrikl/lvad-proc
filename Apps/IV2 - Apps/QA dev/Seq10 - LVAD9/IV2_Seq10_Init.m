@@ -1,9 +1,9 @@
 %% Initialze the processing environment and input file structure
 
 % Which experiment
-basePath = 'C:\Data\IVS\Didrik';
+basePath = 'D:\Data\IVS\Didrik';
 sequence = 'IV2_Seq10';
-experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq10 - LVAD9';
+experiment_subdir = 'IV2 - Data\Seq10 - LVAD9';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure

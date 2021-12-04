@@ -12,7 +12,7 @@ function [R,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 	speeds = [2200,2500,2800,3100];
 	
 	% No of bootstrap iterations to calculate AUC confidence intervals
-	nBootItr = 5;
+	nBootItr = 1000;
 	
 	R.pooled = pooled;
 	R.classifiers = classifiers;

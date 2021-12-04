@@ -3,7 +3,7 @@ function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
     
     if nargin<5, T_err_pos = T_err_neg; end
     
-	specs = get_specs_for_plot_NHA;
+	specs = get_plot_specs;
     markers = {'o','pentagram','square','diamond','hexagram'};
     err_bar_specs = {
         'LineWidth',2,...

@@ -171,7 +171,7 @@ function comments = make_comments_table(raw,T)
     comments = table;
     comments.channel = raw.com(:,1);
     comments.time = T.time(raw.com(:,3));
-    comments.text = raw.comtext;
+    comments.comments = raw.comtext(raw.com(:,5),:);
        
 function signal = append_signal_variable_column(signal,col,...
         signal_samplerates, col_samplerates, varname)
