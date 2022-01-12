@@ -73,8 +73,8 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(R,...
 	set([h_ax(:);h_xax(:);h_yax(:)],'XTick',0:0.2:1);
 	set([h_ax(:);h_xax(:);h_yax(:)],'YTick',0:0.2:1);
 	
-	format_axes_in_plot_NHA(h_ax,spec.ax,spec.axTick);
-	format_axes_in_plot_NHA([h_xax,h_yax],spec.ax,spec.axTick);
+	format_axes_in_plot_NHA(h_ax,spec);
+	format_axes_in_plot_NHA([h_xax,h_yax],spec);
 	set(h_ax,spec.rocAx{:})
 			
 	[gap, h_ax] = position_roc_panels(panelLength, h_ax);

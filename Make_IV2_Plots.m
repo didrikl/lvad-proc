@@ -29,9 +29,9 @@ levelLabels = {
 xVar = 'arealOccl_pst';
 xLims = [0,100];
 tit = 'Pendulating Mass in Inlet Conduit';
-xLab = 'Areal inflow occlusion (%)';
+xLab = 'Areal inflow obstruction (%)';
 
-close all
+home; close all
 plot_nha_power_and_flow_per_intervention(F,G.med,R,nhaVars,levelLabels,xVar,xLims,xLab,tit,'effect');
 
 
@@ -79,18 +79,36 @@ plot_nha_power_and_flow_per_intervention(F,G.med,R,nhaVars,levelLabels,xVar,xLim
 %% ROC curves for each diameter states and each speed
 % Overlaid classifier curves 
 % [no of states]x[no of speeds] panels 
-% Figure 4 in submission for ASAIO
+% Figure 6 in submission for ASAIO
 
 classifiers = {
+ 	%'accA_y_pow', 'NHA_{\ity}';
+	%'accA_x_pow', 'NHA_{\itx}';
+	%'accA_z_pow', 'NHA_{\itz}';
  	'accA_y_nf_pow', 'NHA_{\ity}';
-	'accA_x_nf_pow', 'NHA_{\itx}';
-	'accA_z_nf_pow', 'NHA_{\itz}';
+ 	'accA_x_nf_pow', 'NHA_{\itx}';
+ 	'accA_z_nf_pow', 'NHA_{\itz}';
+	%'P_LVAD_drop',   '\itP\rm_{LVAD}';
 	...'accA_xynorm_nf_pow', 'NHA_{\it|xy|}';
 	};
 tit = 'ROC Curves for Pendulating Mass States';
 
-close all
-plot_roc_curve_matrix_per_intervention_and_speed(ROC,F,classifiers,tit);
+%close all
+plot_roc_curve_matrix_per_intervention_and_speed(ROC,classifiers,tit);
+
+%% ROC curves for each diameter states and each speed
+% Overlaid classifier curves 
+% [no of states]x[no of speeds] panels 
+% Figure 4 in submission for ASAIO
+
+classifiers = {
+ 	'accA_x_nf_pow', 'NHA_{\itx}';
+ 	'accA_y_nf_pow', 'NHA_{\ity}';
+ 	'accA_z_nf_pow', 'NHA_{\itz}';
+	};
+tit = 'ROC Curves for Pendulating Mass States by Spatial Component';
+
+plot_roc_curve_matrix_per_intervention_and_xyz(ROC,classifiers,tit);
 
 %% ROC curves for each pooled diameter states
 % Overlaid each speed
@@ -161,3 +179,17 @@ vars = {
 
 close all
 plot_aggregate_effects_against_interv_cats_per_speed(G.med,vars,{'median','absolute'},G.q1,G.q3)
+
+%% Spectrograms 
+% [2x2] panels, controls to the left and balloon interventions to the right
+% Figure 3 in submission for ASAIO
+
+supTit = 'Spectrogram';
+S = Data.IV2_Seq10.S;
+var = 'accA_y_nf';
+rpm = 2800;
+
+close all
+make_spectrogram_figure_IV2(S, supTit, var, rpm, fs_new);
+
+

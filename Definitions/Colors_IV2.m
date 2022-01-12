@@ -50,3 +50,6 @@ Colors.Fig.Cats.Components4 = [
 Colors.Proc.Done_Green = [49,163,84]/256;
 Colors.Proc.Undone_Red = [228,26,28]/256;
 Colors.Proc.Wait_Orange = [255,127,0]/256;
+
+load('ScientificColormaps')
+Colors.Fig.RPM_Order_Map = scientificColormaps.batlow;

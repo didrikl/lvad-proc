@@ -1,6 +1,7 @@
 function [h_ax,h_xax,h_yax] = offset_main_ax(h_ax,h_xax,h_yax,mainXAxGap,mainYAxGap)
 	% Make neccessary formating and offsets for extra set of common axis to 
-	% sets of plot panels
+	% sets of plot panels. Make "actual data axes" invisible.
+		
 	
 	nPanelRows = size(h_ax,1);
 	nPanelCols = size(h_ax,2);

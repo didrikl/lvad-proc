@@ -15,7 +15,13 @@ for i=1:numel(prefixes)
         else
             % strip prefix and add suffix
             newVar = [newPrefixes{i},separator,vars{j}(nCharsPrefix+numel(separator)+1:end)];
-        end
-        T.Properties.VariableNames{vars{j}} = newVar;          
+		end
+
+		% TODO: Checks if varibles already exists by check_table_var_output
+		try
+		T.Properties.VariableNames{vars{j}} = newVar;          
+		catch
+		vars{j}
+	    end
     end
 end

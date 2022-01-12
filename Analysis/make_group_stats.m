@@ -13,10 +13,17 @@ function G = make_group_stats(F,idSpecs)
     G.q3 = groupsummary(F,'analysis_id',@(x)prctile(x,75),F(:,vartype('numeric')).Properties.VariableNames);
     G.iqr = groupsummary(F,'analysis_id',@iqr,F(:,vartype('numeric')).Properties.VariableNames);
     
+	% Automatically made prefixes by groupsummary
+	prefixes = {'mean_','std_','median_','fun1_'};
+
 	% Add categorical info from idSpecs
-    G = structfun(@(S)join(S,idSpecs,'Keys','analysis_id'),G,'UniformOutput',false);
+	G = structfun(@(S) ...
+		removevars(S,ismember(S.Properties.VariableNames,prefixes+"GroupCount"))...
+		,G,'UniformOutput',false);
+    G = structfun( @(S)join(S,idSpecs,'Keys','analysis_id'), ...
+		G,'UniformOutput',false);
     
 	% Tidy up automatically given aggegate names
-	G = structfun(@(S)change_variablename_prefix(S,{'mean_','std_','median_','fun1_'},{'','','',''}),G,'UniformOutput',false);
+	G = structfun(@(S)change_variablename_prefix(S,prefixes,{'','','',''}),G,'UniformOutput',false);
     G = structfun(@(S)movevars(S,idSpecs.Properties.VariableNames,'Before',1),G,'UniformOutput',false);
     

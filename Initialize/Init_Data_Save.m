@@ -25,6 +25,14 @@ save(fullfile(proc_path,[seq,'_Notes']),'Notes')
 display_filename([seq,'_Notes.mat'],proc_path,'\nSaved to:','\t');
 
 seqID = [seq(1:7),sprintf('%.2d',str2double(seq(8:end)))];
+
+S.Description = 'Fused data - Analysis ID segments';
+S_parts.Description = 'Fused data - Part no. segments';
+Notes.Description = 'Pre-processed notes';
+S.UserData.SequenceID = seqID;
+S_parts.UserData.SequenceID = seqID;
+Notes.UserData.SequenceID = seqID;
+
 Data.(seqID).S = S;
 Data.(seqID).S_parts = S_parts;
 Data.(seqID).Notes = Notes; 

@@ -23,7 +23,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 	yVar_row2 = {'P_LVAD_mean',[0 8]};
 	yLabels = {
 		{'\itQ\rm (L/min)'}
-		{'\itP_{\rmLVAD} (W)'}
+		{'\itP_{\rmLVAD}\rm (W)'}
 		{'NHA_{\ity}\rm ({\it{g}^2}/{\rmkHz})'}
 		};
 	legTit = {'RPM'};
@@ -31,8 +31,21 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 	
 	spec = get_plot_specs;
 	figWidth = 1180;
-	figHeight =  900; %955
+	figHeight =  890; %955
     panelHeight = 185; %200
+	yStart = 74;
+	yGap = 7;
+
+	switch intervention
+		case 'control'
+			xGap = 60;
+			panelWidth = 300;
+			xStart = 105;
+		case 'effect'
+			xGap = 22;
+			xStart = 68;
+			panelWidth = 165;
+	end
 	
 	% Offsets for common axes
 	mainXAxGap = 0.01;
@@ -71,18 +84,16 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 			h_ax(1,j) = subplot(nRows,nCols,j,spec.subPlt{:});
 			if j==1, h_yax(1) = copyobj(h_ax(1,j),gcf); end
 			
-			[~,h_qPts,h_qLines] = plot_group_and_individual_data(h_ax(1,j),...
-				G(G_inds,:),F(F_inds,:),speeds,xVar,xLims,yVar_row1,...
-				spec,R(R_inds,:));
+			plot_group_and_individual_data(h_ax(1,j),G(G_inds,:),F(F_inds,:),...
+				speeds,xVar,xLims,yVar_row1,spec,R(R_inds,:));
 			
 			% Plot panel row 2 with LVAD power data
 			% ---------------------------------------------------
 			h_ax(2,j) = subplot(nRows,nCols,nCols+j,spec.subPlt{:});
 			if j==1, h_yax(2) = copyobj(h_ax(2,j),gcf); end
 			
-			[~,h_powPts,h_powLines] = plot_group_and_individual_data(h_ax(2,j),...
-				G(G_inds,:),F(F_inds,:),speeds,xVar,xLims,yVar_row2,...
-				spec,R(R_inds,:));
+			plot_group_and_individual_data(h_ax(2,j),G(G_inds,:),F(F_inds,:),...
+				speeds,xVar,xLims,yVar_row2,spec,R(R_inds,:));
 			
 			% Panel row with 3 NHA data
 			% ---------------------------------------------------
@@ -90,85 +101,77 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 			if j==1, h_yax(3) = copyobj(h_ax(3,j),gcf); end
 			h_xax(j) = copyobj(h_ax(3,j),gcf);
 			
-			[h_nha,h_nhaPts,h_nhaLines] = plot_group_and_individual_data(h_ax(3,j),...
-				G(G_inds,:),F(F_inds,:),speeds,xVar,xLims,nhaVar(v,:),...
-				spec,R(R_inds,:));
+			h_nha = plot_group_and_individual_data(h_ax(3,j),G(G_inds,:),...
+				F(F_inds,:),speeds,xVar,xLims,nhaVar(v,:),spec,R(R_inds,:));
 					
 		end
 		
-		format_axes_in_plot_NHA(h_ax,spec.ax,spec.axTick);
-		format_axes_in_plot_NHA([h_xax,h_yax],spec.ax,spec.axTick);
- 		
-		
+		format_axes_in_plot_NHA(h_ax,spec);
+		format_axes_in_plot_NHA([h_xax,h_yax],spec);
+ 				
 		% Adjust axes positions (after all content is made)
 		% ---------------------------------------------------
 		
-		yGap = 9;
-		rowStart = 74;
-		switch intervention
-			case 'control'
-				xGap = 60;
-				panelWidth = 300;
-				colStart = 105;
-				for i=1:nRows
-					rowPos = (nRows-i)*(panelHeight+yGap)+rowStart;
-					for j=1:nCols
-						colPos = (j-1)*(panelWidth+xGap)+colStart;
-						h_ax(i,j).Position = [colPos,rowPos,panelWidth,panelHeight];
-					end
-				end
-			case 'effect'
-				xGap = 22;
-				colStart = 68;
-				panelWidth = 165;
-				for i=1:nRows
-					rowPos = (nRows-i)*(panelHeight+yGap)+rowStart;
-					for j=1:nCols
-						colPos = (j-1)*(panelWidth+xGap)+colStart;
-						h_ax(i,j).Position = [colPos,rowPos,panelWidth,panelHeight];
-					end
-				end
-		end
-
-		
-	    % Add annotations 
+		adjust_panel_positions(h_ax,xGap,yGap,yStart,xStart,...
+			panelWidth,panelHeight);
+	    
+		% Add annotations 
 		% ------------------
 		
-		%sgtitle(supTit,spec.supTit{:});
-		h_ax = add_shaded_boxes_and_titles(h_ax,levelLabels(:,2),...
+		h_ax = add_shaded_boxes_and_subtitles(h_ax,levelLabels(:,2),...
 			panelHeight,panelWidth,yGap,spec);
 		
 		h_leg = add_legend_to_plot_NHA(h_nha,speeds,spec,legTit);
-		h_leg.Position(1) = h_ax(end,end).Position(1)+h_ax(end,end).Position(3)+12;
+		h_leg.Position(1) = h_ax(end,end).Position(1)+h_ax(end,end).Position(3)+15;
 		h_leg.Position(2) = 65;		
   		
 		% Add row y-labels
-		h_yLab = add_subYLabels_to_plot_NHA(h_yax,yLabels);
-		for i=1:nRows
-  			h_yLab(i).Position(1) = -27;
-			h_yLab(i).Position(2) = h_yLab(i).Position(2)+22;
-  		end
-		h_yLab(1).Position(1) = -29;
-
+		h_yLab = add_subYLabels_to_plot_NHA(h_yax,yLabels,spec);
+		
 		% Add common x label, must be done after other repositioning
-		h_supLab = add_supLabel(xLab,spec.supXLab,'x');
-		h_supLab.Position(2) = h_supLab.Position(2)+7;
-  		
-		h_ax = make_intervention_ticks_bold(h_ax);
+		h_supLab = add_supLabel(xLab,spec,'x');
 
-		% Make main axes offset
+		h_ax = make_intervention_ticks_bold(h_ax);
+		adjust_axis_label_positions(h_yLab,h_supLab);
+
+		% Make main axes offset and "actual data axes" invisible
 		offset_main_ax(h_ax,h_xax,h_yax,mainXAxGap,mainYAxGap);
   		%make_xy_halfframe(h_ax)
 
-		% Fix overlapping xlabel issues
-		if strcmp(intervention,'effect')
-			for j=1:nCols-1, h_xax(j).XTickLabel{end} = '100  ';end
-			for j=2:nCols, h_xax(j).XTickLabel{1} = ' 0';end
-		end
-		for i=1:nRows
-			h_yax(i).YTick(end) = '';
-		end
+		fix_overlapping_labels(intervention,h_xax,h_yax);
 		
 	end
+
+function h_ax = adjust_panel_positions(h_ax,xGap,yGap,rowStart,colStart,width,height)
+	nRows = size(h_ax,1);
+	nCols = size(h_ax,2);
+	for i=1:nRows
+		rowPos = (nRows-i)*(height+yGap)+rowStart;
+		for j=1:nCols
+			colPos = (j-1)*(width+xGap)+colStart;
+			h_ax(i,j).Position = [colPos,rowPos,width,height];
+		end
+	end
+
+function h_yLab = adjust_axis_label_positions(h_yLab,h_supLab)
+	for i=1:numel(h_yLab)
+		h_yLab(i).Position(2) = h_yLab(i).Position(2)+22;
+	end
+
+	h_yLab(1).Position(1) = -37;
+	h_yLab(2).Position(1) = -31;
+	h_yLab(3).Position(1) = -29;
 	
-end
+	h_supLab.Position(2) = h_supLab.Position(2)+12;
+
+function [h_xax,h_yax] = fix_overlapping_labels(intervention,h_xax,h_yax)
+	nCols = numel(h_xax);
+	nRows = numel(h_yax);
+	if strcmp(intervention,'effect')
+		for j=1:nCols-1, h_xax(j).XTickLabel{end} = '100  ';end
+		for j=2:nCols, h_xax(j).XTickLabel{1} = ' 0';end
+	end
+
+	for i=1:nRows
+		h_yax(i).YTick(end) = '';
+	end

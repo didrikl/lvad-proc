@@ -31,7 +31,7 @@ for i=1:numel(X)-1
 end
 
 plot(X,Y,'LineWidth',line_width,'Color',color_value);
-hold off
+%hold off
 
 end
 

@@ -6,12 +6,13 @@ function T_parts = add_moving_statistics(T_parts, varNames, statistics, newVarsN
     % doing interventions, which would avoid such gaps.
     
     % TODO: Make this an model object method
+	% TODO: Implement use of newVarsNames argument
     
     statSpecs = {
         % Supported   Win len (sec) Suffix
         'rms',        1,            '_movRMS'
         'var',        10,           '_movVar'
-        'std',        10,            '_movStd'
+        'std',        10,           '_movStd'
         'min',        5,            '_movMin'
         'max',        5,            '_movMax'
         'avg',        10,           '_movAvg'

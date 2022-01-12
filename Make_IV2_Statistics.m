@@ -16,6 +16,7 @@ meanVars = {'p_eff','pGrad','Q','accA_x','accA_y','accA_z','accA_xynorm_nf',...
 	'accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'};
 medianVars = {};
 F_all = make_intervention_stats(Data,discrVars,meanVars,medianVars,idSpecs);
+F_all.P_LVAD_drop = -F_all.P_LVAD_mean;
 
 % Make band powers and periodograms of vibration variables of each intervention
 accVars = {'accA_x','accA_y','accA_z','accA_x_nf','accA_y_nf','accA_z_nf'};
@@ -43,10 +44,10 @@ clear discrVars meanVars medianVars accVars
 %% Make feature table for ROC analysis, with pooled diameter state vars
 
 % Turn Power elevation into Power drop
-F_ROC = join(F,F_del(:,{'id','P_LVAD_mean'}),'keys','id');
-F_ROC.Properties.VariableNames{'P_LVAD_mean_F'} = 'P_LVAD_mean';
-F_ROC.Properties.VariableNames{'P_LVAD_mean_right'} = 'P_LVAD_drop';
-F_ROC.P_LVAD_drop = -F_ROC.P_LVAD_drop;
+%F_ROC = join(F,F_del(:,{'id'}),'keys','id');
+%F_ROC.Properties.VariableNames{'P_LVAD_mean_F'} = 'P_LVAD_mean';
+%F_ROC.Properties.VariableNames{'P_LVAD_mean_right'} = 'P_LVAD_drop';
+%F_ROC.P_LVAD_mean_right = [];
 
 % Make boolean state variables for SPSS
 F_ROC.('diam_4.31mm_or_more') = F_ROC.balloonDiam>=4.30;
@@ -189,6 +190,8 @@ classifiers = {
  	'accA_y_nf_pow'
  	'accA_x_nf_pow'
  	'accA_z_nf_pow'
+	'P_LVAD_mean'
+	'P_LVAD_drop'
 	%'accA_xynorm_nf_pow'
 	};
 
