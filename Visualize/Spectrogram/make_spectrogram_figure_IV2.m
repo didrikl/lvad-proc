@@ -39,8 +39,7 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs)
 
 	Colors_IV2
 	spec = get_plot_specs;
-	colorMap = scientificColormaps.batlowW;
-	% colormap(scientificColormaps.lisbon)
+	colorMap = scientificColormaps.batlowW; % colormap(scientificColormaps.lisbon)
 	colorRange = [-62,-40]; % for Seq13
 	
 	IDs1 = make_segment_id_for_given_rpm(rpm, IDs1);
@@ -57,19 +56,19 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs)
 	
 	hSub(1,1) = subplot(2,2,1,spec.subPlt{:});
 	plot_rpm_order_map(hSub(1,1), colorRange, colorMap, mapTime1, order1, map1, yLim_map, segEnds1);
-	hSubTit(1,1) = subtitle({'Control interventions,', 'outflow clamp'});
-	hNum(1,1) = text(15,3.85,'A');
 	
 	hSub(1,2) = subplot(2,2,2,spec.subPlt{:});
 	plot_rpm_order_map(hSub(1,2),colorRange, colorMap, mapTime2, order2, map2, yLim_map, segEnds2);
-	hSubTit(1,2) = subtitle({'Balloon interventions,','areal inflow obstructions'});
-	hNum(1,2) = text(15,3.85,'B');
-	
 	hSub(2,1) = subplot(2,2,3,spec.subPlt{:});
 	plot_curves(T1);
 	hSub(2,2) = subplot(2,2,4,spec.subPlt{:});
 	hPlt = plot_curves(T2);
 	
+	% Add annotations
+	hSubTit(1) = subtitle(hSub(1,1),{'Control interventions,','outflow clamp'});
+	hSubTit(2) = subtitle(hSub(1,1),{'Balloon interventions,','areal inflow obstructions'});
+	hNum(1) = text(hSub(1,1),15,3.85,'A');
+	hNum(2) = text(hSub(1,2),15,3.85,'B');
 	add_xlines(hSub, segStarts1, segStarts2, spec);
 	hLeg = legend(hPlt,legStr,spec.leg{:},'FontSize',15);
 	hColBar = add_colorbar(hSub, spec);
@@ -77,6 +76,7 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs)
 	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm, order2);
 	hXLab = xlabel('(sec)',spec.xLab{:});
 	
+	% Adjustments
 	adjust_axes_limits_and_ticks(hSub);
 	hSub = position_panels(hSub, xStart, yStart, segEnds1, segEnds2, ...
 		panelWidthFactor, panelHeight, xGap, yGap);

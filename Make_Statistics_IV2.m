@@ -1,10 +1,3 @@
-%% Init preprocessed data from raw data or already preprocessed 
-
-% Init from raw data or already pre-processed
-%Init_IV2_Preprocess
-%Init_IV2_Preprocessed
-
-
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 Environment_Analysis_IV2
@@ -20,7 +13,8 @@ F_all.P_LVAD_drop = -F_all.P_LVAD_mean;
 
 % Make band powers and periodograms of vibration variables of each intervention
 accVars = {'accA_x','accA_y','accA_z','accA_x_nf','accA_y_nf','accA_z_nf'};
-[F_all,psds] = make_power_spectra(Data,F_all,accVars,idSpecs,fs_new);
+hBands = [1.10,2.9];
+[F_all,psds] = make_power_spectra(Data,F_all,accVars,idSpecs,fs_new,hBands,'IV2');
 
 % Make relative and delta differences from tagged baselines 
 F_rel_all = calc_relative_feats(F_all);
@@ -39,7 +33,7 @@ save_data('Features - Delta', feats_path, F_del, {'matlab','spreadsheet'});
 %save_data('Power spectra densities', feats_path, F_rel, 'matlab');
 
 multiWaitbar('CloseAll');
-clear discrVars meanVars medianVars accVars
+clear save_data discrVars meanVars medianVars accVars hBands
 
 %% Make feature table for ROC analysis, with pooled diameter state vars
 
@@ -134,6 +128,7 @@ save_data('Group median of features - Delta', stats_path, G_del.med, 'spreadshee
 save_data('Group 25-percentile of features - Delta', stats_path, G_del.q1, 'spreadsheet');
 save_data('Group 75-percentile of features - Delta', stats_path, G_del.q3, 'spreadsheet');
 
+clear save_data
 
 %% Do Wilcoxens pair test and make table of median and p-values
 % Make stats table
@@ -227,6 +222,4 @@ pooled = false;
 save_data('Results - AUC', stats_path, AUC, {'spreadsheet','matlab'});
 save_data('Results - ROC curve info', stats_path, ROC, 'matlab');
 
-%% Round up
-clear save_data
-clear pVars pooled classifiers predStateVar predStates
+clear save_data pVars pooled classifiers predStateVar predStates

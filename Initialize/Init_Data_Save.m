@@ -24,6 +24,7 @@ multiWaitbar('Saving S','Busy','Close');
 save(fullfile(proc_path,[seq,'_Notes']),'Notes')
 display_filename([seq,'_Notes.mat'],proc_path,'\nSaved to:','\t');
 
+% TODO: 1:7 is only for IV2_Seq[]. Make generic to include G1_Seq[]
 seqID = [seq(1:7),sprintf('%.2d',str2double(seq(8:end)))];
 
 S.Description = 'Fused data - Analysis ID segments';

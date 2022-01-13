@@ -70,7 +70,7 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_xyz(R,...
 
 	
 	% Format axes
-	format_axes_in_plot_NHA(h_ax,spe);
+	format_axes_in_plot_NHA(h_ax,spec);
 	format_axes_in_plot_NHA([h_xax,h_yax],spec);
 	%set(h_ax,spec.rocAx{:})
 	h_ax = position_panels(panelLength, h_ax, gap_x,gap_y);

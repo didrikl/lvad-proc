@@ -1,6 +1,7 @@
 clear PL US 
 %clear S_parts
 
+clar input i
 clear ultrasound_subdir powerlab_subdir notes_subdir experiment_path
 clear pl_filePaths us_filePaths notes_filePath
 %clear labChart_varMapFile systemM_varMapFile notes_varMapFile

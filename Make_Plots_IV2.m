@@ -1,7 +1,19 @@
+%% Spectrograms 
+% [2x2] panels, controls to the left and balloon interventions to the right
+% Figure 3 in submission for ASAIO
+
+supTit = 'Spectrogram';
+S = Data.IV2_Seq10.S;
+var = 'accA_y_nf';
+rpm = 2800;
+
+close all
+make_spectrogram_figure_IV2(S, supTit, var, rpm, fs_new);
+
 %% NHA, Q and P, per catheter type
 % Pendulating Mass in Inlet Conduit
 % 3 X [nLevels] panels
-% Figure 3 in submission for ASAIO
+% Figure 5 in submission for ASAIO
 
 nhaVars = {
 %      'accA_x_nf_pow',[0,0.008]
@@ -38,7 +50,7 @@ plot_nha_power_and_flow_per_intervention(F,G.med,R,nhaVars,levelLabels,xVar,xLim
 %% NHA, Q and P for afterload and prelod side by side 
 % Control intervention
 % 3 X 2 panels
-% Figure 2 in submission for ASAIO
+% Figure 4 in submission for ASAIO
 
 close all
 
@@ -77,7 +89,7 @@ plot_nha_power_and_flow_per_intervention(F,G.med,R,nhaVars,levelLabels,xVar,xLim
 
 
 %% ROC curves for each diameter states and each speed
-% Overlaid classifier curves 
+% Overlaid component curves 
 % [no of states]x[no of speeds] panels 
 % Figure 6 in submission for ASAIO
 
@@ -93,13 +105,12 @@ classifiers = {
 	};
 tit = 'ROC Curves for Pendulating Mass States';
 
-%close all
+close all
 plot_roc_curve_matrix_per_intervention_and_speed(ROC,classifiers,tit);
 
-%% ROC curves for each diameter states and each speed
-% Overlaid classifier curves 
-% [no of states]x[no of speeds] panels 
-% Figure 4 in submission for ASAIO
+%% ROC curves for each diameter states and each component
+% Overlaid speed curves 
+% [no of states]x[3] panels
 
 classifiers = {
  	'accA_x_nf_pow', 'NHA_{\itx}';
@@ -166,7 +177,7 @@ plot_individual_effects_against_interv_cats_per_speed(...
 	vars,{'Absolute','Medians'},F,'Absolute median effects');
 
 %% Aggregated effects aginst categories of Q red. and balloon occlusions
-% [no of speeds]x1panels
+%  [no of speeds]x1panels
 % Includes all diameters (incl. intermediate levels) 
 % D is numerical (unevenly distributed)
 
@@ -180,16 +191,5 @@ vars = {
 close all
 plot_aggregate_effects_against_interv_cats_per_speed(G.med,vars,{'median','absolute'},G.q1,G.q3)
 
-%% Spectrograms 
-% [2x2] panels, controls to the left and balloon interventions to the right
-% Figure 3 in submission for ASAIO
-
-supTit = 'Spectrogram';
-S = Data.IV2_Seq10.S;
-var = 'accA_y_nf';
-rpm = 2800;
-
-close all
-make_spectrogram_figure_IV2(S, supTit, var, rpm, fs_new);
 
 

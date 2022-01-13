@@ -13,7 +13,7 @@ Signal processing and analysis for LVAD sensor data, for scientific research pur
 What things you need to install the software and how to install them
 
 ```
-Matlab version 2018b or later
+Matlab version 2021a or later
 ```
 
 ### Installing

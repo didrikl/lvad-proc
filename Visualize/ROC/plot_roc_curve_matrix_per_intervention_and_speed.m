@@ -11,20 +11,10 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 	% - NHA as classifier, component-wise
 
 	rowLabels = {
-		{'\bfCatheter 2\rm','27% areal obstruction'}
-		{'\bfCatheter 3\rm','45% areal obstruction'}
-		{'\bfCatheter 4\rm','75% areal obstruction'}
-		};
-	rowLabels = {
 		{'\bf27%\rm','obstruction'}
 		{'\bf45%\rm','obstruction'}
 		{'\bf75%\rm','obstruction'}
 		};
-% 	rowLabels = {
-% 		{'\bf27%\rm AO'}
-% 		{'\bf45%\rm AO'}
-% 		{'\bf75%\rm AO'}
-% 		};
 	speeds = [2200,2500,2800,3100];
 	classifier_labels = classifiers_to_use(:,2);
 	classifier_inds = find(ismember(ROC.classifiers,classifiers_to_use(:,1)));
@@ -34,11 +24,11 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 	spec = get_plot_specs;
 	figHeight = 850;%900; %955
 	figWidth = 1180;
-	panelLength = 152;
+	panelLength = 154;
 	gap = 25;
 	
 	% Offsets for common axes
-	mainAxGap = 17;
+	mainAxGap = 15;
 	
 	nRows = size(predStates,1);
 	nCols = numel(speeds);
@@ -64,10 +54,10 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 				h_nha(k) = plot(h_ax(i,j),X(:,1),Y(:,1));
 				if contains(classifiers{k},'y')
 					set(h_nha(k),'LineWidth',4);
-%  					area(X(:,1),Y(:,1),'FaceColor',h_nha(k).Color,...
-%  						'EdgeColor','none', 'FaceAlpha',0.07)
+   					area(X(:,1),Y(:,1),'FaceColor',h_nha(k).Color,...
+   						'EdgeColor','none', 'FaceAlpha',0.07)
 % 					plot_shaded(X(:,1),Y(:,1),'LineWidth',0.1,'Color',h_nha(k).Color);
-% 					text(0.625,0.3,[num2str(AUC(1),'%1.2f')],spec.text{:})
+  					text(0.625,0.3,[num2str(AUC(1),'%1.2f')],spec.rocText{:})
 				elseif contains(classifiers{k},'x')
 					set(h_nha(k),'LineWidth',2.25,'LineStyle',':','Color',min(1.1*h_nha(k).Color,[1 1 1]));
 				elseif contains(classifiers{k},'z')
@@ -85,9 +75,12 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 
 		end
 
-		text(1.10,0.5,rowLabels{i},spec.text{:});
+		text(1.10,0.5,rowLabels{i},spec.rocText{:});
 
 	end
+	
+	hXLab = suplabel('1 - specificity','x');
+	hYLab = suplabel('Sensitivity','y');
 	
 	% Format axes
 	format_axes_in_plot_NHA(h_ax,spec);
@@ -97,17 +90,26 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 	offset_main_ax(h_ax,h_xax,h_yax,mainAxGap,mainAxGap);			
 	format_tick_labels(h_ax,h_xax, h_yax);
 	
-	add_subtitles(h_ax,cellstr("\bf"+string(speeds)+"\rm RPM"),panelLength,gap,spec);
-
-	h_xlab = suplabel('1 - Specificity');
-	h_ylab = suplabel('Sensitivity','y');
-	set(h_xlab,spec.supXLab{:})
-	set(h_ylab,spec.supXLab{:})
-	h_ylab.Position(1) = h_ylab.Position(1)+0.032;
-	h_xlab.Position(2) = h_xlab.Position(2)+0.025;
-	
 	h_leg = legend(h_nha,classifier_labels,spec.leg{:},'Units','points');
-	h_leg.Position(1) = h_leg.Position(1) + 114;%132;%figWidth-20;% h_ax(end,end).Position(1)+h_ax(end,end).Position(3)+12;
+	add_subtitles(h_ax,cellstr("\bf"+string(speeds)+"\rm RPM"),panelLength,gap,spec);
+	
+	set([hXLab,hYLab],spec.supXLab{:})
+	hYLab.Position(1) = hYLab.Position(1)-20;
+	hXLab.Position(2) = hXLab.Position(2)+14;
+	h_leg.Position(1) = h_leg.Position(1) + 115;
 	h_leg.Position(2) = 0;
   		
-			
+function h_ax = position_panels(panelLength,h_ax,gap_x,gap_y)
+	
+	if nargin==3, gap_y = gap_x; end
+
+	rowStart = 85;
+	colStart = 80;
+	[nRows,nCols] = size(h_ax);
+	for i=1:nRows
+		rowPos = (nRows-i)*(panelLength+gap_y)+rowStart;
+		for j=1:nCols
+			colPos = (j-1)*(panelLength+gap_x)+colStart;
+			h_ax(i,j).Position = [colPos,rowPos,panelLength,panelLength];
+		end
+	end

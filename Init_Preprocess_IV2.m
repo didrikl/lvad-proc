@@ -1,7 +1,7 @@
 % Initialize from raw data, preprocess and store (in memory and to disc)
 inputs = {
 	'IV2_Seq6'
- 	'IV2_Seq7'
+% 	'IV2_Seq7'
 % 	'IV2_Seq9'
 % 	'IV2_Seq10'
 % 	'IV2_Seq11'
@@ -14,7 +14,7 @@ inputs = {
 
 % Do separate initialization parts
 for i=1:numel(inputs)
-	seq = inputs{i};
+	seq = inputs{i}(6:end);
 	Environment_Init_IV2
 	eval(inputs{i});
 	Init_Data_Raw

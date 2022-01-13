@@ -1,21 +1,19 @@
 % Initialize from raw data, preprocess and store (in memory and to disc)
 inputs = {
-	'IV2_Seq6'
- 	'IV2_Seq7'
-% 	'IV2_Seq9'
-% 	'IV2_Seq10'
-% 	'IV2_Seq11'
-% 	'IV2_Seq12'
-% 	'IV2_Seq13'
-% 	'IV2_Seq14'
-% 	'IV2_Seq18'
-% 	'IV2_Seq19'
+	'G1_Seq3' % (pilot)
+	'G1_Seq6'
+	'G1_Seq7'
+	'G1_Seq8'
+	'G1_Seq11'
+	'G1_Seq12'
+	'G1_Seq13'
+	'G1_Seq14'
 	};
 
 % Do separate initialization parts
 for i=1:numel(inputs)
 	seq = inputs{i};
-	Environment_Init_IV2
+	Environment_Init_G1
 	eval(inputs{i});
 	Init_Data_Raw
 	Init_Data_Preprocess
