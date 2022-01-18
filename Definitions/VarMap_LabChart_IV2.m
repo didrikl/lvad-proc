@@ -9,3 +9,4 @@ varMap = {
     %'SensorBAccY'    'accB_y'      'single'    'continuous'
     %'SensorBAccZ'    'accB_z'      'single'    'continuous'
     };
+

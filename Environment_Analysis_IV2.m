@@ -29,3 +29,10 @@ clear save_data
 %%
 
 warning('on')
+
+%%
+
+% How to fuse data
+interNoteInclSpec = 'nearest';
+outsideNoteInclSpec = 'nearest';
+

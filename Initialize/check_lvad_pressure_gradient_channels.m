@@ -1,5 +1,9 @@
-function check_lvad_pressure_gradient_channels(PL,affVar,effVar)
+function check_lvad_pressure_gradient_channels(PL,pGradVars)
 	
+	if isempty(pGradVars), return; end
+	affVar = pGradVars{1};
+	effVar = pGradVars{2};
+
 	noiseThreshold = 0.01;
 	lowEffThreshold = 30;
 	

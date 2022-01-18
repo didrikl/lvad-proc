@@ -68,7 +68,7 @@ function stats = calc_stats(ids_specs,id_col,seqs,S_analysis,...
 %                     stats.pumpSpeed{jj} = string(ids_specs.pumpSpeed(i));
 %                     stats.Catheter{jj} = string(ids_specs.Catheter(i));
 %                     stats.FlowRedTarget{jj} = string(ids_specs.FlowRedTarget(i));
-%                     stats.balloonLev{jj} = string(ids_specs.balloonLev(i));
+%                     stats.balLev{jj} = string(ids_specs.balLev(i));
 %                 end
                 
                 jj = jj+1;
@@ -97,6 +97,6 @@ function stats = calc_stats(ids_specs,id_col,seqs,S_analysis,...
 %     stats.pumpSpeed = categorical(stats.pumpSpeed);
 %     stats.Catheter = categorical(stats.Catheter);
 %     stats.FlowRedTarget = categorical(stats.FlowRedTarget);
-%     stats.balloonLev = categorical(stats.balloonLev);
+%     stats.balLev = categorical(stats.balLev);
     
 end

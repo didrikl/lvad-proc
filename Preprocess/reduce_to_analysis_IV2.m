@@ -1,4 +1,4 @@
-function S = reduce_to_analysis_IV2(S, Notes, id_specs)
+function S = reduce_to_analysis_IV2(S, Notes, idSpecs)
 	
 	welcome('Reduce data to analysis ID segments','function')
 	
@@ -9,46 +9,38 @@ function S = reduce_to_analysis_IV2(S, Notes, id_specs)
 	% Remove irrelevant columns
 	S(:,{'event','intervType','part'}) = [];
 	
-	ids = categories(id_specs.analysis_id);
+	ids = categories(idSpecs.analysis_id);
 	
 	for i=1:numel(ids)
 		
 		id = ids(i);
 		welcome(sprintf('ID: %s\n',string(id)),'iteration')
 		
-		id_spec = id_specs(id_specs.analysis_id==id,:);
+		id_spec = idSpecs(idSpecs.analysis_id==id,:);
 		s_id_tab = S(S.analysis_id==id,:);
 		
 		s_id_tab = duration_handling(s_id_tab,id_spec);
 		
 		% NOTE: Should move to plot QC functionality:
 		% - For visual impression on signal
-		% - To make this function "more generic"
-		check_emboli(s_id_tab)
-		
+		check_emboli(s_id_tab,'affEmboliVol',1000)		
 		check_id_parameter_consistency_IV2(s_id_tab,id_spec);
 		
 		multiWaitbar('Reducing to analysis ID segments',i/numel(ids));
 		
 	end
 	
-	S = S(ismember(S.analysis_id,id_specs.analysis_id),:);
+	S = S(ismember(S.analysis_id,idSpecs.analysis_id),:);
 	S.Properties.UserData.Notes = Notes;
 	
 	% Remove irrelevant categoric columns
-	S(:,ismember(S.Properties.VariableNames,{'balloonLev','pumpSpeed','affEmboliVol'})) = [];
+	S(:,ismember(S.Properties.VariableNames,{'balLev','pumpSpeed','affEmboliVol'})) = [];
 	
 	%S.noteRow = categorical(S.noteRow)
 	S = movevars(S, 'noteRow', 'Before', 1);
 	S = movevars(S, 'bl_id', 'Before', 1);
 	S = movevars(S, 'analysis_id', 'Before', 1);
-	
-function check_emboli(s_id_tab)
-	vol = sum(s_id_tab.affEmboliVol);
-	if vol>1000
-		warning(['Accumulated emboli volume >1000 muL detected: ',num2str(vol)])
-	end
-	
+		
 function s_id_tab = duration_handling(s_id_tab,id_spec)
 	% Warn if recording interval duration is less than specifices in ID
 	% specification file. Also, if duration exceeds with 2 or more seconds, then

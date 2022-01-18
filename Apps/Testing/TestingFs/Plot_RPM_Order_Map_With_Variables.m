@@ -8,7 +8,7 @@ catBarColor
 barVars = {
     'part',           partBarColorSet;
     'pumpSpeed'       pumpSpeedColorSet;%brewermap(20,'Paired');
-    ...'balloonLev'    balLevColorSet;%brewermap(10,'RdPu');
+    ...'balLev'    balLevColorSet;%brewermap(10,'RdPu');
     ...'thrombusVol'    balLevColorSet;%brewermap(10,'RdPu');
     };
 
@@ -90,7 +90,7 @@ function T = make_plot_data(parts,S_parts,sampleRate,std_winLenSec,rms_winLenSec
         
         if height(T{j})==0, continue; end
         
-        cat_blocks = find_cat_blocks(T{j},{'thrombusVol','balloonLev'});
+        cat_blocks = find_cat_blocks(T{j},{'thrombusVol','balLev'});
         if numel(cat_blocks.start_inds)==0
             T{j}.accA_xz_norm_std(:) = std(T{j}.accA_xz_norm);
             T{j}.accA_xz_norm_rms(:) = rms(T{j}.accA_xz_norm);

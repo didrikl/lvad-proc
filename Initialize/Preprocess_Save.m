@@ -27,12 +27,13 @@ display_filename([seq,'_Notes.mat'],proc_path,'\nSaved to:','\t');
 % TODO: 1:7 is only for IV2_Seq[]. Make generic to include G1_Seq[]
 seqID = [seq(1:7),sprintf('%.2d',str2double(seq(8:end)))];
 
-S.Description = 'Fused data - Analysis ID segments';
-S_parts.Description = 'Fused data - Part no. segments';
-Notes.Description = 'Pre-processed notes';
-S.UserData.SequenceID = seqID;
-S_parts.UserData.SequenceID = seqID;
-Notes.UserData.SequenceID = seqID;
+S.Properties.Description = 'Fused data - Analysis ID segments';
+S.Properties.UserData.SequenceID = seqID;
+% TODO: implement to add in each part
+%S_parts.Properties.Description = 'Fused data - Part no. segments'; 
+%S_parts.Properties.UserData.SequenceID = seqID;
+Notes.Properties.Description = 'Pre-processed notes';
+Notes.Properties.UserData.SequenceID = seqID;
 
 Data.(seqID).S = S;
 Data.(seqID).S_parts = S_parts;

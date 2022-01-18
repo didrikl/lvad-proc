@@ -75,13 +75,13 @@ function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
                 hold on
                 h.ColorOrderIndex=i;
                 
-                x = double(string(T_i.balloonDiam));
+                x = double(string(T_i.balDiam));
                 x(isnan(x)) = 0;
 %                 h_err(end+1) = errorbar(x,T_i.(var),T_err_neg_i.(var),T_err_pos_i.(var),...
 %                      err_bar_specs{:},...
 %                      'Marker',markers{i}...
 %                      );
-				plot(F_i.balloonDiam,F_i.(var),...
+				plot(F_i.balDiam,F_i.(var),...
 				'LineStyle','none','Marker','.','MarkerSize',20,'Color',h.ColorOrder(i,:))
 			
                 diams = [diams;x];
@@ -99,37 +99,37 @@ function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
 			%ctrl_levels = unique(T_pre.QRedTarget_pst);
             M = numel(ctrl_levels);
             for m=1:M
-                T_aft.balloonDiam(T_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
-                T_pre.balloonDiam(T_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
-                F_aft.balloonDiam(F_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
-                F_pre.balloonDiam(F_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
+                T_aft.balDiam(T_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
+                T_pre.balDiam(T_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
+                F_aft.balDiam(F_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
+                F_pre.balDiam(F_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
             end
             
             T_aft_n = T_aft(T_aft.pumpSpeed==speeds(s),:);
             F_aft_n = F_aft(F_aft.pumpSpeed==speeds(s),:);
             T_aft_n_err_neg = T_aft_err_neg(T_aft_err_neg.pumpSpeed==speeds(s),:);
             T_aft_n_err_pos = T_aft_err_pos(T_aft_err_pos.pumpSpeed==speeds(s),:);
-            x = double(string(T_aft_n.balloonDiam));
+            x = double(string(T_aft_n.balDiam));
             
 % 			h_err(end+1) = errorbar(x,T_aft_n.(var),T_aft_n_err_neg.(var),T_aft_n_err_pos.(var),...
 %                 err_bar_specs{:},...
 %                 'Marker',markers{1},...
 %                 'Color',[0,0,0]);
-            plot(F_aft_n.balloonDiam,F_aft_n.(var),...
+            plot(F_aft_n.balDiam,F_aft_n.(var),...
 				'LineStyle','none','Marker','.','MarkerSize',20,'Color',[0,0,0,0.5])
 			
             T_pre_n = T_pre(T_pre.pumpSpeed==speeds(s),:);
             F_pre_n = F_pre(F_pre.pumpSpeed==speeds(s),:);
             T_pre_n_err_neg = T_pre_err_neg(T_pre_err_neg.pumpSpeed==speeds(s),:);
             T_pre_n_err_pos = T_pre_err_pos(T_pre_err_pos.pumpSpeed==speeds(s),:);
-            x = double(string(T_pre_n.balloonDiam));
+            x = double(string(T_pre_n.balDiam));
             %T_pre_n.(var)
 			  
 %             h_err(end+1) = errorbar(x,T_pre_n.(var),T_pre_n_err_neg.(var),T_pre_n_err_pos.(var),...
 %                 err_bar_specs{:},...
 %                  'Marker',markers{1},...
 %                  'Color',[0.5,0.5,0.5]);
-            plot(F_pre_n.balloonDiam,F_pre_n.(var),...
+            plot(F_pre_n.balDiam,F_pre_n.(var),...
 				'LineStyle','none','Marker','.',...
 				'MarkerSize',20,'Color',[0.5,0.5,0.5,0.5],'MarkerFaceColor',[0.5,0.5,0.5])
 			 

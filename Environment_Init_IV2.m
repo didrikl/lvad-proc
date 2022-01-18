@@ -10,11 +10,6 @@ Paths_IV2
 % Categoric overview of data segments to analyse 
 idSpecs = init_id_specifications(idSpecs_path);
 
-% Input file structure map, store in folder named Definitions
-labChart_varMapFile = 'VarMap_LabChart_IV2';
-systemM_varMapFile = 'VarMap_SystemM_IV2';
-notes_varMapFile = 'VarMap_Notes_IV2_v1';
-
 
 %% Progress bars
 
@@ -46,3 +41,12 @@ clear h_right_shade_sub1 h_right_shade_sub2 h_right_shade_zoom
 %%
 
 warning('on')
+
+%%
+
+% How to fuse data
+interNoteInclSpec = 'nearest';
+outsideNoteInclSpec = 'none';
+
+pGradVars = {'p_aff', 'p_eff'};
+

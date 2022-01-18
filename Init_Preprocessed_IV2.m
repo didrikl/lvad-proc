@@ -2,7 +2,7 @@
 
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Environment.m')
 Environment_Analysis_IV2
-idSpecs = init_id_specifications(idSpecs_path);
+Definitions.idSpecs = init_id_specifications(idSpecs_path);
 
 sequences = {
     'IV2_Seq6','Seq6 - LVAD8\Processed'
@@ -16,25 +16,12 @@ sequences = {
     'IV2_Seq18','Seq18 - LVAD14\Processed'
     'IV2_Seq19','Seq19 - LVAD13\Processed'
     };
-Data = load_processed_sequences(sequences(:,1),...
+Data.IV2 = load_processed_sequences(sequences(:,1),...
     fullfile(data_basePath,sequences(:,2),sequences(:,1)));
 
 % Load previously calculated features for analysis
-load(fullfile(feats_path,'Features - All'))
-load(fullfile(feats_path,'Features - Relative'))
-load(fullfile(feats_path,'Features - Delta'))
-load(fullfile(feats_path,'Features - ROC'))
-load(fullfile(feats_path,'Features - ROC - SPSS'))
-load(fullfile(feats_path,'Features - Paired for Wilcoxens signed rank test'));
-load(fullfile(feats_path,'Features - Paired for Wilcoxens signed rank test - Relative'));
-load(fullfile(stats_path,'Group stats tables'));
-load(fullfile(stats_path,'Group stats tables - Delta'));
-load(fullfile(stats_path,'Group stats tables - Relative'));load(fullfile(feats_path,'Features'))
-load(fullfile(stats_path,'Results - Median and p-values - Wilcoxon paired signed rank test'));
-load(fullfile(stats_path,'Results - Median and p-values - Wilcoxon paired signed rank test - Relative'));
-load(fullfile(stats_path,'Results - p-values - Wilcoxon paired signed rank test'));
-load(fullfile(stats_path,'Results - p-values - Wilcoxon paired signed rank test - Relative'));
-load(fullfile(stats_path,'Results - AUC'));
-load(fullfile(stats_path,'Results - ROC curve info'));
+load(fullfile(feats_path,'Features'));
+load(fullfile(stats_path,'Features'));
 
 multiWaitbar('CloseAll');
+clear sequences

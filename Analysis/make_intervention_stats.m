@@ -1,4 +1,5 @@
-function stats = make_intervention_stats(D,discrVars,meanVars,medVars,idSpecs)
+function stats = make_intervention_stats(...
+		D, discrVars, meanVars, medVars, idSpecs)
     % In groups of tagged interventions from column analysis_id in D, 
 	% calculate aggregates. 
 	%
@@ -17,10 +18,10 @@ function stats = make_intervention_stats(D,discrVars,meanVars,medVars,idSpecs)
 	welcome('Calculate stats','function')
     
 	% Find which sequences (experiments) to be aggregated per intervention
-    seqs = fieldnames(D);
+    seqs = D.Sequences;
     stats = cell(numel(seqs),1);
 	
-    % Code if parallellization by parfor loop instead of for loop below:
+	% Code if parallellization by parfor loop instead of for loop below:
 	%{
         data = cell(numel(seqs),1);
         for j=1:numel(seqs)
@@ -33,10 +34,11 @@ function stats = make_intervention_stats(D,discrVars,meanVars,medVars,idSpecs)
         welcome([seqs{j},'\n'],'iteration')
         
         % Extract relevant intervals/interventions tagged with analysis_id
-        S = remove_rows_without_analysis_id(D.(seqs{j}).S,idSpecs);
+        S = remove_rows_with_irrelevant_analysis_id(...
+			D.(seqs{j}).S,idSpecs);
 		
 		idStatsMeans = groupsummary(S,{'analysis_id','bl_id'},...
-            {'mean','std','median',@(x)prctile(x,[25,75])},{meanVars},...
+            {'mean','std'},{meanVars},...
             'IncludeEmptyGroups',false);
 
 		idStatsMedians = groupsummary(S,{'analysis_id','bl_id'},...
@@ -66,7 +68,7 @@ function stats = make_intervention_stats(D,discrVars,meanVars,medVars,idSpecs)
         stats{j} = join(stats{j},idStatsMedians,'Keys',{'analysis_id','bl_id'});    
         
 		% Adding unique categorical info for every intervention and sequence 
-		stats{j} = join(stats{j},idSpecs,"Keys","analysis_id");
+		stats{j} = join(stats{j},D.idSpecs_analysis,"Keys","analysis_id");
         stats{j}.id = seqs{j} + "_" + string(stats{j}.idLabel);
         stats{j}.seq = repmat(string(seqs{j}),height(stats{j}),1);
         
@@ -82,7 +84,7 @@ function stats = make_intervention_stats(D,discrVars,meanVars,medVars,idSpecs)
 	stats = tidy_up_row_and_column_positions(stats);
 	stats = remove_round_off_errors_in_discrete_vars(stats, discrVars);
 
-function S = remove_rows_without_analysis_id(S,idSpecs)
+function S = remove_rows_with_irrelevant_analysis_id(S,idSpecs)
 	
 	% Remove rows with extra ids in data not listed in id spec file
     extraIDs = not(ismember(S.analysis_id,idSpecs.analysis_id));
@@ -107,7 +109,7 @@ function stats = tidy_up_row_and_column_positions(stats)
 	% Tidy up row and column positions
 	stats = movevars(stats,{'id','analysis_id','bl_id','seq','idLabel',...
 		'categoryLabel','levelLabel','interventionType','contingency','duration',...
-		'pumpSpeed','catheter','balloonLev','balloonDiam','balloonVolume','QRedTarget_pst'},...
+		'pumpSpeed','catheter','balLev','balDiam','balloonVolume','QRedTarget_pst'},...
 		'Before',1);
 	stats = sortrows(stats,'id','ascend');
 

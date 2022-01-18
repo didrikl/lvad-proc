@@ -131,7 +131,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
             mat2str(parts),mat2str(rpm));
     end
     
-    blocks = find_cat_block_inds(T,{'balloonLev','intervType'});
+    blocks = find_cat_block_inds(T,{'balLev','intervType'});
     
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
@@ -330,18 +330,18 @@ function add_interv_bar(h,T,notes,mapVar)
     end
     
     try
-        T.balloonLev = mergecats(T.balloonLev,{'2','3','4','5'},...
+        T.balLev = mergecats(T.balLev,{'2','3','4','5'},...
             'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-        T.balloonLev = renamecats(T.balloonLev,'1',...
+        T.balLev = renamecats(T.balLev,'1',...
             sprintf('Deflated balloon'));%sprintf('Deflated %s balloon',catheter));
-        T.balloonLev = removecats(removecats(T.balloonLev),{'-'});
+        T.balLev = removecats(removecats(T.balLev),{'-'});
     catch
     end
     
-    plot(T.t(ss_inds),T.balloonLev(ss_inds),specs.trans_lev_bar{:})
+    plot(T.t(ss_inds),T.balLev(ss_inds),specs.trans_lev_bar{:})
     t_ss = nan(height(T),1);
     t_ss(ss_inds) = T.t(ss_inds);
-    plot(t_ss,T.balloonLev,specs.bal_lev_bar{:})
+    plot(t_ss,T.balLev,specs.bal_lev_bar{:})
     
     h.YColor = [0 0 0];
     
@@ -608,7 +608,7 @@ function add_circulation(h,T,orderMapVar)
     
     fullColorRows = get_steady_state_rows(T) | contains(string(T.event),'Injection');
     
-    %     area_bal = pi*((double(string(T.balloonDiam))/2).^2);
+    %     area_bal = pi*((double(string(T.balDiam))/2).^2);
     %     area_inlet = pi*(13.0/2)^2;
     %     area_red = 100*((area_inlet-area_bal)/area_inlet - 1);
     %     area_red_ss = area_red;

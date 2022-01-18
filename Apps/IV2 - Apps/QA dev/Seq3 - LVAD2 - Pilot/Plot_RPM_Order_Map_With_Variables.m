@@ -61,7 +61,7 @@ function save_to_png(T,notes,h_fig,parts,orderMapVar,save_path,rpms)
     resolution = 300;
     
     catheter = string(notes.catheter(T.noteRow(...
-        find(T.balloonLev=='1',1,'first'))));
+        find(T.balLev=='1',1,'first'))));
     if isempty(catheter)
         catheter = "(No catheter)";
     end
@@ -93,7 +93,7 @@ function [T,rpm] = make_plot_data(parts,S_parts,rpm,fs,bl_part)
         
         if height(T{j})==0, continue; end
         
-        bal_blocks = find_cat_blocks(T{j},{'balloonLev','intervType'},fs);
+        bal_blocks = find_cat_blocks(T{j},{'balLev','intervType'},fs);
         for k=1:numel(bal_blocks.start_inds)
             range = bal_blocks.start_inds(k):bal_blocks.end_inds(k);
             T{j}.accA_x_std(range) = std(T{j}.accA_x(range));
@@ -254,19 +254,19 @@ function add_interv_bar(h,T,notes)
     plot(T.t,event,specs.event_bar{:})
     
     catheter = string(notes.catheter(T.noteRow(...
-        find(T.balloonLev=='1',1,'first'))));
-    T.balloonLev = mergecats(T.balloonLev,{'2','3','4','5'},...
+        find(T.balLev=='1',1,'first'))));
+    T.balLev = mergecats(T.balLev,{'2','3','4','5'},...
         'Inflated balloon');%sprintf('Inflated %s balloon',catheter));
-    T.balloonLev = renamecats(T.balloonLev,'1',...
+    T.balLev = renamecats(T.balLev,'1',...
         sprintf('Empty balloon'));%sprintf('Empty %s balloon',catheter));
-    T.balloonLev = removecats(removecats(T.balloonLev),{'-'});
+    T.balLev = removecats(removecats(T.balLev),{'-'});
     
-    blocks = find_cat_blocks(T,{'balloonLev','event'},700);
+    blocks = find_cat_blocks(T,{'balLev','event'},700);
     for i=1:min(numel(blocks.start_inds),numel(blocks.end_inds))
        inds = false(height(T),1);
        inds(blocks.start_inds(i):blocks.end_inds(i)) = true;
        inds = inds & ss_inds;
-       plot(T.t(inds),T.balloonLev(inds),specs.bal_lev_bar{:})
+       plot(T.t(inds),T.balLev(inds),specs.bal_lev_bar{:})
     end
     
 %    h.YColor = [0 0 0];
@@ -591,7 +591,7 @@ function add_circulation(h,T)
         'Color',[0.39,0.60,0.12,0.6],...
         'HandleVisibility','off');
      
-    area_bal = pi*((double(string(T.balloonDiam))/2).^2);
+    area_bal = pi*((double(string(T.balDiam))/2).^2);
     area_inlet = pi*(13.0/2)^2;
     area_red = 100*((area_inlet-area_bal)/area_inlet - 1);
     area_red_ss = area_red;

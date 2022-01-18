@@ -29,9 +29,16 @@ function [savePath, fileName] = save_data(fileNames, savePath, data, types, vara
 
 	% NOTE: Can make a new expanded function that also saves figures, using the
 	%       same framework
+	% TODO: Save multiple data in multiple filenames
 	
 	% Name of the table as it exist in memory
 	dataName = inputname(3);
+	if isempty(dataName) 
+		dataName = genvarname(fileNames);
+		warning(['Data input is a struct field in the caller. ',...
+			'Unable to retrieve its name for storage. ',...
+			'Data is stored as: ',dataName]);
+	end
 
 	% If inputs are given as strings, then parse to char for compability
 	[types,fileNames,savePath] = parse_inputs(types,fileNames,savePath);
@@ -70,7 +77,7 @@ end
 function save_data_type(savePath,fileName,data,dataName,fileType,varargin)
 	
 	filePath = fullfile(savePath,fileName);
-
+	data = data;
 	try
 		
 		switch lower(fileType)
@@ -176,6 +183,5 @@ function [fileTypes, fileNames, savePath] = parse_inputs(fileTypes, fileNames, s
 	elseif numel(fileNames)~=numel(fileTypes)
 		error('Number of fileNames must eqal the number of fileTypes or one')
 	end
-	[savePath, fileTypes{:}] = convertStringsToChars(...
-		savePath, fileTypes{:});
+	[savePath, fileTypes{:}] = convertStringsToChars(savePath, fileTypes{:});
 end

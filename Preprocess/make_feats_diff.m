@@ -16,15 +16,17 @@ function F_diff = make_feats_diff(feats,fnc,nominalAsBaseline)
         feats_i_diff{:,cols} = nan*feats_i_diff{:,cols};
         
 		for j=1:height(feats_i)
-            bl_row = find(feats_i.analysis_id==feats_i.bl_id(j));
+			bl_row = find(feats_i.analysis_id==feats_i.bl_id(j));
             
             if isempty(bl_row)
 				
 				% Missing baseline shall result in NaN-values
+				feats_i.analysis_id
+				feats_i.bl_id(j)
                 warning(sprintf(['Baseline row not found',...
                     '\n\tRow where Analysis_id = bl_id = %s',...
                     '\n\tSequence: %s'],...
-                    string(feats.bl_id(j)),string(seqs{i})));
+                    string(feats_i.bl_id(j)),string(seqs{i})));
                 feats_i_diff{j,cols} = (feats_i{j,cols}-NaN);
             
              elseif contains(string(feats_i.categoryLabel(j)),'Nominal') && ...

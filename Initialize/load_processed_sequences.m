@@ -7,6 +7,7 @@ function Data = load_processed_sequences(seqNames,seqFilePaths)
 
 	Data = load_data(Data,'S',seqFilePaths,seqNames);
 	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
+	Data.Sequences = fieldnames(Data);
 
 function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 

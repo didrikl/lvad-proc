@@ -1,4 +1,4 @@
-function [P,R] = make_results_table_from_paired_signed_rank_test(W,G,pVars)
+function [P,R] = make_paired_signed_rank_test(W,G,pVars)
 	
 	speeds=[2200,2500,2800,3100];
 	levLab = sort_nat(string(unique(G.med.('levelLabel'))));
@@ -50,10 +50,10 @@ function [P,R] = make_results_table_from_paired_signed_rank_test(W,G,pVars)
 			q3.Properties.VariableNames(2) = "q3 "+var;
 			
 			% Store the looked up info in results table R
-			R{s} = join(R{s},eff,'Keys','levelLabel');
-			R{s} = join(R{s},iqr,'Keys','levelLabel');
-			R{s} = join(R{s},q1,'Keys','levelLabel');
-			R{s} = join(R{s},q3,'Keys','levelLabel');
+			R{s} = join(R{s}, eff, 'Keys','levelLabel');
+			R{s} = join(R{s}, iqr, 'Keys','levelLabel');
+			R{s} = join(R{s}, q1, 'Keys','levelLabel');
+			R{s} = join(R{s}, q3, 'Keys','levelLabel');
 			
 			% Add p values as formatted text columns in results table R
 			R{s}.(['p ',var]) = compose("%1.3f",p);

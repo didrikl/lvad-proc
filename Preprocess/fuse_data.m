@@ -76,8 +76,10 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
         catch
         end
         
-        PL{i}{:,notes_int_vars} = single(PL{i}{:,notes_int_vars});
-        PL{i} = standardizeMissing(PL{i},-9999);
+		% TODO: Test if this is neccessary (c.f. code line 34)
+        %PL{i}{:,notes_int_vars} = single(PL{i}{:,notes_int_vars}); 
+        
+		PL{i} = standardizeMissing(PL{i},-9999);
     end
     
     try
@@ -169,9 +171,7 @@ end
 
 function B = check_for_gap_in_note_blocks(Notes,B,b_rowStep,b_inds,i,interNoteInclSpec)
     % Handle intermediate notes, in case LabChart was paused or there are some
-    % PowerLab files not being initialized
-
-    
+    % PowerLab files not being initialized  
     
     if b_rowStep>1 % i>1 is implied
         intermediateNotes = b_inds{i}(1)-b_rowStep:b_inds{i}(1);

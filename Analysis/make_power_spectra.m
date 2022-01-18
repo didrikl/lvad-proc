@@ -1,44 +1,37 @@
-function [F,psds] = make_power_spectra(Data,F,vars,idSpecs,fs,hBands,calcType)
+function psds = make_power_spectra(Data, vars, fs, hBands, idSpecs, isHarmBand)
     % TODO: Split function into spectral desities pxx calculation function and
 	% another function for bandpower and mean-power-frequency based on pxx.
     welcome('Make power spectra','function')
-    
-    speeds = unique(idSpecs.pumpSpeed);
-    seqs = fieldnames(Data);
-    
-	% NOTE: This is proably better as object oriented
-	switch calcType
-		case 'IV2'
-			% focused harmonic bands definition
-			bandMetricsCalcFnc = @make_psd_data_IV2;
-			convertMetricsToColumsFnc = @split_cell_to_vars_IV2;
-		case 'G1'
-			bandMetricsCalcFnc = @make_psd_metrics_G1;
-			convertMetricsToColumsFnc = @split_cell_to_vars_G1;
-	end
+	
+	if nargin<6, isHarmBand = false; end
 
+	speeds = unique(idSpecs.pumpSpeed);
+	seqs = Data.Sequences;
     pxx = cell(numel(seqs),1);
     for j=1:numel(seqs)
         
         welcome([seqs{j},'\n'],'iteration')
-        
+       
         S = Data.(seqs{j}).S;
-        blockForSpeed = cell(numel(speeds),1);
+		S = S(ismember(S.analysis_id,idSpecs.analysis_id),:);
+       
+		summaryBlock4Speed = cell(numel(speeds),1);
         for k=1:numel(speeds)
-            multiWaitbar('Making spectral densities',...
+            
+			multiWaitbar('Making spectral densities',...
 				'Increment',(1/(numel(speeds))/numel(seqs)));        
 
-            ids_speed = idSpecs.analysis_id(idSpecs.pumpSpeed==speeds(k));           
-            S_speed = S(ismember(S.analysis_id,ids_speed),:);
-            if isempty(S_speed), continue; end
+            ids_speed = idSpecs.analysis_id(idSpecs.pumpSpeed==speeds(k));        
+            block4Speed = S(ismember(S.analysis_id,ids_speed),:);
+            if isempty(block4Speed), continue; end
 
-            fBands = hBands*(double(speeds(k))/60);
-            blockForSpeed{k} = groupsummary(S_speed,{'analysis_id'},...
-                @(x)bandMetricsCalcFnc(x,fs,fBands),vars);
+			if isHarmBand, fBands = hBands*(double(speeds(k))/60); end
+			summaryBlock4Speed{k} = groupsummary(block4Speed,{'analysis_id'},...
+                @(x)make_pxx_metric_cell(x,fs,fBands),vars);
             
         end
         
-        pxx{j} = merge_table_blocks(blockForSpeed);
+        pxx{j} = merge_table_blocks(summaryBlock4Speed);
         pxx{j} = join(pxx{j},idSpecs(:,{'analysis_id','idLabel'}),...
 			'Keys','analysis_id');  
         pxx{j}.id = seqs{j} + "_" + string(pxx{j}.idLabel);
@@ -47,10 +40,9 @@ function [F,psds] = make_power_spectra(Data,F,vars,idSpecs,fs,hBands,calcType)
     
 	% Make one common table with groupsummary output stored as cells
 	T = merge_to_common_table(pxx);
-	
-	% Make struct with tables of periodograms, band metrices, etc.
-    T = convertMetricsToColumsFnc(vars, T);
-	
+	T = split_metric_cell_to_var(vars, T);
+	T.idLabel = [];
+
 	psds = struct;
 	psds.bandMetrics = T(:,not(endsWith(T.Properties.VariableNames,...
         {'_pxx','_f','GroupCount'})));
@@ -58,47 +50,35 @@ function [F,psds] = make_power_spectra(Data,F,vars,idSpecs,fs,hBands,calcType)
     psds.peridograms = T(:,endsWith(T.Properties.VariableNames,...
 		{'id','analysis_id','_pxx'}));  
 	psds.idSpecs = idSpecs;
-	psds.frequencyBands = make_band_specs(psds, hBands);
+	psds.Bands_Specifications = make_band_specs(psds, hBands);
 	
-	% Add bandpowers to F table
-	F = join(F,psds.bandMetrics,'Keys',{'id','analysis_id'});
-  
-function c = make_psd_data_IV2(x,fs,freqBands)
-	if size(freqBands,1)>1 
-		error('No. of focued bands cannot be more than 1'); 
-	end
+function c = make_pxx_metric_cell(x,fs,freqBands)
+	[pxx, f, mpf, pow] = calc_periodogram_metrics(detrend(x), fs, freqBands);
+	c = [{pxx},{f},struct2cell(pow)',struct2cell(mpf)'];
 	
-	[pxx,f] = periodogram(detrend(x),[],[],fs);
-	
-	[mpf,pow] = meanfreq(pxx,f);
-	[~,bpow] = meanfreq(pxx,f,freqBands);
-	c = {pxx,f,mpf,pow,bpow};
-
-function T = split_cell_to_vars_IV2(vars, T)
-	% Split the cell content as made in make_psd_band_metrics_IV2
+function T = split_metric_cell_to_var(vars, T)
+	% Split the cell content as made in make_psd_band_metrics_IV2 and store just
+	% the band power (not the mean power frequencies).
 	vars = cellstr(vars);
+
+	% number of band are size found from a cell corresponding to  e.g. the 1st
+	% varible. Minus 2 because pxx and f is also stored in the cell. Divide by 
+	% two because both pow and mpf is stored for each band.
+	nPow = (size(T.(vars{1}),2)-2)/2;
+	
 	for i=1:numel(vars)
 		v = vars{i};
-		T = splitvars(T,v,'NewVariableNames',v+["_pxx","_f","_mpf","_pow","_bpow"]);
+		bandPowVars = "_b"+[1:nPow]+"_pow";
+		bandMPFVars = "_b"+[1:nPow]+"_mpf";
+		newVars = v+["_pxx","_f",bandPowVars,bandMPFVars];
+		T = splitvars(T,v,'NewVariableNames',newVars);
 		
 		% Store are numbers (whereas pxx, f and h remain as structs)
-		T.(v+"_mpf") = cell2mat(T{:,v+"_mpf"});
-		T.(v+"_pow") = cell2mat(T{:,v+"_pow"});
-		T.(v+"_bpow") = cell2mat(T{:,v+"_bpow"});
+		metricVars = newVars(3:end);
+		for j=1:numel(metricVars)
+			T.(metricVars{j}) = cell2mat(T{:,metricVars{j}});
+		end
 	end
-
-% function c = make_psd_data_G1(x,fs,focusedFreqBands)
-% 	% TODO: Implement struct saving of metrics
-% 	[pxx,f] = periodogram(detrend(x),[],[],fs);
-% 	c.pxx = pxx;
-% 	c.f = f;
-% 	c.h = f*60/speed;
-% 	
-% 	[c.mpf,c.pow] = meanfreq(pxx,f);
-% 	
-% 	for i=1:size(focusedFreqBands,1)
-% 		[c.band1.mpf,bpow] = meanfreq(pxx,f,focusedFreqBands);
-% 	end
 
 function T = merge_to_common_table(pxx)
 	T = merge_table_blocks(pxx);    
@@ -120,6 +100,6 @@ function T = make_band_specs(psds, hBands)
 		end
 		T.analysis_id = idSpecs.analysis_id;
 		T.pumpSpeeds = speed;
-		T.(['band',num2str(i),'_harmonics']) = hBand;
-		T.(['band',num2str(i),'_frequencies'])  = (hBand/60).*speed;
+		T.(['b',num2str(i),'_harmonics']) = hBand;
+		T.(['b',num2str(i),'_frequencies'])  = (hBand/60).*speed;
 	end

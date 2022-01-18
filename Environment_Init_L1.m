@@ -45,3 +45,9 @@ clear h_right_shade_sub1 h_right_shade_sub2 h_right_shade_zoom
 %%
 
 warning('on')
+
+%%
+
+% How to fuse data
+interNoteInclSpec = 'nearest';
+outsideNoteInclSpec = 'none';

@@ -50,9 +50,9 @@ function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
 				hold on
 				h.ColorOrderIndex=i;
 
-				x = double(string(F_i.balloonDiam));
+				x = double(string(F_i.balDiam));
 				x(isnan(x)) = 0;
-				plot(F_i.balloonDiam,F_i.(var),...
+				plot(F_i.balDiam,F_i.(var),...
 					'LineStyle','none','Marker','.','MarkerSize',20,'Color',h.ColorOrder(i,:))
 
 				diams = [diams;x];
@@ -63,16 +63,16 @@ function h_fig = plot_individual_effects_against_interv_cats_per_speed(...
 
 			M = numel(ctrl_levels);
 			for m=1:M
-				F_aft.balloonDiam(F_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
-				F_pre.balloonDiam(F_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
+				F_aft.balDiam(F_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
+				F_pre.balDiam(F_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
 			end
 
 			F_aft_n = F_aft(F_aft.pumpSpeed==speeds(s),:);
-			plot(F_aft_n.balloonDiam,F_aft_n.(var),...
+			plot(F_aft_n.balDiam,F_aft_n.(var),...
 				'LineStyle','none','Marker','.','MarkerSize',20,'Color',[0,0,0,0.5])
 
 			F_pre_n = F_pre(F_pre.pumpSpeed==speeds(s),:);
-			plot(F_pre_n.balloonDiam,F_pre_n.(var),...
+			plot(F_pre_n.balDiam,F_pre_n.(var),...
 				'LineStyle','none','Marker','.',...
 				'MarkerSize',20,'Color',[0.5,0.5,0.5,0.5],'MarkerFaceColor',[0.5,0.5,0.5])
 

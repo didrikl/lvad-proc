@@ -1,3 +1,5 @@
+%#ok<*NASGU> 
+
 % Initialize from raw data, preprocess and store (in memory and to disc)
 inputs = {
 	'IV2_Seq6'
@@ -12,16 +14,18 @@ inputs = {
 % 	'IV2_Seq19'
 	};
 
+askToReInit = false;
+
 % Do separate initialization parts
 for i=1:numel(inputs)
 	seq = inputs{i}(6:end);
 	Environment_Init_IV2
 	eval(inputs{i});
+
 	Init_Data_Raw
-	Init_Data_Preprocess
-	Init_Data_Save
-	Init_Data_Roundup
+	Preprocess_Sequence_IV2
+	Preprocess_Save
 end
 
-% Close all progress bar window and any pop-up messages
-close2 all
+Preprocess_Roundup
+

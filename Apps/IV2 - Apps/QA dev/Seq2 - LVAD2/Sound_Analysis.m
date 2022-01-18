@@ -27,7 +27,7 @@ P.(varName) = detrend(P.(varName));
 s = cell(1,n_levels+1);
 s{1} = B.(varName);
 for i=1:5   
-    s{i+1} = P.(varName)(P.balloonLev==num2str(i));
+    s{i+1} = P.(varName)(P.balLev==num2str(i));
 end
 
 % Amplifying and clipping in time

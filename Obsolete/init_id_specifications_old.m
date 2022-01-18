@@ -30,7 +30,7 @@ function id_specs = init_id_specifications(filename, dataLines)
     opts.Delimiter = ",";
     
     % Specify column names and types
-    opts.VariableNames = ["categoryLabel", "levelLabel",  "labelID",     "analysis_id",  "analysisDuration", "contingency",  "flowRedTarget", "pumpSpeed", "catheter",    "balloonDiam", "balloonVolume"];
+    opts.VariableNames = ["categoryLabel", "levelLabel",  "labelID",     "analysis_id",  "analysisDuration", "contingency",  "flowRedTarget", "pumpSpeed", "catheter",    "balDiam", "balloonVolume"];
     opts.VariableTypes = ["categorical",   "categorical", "categorical", "categorical", "categorical",      "duration",     "categorical",   "int16",     "categorical", "single",          "single" ];
     
     % Specify file level properties

@@ -85,7 +85,7 @@ S = fuse_data(notes,PL,US);
 clear PL US
 
 % Merge balloon level 0 into level 1 (as it actually was the same as level 1)
-S.balloonLev = mergecats(S.balloonLev,{'0','1'},'1');
+S.balLev = mergecats(S.balLev,{'0','1'},'1');
 
 S_parts = split_into_parts(S);
 clear S

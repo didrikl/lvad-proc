@@ -10,5 +10,9 @@ analysis_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis';
 feats_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\IV2 - Features';
 stats_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\IV2 - Statistics';
 fig_path      = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\IV2 - Figures';
-idSpecs_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\ID_Spefications_IV2.xlsx';
+idSpecs_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\IV2 - ID Specifications.xlsx';
 
+% Input file structure map, store in folder named Definitions
+labChart_varMapFile = 'VarMap_LabChart_IV2';
+systemM_varMapFile = 'VarMap_SystemM_IV2';
+notes_varMapFile = 'VarMap_Notes_IV2_v1';

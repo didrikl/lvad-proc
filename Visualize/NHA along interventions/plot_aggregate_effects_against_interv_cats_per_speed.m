@@ -72,7 +72,7 @@ function h_fig = plot_aggregate_effects_against_interv_cats_per_speed(...
                 hold on
                 h.ColorOrderIndex=i;
                 
-                x = double(string(T_i.balloonDiam));
+                x = double(string(T_i.balDiam));
                 x(isnan(x)) = 0;
                  h_err(end+1) = errorbar(x,T_i.(var),T_err_neg_i.(var),T_err_pos_i.(var),...
                       err_bar_specs{:},...
@@ -92,14 +92,14 @@ function h_fig = plot_aggregate_effects_against_interv_cats_per_speed(...
 			%ctrl_levels = unique(T_pre.QRedTarget_pst);
             M = numel(ctrl_levels);
             for m=1:M
-                T_aft.balloonDiam(T_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
-                T_pre.balloonDiam(T_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
+                T_aft.balDiam(T_aft.QRedTarget_pst==ctrl_levels(m)) = -M+m-1-0.08;
+                T_pre.balDiam(T_pre.QRedTarget_pst==ctrl_levels(m)) = -M+m-1+0.08;
             end
             
             T_aft_n = T_aft(T_aft.pumpSpeed==speeds(s),:);
             T_aft_n_err_neg = T_aft_err_neg(T_aft_err_neg.pumpSpeed==speeds(s),:);
             T_aft_n_err_pos = T_aft_err_pos(T_aft_err_pos.pumpSpeed==speeds(s),:);
-            x = double(string(T_aft_n.balloonDiam));
+            x = double(string(T_aft_n.balDiam));
             
 			h_err(end+1) = errorbar(x,T_aft_n.(var),T_aft_n_err_neg.(var),T_aft_n_err_pos.(var),...
                  err_bar_specs{:},...
@@ -109,7 +109,7 @@ function h_fig = plot_aggregate_effects_against_interv_cats_per_speed(...
             T_pre_n = T_pre(T_pre.pumpSpeed==speeds(s),:);
             T_pre_n_err_neg = T_pre_err_neg(T_pre_err_neg.pumpSpeed==speeds(s),:);
             T_pre_n_err_pos = T_pre_err_pos(T_pre_err_pos.pumpSpeed==speeds(s),:);
-            x = double(string(T_pre_n.balloonDiam));
+            x = double(string(T_pre_n.balDiam));
               
              h_err(end+1) = errorbar(x,T_pre_n.(var),T_pre_n_err_neg.(var),T_pre_n_err_pos.(var),...
                  err_bar_specs{:},...

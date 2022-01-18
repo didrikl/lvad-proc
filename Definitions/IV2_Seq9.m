@@ -50,7 +50,7 @@ labChart_fileNames = {
     'IV2_Seq9 - F13 [accA].mat'
 %     'IV2_Seq9 - F13 [accB].mat'
     };
-notes_fileName = 'IV2_Seq9 - Notes IV2 v1.0 - Rev3.xlsm';
+notes_fileName = 'IV2_Seq9 - Notes IV2 v1.0.0 - Rev3.xlsm';
 ultrasound_fileNames = {
     'ECM_2020_08_31__12_20_52.wrf'
     'ECM_2020_08_31__14_33_40.wrf'

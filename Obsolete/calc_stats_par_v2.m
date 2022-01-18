@@ -16,7 +16,7 @@ function stats = calc_stats_par(ids_specs,id_col,seqs,S_analysis,...
 %     stats.pumpSpeed = cellstr(repmat("",numel(ids)*numel(seqs),1));
 %     stats.Catheter = cellstr(repmat("",numel(ids)*numel(seqs),1));
 %     stats.FlowRedTarget = cellstr(repmat("",numel(ids)*numel(seqs),1));
-%     stats.balloonLev = cellstr(repmat("",numel(ids)*numel(seqs),1));
+%     stats.balLev = cellstr(repmat("",numel(ids)*numel(seqs),1));
     
     welcome('Calculate stats','function')
     
@@ -82,7 +82,7 @@ function stats = calc_stats_par(ids_specs,id_col,seqs,S_analysis,...
 %                     stats.pumpSpeed{jj} = string(ids_specs.pumpSpeed(i));
 %                     stats.Catheter{jj} = string(ids_specs.Catheter(i));
 %                     stats.FlowRedTarget{jj} = string(ids_specs.FlowRedTarget(i));
-%                     stats.balloonLev{jj} = string(ids_specs.balloonLev(i));
+%                     stats.balLev{jj} = string(ids_specs.balLev(i));
 %                 end
                 
                 jj = jj+1;
@@ -123,6 +123,6 @@ function stats = calc_stats_par(ids_specs,id_col,seqs,S_analysis,...
 %     stats.pumpSpeed = categorical(stats.pumpSpeed);
 %     stats.Catheter = categorical(stats.Catheter);
 %     stats.FlowRedTarget = categorical(stats.FlowRedTarget);
-%     stats.balloonLev = categorical(stats.balloonLev);
+%     stats.balLev = categorical(stats.balLev);
     
 end

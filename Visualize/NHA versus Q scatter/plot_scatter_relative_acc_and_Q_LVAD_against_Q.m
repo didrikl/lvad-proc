@@ -26,7 +26,8 @@ function h_figs = plot_scatter_relative_acc_and_Q_LVAD_against_Q(F,F_rel,vars)
 			
             h_ax(j) = nexttile;
             
-            rpm_ind = F_rel.pumpSpeed==speeds(j)
+            rpm_ind = F_rel.pumpSpeed==speeds(j);
+			
             hold on
             h_ax(j).ColorOrderIndex = 4;
             scatter(F.Q_mean(ctrl_ind&rpm_ind),F_rel.Q_LVAD_mean(ctrl_ind&rpm_ind),...

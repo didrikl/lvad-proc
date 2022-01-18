@@ -36,7 +36,7 @@ function stats = make_stats(S_analysis,note_vars,meas_vars)
         strrep(stats.Properties.VariableNames(q1q3_vars),"fun1_","q1q3_");
     stats = movevars(stats,{'id','analysis_id','bl_id','seq','LabelID',...
         'LevelLabel','CategoryLabel','Contingency','pumpSpeed','Catheter',...
-        'balloonLev','FlowRedTarget'},'Before',1);
+        'balLev','FlowRedTarget'},'Before',1);
     stats.GroupCount_stats_meas = [];
     
   
