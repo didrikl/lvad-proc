@@ -1,8 +1,6 @@
-function US = aggregate_effQ_and_affQ(US,varsToAgg)
+function US = aggregate_effQ_and_affQ(US)
     
-	if nargin==2 && isempty(varsToAgg), return; end
-
-    welcome('Aggregate afferent and efferent ultrasonic data','function')
+	welcome('Aggregate afferent and efferent ultrasonic data','function')
     
     US.Q = mean([US.effQ,US.affQ],2,'omitnan');
     if all(isnan(US.effQ))

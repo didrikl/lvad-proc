@@ -1,5 +1,6 @@
 function S = reduce_to_analysis_G1(S, Notes, idSpecs)
-	
+	% Note: Better to implement as object oriented.
+
 	welcome('Reduce data to analysis ID segments','function')
 	
 	% Keep only intervals that will go into quatitative analysis, as def. in Notes
@@ -16,15 +17,12 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 		id = ids(i);
 		welcome(sprintf('ID: %s\n',string(id)),'iteration')
 		
-		id_spec = idSpecs(idSpecs.analysis_id==id,:);
-		s_id_tab = S(S.analysis_id==id,:);
-		
+		idSpec = idSpecs(idSpecs.analysis_id==id,:);
+		S_id = S(S.analysis_id==id,:);
 		%s_id_tab = duration_handling(s_id_tab,id_spec);
 		
-		% NOTE: Should move to plot QC functionality:
-		% - For visual impression on signal
-		check_emboli(s_id_tab,'graftEmboliVol',1000)
-		check_id_parameter_consistency_IV2(s_id_tab,id_spec);
+		check_emboli(S_id,'graftEmboliVol',1000)
+		check_id_parameter_consistency_IV2(S_id,idSpec);
 		
 		multiWaitbar('Reducing to analysis ID segments',i/numel(ids));
 		
@@ -34,12 +32,9 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 	S.Properties.UserData.Notes = Notes;
 	
 	% Remove irrelevant categoric columns
-	S(:,ismember(S.Properties.VariableNames,{'balLev','pumpSpeed','graftEmboliVol','graftEmboliCount'})) = [];
+	S(:,ismember(S.Properties.VariableNames,{'balLev','pumpSpeed'})) = [];
 	
-	%S.noteRow = categorical(S.noteRow)
-	S = movevars(S, 'noteRow', 'Before', 1);
-	S = movevars(S, 'bl_id', 'Before', 1);
-	S = movevars(S, 'analysis_id', 'Before', 1);
+	S = move_key_columns_first(S);
 		
 function s_id_tab = duration_handling(s_id_tab,id_spec)
 	% Warn if recording interval duration is less than specifices in ID

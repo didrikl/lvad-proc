@@ -44,9 +44,20 @@ warning('on')
 
 %%
 
+askToReInit = true;
+
 % How to fuse data
 interNoteInclSpec = 'nearest';
 outsideNoteInclSpec = 'none';
 
 pGradVars = {'p_aff', 'p_eff'};
+
+notesVer = 'IV2_ver1.0.0';
+
+US_offsets = {};
+US_drifts = {}; 
+accChannelToSwap = {};
+blocksForAccChannelSwap = [];
+pChannelToSwap = {};
+pChannelSwapBlocks = [];
 

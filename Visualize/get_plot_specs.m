@@ -6,7 +6,7 @@ function specs = get_plot_specs
 	Colors_IV2
 	
 	fontSize = 17; 
-	fontName = 'Helvetica';%'Gill Sans Nova';%'Arial';%;
+	fontName = 'Arial';%'Gill Sans Nova';%'Arial';%;
 	axLineWidth = 2;
 	labelColor = [.2 .2 .2];
 
@@ -190,6 +190,9 @@ function specs = get_plot_specs
 		'VerticalAlignment','bottom'...
 		'Units','Points'
 		};
+	specs.asterix = {
+		specs.text{:},...
+		'FontSize',fontSize+1.5};
 
 	% For sequence parts plot of spectrogram and time domain curves
 	% -------------------------------------------------------------

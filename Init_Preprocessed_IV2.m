@@ -21,7 +21,7 @@ Data.IV2 = load_processed_sequences(sequences(:,1),...
 
 % Load previously calculated features for analysis
 load(fullfile(feats_path,'Features'));
-load(fullfile(stats_path,'Features'));
+load(fullfile(stats_path,'Statistics'));
 
 multiWaitbar('CloseAll');
 clear sequences

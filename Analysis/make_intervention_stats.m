@@ -68,7 +68,7 @@ function stats = make_intervention_stats(...
         stats{j} = join(stats{j},idStatsMedians,'Keys',{'analysis_id','bl_id'});    
         
 		% Adding unique categorical info for every intervention and sequence 
-		stats{j} = join(stats{j},D.idSpecs_analysis,"Keys","analysis_id");
+		stats{j} = join(stats{j},idSpecs,"Keys","analysis_id");
         stats{j}.id = seqs{j} + "_" + string(stats{j}.idLabel);
         stats{j}.seq = repmat(string(seqs{j}),height(stats{j}),1);
         
@@ -92,7 +92,6 @@ function S = remove_rows_with_irrelevant_analysis_id(S,idSpecs)
 	S.analysis_id = removecats(S.analysis_id);
 	S.bl_id = removecats(S.bl_id);
 
-
 function stats = tidy_up_aggregate_variable_names(stats)
 	% Tidy up names 
 	q1q3_vars = startsWith(stats.Properties.VariableNames,"fun1_");  
@@ -107,10 +106,11 @@ function stats = tidy_up_aggregate_variable_names(stats)
 
 function stats = tidy_up_row_and_column_positions(stats)
 	% Tidy up row and column positions
-	stats = movevars(stats,{'id','analysis_id','bl_id','seq','idLabel',...
+	catCols = ismember(stats.Properties.VariableNames,...
+		{'id','analysis_id','bl_id','seq','idLabel',...
 		'categoryLabel','levelLabel','interventionType','contingency','duration',...
-		'pumpSpeed','catheter','balLev','balDiam','balloonVolume','QRedTarget_pst'},...
-		'Before',1);
+		'pumpSpeed','catheter','balLev','balDiam','balVol','QRedTarget_pst'});
+	stats = movevars(stats,catCols,'Before',1);
 	stats = sortrows(stats,'id','ascend');
 
 function stats = convert_intervention_sample_counts_to_durations(stats)

@@ -1,4 +1,4 @@
-function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
+function S = fuse_data(Notes, PL, US, fs, interNoteInclSpec, outsideNoteInclSpec)
     % fuse_data Fuse notes and ultrasound into PowerLab data
     %
     %    S = fuse_data(notes,PL,US)
@@ -17,14 +17,14 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     
     % NOTE: Make OO and InclInterRowsInFusion,outsideNoteInclSpec as properties
     if nargin<3, US = table; end
-    if nargin<4, fs_new = nan; end
+    if nargin<4, fs = nan; end
     if nargin<5, interNoteInclSpec = 'nearest'; end
     if nargin<6, outsideNoteInclSpec = 'nearest'; end
         
     welcome('Data fusion of PowerLab data with Notes and ultrasonic data')
             
     [~,PL] = get_cell(PL);
-    fuse_opts = make_fuse_opts(fs_new);
+    fuse_opts = make_fuse_opts(fs);
     
     % Notes without timestamps can not be used in data fusion
     Notes = Notes(not(isnat(Notes.time)),:);
@@ -100,11 +100,11 @@ function S = fuse_data(Notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec)
     
 end
 
-function fuse_opts = make_fuse_opts(fs_new)
+function fuse_opts = make_fuse_opts(fs)
     fuse_opts = {};
-    if not(isnan(fs_new)) 
+    if not(isnan(fs)) 
         fuse_opts = {'regular',...
-            'SampleRate',fs_new,...
+            'SampleRate',fs,...
             %'EndValues',missing...
             };
     end

@@ -8,7 +8,6 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     % notes table
     
     if nargin<2, path = ''; end  
-    %if nargin<3, varMapFile = 'VarMap_G1_Notes_Ver4p16'; end
     eval(varMapFile);
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
@@ -131,7 +130,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     
     % Parse relevant columns, other than time columns 
     notes = standardizeMissing(notes, missingValueRepr);
-    num_vars = get_varname_of_specific_type(notes,'float');
+    num_vars = get_varname_of_specific_type(notes,'single');
     no_interp_rows = notes.intervType~='Transitional' | ...
         notes.part=='-' | ismissing(notes.part);
     notes(no_interp_rows,num_vars) = fillmissing(notes(no_interp_rows,num_vars),'constant',-9999);
@@ -150,7 +149,7 @@ function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
-    notes.noteRow = int16((1:height(notes))' + n_header_lines');
+    notes.noteRow = int16((1:height(notes))' + n_header_lines' +1);
     notes = movevars(notes, 'noteRow', 'Before', 'partDurTime');
     notes.Properties.VariableContinuity('noteRow') = 'step';
        

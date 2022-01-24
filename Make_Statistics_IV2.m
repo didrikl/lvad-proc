@@ -1,14 +1,11 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 Environment_Analysis_IV2
-clear save_data discrVars meanVars accVars hBands G G_rel G_del F F_rel F_del ...
-	pVars pooled classifiers predStateVar predStates ROC AUC
 
 % This defines the relevant ids for analysis
 idSpecs = init_id_specifications(idSpecs_path);
-idSpecs = idSpecs(not(ismember(idSpecs.interventionType,{'Extra'})),:);
+idSpecs_stats = idSpecs(not(ismember(idSpecs.interventionType,{'Extra'})),:);
 % idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
-
 
 % Make variable features of each intervention
 % -----------------------------------------------------------
@@ -20,11 +17,11 @@ meanVars = {...
 accVars = {...
 	'accA_x','accA_y','accA_z',...
 	'accA_x_nf','accA_y_nf','accA_z_nf'};
-F = make_intervention_stats(Data.IV2, discrVars, meanVars, {}, idSpecs);
+F = make_intervention_stats(Data.IV2, discrVars, meanVars, {}, idSpecs_stats);
 F.P_LVAD_drop = -F.P_LVAD_mean;
 hBands =  [1.10,2.9];
 isHarmBand = true;
-Pxx = make_power_spectra(Data.IV2, accVars, fs_new, hBands, idSpecs, isHarmBand);
+Pxx = make_power_spectra(Data.IV2, accVars, fs_new, hBands, idSpecs_stats, isHarmBand);
 F = join(F, Pxx.bandMetrics, 'Keys',{'id','analysis_id'});
 
 % Make relative and delta differences from tagged baselines 
@@ -35,9 +32,9 @@ F_del = calc_delta_diff_feats(F);
 % Descriptive stastistics over group of experiments
 % -----------------------------------------------------------
 
-G = make_group_stats(F, idSpecs);
-G_rel = make_group_stats(F_rel, idSpecs);
-G_del = make_group_stats(F_del, idSpecs);
+G = make_group_stats(F, idSpecs_stats);
+G_rel = make_group_stats(F_rel, idSpecs_stats);
+G_del = make_group_stats(F_del, idSpecs_stats);
 
 
 % Hypothesis test
@@ -101,12 +98,11 @@ F_ROC_SPSS = make_tables_for_ROC_analysis_in_SPSS(F);
 F_ROC = make_table_for_pooled_ROC_analysis(F,F_del);
 
 
-
 % Save and roundup
 % -----------------------------------------------------------
 
 % Gather all analytical data
-Data.IV2.idSpecs_analysis = idSpecs;
+Data.IV2.idSpecs_stats = idSpecs_stats;
 Data.IV2.Periodograms = Pxx;
 Data.IV2.Features.Absolute = F;
 Data.IV2.Features.Relative = F_rel;
@@ -131,4 +127,4 @@ save_statistics_as_separate_spreadsheets(Data.IV2.Feature_Statistics, stats_path
 multiWaitbar('CloseAll');
 clear save_data
 clear discrVars meanVars accVars hBands G G_rel G_del F F_rel F_del pVars ...
-	pooled classifiers predStateVar predStates ROC F_ROC F_ROC_SPSS AUC idSpecs
+	pooled classifiers predStateVar predStates ROC F_ROC F_ROC_SPSS AUC idSpecs_stats

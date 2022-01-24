@@ -103,7 +103,7 @@ notes = qc_notes_ver4(notes);
 
 PL = resample_signal(PL, fs_new);
 
-PL_files_with_time_offset = {...
+PL_filesOffset = {...
     'IV2_Seq12 - F7.mat'
     'IV2_Seq12 - F8.mat'
     'IV2_Seq12 - F9.mat'
@@ -115,7 +115,8 @@ PL_files_with_time_offset = {...
     'IV2_Seq12 - F15.mat'
     'IV2_Seq12 - F16.mat'
     };
-PL = adjust_for_constant_time_offset(PL,PL_files_with_time_offset,seconds(60));
+PL = adjust_for_constant_time_offset_for_filenames(...
+	PL, PL_filesOffset, seconds(60));
 
 PL = add_spatial_norms(PL,2,{'accA_x','accA_y','accA_z'},'accA_norm');
 %PL = add_spatial_norms(PL,2,{'accB_x','accB_y','accB_z'},'accB_norm');

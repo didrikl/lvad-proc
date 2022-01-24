@@ -22,8 +22,11 @@ Notes = init_notes_xlsfile_ver4(notes_filePath, '', notes_varMapFile);
 
 welcome(['Quality control and fixes ',seq],'module')
 
-Notes = qc_notes_ver4(Notes, idSpecs, askToReInit);
+Notes = qc_notes(Notes, idSpecs, askToReInit, notesVer);
+
 US = adjust_for_system_m_time_drift(US, US_drifts);
+US = adjust_for_system_m_time_offset(US, US_offsets);
+
 PL = swap_channel_names(PL, accChannelToSwap, blocksForAccChannelSwap);
 
 % Swap any pressure channels by manual input, before check pressure channels

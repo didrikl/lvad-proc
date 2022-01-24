@@ -66,7 +66,7 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs)
 	
 	% Add annotations
 	hSubTit(1) = subtitle(hSub(1,1),{'Control interventions,','outflow clamp'});
-	hSubTit(2) = subtitle(hSub(1,1),{'Balloon interventions,','areal inflow obstructions'});
+	hSubTit(2) = subtitle(hSub(1,2),{'Balloon interventions,','areal inflow obstructions'});
 	hNum(1) = text(hSub(1,1),15,3.85,'A');
 	hNum(2) = text(hSub(1,2),15,3.85,'B');
 	add_xlines(hSub, segStarts1, segStarts2, spec);

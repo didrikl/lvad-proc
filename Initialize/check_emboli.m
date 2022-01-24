@@ -1,9 +1,11 @@
-function check_emboli(s_id_tab,var,threshold)
+function check_emboli(S,var,threshold)
 	
-	%TODO: check if variable exist
-	vol = sum(s_id_tab.(var));
+	var = check_table_var_input(S,var);
+
+	vol = sum(S.(var));
+	id = unique(S.analysis_id);
 	if vol>threshold
-		warning(['Accumulated emboli volume >',num2str(threshold),...
-			' muL detected: ',num2str(vol)])
-		% TODO: Display id info as well
+		warning(sprintf(...
+			'Accumulated emboli volume > %g muL\n\tVolume: %g\n\tSegment ID: %s',...
+			threshold,vol,id));
 	end

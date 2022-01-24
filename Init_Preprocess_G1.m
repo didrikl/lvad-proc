@@ -2,9 +2,9 @@
 
 % Initialize from raw data, preprocess and store (in memory and to disc)
 inputs = {
-	'G1_Seq3' % (pilot)
+%	'G1_Seq3' % (pilot)
 % 	'G1_Seq6'
-% 	'G1_Seq7'
+ 	'G1_Seq7'
 % 	'G1_Seq8'
 % 	'G1_Seq11'
 % 	'G1_Seq12'
@@ -20,9 +20,9 @@ for i=1:numel(inputs)
 	Environment_Init_G1 % TODO make generic
 	eval(inputs{i});
 
-	Init_Data_Raw
-	Preprocess_Sequence_G1
-	Preprocess_Save
+	Init_Data_Raw;
+	Preprocess_Sequence_G1;
+	Preprocess_Save;
 end
 
-Preprocess_Roundup
+Preprocess_Roundup;

@@ -1,4 +1,4 @@
-function notes = qc_notes_ver4(notes,id_specs,askToReInit)
+function notes = qc_notes_ver4(notes, idSpecs, askToReInit)
 	% QC_NOTES_VER4 checks notes file intergrity.
 	%
 	% Checks and displays rows of notes file that have
@@ -17,7 +17,7 @@ function notes = qc_notes_ver4(notes,id_specs,askToReInit)
 	if nargin<3, askToReInit = true; end
 	if nargin<2
 		warning('No ID parameter specfications given, thus not checked');
-		id_specs = table;
+		idSpecs = table;
 	end
 	
 	% NOTE: If OO, then this is notes object property
@@ -36,7 +36,7 @@ function notes = qc_notes_ver4(notes,id_specs,askToReInit)
 	irregParts = check_irregular_parts(notes);
 	undefCat = check_missing_essential_info(notes,mustHaveVars);
 	
-	irregRowsWithID = check_analysis_ids(notes,id_specs);
+	irregRowsWithID = check_analysis_ids(notes,idSpecs);
 	
 	if any(notChrono | natPause | natPart | undefCat | irregParts | ...
 			irregRowsWithID | misNum)
@@ -50,15 +50,15 @@ function notes = qc_notes_ver4(notes,id_specs,askToReInit)
 	
 	fprintf('\nQuality control of notes done.\n')
 	
-function misNum = check_missing_numeric_data(notes,numVarsNotToCheck)
+function misNum = check_missing_numeric_data(notes, numVarsNotToCheck)
 	notes(:,numVarsNotToCheck) = [];
 	misNum = any(notes{:,vartype('numeric')}==-9999,2) & ...
 		contains(string(notes.intervType),{'steady','baseline'},'IgnoreCase',true);
 	
-function irregID = check_analysis_ids(Notes, ids_specs)
+function irregID = check_analysis_ids(Notes, idSpecs)
 	% Verify event and intervType are always respectively '-' and 'Steady-state'
 	
-	if height(ids_specs)==0
+	if height(idSpecs)==0
 		irregID = false(height(Notes),1);
 		return;
 	end
@@ -72,48 +72,19 @@ function irregID = check_analysis_ids(Notes, ids_specs)
 	
 	irregID = not(ismember(Notes.event,analyse_events)) & id_inds;
 	
-	% TODO: Factorize the following checks into separate functions
-	% QC of ids compared to id_specs...
-	if height(ids_specs)>0
+	% TODO: Make separate funcions for IV2 and G1
+	if height(idSpecs)>0
 		
-		% check for any rows with analysis_id, but without baseline_id
-		% (Vice-versa, baseline_id without analysis_id is ok.)
-		misBaselineIds = ismissing(Notes.bl_id);
-		if any(misBaselineIds)
-			fprintf('\n')
-			warning(sprintf('\n\tMissing baseline IDs at rows %s\n',...
-				mat2str(Notes.noteRow(misBaselineIds))));
-			irregID = irregID | misBaselineIds;
-		end
+		irregID = check_for_missing_baseline_ids(Notes, irregID);
 		
-		% Any missing?
-		misIDs = not(ismember(ids_specs.analysis_id,Notes.analysis_id(id_inds)))...
-			& not(ids_specs.contingency);
-		if any(misIDs)
-			fprintf('\n\nMissing analysis IDs defined as:\n\n');
-			disp(ids_specs(misIDs,:))
-		end
-		
-		% Any duplicates?
-		[~, dups] = find_cellstr_duplicates(cellstr(Notes.analysis_id(id_inds)));
-		if not(isempty(dups))
-			dup_inds = ismember(Notes.analysis_id,dups);
-			fprintf('\n\n\tDuplicate IDs:\n\t\t%s\n\n',strjoin(unique(dups),'\n\t\t'))
-			disp(Notes(dup_inds,:))
-		end
-		
-		% Any ID tags not listed in specfication file?
-		extraIDs = not(ismember(Notes.analysis_id,ids_specs.analysis_id)) & id_inds;
-		if any(extraIDs)
-			fprintf('\n\nExtra analysis IDs that are not defined:\n\n');
-			disp(Notes(extraIDs,:))
-		end
+		check_for_missing_ids_in_data(idSpecs, Notes, id_inds);
+		%check_for_duplicate_id_rows(Notes, id_inds);
+		check_for_unlisted_ids(Notes, idSpecs, id_inds);
 		
 		% Non-matching ID parameters with those in specfication file?
-		for i=1:height(ids_specs)
-			idNote_inds = Notes.analysis_id==ids_specs.analysis_id(i);
-			id_specs = ids_specs(i,:);
-			isOK(i) = check_id_parameter_consistency_IV2(Notes(idNote_inds,:),id_specs);
+		for i=1:height(idSpecs)
+			idNote_inds = Notes.analysis_id==idSpecs.analysis_id(i);
+			isOK(i) = check_id_parameter_consistency_IV2(Notes(idNote_inds,:), idSpecs(i,:));
 			
 			if numel(unique(Notes.bl_id(idNote_inds)))>1
 				warning('There are disparate baseline IDs in Notes with same Analysis ID')
@@ -121,17 +92,9 @@ function irregID = check_analysis_ids(Notes, ids_specs)
 			
 		end
 		
-		inCons = check_pump_speed_id_consistency(Notes);
-		isOK(i) = not(any(inCons));
-		irregID = irregID | inCons;
+		%[isOK(i), irregID] = check_pump_speed_id_consistency(Notes, irregID, 2);
 		
-		if any(not(isOK))
-			opts = struct('WindowStyle','non-modal','Interpreter','none');
-			msg = sprintf('ID parameter issues detected in Notes.\n\n%s\n',...
-				display_filename(Notes.Properties.UserData.FilePath));
-			warndlg(msg,'Warning, Notes',opts)
-		end
-		
+		notify_about_issues_found(isOK, Notes);
 		
 	end
 	
@@ -286,7 +249,7 @@ function [isNatPauseStart, isMissingTimestamp] = check_missing_time(notes)
 	end
 	
 	
-function isUndefCat = check_missing_essential_info(notes,mustHaveCats)
+function isUndefCat = check_missing_essential_info(notes, mustHaveCats)
 	% Get and display rows with missing essential categoric info
 	
 	isUndefCat = any(ismissing(notes(:,mustHaveCats)),2);
@@ -296,3 +259,44 @@ function isUndefCat = check_missing_essential_info(notes,mustHaveCats)
 		disp(missing_categories)
 	end
 	
+function check_for_unlisted_ids(Notes, idSpecs, id_inds)
+	extraIDs = not(ismember(Notes.analysis_id,idSpecs.analysis_id)) & id_inds;
+	if any(extraIDs)
+		fprintf('\n\nExtra analysis IDs that are not defined:\n\n');
+		disp(Notes(extraIDs,:))
+	end
+
+function check_for_duplicate_id_rows(Notes, id_inds)
+	[~, dups] = find_cellstr_duplicates(cellstr(Notes.analysis_id(id_inds)));
+	if not(isempty(dups))
+		dup_inds = ismember(Notes.analysis_id,dups);
+		fprintf('\n\n\tDuplicate IDs:\n\t\t%s\n\n',strjoin(unique(dups),'\n\t\t'))
+		disp(Notes(dup_inds,:))
+	end
+	
+function check_for_missing_ids_in_data(idSpecs, Notes, id_inds)
+	misIDs = not(ismember(idSpecs.analysis_id,Notes.analysis_id(id_inds)))...
+		& not(idSpecs.contingency);
+	if any(misIDs)
+		fprintf('\n\nMissing analysis IDs defined as:\n\n');
+		disp(idSpecs(misIDs,:))
+	end
+	
+function irregID = check_for_missing_baseline_ids(Notes, irregID)
+	% check for any rows with analysis_id, but without baseline_id
+	% (Vice-versa, baseline_id without analysis_id is ok.)
+	misBaselineIds = ismissing(Notes.bl_id);
+	if any(misBaselineIds)
+		fprintf('\n')
+		warning(sprintf('\n\tMissing baseline IDs at rows %s\n',...
+			mat2str(Notes.noteRow(misBaselineIds))));
+		irregID = irregID | misBaselineIds;
+	end
+	
+function notify_about_issues_found(isOK, Notes)
+	if any(not(isOK))
+		opts = struct('WindowStyle','non-modal','Interpreter','none');
+		msg = sprintf('ID parameter issues detected in Notes.\n\n%s\n',...
+			display_filename(Notes.Properties.UserData.FilePath));
+		warndlg(msg,'Warning, Notes',opts)
+	end

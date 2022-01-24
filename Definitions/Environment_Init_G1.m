@@ -44,10 +44,30 @@ warning('on')
 
 %%
 
+askToReInit = true;
+
 % How to fuse data
 interNoteInclSpec = 'nearest';
 outsideNoteInclSpec = 'none';
 
-flowVarsToAgg = {};
+labChart_varMapFile = 'VarMap_LabChart_G1';
+systemM_varMapFile = 'VarMap_SystemM_G1';
+notes_varMapFile = 'VarMap_Notes_G1_v1_0_0';
+
+% Directory structure
+powerlab_subdir = 'Recorded\PowerLab';
+ultrasound_subdir = 'Recorded\SystemM';
+notes_subdir = 'Noted';
+
+notesVer = 'G1_ver1.0.0';
+
 pGradVars = {'pMillar','pGraft'};
+
+US_offsets = {};
+US_drifts = {}; 
+accChannelToSwap = {};
+blocksForAccChannelSwap = [];
+pChannelToSwap = {};
+pChannelSwapBlocks = [];
+
 

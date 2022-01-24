@@ -38,10 +38,11 @@ function S_parts = split_into_parts(S,fs)
                     'missing within gap between \n\tStart:%s\n\tEnd: %s\n\n'],...
                     gap_start_time(j),gap_end_time(j));
                 gap_times = timerange(gap_start_time(j),gap_end_time(j));
+                int16Vars = get_varname_of_specific_type(S_parts{i},'int16');
                 vars_as_missing = ...
                     not(ismember(S_parts{i}.Properties.VariableNames,...
-                    {'Q','noteRow','part'}));
-                S_parts{i}{gap_times,vars_as_missing} = missing;
+                    [{'Q','noteRow','part'},int16Vars]));
+				S_parts{i}{gap_times,vars_as_missing} = missing;
             end
             
         end

@@ -1,44 +1,63 @@
-function PL = calculate_pressure_gradient(PL,affVar,effVar)
+function T = calculate_pressure_gradient(T, pGradVars)
+
+	welcome('Calculate pressure gradient','function')
 	
+	if isempty(pGradVars)
+		T = add_empty_grad(T);
+		return
+	end
+
+	affVar = pGradVars{1};
+	effVar = pGradVars{2};
+
 	noiseThreshold = 0.01;
 	
-	welcome('Calculate pressure gradient','function')
-	[returnAsCell,PL] = get_cell(PL);
+	[returnAsCell,T] = get_cell(T);
 	
-	for i=1:numel(PL)
+	for i=1:numel(T)
 		
-		isEmpty = display_block_info(PL{i},i,numel(PL),not(returnAsCell));
+		isEmpty = display_block_info(T{i},i,numel(T),not(returnAsCell));
         if isEmpty, continue; end
 		
-		pAvg_aff = mean(PL{i}.(affVar));
-		pAvg_eff = mean(PL{i}.(effVar));
+		pAvg_aff = mean(T{i}.(affVar));
+		pAvg_eff = mean(T{i}.(effVar));
 		
 		isOnlyAffNoise = pAvg_aff<noiseThreshold;
 		isOnlyEffNoise = pAvg_eff<noiseThreshold;
 		
 		% Check for missing recording
 		if isOnlyAffNoise || isOnlyEffNoise
-			PL{i}.pGrad = nan(height(PL{i}),1);
+			T{i}.pGrad = nan(height(T{i}),1);
 		else
 			if pAvg_eff<pAvg_aff
 				warning('Negative mean pressure gradient')
 			end
-			PL{i}.pGrad = PL{i}.p_eff - PL{i}.p_aff;
+			T{i}.pGrad = T{i}.(effVar) - T{i}.(affVar);
 		end
 		
-		nan_inds = isnan(PL{i}.pGrad);
+		nan_inds = isnan(T{i}.pGrad);
 		if any(nan_inds)
 			warning(sprintf(...
 				['There is %g pst NaNs in pressure gradient in ',...
-				'block %d'],100*nnz(nan_inds)/height(PL{i}.pGrad),i));
+				'block %d'],100*nnz(nan_inds)/height(T{i}.pGrad),i));
 		end
 		
-		PL{i}.Properties.VariableUnits('pGrad') = ...
-			PL{i}.Properties.VariableUnits(affVar);
-		PL{i}.Properties.VariableContinuity('pGrad') = {'continuous'};
-		PL{i}.Properties.VariableDescriptions{'pGrad'} = ...
-			'Pressure gradient over LVAD: Efferent minus afferent pressure';
-		PL{i} = movevars(PL{i},'pGrad','After',effVar);
+		T{i} = add_prop(T{i},T{i}.Properties.VariableUnits(affVar));
+		T{i} = movevars(T{i},'pGrad','After',effVar);
 	end
 	
 	if not(returnAsCell), T = T{1}; end
+
+function PL= add_empty_grad(PL)
+	for i=1:numel(PL)
+		PL{i}.pGrad = nan(height(PL{i}),1);
+		PL{i} = add_prop(PL{i},{''});
+	end
+	warning('Pressure gradient is created as NaNs')
+
+function PL = add_prop(PL,unit)
+	PL.Properties.VariableUnits('pGrad') = unit;
+	PL.Properties.VariableContinuity('pGrad') = {'continuous'};
+	PL.Properties.VariableDescriptions{'pGrad'} = ...
+		'Pressure gradient over LVAD: Efferent minus afferent pressure';
+	

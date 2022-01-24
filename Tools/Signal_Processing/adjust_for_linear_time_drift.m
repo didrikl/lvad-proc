@@ -1,7 +1,5 @@
 function T = adjust_for_linear_time_drift(T,secsAhead,defDriftRatePerSec,diffReadTime,inSyncTime)
     
-    % TODO: Make this as input...
-        
     if isempty(T)
         warning('Input data table %s is empty',inputname(1))
         return
