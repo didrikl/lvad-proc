@@ -1,12 +1,12 @@
 %% Sequence definitions and correction inputs
 
-% ID
-sequence = 'IV2_Seq7';
+% Experiment sequence ID
+seq = 'G1_Seq7';
 
 % Folder in base path
 experiment_subdir = 'Seq7 - LVAD11';
 
-% Which files to input from input directory 
+% Which files to input from input directory
 labChart_fileNames = {
 	'G1_Seq7 - F1 [accA].mat'
 	%'G1_Seq7 - F1 [accB].mat'
@@ -29,13 +29,10 @@ labChart_fileNames = {
 	%'G1_Seq7 - F3_Sel2 [i1,i2,i3].mat'
 	%'G1_Seq7 - F3_Sel2 [v1,v2,v3].mat'
 	};
-notes_fileName = 'G1_Seq7 - Notes ver4.16 - Rev6.xlsm';
+notes_fileName = 'G1_Seq7 - Notes G1 v1.0.0 - Rev7.xlsm';
 ultrasound_fileNames = {
-    'ECM_2020_11_05__12_27_25.wrf'
-};
-
-% Override defaults
-outsideNoteInclSpec = 'nearest';
+	'ECM_2020_11_05__12_27_25.wrf'
+	};
 
 % Correction input
 US_offsets = {3600};
@@ -44,3 +41,5 @@ accChannelToSwap = {};
 blocksForAccChannelSwap = [];
 pChannelToSwap = {};
 pChannelSwapBlocks = [];
+PL_offset = [];
+PL_offset_files = {};

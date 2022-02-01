@@ -1,9 +1,9 @@
-function S_parts = split_into_parts(S,fs)
+function S_parts = split_into_parts(S, fs)
         
     % Sample rate for re-sampling down to highest signal content frequency 
     if nargin<2, fs=get_sampling_rate(S); end
     
-    welcome('Splitting into cell array of regular part tables')
+    welcome('Splitting into cell array of regular part tables');
     
     n_parts = max(double(string(categories(S.part))));
     S_parts = cell(n_parts,1); 
@@ -59,9 +59,11 @@ function S_parts = split_into_parts(S,fs)
              S_parts{i}(not_nan_end_ind+1:end,:) = [];
         end
         
-        % Remove excessive info to save memory
-        %S_parts{i}.part = [];
-        
+        S = move_key_columns_first(S);
+
+		S_parts{i}.Properties.Description = 'Fused data - Part no. segments';
+        S_parts{i}.Properties.UserData.SampleRate = fs;
+		
     end
     
     multiWaitbar('Splitting into parts',1);

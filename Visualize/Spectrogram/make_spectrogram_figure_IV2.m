@@ -1,27 +1,10 @@
-function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs)
-	IDs1 = {
-		'02.0 #1'
-		% 	'52.0'
-		'52.1'
-		'52.2'
-		'52.3'
-		'52.4'
-		% 	'62.0'
-		% 	'62.5'
-		% 	'62.1'
-		% 	'62.2'
-		% 	'62.3'
-		% 	'62.4'
-		};
-	IDs2 = {
-		'02.0 #1'
-		%'12.3'
-		'22.3'
-		'32.3'
-		'42.4'
-		%'42.5'
-		};
+function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs, IDs1, IDs2)
 	legStr = {'\itQ\rm','\itP\rm_{LVAD}','NHA\it_y\rm'};
+
+	durLim = 120;
+	res = 0.010;
+	overlapPst = 95;
+	yLim_map = [0.5,4.07];
 
 	figWidth = 1200;
 	figHeight =  785;
@@ -32,11 +15,6 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs)
 	xStart = 68;
 	yStart = 38;
 	
-	durLim = 120;
-	res = 0.010;
-	overlapPst = 95;
-	yLim_map = [0.5,4.07];
-
 	Colors_IV2
 	spec = get_plot_specs;
 	colorMap = scientificColormaps.batlowW; % colormap(scientificColormaps.lisbon)

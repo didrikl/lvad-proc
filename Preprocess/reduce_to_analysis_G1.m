@@ -1,14 +1,10 @@
 function S = reduce_to_analysis_G1(S, Notes, idSpecs)
-	% Note: Better to implement as object oriented.
-
+	
 	welcome('Reduce data to analysis ID segments','function')
 	
 	% Keep only intervals that will go into quatitative analysis, as def. in Notes
 	S.analysis_id = standardizeMissing(S.analysis_id,'-');
 	S = S(not(ismissing(S.analysis_id)),:);
-	
-	% Remove irrelevant columns
-	S(:,{'event','intervType','part'}) = [];
 	
 	ids = categories(idSpecs.analysis_id);
 	
@@ -19,11 +15,11 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 		
 		idSpec = idSpecs(idSpecs.analysis_id==id,:);
 		S_id = S(S.analysis_id==id,:);
-		%s_id_tab = duration_handling(s_id_tab,id_spec);
+		S_id = duration_handling(S_id, idSpec);
 		
-		check_emboli(S_id,'graftEmboliVol',1000)
-		check_id_parameter_consistency_IV2(S_id,idSpec);
-		
+		% Display info about each segment
+		check_emboli(S_id,'graftEmboliVol',300)
+		check_id_parameter_consistency_G1(S_id, idSpec);
 		multiWaitbar('Reducing to analysis ID segments',i/numel(ids));
 		
 	end
@@ -31,40 +27,25 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 	S = S(ismember(S.analysis_id,idSpecs.analysis_id),:);
 	S.Properties.UserData.Notes = Notes;
 	
-	% Remove irrelevant categoric columns
-	S(:,ismember(S.Properties.VariableNames,{'balLev','pumpSpeed'})) = [];
-	
+	% Remove irrelevant columns
+	% S will retain noted values for statistical mean calculations
+	colsToRem = {
+		'event'
+		'intervType'
+		'part'
+		'balLev'
+		'pumpSpeed'
+		'balDiamEst'
+		'injEff'
+		'accA_x_nf'
+		'accA_y_nf'
+		'accA_z_nf'
+		'accA_norm_nf'
+		'accA_xynorm_nf'
+		'graftEmboliCount'
+		};
+	S(:,ismember(S.Properties.VariableNames,colsToRem)) = [];
+
 	S = move_key_columns_first(S);
-		
-function s_id_tab = duration_handling(s_id_tab,id_spec)
-	% Warn if recording interval duration is less than specifices in ID
-	% specification file. Also, if duration exceeds with 2 or more seconds, then
-	% cut 1 seconds of the recording at the start and end of the interval. The
-	% cut is done as a mitigation measure against inaccuracies in timestames
-	% (round off errors, human note response, clock drift corrections and clock
-	% offsets).
+	S.Properties.Description = 'Fused data - Analysis ID segments';
 	
-	% NOTE: Which solution is best?
-	% - Strip 1 secs at each side of the id-interval?
-	% - Strip down to exact duration according to the protocol evenly
-	%   distributed at each side of the id intererval?
-	
-	if height(s_id_tab)==0
-		if not(id_spec.contingency)
-			warning('Missing data');
-		end
-	else
-		totDur = s_id_tab.time(end)-s_id_tab.time(1);
-		%fprintf('%s duration\n',string(totDur))
-		if totDur<id_spec.analysisDuration
-			warning(sprintf('Duration is less than in protocol (%s)',...
-				string(id_spec.analysisDuration)));
-		elseif totDur>id_spec.analysisDuration+seconds(2)
-			dur = s_id_tab.time - s_id_tab.time(1);
-			cut_inds = dur<seconds(1) | dur>totDur-seconds(1);
-			s_id_tab(cut_inds,:) = [];
-			totDur = s_id_tab.time(end)-s_id_tab.time(1);
-			fprintf('%s duration\n',string(totDur))
-		end
-		
-	end

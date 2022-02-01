@@ -1,4 +1,5 @@
 function T = calculate_pressure_gradient(T, pGradVars)
+	% Calculate pressure gradient
 
 	welcome('Calculate pressure gradient','function')
 	
@@ -16,8 +17,17 @@ function T = calculate_pressure_gradient(T, pGradVars)
 	
 	for i=1:numel(T)
 		
-		isEmpty = display_block_info(T{i},i,numel(T),not(returnAsCell));
+		isEmpty = display_block_info(T{i}, i, numel(T), not(returnAsCell));
         if isEmpty, continue; end
+		
+		if not(ismember(affVar,T{i}.Properties.VariableNames))
+			warning('Afferent pressure channel %s is missing',affVar);
+			T{i}.(affVar) = nan(height(T{i}),1);
+		end
+		if not(ismember(effVar,T{i}.Properties.VariableNames))
+			warning('Efferent pressure channel %s is missing',effVar);
+			T{i}.(effVar) = nan(height(T{i}),1);
+		end
 		
 		pAvg_aff = mean(T{i}.(affVar));
 		pAvg_eff = mean(T{i}.(effVar));
@@ -48,16 +58,16 @@ function T = calculate_pressure_gradient(T, pGradVars)
 	
 	if not(returnAsCell), T = T{1}; end
 
-function PL= add_empty_grad(PL)
-	for i=1:numel(PL)
-		PL{i}.pGrad = nan(height(PL{i}),1);
-		PL{i} = add_prop(PL{i},{''});
+function T= add_empty_grad(T)
+	for i=1:numel(T)
+		T{i}.pGrad = nan(height(T{i}),1);
+		T{i} = add_prop(T{i},{''});
 	end
 	warning('Pressure gradient is created as NaNs')
 
-function PL = add_prop(PL,unit)
-	PL.Properties.VariableUnits('pGrad') = unit;
-	PL.Properties.VariableContinuity('pGrad') = {'continuous'};
-	PL.Properties.VariableDescriptions{'pGrad'} = ...
+function T = add_prop(T, unit)
+	T.Properties.VariableUnits('pGrad') = unit;
+	T.Properties.VariableContinuity('pGrad') = {'continuous'};
+	T.Properties.VariableDescriptions{'pGrad'} = ...
 		'Pressure gradient over LVAD: Efferent minus afferent pressure';
 	

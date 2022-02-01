@@ -1,17 +1,20 @@
-function F_diff = make_feats_diff(feats,fnc,nominalAsBaseline)
+function F_diff = make_feats_diff(F, fnc, nominalAsBaseline)
 	% Calculate difference from baseline values (tagged in bl_id column) using the
 	% specfic fnc function handle input
 	
 	if nargin<3, nominalAsBaseline=true; end
 	
-	seqs = unique(feats.seq);
+	seqs = unique(F.seq);
     F_diff = cell(numel(seqs),1);
-	cols = get_varname_of_specific_type(feats,'numeric');
-	cols = cols(not(contains(cols,{'speed','Speed'})));
+	
+	cols = get_varname_of_specific_type(F,'numeric');
+	ctrlVars = F.Properties.VariableNames(F.Properties.CustomProperties.Controlled);
+	constCols = contains(cols, [ctrlVars,{'GroupCount'}], 'IgnoreCase',true);
+	cols = cols(not(constCols));
 	    
 	% Separate each sequence of feats to look for baseline reference values
     for i=1:numel(seqs)
-        feats_i = feats(feats.seq==seqs{i},:);
+        feats_i = F(F.seq==seqs{i},:);
         feats_i_diff = feats_i;
         feats_i_diff{:,cols} = nan*feats_i_diff{:,cols};
         
@@ -21,8 +24,8 @@ function F_diff = make_feats_diff(feats,fnc,nominalAsBaseline)
             if isempty(bl_row)
 				
 				% Missing baseline shall result in NaN-values
-				feats_i.analysis_id
-				feats_i.bl_id(j)
+				%feats_i.analysis_id
+				%feats_i.bl_id(j)
                 warning(sprintf(['Baseline row not found',...
                     '\n\tRow where Analysis_id = bl_id = %s',...
                     '\n\tSequence: %s'],...
@@ -38,8 +41,13 @@ function F_diff = make_feats_diff(feats,fnc,nominalAsBaseline)
 			else
 				
 				% Calculate with function handle given
-				feats_i_diff{j,cols} = fnc(feats_i{j,cols},feats_i{bl_row,cols});
-                
+				if numel(bl_row)>1
+					warning('Multiple baseline rows for ID in %s, id=%s',...
+						seqs{i}, feats_i.bl_id(j))
+				else
+					feats_i_diff{j,cols} = fnc(feats_i{j,cols},feats_i{bl_row,cols});
+				end
+
             end
             
         end
@@ -47,4 +55,4 @@ function F_diff = make_feats_diff(feats,fnc,nominalAsBaseline)
     end
     
     F_diff = merge_table_blocks(F_diff);
-    F_diff = sortrows(F_diff,'id','ascend');
+	F_diff = sortrows(F_diff,'id','ascend');

@@ -1,6 +1,6 @@
 %% Initialze the processing environment and input file structure
 
-% Which experiment
+% Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
 experiment_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq13 - LVAD12';
 proc_path = fullfile(basePath,experiment_subdir,'Processed');

@@ -51,7 +51,7 @@ function S = fuse_data(Notes, PL, US, fs, interNoteInclSpec, outsideNoteInclSpec
             PL{i} = PL{i}(PL{i}.time>=B{i}.time(1) & PL{i}.time<=B{i}.time(end),:);
         end
         
-        % Introducing better names, in case something goes wrong in LabChart_i        % fuse_timetables function
+        % Introducing names, in case something goes wrong in fuse_timetables
         LabChart_i = PL{i};
         Notes_block_i = B{i};
         PL{i} = fuse_timetables(LabChart_i,Notes_block_i,fuse_opts);
@@ -95,8 +95,8 @@ function S = fuse_data(Notes, PL, US, fs, interNoteInclSpec, outsideNoteInclSpec
     end
     multiWaitbar('Merging table blocks into one timetable','Close');
     multiWaitbar('Data fusion',1);
-          
-    clear fuse_timetables
+    
+	clear fuse_timetables
     
 end
 
@@ -204,7 +204,7 @@ function B = check_for_notes_outside_PL(B,PL_i,outsideNoteInclSpec)
     postDataNotes_ind = find(B.time>PL_i.time(end));
     if nnz(postDataNotes_ind)>0       
         fprintf('\n')
-        warning(sprintf('\n\tThere are Notes rows after LabChart data starts\n'));
+        warning(sprintf('\n\tThere are Notes rows after LabChart data ends\n'));
         disp(B(postDataNotes_ind,:))
     end
     

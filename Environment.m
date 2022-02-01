@@ -21,6 +21,8 @@ if numel(who)>1
     if strcmp(answer,'Yes'), clear variables; end
 end
 
+multiWaitbar('CloseAll');
+
 
 %% Information
 
@@ -50,3 +52,5 @@ set(groot,'defaultAxesCreateFcn','disableDefaultInteractivity(gca)')
 
 %set(groot,'DefaultFigureGraphicsSmoothing','on')
 set(0, 'DefaultFigureRenderer', 'painters');
+
+clear e

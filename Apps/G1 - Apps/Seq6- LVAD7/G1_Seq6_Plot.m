@@ -3,7 +3,7 @@ clear check_table_var_input
 seq_no = 6;
 
 % Calculation settings
-sampleRate = 500;
+sampleRate = 750;
 
 orderMapVar = 'accA_norm';
 mapColScale = [-85,-30];

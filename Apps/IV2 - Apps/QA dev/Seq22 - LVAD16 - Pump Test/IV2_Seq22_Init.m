@@ -1,6 +1,6 @@
 %% Initialze the processing environment and input file structure
 
-% Which experiment
+% Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'IV2_Seq22';
 experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq22 - LVAD16 - Pump test';

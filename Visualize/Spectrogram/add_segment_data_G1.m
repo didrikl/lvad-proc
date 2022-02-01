@@ -27,3 +27,6 @@ function T = add_segment_data_G1(T,BL,accVar,inds,fs)
 
 	% Make curves discountinious at bewtween segments
 	T{inds(end),{'bp','P_LVAD','P_LVAD_diff','P_LVAD_diff'}} = nan;
+
+	% TODO:
+	% Implement join with Notes to get categorical info and noted values

@@ -1,4 +1,4 @@
-function [fs,T] = get_sampling_rate(T,ask_user_if_nan)
+function [fs,T] = get_sampling_rate(T, askIfNan)
     % Get sample rate of a table or a timetable by:
     % 
     % 1) Checking T.Properties.SampleRate in input is a timetables, or
@@ -9,7 +9,7 @@ function [fs,T] = get_sampling_rate(T,ask_user_if_nan)
     %
     % See also resample_signal, timetable
     
-    if nargin<2, ask_user_if_nan = true; end
+    if nargin<2, askIfNan = true; end
     
     % If the input table is a regular timetable, then sample rate is set as a
     % property automatically by Matlab, otherwise the userdata is also checked  
@@ -23,7 +23,7 @@ function [fs,T] = get_sampling_rate(T,ask_user_if_nan)
         end
     end
     
-    if isnan(fs) && ask_user_if_nan
+    if isnan(fs) && askIfNan
         
         opts = {
             'Set new and re-sample'

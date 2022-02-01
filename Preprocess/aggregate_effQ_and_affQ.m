@@ -2,6 +2,11 @@ function US = aggregate_effQ_and_affQ(US)
     
 	welcome('Aggregate afferent and efferent ultrasonic data','function')
     
+	if ismember('Q',US.Properties.VariableNames)
+		warning('Q variable already exist in ultrasound data.')
+		return
+	end
+	
     US.Q = mean([US.effQ,US.affQ],2,'omitnan');
     if all(isnan(US.effQ))
         warning(sprintf([...
@@ -18,4 +23,6 @@ function US = aggregate_effQ_and_affQ(US)
         ['Mean of ',US.Properties.VariableDescriptions{'effQ'}, ' and ',...
         US.Properties.VariableDescriptions{'affQ'}];
     US(:,{'effQ','affQ'}) = [];
+
+	US.Properties.CustomProperties.Measured(:) = true;
     

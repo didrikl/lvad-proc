@@ -1,13 +1,15 @@
-function Data = load_processed_sequences(seqNames,seqFilePaths)
+function Data = load_processed_sequences(seqNames, seqFilePaths)
 
 	welcome('Loading processed data files')
 	Data = struct;
 	seqNames = cellstr(seqNames);
 	seqFilePaths = cellstr(seqFilePaths);
 
+	init_multiwaitbar_saved_preproc
 	Data = load_data(Data,'S',seqFilePaths,seqNames);
 	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
-	Data.Sequences = fieldnames(Data);
+	Data = load_data(Data,'Notes',seqFilePaths,seqNames);
+	multiWaitbar('CloseAll');
 
 function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 
@@ -15,14 +17,14 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 	nSeqs = numel(seqNames);
 
 	for i=1:nSeqs
-
-		seq = seqNames{i};
+	
+		seq = get_seq_id(seqNames{i});
 		seqFilePath = seqFilePaths{i};
 		display_filename(seqFilePath,'',['\nLoading processed ',dataType,' file']);
 		try
+			%T = load(seqFilePath, '-mat', dataType);
 			load(seqFilePath)
-			seqNoStr = sprintf('%.2d',str2double(seq(8:end)));
-			Data.([seq(1:7),seqNoStr]).(dataType) = eval(dataType);
+			Data.(seq).(dataType) = eval(dataType);
 		catch err
 			warning('File not loaded')
 			disp(err)

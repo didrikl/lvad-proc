@@ -1,13 +1,11 @@
-function psds = make_power_spectra(Data, vars, fs, hBands, idSpecs, isHarmBand)
-    % TODO: Split function into spectral desities pxx calculation function and
-	% another function for bandpower and mean-power-frequency based on pxx.
-    welcome('Make power spectra','function')
+function psds = make_power_spectra(Data, seqs, vars, fs, hBands, idSpecs, isHarmBand)
+    
+	welcome('Make power spectra','function')
 	
 	if nargin<6, isHarmBand = false; end
-
+	
 	speeds = unique(idSpecs.pumpSpeed);
-	seqs = Data.Sequences;
-    pxx = cell(numel(seqs),1);
+	pxx = cell(numel(seqs),1);
     for j=1:numel(seqs)
         
         welcome([seqs{j},'\n'],'iteration')

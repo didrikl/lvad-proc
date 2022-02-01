@@ -1,6 +1,6 @@
 %% Sequence definitions and correction inputs
 
-% ID
+% Experiment sequence ID
 seq = 'G1_Seq3';
 
 % Folder in base path
@@ -29,11 +29,15 @@ ultrasound_fileNames = {
 % Override defaults
 labChart_varMapFile = 'VarMap_LabChart_G1_Seq3';
 pGradVars = {};
+outsideNoteInclSpec = 'none';
 
 % Correction input
-US_drifts = {50}; % Just an estimate based on previous drifts
-US_drifts = {[]};
+US_offsets = {};
+%US_drifts = {50}; % Just an estimate based on previous drifts
+US_drifts = {[]}; 
 accChannelToSwap = {};
 blocksForAccChannelSwap = [];
 pChannelToSwap = {};
 pChannelSwapBlocks = [];
+PL_offset = [];
+PL_offset_files = {};

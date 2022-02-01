@@ -104,7 +104,7 @@ function T = fill_cols(T, new_block, mis_vars)
     n_rows = height(T);
     for i=1:length(mis_vars)
         val = new_block{1,mis_vars{i}};
-        class(val)
+        fprintf('\b (%s)\n',class(val));
         if isdatetime(val)
             fillCol = NaT(n_rows,1);
         elseif isnumeric(val)

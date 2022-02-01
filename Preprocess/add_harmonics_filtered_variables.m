@@ -1,4 +1,5 @@
-function T_parts = add_harmonics_filtered_variables(T_parts, varNames, fs)
+function T_parts = add_harmonics_filtered_variables(...
+		T_parts, varNames, newVarNames)
     % Add harmonics filtered varibles by a combined notch filter
     % 
 	% Inputs
@@ -16,7 +17,7 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, fs)
 	fixFreq = [];
 	fixFreqWidth = 1;
 	
-    welcome('Add hamonic notch filtered variables')
+    welcome('Derive hamonic notch filtered variables')
      
     [returnAsCell,T_parts] = get_cell(T_parts);
     if isempty(T_parts)
@@ -24,7 +25,6 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, fs)
         return
     end
     
-    newVarNames = varNames+"_nf";
     fprintf('\nInput\n\t%s\n',strjoin(varNames,', '))
     fprintf('Output\n\t%s\n\n',strjoin(newVarNames,', '))
  
@@ -35,6 +35,8 @@ function T_parts = add_harmonics_filtered_variables(T_parts, varNames, fs)
     end
     %}
 	
+	% TODO: Implement with add_in_parts, c.f. add_highpass_RPM_filter_variables
+
     for i=1:numel(T_parts)
         
 		isEmpty = display_block_info(T_parts{i},i,numel(T_parts));

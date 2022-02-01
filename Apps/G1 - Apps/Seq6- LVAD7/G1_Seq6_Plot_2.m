@@ -9,27 +9,27 @@ sampleRate = fs_new;
 mapSpec = {
     % Variable       Colorbar   y-lims
      'accA_norm',    [-80,-36], [0,5.2];
-     'accA_norm_HP', [-80,-36], [0,5.2];
-     'accA_x',       [-80,-36], [0,5.2];
-     'accA_x_HP',    [-80,-36], [0,5.2];
-     'accA_y',       [-80,-36], [0,5.2];
-     'accA_y_HP',    [-80,-36], [0,5.2];
-     'accA_z',       [-80,-36], [0,5.2];
-     'accA_z_HP',    [-80,-36], [0,5.2];
-     'accB_norm',    [-75,-45], [0,5.2];
+%      'accA_norm_HP', [-80,-36], [0,5.2];
+%      'accA_x',       [-80,-36], [0,5.2];
+%      'accA_x_HP',    [-80,-36], [0,5.2];
+%      'accA_y',       [-80,-36], [0,5.2];
+%      'accA_y_HP',    [-80,-36], [0,5.2];
+%      'accA_z',       [-80,-36], [0,5.2];
+%      'accA_z_HP',    [-80,-36], [0,5.2];
+%      'accB_norm',    [-75,-45], [0,5.2];
     };
 
 graphSpec = {
     % MovStd var     y-lims
      'accA_norm',    [-85,25]
-     'accA_norm_HP', [-85,25];
-     'accA_x',       [-85,25];
-     'accA_x_HP',    [-85,25];
-     'accA_y',       [-85,25];
-     'accA_y_HP',    [-85,25];
-     'accA_z',       [-85,25];
-     'accA_z_HP',    [-85,25];
-     'accB_norm',    [-85,25]
+%      'accA_norm_HP', [-85,25];
+%      'accA_x',       [-85,25];
+%      'accA_x_HP',    [-85,25];
+%      'accA_y',       [-85,25];
+%      'accA_y_HP',    [-85,25];
+%      'accA_z',       [-85,25];
+%      'accA_z_HP',    [-85,25];
+%      'accB_norm',    [-85,25]
     };
            
 % % Extract data for these RPM values
@@ -37,14 +37,15 @@ graphSpec = {
 rpm={};
 
 parts = {
+             {},       [2],     [],   '0. RPM changes'
              {},       [6],     [],   '1. RPM changes'
-             {},       [7],     [],   '2. Graft clamping'
-             {},       [3],     [],   '3. Balloon inflation'
-             [],       [4],     [],   '4. Balloon inflation'
-             [],       [5],     [],   '5. Balloon inflation'
-             [],       [8:11],  [],   '7. Thrombus injections 1-4'
-             {11,131}, [12:14], [],   '7. Thrombus injections 5-7'
-             {14,146}, [15:16], [],   '7. Thrombus injections 8-9'  
+%              {},       [7],     [],   '2. Graft clamping'
+%              {},       [3],     [],   '3. Balloon inflation'
+%              [],       [4],     [],   '4. Balloon inflation'
+%              [],       [5],     [],   '5. Balloon inflation'
+%              [],       [8:11],  [],   '7. Thrombus injections 1-4'
+%              {11,131}, [12:14], [],   '7. Thrombus injections 5-7'
+%              {14,146}, [15:16], [],   '7. Thrombus injections 8-9'  
     };
 
 
@@ -60,10 +61,10 @@ for j=1:size(mapSpec,1)
         h_fig = plot_ordermap_with_vars(...
             T,mapSpec{j,1},sampleRate,parts{i,1},mapSpec{j,2},Notes,graphSpec{j,2},mapSpec{j,3});
 
-        save_to_png(h_fig,parts{i,2},parts{i,4},mapSpec{j,1},...
-            proc_path,fig_subdir,rpms,seq_no,300)
+%         save_to_png(h_fig,parts{i,2},parts{i,4},mapSpec{j,1},...
+%             proc_path,fig_subdir,rpms,seq_no,300)
     end
-    close all
+    %close all
 end
 
 
@@ -89,7 +90,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
     
     T.Properties.SampleRate = fs;
     T = add_moving_statistics(T,{movStdVar},{'std'});
-    T = add_moving_statistics(T,{'p_graft'},{'avg'});
+    T = add_moving_statistics(T,{'pGraft'},{'avg','std'});
     
     % Keep only steady or baseline denoted row in the baseline parts
 %     T(contains(string(T.part),string([bl_part{1},cbl_part])) & ...
@@ -100,7 +101,7 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
             mat2str(all_parts),mat2str(rpm));
     end
     
-    blocks = find_cat_block_inds(T,{'balLev','intervType'});
+    blocks = find_cat_block_inds(T,{'analysis_id','intervType'});
     
     if isempty(bl_part)
         bl_inds = ismember(lower(string(T.intervType)),{'baseline'});
@@ -136,11 +137,11 @@ function [T,rpm] = make_plot_data(parts,T,rpm,fs,bl_part,cbl_part,movStdVar)
    %     T.accA_norm_mpf(range) = freq{k};
     %    T.accA_norm_mpf_shift(range) = freq{k} - freq{1};  
         
-        Q = T.Q_graft;
+        Q = T.Q;
         % TODO: Do as preprocessing for IV2:
         %T.Q_graft = mean([T.affQ,T.effQ],2);
         T.Q_ultrasound_shift = 100*(Q-mean(Q(bl_inds),'omitnan'))/mean(Q(bl_inds),'omitnan');
-        T.p_graft_shift = 100*(T.p_graft_movAvg-mean(T.p_graft(bl_inds),'omitnan'))/mean(T.p_graft(bl_inds),'omitnan');
+        %T.p_graft_shift = 100*(T.p_graft_movAvg-mean(T.p_graft(bl_inds),'omitnan'))/mean(T.p_graft(bl_inds),'omitnan');
         T.Q_LVAD_shift = 100*(T.Q_LVAD-mean(T.Q_LVAD(bl_inds),'omitnan'))/mean(T.Q_LVAD(bl_inds),'omitnan');
         T.P_LVAD_shift = 100*(T.P_LVAD-mean(T.P_LVAD(bl_inds),'omitnan'))/mean(T.P_LVAD(bl_inds),'omitnan');
         

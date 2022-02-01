@@ -1,0 +1,3 @@
+function filePaths = init_us_filepaths(Config, experiment_subdir, fileNames)
+filePaths  = fullfile(Config.data_basePath, experiment_subdir, ...
+	Config.ultrasound_subdir, fileNames);

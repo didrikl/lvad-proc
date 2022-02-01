@@ -1,4 +1,4 @@
-function T = remove_variables(T,varNames)
+function T = remove_variables(T, varNames)
     
     [returnAsCell,T] = get_cell(T);
     

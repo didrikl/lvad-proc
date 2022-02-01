@@ -1,4 +1,4 @@
-function T = adjust_for_system_m_time_drift(T,secsAhead,varargin)
+function T = adjust_for_system_m_time_drift(T, secsAhead, varargin)
     
 	if isempty(secsAhead), return; end
 	
@@ -18,6 +18,7 @@ function T = adjust_for_system_m_time_drift(T,secsAhead,varargin)
 		isEmpty = display_block_info(T{i},i,numel(T));
         if isEmpty, continue; end
 
-        T{i} = adjust_for_linear_time_drift(T{i},secsAhead{i},defDriftRatePerSec,varargin{:});
+        T{i} = adjust_for_linear_time_drift(...
+			T{i}, secsAhead{i}, defDriftRatePerSec, varargin{:});
 
     end

@@ -1,6 +1,6 @@
 %% User inputs
 
-% Which experiment
+% Experiment sequence ID
 seq = 'IV2_Seq18';
 experiment_subdir = 'Seq18 - LVAD14';
 
@@ -46,8 +46,11 @@ ultrasound_fileNames = {
     };
 
 % Correction input
+US_offsets = {};
 US_drifts = {9, 55};
 accChannelToSwap = {'accA_y','accA_z'};
 blocksForAccChannelSwap = [];
 pChannelToSwap = {};
 pChannelSwapBlocks = [];
+PL_offset = [];
+PL_offset_files = {};

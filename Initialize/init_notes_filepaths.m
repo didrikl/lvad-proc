@@ -1,0 +1,3 @@
+function filePath = init_notes_filepaths(Config, experiment_subdir, fileNames)
+	filePath = fullfile(Config.data_basePath, experiment_subdir, ...
+		Config.notes_subdir, fileNames);

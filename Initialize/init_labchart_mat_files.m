@@ -39,8 +39,8 @@ function T = init_labchart_mat_files(fileNames,path,varMapFile)
         fprintf('\n<strong>File (no %d/%d) </strong>',i,nFiles)
         display_filename('',fileNames{i});
         
-		cancel = multiWaitbar('Reading .mat files',(i-1)/nFiles);  
-        if confirm_waitbar_cancel(cancel,'Reading .mat files'), break; end
+		cancel = multiWaitbar('Read LabChart .mat files',(i-1)/nFiles);  
+        if confirm_waitbar_cancel(cancel,'Read LabChart .mat files'), break; end
         
         T{i} = read_signal_file_into_table(filePaths{i},timestampFmt);
         
@@ -79,7 +79,7 @@ function T = init_labchart_mat_files(fileNames,path,varMapFile)
 	end
 	
 	if not(returnAsCell), T = T{1}; end
-    multiWaitbar('Reading .mat files',1,'CanCancel','off');  
+    multiWaitbar('Read LabChart .mat files',1,'CanCancel','off');  
         
 function T = read_signal_file_into_table(filePath,timestamp_fmt)    
     

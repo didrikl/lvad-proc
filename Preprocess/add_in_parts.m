@@ -21,22 +21,23 @@ function T_parts = add_in_parts(fnc,T_parts,inputVarNames,outputVarNames,varargi
     
     for i=1:numel(T_parts)
         
-%         if numel(T_parts)>1
-%             welcome(sprintf('Part %d',i),'iteration')
-%         end
-        
-        if height(T_parts{i})==0
+         if numel(T_parts)>1
+			 welcome(sprintf('Part %d',i),'iteration')
+			 waitStr = ['Running: ',func2str(fnc)];
+			 multiWaitbar(waitStr,(i-1)/numel(T_parts));
+		 end
+
+		 if height(T_parts{i})==0
             fprintf(newline)
             welcome(sprintf('Part %d',i),'iteration')
             warning('Empty part')
             continue; 
         end
        
-        inputVarNamesChecked = check_table_var_input(T_parts{i}, inputVarNames);
-        if any(cellfun(@isempty,inputVarNamesChecked))
+        [inputVarNamesChecked,remVars] = check_table_var_input(T_parts{i}, inputVarNames);
+        if any(remVars)
             fprintf('\n')
-            warning(sprintf('%s is not added in part %d',...
-                strjoin(outputVarNames,', '),i))
+            warning(sprintf('%s is not added in part %d',strjoin(remVars,', '),i))
             continue;
         end
         
@@ -63,6 +64,7 @@ function T_parts = add_in_parts(fnc,T_parts,inputVarNames,outputVarNames,varargi
 
     %dbs = dbstack;
     %fprintf('\n%s done.\n',dbs(end).name);
-    fprintf('\nDone.\n'); 
+	multiWaitbar(waitStr,'Close');
+	%fprintf('\nDone.\n'); 
     
     
