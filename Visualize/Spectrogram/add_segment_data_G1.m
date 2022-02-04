@@ -1,7 +1,10 @@
 function T = add_segment_data_G1(T,BL,accVar,inds,fs)
 	
+	T = join_notes(T,T.Properties.UserData.Notes);
+	BL = join_notes(BL,BL.Properties.UserData.Notes);
+	
 	movStdWin = 10;
-	MovObj = dsp.MovingStandardDeviation(T.fs*movStdWin);
+	MovObj = dsp.MovingStandardDeviation(fs*movStdWin);
 	
 	acc = T.(accVar)(inds);
 	
@@ -27,6 +30,3 @@ function T = add_segment_data_G1(T,BL,accVar,inds,fs)
 
 	% Make curves discountinious at bewtween segments
 	T{inds(end),{'bp','P_LVAD','P_LVAD_diff','P_LVAD_diff'}} = nan;
-
-	% TODO:
-	% Implement join with Notes to get categorical info and noted values

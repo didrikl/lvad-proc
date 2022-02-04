@@ -4,7 +4,7 @@
 seq = 'G1_Seq3';
 
 % Folder in base path
-experiment_subdir = 'Seq3 - LVAD6 - Pilot';
+seq_subdir = 'Seq3 - LVAD6 - Pilot';
 
 % Which files to input from input directory 
 labChart_fileNames = {
@@ -27,17 +27,17 @@ ultrasound_fileNames = {
     };
 
 % Override defaults
-labChart_varMapFile = 'VarMap_LabChart_G1_Seq3';
-pGradVars = {};
-outsideNoteInclSpec = 'none';
+pc.labChart_varMapFile = 'VarMap_LabChart_G1_Seq3';
+pc.pGradVars = {};
+pc.outsideNoteInclSpec = 'none';
 
 % Correction input
-US_offsets = {};
-%US_drifts = {50}; % Just an estimate based on previous drifts
-US_drifts = {[]}; 
-accChannelToSwap = {};
-blocksForAccChannelSwap = [];
-pChannelToSwap = {};
-pChannelSwapBlocks = [];
-PL_offset = [];
-PL_offset_files = {};
+pc.US_offsets = {};
+%pc.US_drifts = {50}; % Just an estimate based on previous drifts
+pc.US_drifts = {[]}; 
+pc.accChannelToSwap = {};
+pc.blocksForAccChannelSwap = [];
+pc.pChannelToSwap = {};
+pc.pChannelSwapBlocks = [];
+pc.PL_offset = [];
+pc.PL_offset_files = {};

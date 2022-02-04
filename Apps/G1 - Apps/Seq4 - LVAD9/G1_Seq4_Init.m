@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
 sequence = 'Seq4 - LVAD9 - Pilot';
-experiment_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq4 - LVAD9';
+seq_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq4 - LVAD9';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -23,10 +23,10 @@ ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
-proc_path = fullfile(basePath,experiment_subdir,'Processed');
+ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
+proc_path = fullfile(basePath,seq_subdir,'Processed');
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity

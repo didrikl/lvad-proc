@@ -44,7 +44,7 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 		
 		% Add all measured values (not categorical) from Notes
 		S = join_notes(S, Notes);
-		S = standardizeMissing(S,-9999);
+		%S = standardizeMissing(S,-9999);
 
 		discrVars = check_table_var_input(S, discrVars);
 		meanVars = check_table_var_input(S, meanVars);

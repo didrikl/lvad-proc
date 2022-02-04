@@ -1,7 +1,7 @@
 function make_spectrogram_figure_G1(S, supTit, var, rpm, fs, IDs1, IDs2)
 	legStr = {'\itQ\rm','\itP\rm_{LVAD}','NHA\it_y\rm'};
 
-	durLim = 120;
+	durLim = 180;
 	res = 0.010;
 	overlapPst = 95;
 	yLim_map = [0.5,4.07];
@@ -9,7 +9,7 @@ function make_spectrogram_figure_G1(S, supTit, var, rpm, fs, IDs1, IDs2)
 	figWidth = 1200;
 	figHeight =  785;
 	panelHeight = 250;
-	panelWidthFactor = 0.64;
+	panelWidthFactor = 0.50;
 	xGap = 22;
 	yGap = 7;
 	xStart = 68;
@@ -17,12 +17,11 @@ function make_spectrogram_figure_G1(S, supTit, var, rpm, fs, IDs1, IDs2)
 	
 	Colors_IV2
 	spec = get_plot_specs;
-	colorMap = scientificColormaps.batlowW; % colormap(scientificColormaps.lisbon)
+	colorMap = scientificColormaps.batlowW; 
+	%colorMap = scientificColormaps.lisbon;
+	%colorMap = parula;
 	colorRange = [-62,-40]; % for Seq13
 	
-	IDs1 = make_segment_id_for_given_rpm(rpm, IDs1);
-	IDs2 = make_segment_id_for_given_rpm(rpm, IDs2);
-
 	[T1, segStarts1, segEnds1] = make_plot_data(IDs1, S, var, fs, durLim, 'G1');
 	[T2, segStarts2, segEnds2] = make_plot_data(IDs2, S, var, fs, durLim, 'G1');
 	[map1,order1,~,mapTime1] = make_rpm_order_map(T1,var,fs,'pumpSpeed',res,overlapPst);

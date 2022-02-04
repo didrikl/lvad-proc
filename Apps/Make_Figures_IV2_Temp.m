@@ -4,11 +4,34 @@
 
 tit = 'Spectrogram';
 S = Data.IV2.Seq10.S;
-var = 'accA_y_nf';
+var = 'accA_y_NF';
 rpm = 2800;
 
+IDs1 = {
+		'02.0 #1'
+		% 	'52.0'
+		'52.1'
+		'52.2'
+		'52.3'
+		'52.4'
+		% 	'62.0'
+		% 	'62.5'
+		% 	'62.1'
+		% 	'62.2'
+		% 	'62.3'
+		% 	'62.4'
+		};
+	IDs2 = {
+		'02.0 #1'
+		%'12.3'
+		'22.3'
+		'32.3'
+		'42.4'
+		%'42.5'
+		};
+
 close all
-make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs);
+make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs, IDs1, IDs2);
 
 clear tit s var rpm
 
@@ -18,10 +41,10 @@ clear tit s var rpm
 % Figure 5 in submission for ASAIO
 
 nhaVars = {
-     %'accA_x_nf_b1_pow',[0,0.008]
-      'accA_y_nf_b1_pow',[0,8]
-     %'accA_z_nf_b1_pow',[0,0.008]
- 	 %'accA_y_nf_stdev',[]
+     %'accA_x_NF_b1_pow',[0,0.008]
+      'accA_y_NF_b1_pow',[0,8]
+     %'accA_z_NF_b1_pow',[0,0.008]
+ 	 %'accA_y_NF_stdev',[]
      %'p_eff_mean',[55,100]
 	 %'pGrad_mean',[]
 	 %'Q_LVAD_mean',[0 8]
@@ -59,9 +82,9 @@ clear nhaVars levelLabels xLims xLab tit
 close all
 
 nhaVars = {
-     %'accA_x_nf_b1_pow',[0,8]
-    'accA_y_nf_b1_pow',[0 8]
-     %'accA_z_nf_b1_pow',[0,8]
+     %'accA_x_NF_b1_pow',[0,8]
+    'accA_y_NF_b1_pow',[0 8]
+     %'accA_z_NF_b1_pow',[0,8]
      };
  
 % Level categories plotted together
@@ -101,11 +124,11 @@ classifiers = {
  	%'accA_y_b1_pow', 'NHA_{\ity}';
 	%'accA_x_b1_pow', 'NHA_{\itx}';
 	%'accA_z_b1_pow', 'NHA_{\itz}';
- 	'accA_y_nf_b1_pow', 'NHA_{\ity}';
- 	'accA_x_nf_b1_pow', 'NHA_{\itx}';
- 	'accA_z_nf_b1_pow', 'NHA_{\itz}';
+ 	'accA_y_NF_b1_pow', 'NHA_{\ity}';
+ 	'accA_x_NF_b1_pow', 'NHA_{\itx}';
+ 	'accA_z_NF_b1_pow', 'NHA_{\itz}';
 	%'P_LVAD_drop',   '\itP\rm_{LVAD}';
-	%'accA_xynorm_nf_b1_pow', 'NHA_{\it|xy|}';
+	%'accA_xynorm_NF_b1_pow', 'NHA_{\it|xy|}';
 	};
 tit = 'ROC Curves for Pendulating Mass States';
 
@@ -120,9 +143,9 @@ clear classfiers tit
 % [no of states]x[3] panels
 
 classifiers = {
- 	'accA_x_nf_b1_pow', 'NHA_{\itx}';
- 	'accA_y_nf_b1_pow', 'NHA_{\ity}';
- 	'accA_z_nf_b1_pow', 'NHA_{\itz}';
+ 	'accA_x_NF_b1_pow', 'NHA_{\itx}';
+ 	'accA_y_NF_b1_pow', 'NHA_{\ity}';
+ 	'accA_z_NF_b1_pow', 'NHA_{\itz}';
 	};
 tit = 'ROC Curves for Pendulating Mass States by Spatial Component';
 
@@ -136,7 +159,7 @@ clear classfiers tit
 % 1x[no of states] panels
 
 classifiers = {
- 	'accA_y_nf_b1_pow';
+ 	'accA_y_NF_b1_pow';
 	};
 predStates = {
 	%'diam_4.30mm_or_more', '>= 4.30mm'
@@ -163,9 +186,9 @@ clear classfiers predStates tit
 % 2x2 panels, one panel per speed
 
 vars = {
-%    'accA_y_nf_stdev',[0.01,0.19]
-    'accA_x_nf_b1_pow',[0,0.018]
-    'accA_y_nf_b1_pow',[0,0.018]
+%    'accA_y_NF_stdev',[0.01,0.19]
+    'accA_x_NF_b1_pow',[0,0.018]
+    'accA_y_NF_b1_pow',[0,0.018]
    };
 
 close all
@@ -181,8 +204,8 @@ clear vars
 % D is numerical (unevenly distributed)
 
 vars = {
-	'accA_y_nf_b1_pow', [0,0.011]
-	%'accA_y_nf_b1_mpf', [90,210]
+	'accA_y_NF_b1_pow', [0,0.011]
+	%'accA_y_NF_b1_mpf', [90,210]
 	};
 
 close all
@@ -198,8 +221,8 @@ clear vars
 % D is numerical (unevenly distributed)
 
 vars = {
-	'accA_y_nf_b1_pow', [0,0.011]
-	%'accA_y_nf_b1_mpf', [90,210]
+	'accA_y_NF_b1_pow', [0,0.011]
+	%'accA_y_NF_b1_mpf', [90,210]
 	};
 
 close all

@@ -1,4 +1,4 @@
-function filePaths = init_pl_filepaths(Config, experiment_subdir, fileNames)
-	filePaths = fullfile(Config.data_basePath, experiment_subdir, ...
-		Config.powerlab_subdir, fileNames);
+function filePaths = init_pl_filepaths(pc, seq_subdir, fileNames)
+	filePaths = fullfile(pc.data_basePath, seq_subdir, ...
+		pc.powerlab_subdir, fileNames);
 end

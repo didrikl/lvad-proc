@@ -1,7 +1,7 @@
             
 % Experiment sequence ID
 seq = 'IV2_Seq7';
-experiment_subdir = 'Seq7 - LVAD1';
+seq_subdir = 'Seq7 - LVAD1';
 
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -68,11 +68,11 @@ ultrasound_fileNames = {
     };
 
 % Correction input
-US_offsets = {};
-US_drifts = {3, 33.5, 46, []};
-accChannelToSwap = {'accA_y','accA_z'};
-blocksForAccChannelSwap = [14:16];
-pChannelToSwap = {};
-pChannelSwapBlocks = [];
-PL_offset = [];
-PL_offset_files = {};
+pc.US_offsets = {};
+pc.US_drifts = {3, 33.5, 46, []};
+pc.accChannelToSwap = {'accA_y','accA_z'};
+pc.blocksForAccChannelSwap = [14:16];
+pc.pChannelToSwap = {};
+pc.pChannelSwapBlocks = [];
+pc.PL_offset = [];
+pc.PL_offset_files = {};

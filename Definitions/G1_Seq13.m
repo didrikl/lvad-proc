@@ -4,7 +4,7 @@
 seq = 'G1_Seq13';
 
 % Folder in base path
-experiment_subdir = 'Seq13 - LVAD16';
+seq_subdir = 'Seq13 - LVAD16';
 
 % Which files to input from input directory
 labChart_fileNames = {
@@ -45,11 +45,11 @@ ultrasound_fileNames = {
     };
 
 % Correction input
-US_offsets = {1};
-US_drifts = {40};
-accChannelToSwap = {};
-blocksForAccChannelSwap = [];
-pChannelToSwap = {};
-pChannelSwapBlocks = [];
-PL_offset = [];
-PL_offset_files = {};
+pc.US_offsets = {1};
+pc.US_drifts = {40};
+pc.accChannelToSwap = {};
+pc.blocksForAccChannelSwap = [];
+pc.pChannelToSwap = {};
+pc.pChannelSwapBlocks = [];
+pc.PL_offset = [];
+pc.PL_offset_files = {};

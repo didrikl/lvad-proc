@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'Seq7 - LVAD11';
-experiment_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq7 - LVAD11';
+seq_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq7 - LVAD11';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -41,10 +41,10 @@ ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
-proc_path = fullfile(basePath,experiment_subdir,'Processed');
+ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
+proc_path = fullfile(basePath,seq_subdir,'Processed');
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -101,7 +101,7 @@ welcome('Preprocessing data','module')
 
 fs_new = 500;
 interNoteInclSpec = 'nearest';
-outsideNoteInclSpec = 'nearest';
+pc.outsideNoteInclSpec = 'nearest';
 
 US.time = US.time-hours(1);
 secsAhead = 5; 
@@ -113,7 +113,7 @@ US(US.time>cut_time,:) = [];
 %PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
-S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
+S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,pc.outsideNoteInclSpec);
 S_parts = split_into_parts(S,fs_new);
 
 

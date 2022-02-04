@@ -6,7 +6,7 @@ fs_new = 1000;
 
 % Which experiment
 data_basePath = 'D:\Data\IVS\Lars\L1 - Data';
-experiment_subdir = 'Seq8';
+seq_subdir = 'Seq8';
 
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -25,18 +25,18 @@ labChart_fileNames = {
 notes_fileName = 'IV2_Seq19 - Notes IVS v1.0 - Rev4.xlsm';
 
 % Correction input
-accChannelToSwap = {};
-blocksForAccChannelSwap = [];
-pChannelToSwap = {'p_eff','p_aff'};
-pChannelSwapBlocks = [];
+pc.accChannelToSwap = {};
+pc.blocksForAccChannelSwap = [];
+pc.pChannelToSwap = {'p_eff','p_aff'};
+pc.pChannelSwapBlocks = [];
 
 
 %% Preprossesring
 % ----------------
 
 % Read PowerLab data in files exported from LabChart
-pl_filePaths = fullfile(data_basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-PL = init_labchart_mat_files(pl_filePaths,'',labChart_varMapFile);
+pl_filePaths = fullfile(data_basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+PL = init_labchart_mat_files(pl_filePaths,'',pc.labChart_varMapFile);
 
 PL = resample_signal(PL, fs_new);
 

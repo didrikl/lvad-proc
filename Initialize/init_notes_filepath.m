@@ -1,0 +1,3 @@
+function filePath = init_notes_filepath(pc, seq_subdir, fileNames)
+	filePath = fullfile(pc.data_basePath, seq_subdir, ...
+		pc.notes_subdir, fileNames);

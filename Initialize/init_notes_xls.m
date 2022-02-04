@@ -48,6 +48,10 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     catVarsInFile = catVarsInMap(ismember(catVarsInMap,opts.VariableNames));
     opts = setvartype(opts,catVarsInFile,'categorical');
 
+	numVarsInMap = varMap(ismember(varMap(:,3),{'single','float','double'}),1); %#ok<USENS>
+    numVarsInFile = numVarsInMap(ismember(numVarsInMap,opts.VariableNames));
+    opts = setvartype(opts,numVarsInFile,'char');
+
     Notes = readtable(filePath,opts,...
         'Sheet',notes_sheet...
         );
@@ -124,18 +128,27 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     
     %% Parse information
     
-    Notes = convert_columns(Notes,varMap(inFile_ind,3));
+	breakInds = ismember(Notes{:,Notes.Properties.CustomProperties.Measured},'-');
+	Notes{:,Notes.Properties.CustomProperties.Measured}(breakInds) = {'-9999'};
+	Notes = convert_columns(Notes,varMap(inFile_ind,3));
 
     % Parse info time, date and dur
     Notes = parse_time_cols(Notes);
     Notes = derive_time_col_not_filled(Notes);
     
+	[N1,TF] = fillmissing(Notes(:,vartype('float')),"previous");
+	misInd = TF & ismember(N1{:,:},-9999);
+	Notes(:,vartype('float')) = N1;
+	Notes{:,vartype('float')}(misInd) = missing;
+	Notes = fillmissing(Notes,"next","DataVariables",@isfloat);
+	Notes = standardizeMissing(Notes,{-9999});
+
     % Parse relevant columns, other than time columns 
-    Notes = standardizeMissing(Notes, missingValueRepr);
-    num_vars = get_varname_of_specific_type(Notes,'single');
-    no_interp_rows = Notes.intervType~='Transitional' | ...
-        Notes.part=='-' | ismissing(Notes.part);
-    Notes(no_interp_rows,num_vars) = fillmissing(Notes(no_interp_rows,num_vars),'constant',-9999);
+%     Notes = standardizeMissing(Notes, missingValueRepr);
+%     num_vars = get_varname_of_specific_type(Notes,'single');
+%     no_interp_rows = Notes.intervType~='Transitional' | ...
+%         Notes.part=='-' | ismissing(Notes.part);
+%     Notes(no_interp_rows,num_vars) = fillmissing(Notes(no_interp_rows,num_vars),'constant',-9999);
     
     % Add note row id to be used for data fusion and looking up data
     Notes = add_note_row_id(Notes, nHeaderLines);

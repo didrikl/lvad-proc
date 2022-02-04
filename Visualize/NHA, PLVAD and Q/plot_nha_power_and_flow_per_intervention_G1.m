@@ -19,15 +19,15 @@ function h_figs = plot_nha_power_and_flow_per_intervention_G1(...
 	% - object positions is adjusted in this function
 	% - Visibility of background points and lines is here toggled on/off.
 	
-	yVar_row1 = {'Q_mean',[-0.75 3]};
-	yVar_row2 = {'P_LVAD_mean',[-0.75 3]};
+	yVar_row1 = {'Q_mean',[-0.75 8]};
+	yVar_row2 = {'P_LVAD_mean',[-0.75 8]};
 	yLabels = {
-		{'\itQ\rm (L/min)'}
-		{'\itP_{\rmLVAD}\rm (W)'}
-		{'NHA_{\ity}\rm ({\it{g}^2}/{\rmkHz})'}
+		{'\itQ\rm'}
+		{'\itP_{\rmLVAD}\rm'}
+		{'NHA_{\ity}\rm'}
 		};
 	legTit = {'RPM'};
-	speeds = [2400];
+	speeds = [2200,2400,2600];
 	
 	spec = get_plot_specs;
 	figWidth = 1180;
@@ -44,7 +44,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention_G1(...
 		case 'effect'
 			xGap = 22;
 			xStart = 68;
-			panelWidth = 400;
+			panelWidth = 500;
 	end
 	
 	% Offsets for common axes
@@ -52,7 +52,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention_G1(...
 	mainYAxGap = mainXAxGap*(figHeight/figWidth);
 	
 	nFigs = size(nhaVar,1);
-	nCols = numel(levelLabels(:,1));
+	nCols = size(levelLabels(:,1),2);
 	nRows = 3;	
 	h_figs = gobjects(nFigs,1);
 

@@ -1,4 +1,4 @@
-function Data = save_in_memory_struct(Data, Config, S, S_parts, Notes, seq)
+function Data = save_in_memory_struct(Data, Config, pc, S, S_parts, Notes, seq)
 	
 	seqID = get_seq_id(seq);
 	
@@ -9,3 +9,4 @@ function Data = save_in_memory_struct(Data, Config, S, S_parts, Notes, seq)
 	Data.(experID).(seqID).Notes = Notes;
 
 	Data.(experID).Config = Config;
+	Data.(experID).(seqID).Processing_Config = pc;

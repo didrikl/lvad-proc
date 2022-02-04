@@ -6,7 +6,7 @@ welcome('Initializing user-input','module')
 
 % Which experiment
 basePath = 'D:\Data\IVS\Einar';
-experiment_subdir = 'Dolly-002';
+seq_subdir = 'Dolly-002';
 save_path = 'C:\Users\Didrik\Desktop\Dolly';
 %save_path = 'D:\Data\IVS\Einar\Dolly-002';
 %save_path = 'E:\';
@@ -165,7 +165,7 @@ labChart_fileNames{11} = {
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day11.mat'
     };
 
-proc_path = fullfile(basePath,experiment_subdir,'Processed');
+proc_path = fullfile(basePath,seq_subdir,'Processed');
 
 powerlab_variable_map = {
     % LabChart name  SingleChannels name   Type        Continuity
@@ -193,7 +193,7 @@ powerlab_variable_map = {
 welcome('Initializing individual channel data','module')
 
 for i=1:11
-    powerlab_filePaths = fullfile(basePath,experiment_subdir,labChart_fileNames{i});
+    powerlab_filePaths = fullfile(basePath,seq_subdir,labChart_fileNames{i});
     PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
     T = merge_table_blocks(PL);
     T = resample_signal(T, 500);

@@ -23,8 +23,8 @@ notes_fileName       = 'IV1 - Seq1 - Notes.xlsx';
 powerlab_fileName    = fullfile('PowerLab','test.mat');
 ultrasound_fileName  = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
 
-experiment_subdir    = 'IV1_Seq1 - Thrombi injection into HVAD';
-[read_path, save_path] = init_io_paths(experiment_subdir);
+seq_subdir    = 'IV1_Seq1 - Thrombi injection into HVAD';
+[read_path, save_path] = init_io_paths(seq_subdir);
 notes_filePath = 'C:\Data\IVS\Didrik\IV1_Seq1 - Thrombi injection into HVAD\Noted\';
 
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)

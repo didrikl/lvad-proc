@@ -14,11 +14,11 @@ inputs = {
 	'IV2_Seq18'
 	'IV2_Seq19'
 	};
-askToReInit = true;
 
 % Do separate initialization parts
 for i=1:numel(inputs)
-	Defaults_IV2
+	pc = get_processing_config_defaults_G1;
+	pc.askToReInit = true;
 	eval(inputs{i});
 	init_multiwaitbar_preproc(i, numel(inputs), seq);
 	
@@ -28,6 +28,6 @@ for i=1:numel(inputs)
 	Preprocess_Roundup
 end
 
-clear seq inputs i askToReInit
+clear inputs i
 
 

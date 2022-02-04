@@ -2,7 +2,7 @@
 
 % This defines the relevant ids for analysis
 Config = Data.IV2.Config;
-idSpecs = init_id_specifications(Config.idSpecs_path);
+idSpecs = init_id_specifications(pc.idSpecs_path);
 idSpecs = idSpecs(not(ismember(idSpecs.interventionType,{'Extra'})),:);
 % idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
 
@@ -24,7 +24,7 @@ sequences = {
 
 discrVars = {'Q_LVAD','P_LVAD'};
 meanVars = {'p_eff','pGrad','Q','accA_x','accA_y','accA_z',...
-	'accA_norm_nf','accA_x_nf','accA_y_nf','accA_z_nf'};
+	'accA_norm_NF','accA_x_NF','accA_y_NF','accA_z_NF'};
 F = make_intervention_stats(Data.IV2, sequences, discrVars, meanVars, {}, idSpecs);
 F.P_LVAD_drop = -F.P_LVAD_mean;
 
@@ -33,7 +33,7 @@ F.P_LVAD_drop = -F.P_LVAD_mean;
 
 accVars = {...
 	'accA_x','accA_y','accA_z',...
-	'accA_x_nf','accA_y_nf','accA_z_nf'};
+	'accA_x_NF','accA_y_NF','accA_z_NF'};
 hBands =  [1.10,2.9];
 isHarmBand = true;
 Pxx = make_power_spectra(Data.IV2, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
@@ -67,8 +67,8 @@ G_del = make_group_stats(F_del, idSpecs);
 
 % Do Wilcoxens pair test and make table of median and p-values
 pVars = {
- 	'accA_x_b1_pow','accA_y_b1_pow','accA_z_b1_pow','accA_y_nf_stdev',...
-	'accA_x_nf_b1_pow','accA_y_nf_b1_pow','accA_z_nf_b1_pow','accA_y_nf_stdev',...
+ 	'accA_x_b1_pow','accA_y_b1_pow','accA_z_b1_pow','accA_y_NF_stdev',...
+	'accA_x_NF_b1_pow','accA_y_NF_b1_pow','accA_z_NF_b1_pow','accA_y_NF_stdev',...
 	'Q_mean','P_LVAD_mean',...Q_LVAD_mean,...
 	...'pGrad_mean','pGrad_stdev','p_aff_mean','p_eff_stdev'...
 	};
@@ -82,9 +82,9 @@ classifiers = {
   	'accA_y_b1_pow'
  	'accA_x_b1_pow'
  	'accA_z_b1_pow'
- 	'accA_y_nf_b1_pow'
- 	'accA_x_nf_b1_pow'
- 	'accA_z_nf_b1_pow'
+ 	'accA_y_NF_b1_pow'
+ 	'accA_x_NF_b1_pow'
+ 	'accA_z_NF_b1_pow'
 	'P_LVAD_mean'
 	'P_LVAD_drop'
 	};
@@ -144,10 +144,10 @@ Data.IV2.Feature_Statistics.ROC = ROC;
 Data.IV2.Feature_Statistics.AUC = AUC;
 
 %save_data('Periodograms', feats_path, Data.IV2.Periodograms, {'matlab'});
-save_data('Features', Config.feats_path, Data.IV2.Features, {'matlab'});
-save_data('Feature_Statistics', Config.stats_path, Data.IV2.Feature_Statistics, {'matlab'});
-save_features_as_separate_spreadsheets(Data.IV2.Features, Config.feats_path);
-save_statistics_as_separate_spreadsheets(Data.IV2.Feature_Statistics, Config.stats_path);
+save_data('Features', pc.feats_path, Data.IV2.Features, {'matlab'});
+save_data('Feature_Statistics', pc.stats_path, Data.IV2.Feature_Statistics, {'matlab'});
+save_features_as_separate_spreadsheets(Data.IV2.Features, pc.feats_path);
+save_statistics_as_separate_spreadsheets(Data.IV2.Feature_Statistics, pc.stats_path);
 
 multiWaitbar('CloseAll');
 clear save_data

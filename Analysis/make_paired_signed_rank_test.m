@@ -1,6 +1,11 @@
 function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType)
 
-	speeds=[2200,2500,2800,3100];
+	welcome('Make paired signed rank test','function')
+	
+	% TODO: Make generic or with input!!!
+	%speeds=[2200,2500,2800,3100];
+	speeds=[2200,2400,2600];
+
 	levLab = sort_nat(string(unique(G.med.('levelLabel'))));
 
 	% Store temporarily results into cell arrays before merging cells into one table
@@ -53,7 +58,7 @@ function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType)
 			R{s} = join(R{s}, iqr, 'Keys','levelLabel');
 			R{s} = join(R{s}, q1, 'Keys','levelLabel');
 			R{s} = join(R{s}, q3, 'Keys','levelLabel');
-
+			
 			% Add p values as formatted text columns in results table R
 			R{s}.(['p ',var]) = compose("%1.3f",p);
 
@@ -99,7 +104,7 @@ function bl_var = get_baseline_varible_name(var, iv_var, exprType)
 			elseif contains(iv_var,'Injection')
 				bl_var = var+"_Nominal, Injection";
 			else
-				bl_var = var+"_Nominal";
+				bl_var = var+"_Deflated, Lev0";
 			end
 
 		case 'IV2'

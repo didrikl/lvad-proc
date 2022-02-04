@@ -79,7 +79,8 @@ function S = fuse_data(Notes, PL, US, fs, interNoteInclSpec, outsideNoteInclSpec
 		% TODO: Test if this is neccessary (c.f. code line 34)
         %PL{i}{:,notes_int_vars} = single(PL{i}{:,notes_int_vars}); 
         
-		PL{i} = standardizeMissing(PL{i},-9999);
+		% Note: Not needed anymore. Must test to remove.
+		%PL{i} = standardizeMissing(PL{i},-9999);
     end
     
     try

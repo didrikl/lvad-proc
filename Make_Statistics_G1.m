@@ -2,11 +2,12 @@
 
 % This defines the relevant ids for analysis
 Config = Data.G1.Config;
-idSpecs = init_id_specifications(Config.idSpecs_path);
+pc = get_processing_config_defaults_G1;
+idSpecs = init_id_specifications(pc.idSpecs_path);
 idSpecs = idSpecs(not(idSpecs.extra),:);
 idSpecs = idSpecs(not(contains(string(idSpecs.analysis_id),{'E'})),:);
 idSpecs = idSpecs(not(contains(string(idSpecs.categoryLabel),{'Injection'})),:);
-% idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
+idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
 
 sequences = {
 	'Seq3' % (pilot)
@@ -25,29 +26,33 @@ sequences = {
 discrVars = {
 	'Q_LVAD'
 	'P_LVAD'
+	'balDiamEst'
 	'p_maxArt'
-%     'p_minArt'
-%     'MAP'             
-%     'p_maxPulm'       
-%     'p_minPulm'       
-%     'HR'              
-%     'CVP'             
+    'p_minArt'
+    'MAP'             
+    'p_maxPulm'       
+    'p_minPulm'       
+    'HR'              
+    'CVP'             
     'SvO2'
 	'graftEmboliVol'
-	%'CO_cont'   % Must derive CO       
-    %'CO_thermo' % Must derive CO        
+	%'CO_cont'         
+    %'CO_thermo'    
+	'CO'
+	%'accA_x' % to check direction
+ 	%'accA_y' % to check direction
+ 	%'accA_z' % to check direction
     };
 
 meanVars = {
-% 	'accA_x' % to check direction
-% 	'accA_y' % to check direction
-% 	'accA_z' % to check direction
-    'accA_x_nf_HP' % to get stddev
-	'accA_y_nf_HP' % to get stddev
-	'accA_z_nf_HP' % to get stddev
+    'accA_x_NF_HP'    % to get stddev
+	'accA_y_NF_HP'    % to get stddev
+	'accA_z_NF_HP'    % to get stddev
+	'accA_xynorm_NF_HP' % to get stddev
+    'accA_norm_NF_HP' % to get stddev
+    %'pGrad'           % Calculation to be revised      
     'pGraft'          
-    %'pGrad'    % Calculation to be revised      
-    'pMillar'  % not working if not present as in Seq3
+    'pMillar'
     'Q'               
     };
 
@@ -58,7 +63,12 @@ F.P_LVAD_drop = -F.P_LVAD_mean;
 % -----------------------------------------------------------
 
 accVars = {...'accA_x','accA_y','accA_z',...
-	'accA_x_nf_HP','accA_y_nf_HP','accA_z_nf_HP'
+	'accA_x_NF_HP'
+	'accA_y_NF_HP'
+	'accA_z_NF_HP'
+	'accA_norm_NF_HP'
+	'accA_xynorm_NF_HP'
+	'accA_yznorm_NF_HP'
 	};
 hBands =  [1.2,7];
 isHarmBand = true;
@@ -96,14 +106,27 @@ Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
 
 % Do Wilcoxens pair test and make table of median and p-values
 pVars = {
- 	...'accA_x_b1_pow','accA_y_b1_pow','accA_z_b1_pow','accA_y_nf_stdev',...
-	'accA_x_nf_HP_b1_pow','accA_y_nf_HP_b1_pow','accA_z_nf_HP_b1_pow',...
-	...'accA_y_HP_nf_stdev',...
-	'Q_mean','P_LVAD_mean',...Q_LVAD_mean,...
-	...'pGrad_mean','pGrad_stdev','p_aff_mean','p_eff_stdev'...
+ 	'accA_x_NF_HP_b2_pow'
+	'accA_y_NF_HP_b2_pow'
+	'accA_z_NF_HP_b2_pow'
+	'accA_norm_NF_HP_b2_pow'
+	'Q_mean'
+	'P_LVAD_mean'
+	%'Q_LVAD_mean'
+	%'pGrad_mean'
+	%'pGrad_stdev'
 	};
 W = make_paired_features_for_signed_rank_test(F, pVars);
-[P,R] = make_paired_signed_rank_test(W, G, pVars, 'G1');
+G_rel2 = G_rel;
+G_rel2.med = G_rel2.med(ismember(G_rel2.med.interventionType,{'Control','Effect'}),:);
+G_rel2.med = G_rel2.med(ismember(G_rel2.med.categoryLabel,{'Balloon'}),:);
+G_rel2.iqr = G_rel2.iqr(ismember(G_rel2.iqr.interventionType,{'Control','Effect'}),:);
+G_rel2.iqr = G_rel2.iqr(ismember(G_rel2.iqr.categoryLabel,{'Balloon'}),:);
+G_rel2.q3 = G_rel2.q3(ismember(G_rel2.q3.interventionType,{'Control','Effect'}),:);
+G_rel2.q3 = G_rel2.q3(ismember(G_rel2.q3.categoryLabel,{'Balloon'}),:);
+G_rel2.q1 = G_rel2.q1(ismember(G_rel2.q1.interventionType,{'Control','Effect'}),:);
+G_rel2.q1 = G_rel2.q1(ismember(G_rel2.q1.categoryLabel,{'Balloon'}),:);
+[P,R] = make_paired_signed_rank_test(W, G_rel2, pVars, 'G1');
 
 
 %% Calculate ROC curves and corresponding confidence intervals
@@ -112,9 +135,9 @@ classifiers = {
 %   	'accA_y_b1_pow'
 %  	'accA_x_b1_pow'
 %  	'accA_z_b1_pow'
- 	'accA_y_nf_HP_b2_pow'
- 	'accA_x_nf_HP_b2_pow'
- 	'accA_z_nf_HP_b2_pow'
+ 	'accA_y_NF_HP_b2_pow'
+ 	'accA_x_NF_HP_b2_pow'
+ 	'accA_z_NF_HP_b2_pow'
 	'P_LVAD_mean'
 	'P_LVAD_drop'
 	};
@@ -164,8 +187,8 @@ Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
 
 %save_data('Periodograms', feats_path, Data.G1.Periodograms, {'matlab'});
-save_data('Features', feats_path, Data.G1.Features, {'matlab'});
-save_data('Statistics', stats_path, Data.G1.Feature_Statistics, {'matlab'});
+save_data('Features', pc.feats_path, Data.G1.Features, {'matlab'});
+save_data('Statistics', pc.stats_path, Data.G1.Feature_Statistics, {'matlab'});
 save_features_as_separate_spreadsheets(Data.G1.Features, feats_path);
 save_statistics_as_separate_spreadsheets(Data.G1.Feature_Statistics, stats_path);
 

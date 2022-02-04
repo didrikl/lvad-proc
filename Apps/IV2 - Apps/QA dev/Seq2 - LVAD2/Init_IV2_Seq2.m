@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
 sequence = 'IV2_Seq2';
-experiment_subdir = 'IV2_Seq2 - Water simulated HVAD thrombosis - Pilot';
+seq_subdir = 'IV2_Seq2 - Water simulated HVAD thrombosis - Pilot';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -34,9 +34,9 @@ ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 [read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,spectrum_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,seq_subdir,spectrum_subdir,ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity

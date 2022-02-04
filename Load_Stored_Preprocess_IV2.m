@@ -15,10 +15,10 @@ sequences = {
 % 	'IV2_Seq19','Seq19 - LVAD13\Processed'
     };
 Data.IV2 = load_processed_sequences(sequences(:,1),...
-    fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)));
+    fullfile(pc.data_basePath,sequences(:,2),sequences(:,1)));
 
 % Load previously calculated features for analysis
-Data.IV2.Features = load(fullfile(Config.feats_path,'Features'),'Features');
-Data.IV2.Statistics = load(fullfile(Config.stats_path,'Feature_Statistics'),'Feature_Statistics');
+Data.IV2.Features = load(fullfile(pc.feats_path,'Features'),'Features');
+Data.IV2.Statistics = load(fullfile(pc.stats_path,'Feature_Statistics'),'Feature_Statistics');
 
 clear sequences

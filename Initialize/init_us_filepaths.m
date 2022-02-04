@@ -1,3 +1,3 @@
-function filePaths = init_us_filepaths(Config, experiment_subdir, fileNames)
-filePaths  = fullfile(Config.data_basePath, experiment_subdir, ...
-	Config.ultrasound_subdir, fileNames);
+function filePaths = init_us_filepaths(pc, seq_subdir, fileNames)
+filePaths  = fullfile(pc.data_basePath, seq_subdir, ...
+	pc.ultrasound_subdir, fileNames);

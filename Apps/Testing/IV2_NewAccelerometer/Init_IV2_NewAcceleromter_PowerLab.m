@@ -2,7 +2,7 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
-experiment_subdir = ['IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer'];
+seq_subdir = ['IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer'];
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -23,9 +23,9 @@ ultrasound_fileNames = {
 % Add subdir specification to filename lists
 read_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer\Recorded';
 save_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer\Processed';
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity

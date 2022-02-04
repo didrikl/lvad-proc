@@ -3,7 +3,7 @@
 % Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'IV2_Seq15';
-experiment_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq15 - LVAD9 - Pump Test';
+seq_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq15 - LVAD9 - Pump Test';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -26,10 +26,10 @@ ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-driveline_filePaths = fullfile(basePath,experiment_subdir,cardibox_subdir,cardibox_fileNames);
-notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+driveline_filePaths = fullfile(basePath,seq_subdir,cardibox_subdir,cardibox_fileNames);
+notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -48,7 +48,7 @@ systemM_varMap = {
     'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
     'VenflowLmin'        'affQ'             1          'single' 'continuous' 'L/min'
     };
-proc_path = fullfile(basePath,experiment_subdir,'Processed');
+proc_path = fullfile(basePath,seq_subdir,'Processed');
 
 %% Read data into Matlab
 % Initialize data into Matlab timetable format

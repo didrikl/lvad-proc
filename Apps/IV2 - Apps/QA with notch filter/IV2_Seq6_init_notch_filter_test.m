@@ -2,8 +2,8 @@
 
 % Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
-experiment_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq6 - LVAD8';
-proc_path = fullfile(basePath,experiment_subdir,'Processed');
+seq_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq6 - LVAD8';
+proc_path = fullfile(basePath,seq_subdir,'Processed');
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -51,9 +51,9 @@ ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,experiment_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,experiment_subdir,powerlab_subdir,labChart_fileNames);
-notes_filePath = fullfile(basePath, experiment_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
+notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -109,8 +109,8 @@ PL = add_spatial_norms(PL,2,{'accA_x','accA_y','accA_z'},'accA_norm');
 %PL = add_spatial_norms(PL,2,{'accB_x','accB_y','accB_z'},'accB_norm');
 
 interNoteInclSpec = 'nearest';
-outsideNoteInclSpec = 'none';
-S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,outsideNoteInclSpec);
+pc.outsideNoteInclSpec = 'none';
+S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,pc.outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 

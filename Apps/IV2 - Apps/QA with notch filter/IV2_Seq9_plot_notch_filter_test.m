@@ -2,33 +2,33 @@
 clear check_table_var_input
 seq_no = 9;
 fig_subdir = 'Figures\Filter comparison - 2.5Hz notch at 4th harmonic';
-fig_path = fullfile(data_basePath,experiment_subdir,fig_subdir);
+fig_path = fullfile(data_basePath,seq_subdir,fig_subdir);
 % Calculation settings
 sampleRate = fs_new;
 
 mapSpec = {
     % Variable       Colorbar   y-lims
     %'accA_norm',    [-80,-36], [0,6.2];
-    'accA_norm_nf', [-80,-36], [0,6.2];
+    'accA_norm_NF', [-80,-36], [0,6.2];
     %'accA_x',       [-80,-36], [0,6.2];
-    %'accA_x_nf',    [-80,-36], [0,6.2];
+    %'accA_x_NF',    [-80,-36], [0,6.2];
     %'accA_y',       [-80,-36], [0,6.2];
-    'accA_y_nf',    [-80,-36], [0,6.2];
+    'accA_y_NF',    [-80,-36], [0,6.2];
     %'accA_z',       [-80,-36], [0,6.2];
-    %'accA_z_nf',    [-80,-36], [0,6.2];
+    %'accA_z_NF',    [-80,-36], [0,6.2];
     %'accB_norm',    [-75,-45], [0,5.2];
     };
 
 graphSpec = {
     % MovStd var     y-lims
     %'accA_norm',    [-90,20]
-    'accA_norm_nf', [-90,20];
+    'accA_norm_NF', [-90,20];
     %'accA_x',       [-90,20];
-    %'accA_x_nf',    [-90,20];
+    %'accA_x_NF',    [-90,20];
     %'accA_y',       [-90,20];
-    'accA_y_nf',    [-90,20];
+    'accA_y_NF',    [-90,20];
     %'accA_z',       [-90,20];
-    %'accA_z_nf',    [-90,20];
+    %'accA_z_NF',    [-90,20];
     %'accB_norm',    [-90,20]
     };
 

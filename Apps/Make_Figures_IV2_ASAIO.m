@@ -4,7 +4,7 @@
 
 tit = 'Spectrogram';
 S = Data.IV2.Seq10.S;
-var = 'accA_y_nf';
+var = 'accA_y_NF';
 rpm = 2800;
 
 IDs1 = {
@@ -41,10 +41,10 @@ clear tit S var rpm
 % Figure 5 in submission for ASAIO
 
 nhaVars = {
-     %'accA_x_nf_b1_pow',[0,0.008]
-      'accA_y_nf_b1_pow',[0,8]
-     %'accA_z_nf_b1_pow',[0,0.008]
- 	 %'accA_y_nf_stdev',[]
+     %'accA_x_NF_b1_pow',[0,0.008]
+      'accA_y_NF_b1_pow',[0,8]
+     %'accA_z_NF_b1_pow',[0,0.008]
+ 	 %'accA_y_NF_stdev',[]
      %'p_eff_mean',[55,100]
 	 %'pGrad_mean',[]
 	 %'Q_LVAD_mean',[0 8]
@@ -82,9 +82,9 @@ clear nhaVars levelLabels xLims xLab tit
 close all
 
 nhaVars = {
-     %'accA_x_nf_b1_pow',[0,8]
-    'accA_y_nf_b1_pow',[0 8]
-     %'accA_z_nf_b1_pow',[0,8]
+     %'accA_x_NF_b1_pow',[0,8]
+    'accA_y_NF_b1_pow',[0 8]
+     %'accA_z_NF_b1_pow',[0,8]
      };
  
 % Level categories plotted together
@@ -124,11 +124,11 @@ classifiers = {
  	%'accA_y_b1_pow', 'NHA_{\ity}';
 	%'accA_x_b1_pow', 'NHA_{\itx}';
 	%'accA_z_b1_pow', 'NHA_{\itz}';
- 	'accA_y_nf_b1_pow', 'NHA_{\ity}';
- 	'accA_x_nf_b1_pow', 'NHA_{\itx}';
- 	'accA_z_nf_b1_pow', 'NHA_{\itz}';
+ 	'accA_y_NF_b1_pow', 'NHA_{\ity}';
+ 	'accA_x_NF_b1_pow', 'NHA_{\itx}';
+ 	'accA_z_NF_b1_pow', 'NHA_{\itz}';
 	%'P_LVAD_drop',   '\itP\rm_{LVAD}';
-	%'accA_xynorm_nf_b1_pow', 'NHA_{\it|xy|}';
+	%'accA_xynorm_NF_b1_pow', 'NHA_{\it|xy|}';
 	};
 tit = 'ROC Curves for Pendulating Mass States';
 

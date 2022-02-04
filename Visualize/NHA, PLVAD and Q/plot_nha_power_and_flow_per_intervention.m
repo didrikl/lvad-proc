@@ -52,7 +52,7 @@ function h_figs = plot_nha_power_and_flow_per_intervention(...
 	mainYAxGap = mainXAxGap*(figHeight/figWidth);
 	
 	nFigs = size(nhaVar,1);
-	nCols = numel(levelLabels(:,1));
+	nCols = size(levelLabels(:,1),1);
 	nRows = 3;	
 	h_figs = gobjects(nFigs,1);
 

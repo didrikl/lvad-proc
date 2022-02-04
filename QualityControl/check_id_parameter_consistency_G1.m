@@ -3,8 +3,8 @@ function isOK = check_id_parameter_consistency_G1(S, idSpecs)
 	% experiment type, object oriented
 
     isOK = true;
-    idSpecs = standardizeMissing(idSpecs,{'-9999'});
-	S = standardizeMissing(S,{'-9999'});
+    %idSpecs = standardizeMissing(idSpecs,{'-9999'});
+	%S = standardizeMissing(S,{'-9999'});
 	
 	speedInData = unique(S.pumpSpeed);
 	speedInData = cast(speedInData,class(idSpecs.pumpSpeed));

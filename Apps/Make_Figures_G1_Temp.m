@@ -3,12 +3,28 @@
 % Figure 3 in submission for ASAIO
 
 tit = 'Spectrogram';
-S = Data.G1.G1_Seq6.S;
-var = 'accA_y_nf';
-rpm = 2800;
+S = Data.G1.Seq11.S;
+var = 'accA_x_NF_HP';
+rpm = 2400;
 
-close all
-make_spectrogram_figure_IV2(S, tit, var, rpm, fs_new);
+IDs1 = {
+	'2.0 #1'
+	'2.1'
+	'2.2'
+	'2.3'
+	'2.0 #2'
+	};
+IDs2 = {
+	'3.0 #1'
+	'3.1'
+	'3.2'
+	'3.3'
+	'3.4'
+	'3.0 #2'
+	};
+
+	close all
+	make_spectrogram_figure_G1(S, tit, var, rpm, Config.fs, IDs1, IDs2);
 
 clear tit s var rpm
 
@@ -18,10 +34,11 @@ clear tit s var rpm
 % Figure 5 in submission for ASAIO
 
 nhaVars = {
-     %'accA_x_nf_b1_pow',[0,0.008]
-      'accA_y_nf_HP_b2_pow',[-0.75,3]
-     %'accA_z_nf_b1_pow',[0,0.008]
- 	 %'accA_y_nf_stdev',[]
+     %'accA_x_NF_b1_pow',[0,0.008]
+     'accA_z_NF_HP_b2_pow',[0, 0.008]
+     %'accA_norm_NF_HP_b2_pow',[0, 0.008]
+     %'accA_z_NF_b1_pow',[0,0.008]
+ 	 %'accA_y_NF_stdev',[]
      %'p_eff_mean',[55,100]
 	 %'pGrad_mean',[]
 	 %'Q_LVAD_mean',[0 8]
@@ -30,15 +47,15 @@ levelLabels = {
 	'flated','balloon'
 	};
 
-xLims = [0,100];
+xLims = [2,12.5];
 tit = 'Pendulating Mass in Inlet Conduit';
 xLab = 'Areal inflow obstruction (%)';
 
-home; close all
-plot_nha_power_and_flow_per_intervention_G1(Data.G1.Features.Relative,...
-	Data.G1.Feature_Statistics.Descriptive_Relative.med, ...
-	[], ...
-	nhaVars, levelLabels, 'arealOccl_pst', xLims, xLab, tit, 'effect');
+%home; close all
+plot_nha_power_and_flow_per_intervention_G1(F,...
+	G.med, ...
+	R, ...
+	nhaVars, levelLabels, 'balDiamEst_mean', xLims, xLab, tit, 'effect');
 
 clear nhaVars levelLabels xLims xLab tit
 
@@ -50,9 +67,9 @@ clear nhaVars levelLabels xLims xLab tit
 close all
 
 nhaVars = {
-     %'accA_x_nf_b1_pow',[0,8]
-    'accA_y_nf_b1_pow',[0 8]
-     %'accA_z_nf_b1_pow',[0,8]
+     %'accA_x_NF_b1_pow',[0,8]
+    'accA_y_NF_b1_pow',[0 8]
+     %'accA_z_NF_b1_pow',[0,8]
      };
  
 % Level categories plotted together
@@ -92,11 +109,11 @@ classifiers = {
  	%'accA_y_b1_pow', 'NHA_{\ity}';
 	%'accA_x_b1_pow', 'NHA_{\itx}';
 	%'accA_z_b1_pow', 'NHA_{\itz}';
- 	'accA_y_nf_b1_pow', 'NHA_{\ity}';
- 	'accA_x_nf_b1_pow', 'NHA_{\itx}';
- 	'accA_z_nf_b1_pow', 'NHA_{\itz}';
+ 	'accA_y_NF_b1_pow', 'NHA_{\ity}';
+ 	'accA_x_NF_b1_pow', 'NHA_{\itx}';
+ 	'accA_z_NF_b1_pow', 'NHA_{\itz}';
 	%'P_LVAD_drop',   '\itP\rm_{LVAD}';
-	%'accA_xynorm_nf_b1_pow', 'NHA_{\it|xy|}';
+	%'accA_xynorm_NF_b1_pow', 'NHA_{\it|xy|}';
 	};
 tit = 'ROC Curves for Pendulating Mass States';
 
@@ -111,9 +128,9 @@ clear classfiers tit
 % % [no of states]x[3] panels
 % 
 % classifiers = {
-%  	'accA_x_nf_b1_pow', 'NHA_{\itx}';
-%  	'accA_y_nf_b1_pow', 'NHA_{\ity}';
-%  	'accA_z_nf_b1_pow', 'NHA_{\itz}';
+%  	'accA_x_NF_b1_pow', 'NHA_{\itx}';
+%  	'accA_y_NF_b1_pow', 'NHA_{\ity}';
+%  	'accA_z_NF_b1_pow', 'NHA_{\itz}';
 % 	};
 % tit = 'ROC Curves for Pendulating Mass States by Spatial Component';
 % 
@@ -127,7 +144,7 @@ clear classfiers tit
 % % 1x[no of states] panels
 % 
 % classifiers = {
-%  	'accA_y_nf_b1_pow';
+%  	'accA_y_NF_b1_pow';
 % 	};
 % predStates = {
 % 	%'diam_4.30mm_or_more', '>= 4.30mm'
@@ -154,9 +171,9 @@ clear classfiers tit
 % % 2x2 panels, one panel per speed
 % 
 % vars = {
-% %    'accA_y_nf_stdev',[0.01,0.19]
-%     'accA_x_nf_b1_pow',[0,0.018]
-%     'accA_y_nf_b1_pow',[0,0.018]
+% %    'accA_y_NF_stdev',[0.01,0.19]
+%     'accA_x_NF_b1_pow',[0,0.018]
+%     'accA_y_NF_b1_pow',[0,0.018]
 %    };
 % 
 % close all
@@ -172,8 +189,8 @@ clear classfiers tit
 % % D is numerical (unevenly distributed)
 % 
 % vars = {
-% 	'accA_y_nf_b1_pow', [0,0.011]
-% 	%'accA_y_nf_b1_mpf', [90,210]
+% 	'accA_y_NF_b1_pow', [0,0.011]
+% 	%'accA_y_NF_b1_mpf', [90,210]
 % 	};
 % 
 % close all
@@ -189,8 +206,8 @@ clear classfiers tit
 % % D is numerical (unevenly distributed)
 % 
 % vars = {
-% 	'accA_y_nf_b1_pow', [0,0.011]
-% 	%'accA_y_nf_b1_mpf', [90,210]
+% 	'accA_y_NF_b1_pow', [0,0.011]
+% 	%'accA_y_NF_b1_mpf', [90,210]
 % 	};
 % 
 % close all

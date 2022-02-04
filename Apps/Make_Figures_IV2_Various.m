@@ -3,9 +3,9 @@
 % [no of states]x[3] panels
 
 classifiers = {
- 	'accA_x_nf_b1_pow', 'NHA_{\itx}';
- 	'accA_y_nf_b1_pow', 'NHA_{\ity}';
- 	'accA_z_nf_b1_pow', 'NHA_{\itz}';
+ 	'accA_x_NF_b1_pow', 'NHA_{\itx}';
+ 	'accA_y_NF_b1_pow', 'NHA_{\ity}';
+ 	'accA_z_NF_b1_pow', 'NHA_{\itz}';
 	};
 tit = 'ROC Curves for Pendulating Mass States by Spatial Component';
 
@@ -19,7 +19,7 @@ clear classfiers tit
 % 1x[no of states] panels
 
 classifiers = {
- 	'accA_y_nf_b1_pow';
+ 	'accA_y_NF_b1_pow';
 	};
 predStates = {
 	%'diam_4.30mm_or_more', '>= 4.30mm'
@@ -46,9 +46,9 @@ clear classfiers predStates tit
 % 2x2 panels, one panel per speed
 
 vars = {
-%    'accA_y_nf_stdev',[0.01,0.19]
-    'accA_x_nf_b1_pow',[0,0.018]
-    'accA_y_nf_b1_pow',[0,0.018]
+%    'accA_y_NF_stdev',[0.01,0.19]
+    'accA_x_NF_b1_pow',[0,0.018]
+    'accA_y_NF_b1_pow',[0,0.018]
    };
 
 close all
@@ -64,8 +64,8 @@ clear vars
 % D is numerical (unevenly distributed)
 
 vars = {
-	'accA_y_nf_b1_pow', [0,0.011]
-	%'accA_y_nf_b1_mpf', [90,210]
+	'accA_y_NF_b1_pow', [0,0.011]
+	%'accA_y_NF_b1_mpf', [90,210]
 	};
 
 close all
@@ -81,8 +81,8 @@ clear vars
 % D is numerical (unevenly distributed)
 
 vars = {
-	'accA_y_nf_b1_pow', [0,0.011]
-	%'accA_y_nf_b1_mpf', [90,210]
+	'accA_y_NF_b1_pow', [0,0.011]
+	%'accA_y_NF_b1_mpf', [90,210]
 	};
 
 close all
