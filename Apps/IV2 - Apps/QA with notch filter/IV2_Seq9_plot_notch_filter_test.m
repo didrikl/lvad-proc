@@ -2,7 +2,7 @@
 clear check_table_var_input
 seq_no = 9;
 fig_subdir = 'Figures\Filter comparison - 2.5Hz notch at 4th harmonic';
-fig_path = fullfile(data_basePath,seq_subdir,fig_subdir);
+fig_path = fullfile(data_basePath,pc.seq_subdir,fig_subdir);
 % Calculation settings
 sampleRate = fs_new;
 

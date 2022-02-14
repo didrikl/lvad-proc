@@ -1,10 +1,13 @@
+pc = get_processing_config_defaults_G1;
+import Figures_Article2.*
+
 %% Spectrograms 
 % [2x2] panels, controls to the left and balloon interventions to the right
 % Figure 3 in submission for ASAIO
 
 tit = 'Spectrogram';
-S = Data.G1.Seq11.S;
-var = 'accA_x_NF_HP';
+S = Data.G1.Seq3.S;
+var = 'accA_y_NF_HP';
 rpm = 2400;
 
 IDs1 = {
@@ -24,7 +27,7 @@ IDs2 = {
 	};
 
 	close all
-	make_spectrogram_figure_G1(S, tit, var, rpm, Config.fs, IDs1, IDs2);
+	make_spectrogram_figure_G1(S, tit, var, rpm, pc.fs, IDs1, IDs2);
 
 clear tit s var rpm
 
@@ -35,7 +38,7 @@ clear tit s var rpm
 
 nhaVars = {
      %'accA_x_NF_b1_pow',[0,0.008]
-     'accA_z_NF_HP_b2_pow',[0, 0.008]
+     'accA_norm_NF_HP_b2_pow',[0, 0.008]
      %'accA_norm_NF_HP_b2_pow',[0, 0.008]
      %'accA_z_NF_b1_pow',[0,0.008]
  	 %'accA_y_NF_stdev',[]
@@ -48,14 +51,15 @@ levelLabels = {
 	};
 
 xLims = [2,12.5];
+xLims = [0,100];
 tit = 'Pendulating Mass in Inlet Conduit';
 xLab = 'Areal inflow obstruction (%)';
 
 %home; close all
 plot_nha_power_and_flow_per_intervention_G1(F,...
 	G.med, ...
-	R, ...
-	nhaVars, levelLabels, 'balDiamEst_mean', xLims, xLab, tit, 'effect');
+	[], ...
+	nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, tit, 'effect');
 
 clear nhaVars levelLabels xLims xLab tit
 
@@ -68,7 +72,7 @@ close all
 
 nhaVars = {
      %'accA_x_NF_b1_pow',[0,8]
-    'accA_y_NF_b1_pow',[0 8]
+    'accA_y_NF_b2_pow',[0 8]
      %'accA_z_NF_b1_pow',[0,8]
      };
  

@@ -1,7 +1,7 @@
 %#ok<*NASGU> 
 
 % Initialize from raw data, preprocess and store (in memory and to disc)
-Config_IV2
+data = struct;
 inputs = {
 	'IV2_Seq6'
    	'IV2_Seq7'
@@ -17,10 +17,10 @@ inputs = {
 
 % Do separate initialization parts
 for i=1:numel(inputs)
-	pc = get_processing_config_defaults_G1;
+	pc = get_processing_config_defaults_IV2;
 	pc.askToReInit = true;
 	eval(inputs{i});
-	init_multiwaitbar_preproc(i, numel(inputs), seq);
+	init_multiwaitbar_preproc(i, numel(inputs), pc.seq);
 	
 	Init_Data_Raw_IV2
 	Preprocess_Sequence_IV2

@@ -3,7 +3,7 @@
 % Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'IV2_Seq15';
-seq_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq15 - LVAD9 - Pump Test';
+pc.seq_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq15 - LVAD9 - Pump Test';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -14,22 +14,22 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-labChart_fileNames = {
+pc.labChart_fileNames = {
     'IV2_Seq15 - F1.mat'
     };
 cardibox_fileNames = { 
     };
-notes_fileName = 'IV2_Seq15 - Notes ver4.9 - Rev0.xlsm';
-ultrasound_fileNames = {
+pc.notes_fileName = 'IV2_Seq15 - Notes ver4.9 - Rev0.xlsm';
+pc.ultrasound_fileNames = {
     'ECM_2020_10_14__17_30_15.wrf'
     };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
-driveline_filePaths = fullfile(basePath,seq_subdir,cardibox_subdir,cardibox_fileNames);
-notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
+driveline_filePaths = fullfile(basePath,pc.seq_subdir,cardibox_subdir,cardibox_fileNames);
+notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -48,7 +48,7 @@ systemM_varMap = {
     'ArtflowLmin'        'effQ'             1          'single' 'continuous' 'L/min'
     'VenflowLmin'        'affQ'             1          'single' 'continuous' 'L/min'
     };
-proc_path = fullfile(basePath,seq_subdir,'Processed');
+proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
 
 %% Read data into Matlab
 % Initialize data into Matlab timetable format

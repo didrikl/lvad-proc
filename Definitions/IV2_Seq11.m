@@ -1,7 +1,7 @@
             
 % Experiment sequence ID
-seq = 'IV2_Seq11';
-seq_subdir = 'Seq11 - LVAD10';
+pc.seq = 'IV2_Seq11';
+pc.seq_subdir = 'Seq11 - LVAD10';
 
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -9,7 +9,7 @@ ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
 % Files to use
-labChart_fileNames = {
+pc.labChart_fileNames = {
     'IV2_Seq11 - F1 [pEff,pAff].mat'
     'IV2_Seq11 - F1 [accA].mat'
 %     'IV2_Seq11 - F1 [accB].mat'
@@ -47,8 +47,8 @@ labChart_fileNames = {
     'IV2_Seq11 - F12 [accA].mat'
 %     'IV2_Seq11 - F12 [accB].mat'
     };
-notes_fileName = 'IV2_Seq11 - Notes IV2 v1.0.0 - Rev3.xlsm';
-ultrasound_fileNames = {
+pc.notes_fileName = 'IV2_Seq11 - Notes IV2 v1.0.0 - Rev3.xlsm';
+pc.ultrasound_fileNames = {
     'ECM_2020_09_07__14_17_44.wrf'
     'ECM_2020_09_08__11_04_21.wrf'
     };

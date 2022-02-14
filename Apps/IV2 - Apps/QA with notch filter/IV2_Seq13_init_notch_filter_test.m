@@ -2,8 +2,8 @@
 
 % Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
-seq_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq13 - LVAD12';
-proc_path = fullfile(basePath,seq_subdir,'Processed');
+pc.seq_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq13 - LVAD12';
+proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -11,7 +11,7 @@ ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-labChart_fileNames = {
+pc.labChart_fileNames = {
     'IV2_Seq13 - F1 [pEff,pAff].mat'
     'IV2_Seq13 - F1 [accA].mat'
     'IV2_Seq13 - F1 [accB].mat'
@@ -52,16 +52,16 @@ labChart_fileNames = {
     'IV2_Seq13 - F13 [accA].mat'
     'IV2_Seq13 - F13 [accB].mat'
     };
-notes_fileName = 'IV2_Seq13 - Notes ver4.9 - Rev2.xlsm';
-ultrasound_fileNames = {
+pc.notes_fileName = 'IV2_Seq13 - Notes ver4.9 - Rev2.xlsm';
+pc.ultrasound_fileNames = {
     'ECM_2020_09_11__12_30_59.wrf'
     };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
-notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
+notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity

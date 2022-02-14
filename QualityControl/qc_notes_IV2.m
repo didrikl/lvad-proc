@@ -79,7 +79,7 @@ function irregID = check_analysis_ids_and_notes(Notes, idSpecs, eventsToCheckID)
 		
 		irregSpeed = check_pump_speed_id_consistency(Notes, 2);
 		irregID = irregID | irregSpeed;
-		isOK = isOK & not((irregSpeed));
+		isOK = any(isOK) & any(not((irregSpeed)));
 	
 		notify_about_notes_issues_found(isOK, Notes);
 		

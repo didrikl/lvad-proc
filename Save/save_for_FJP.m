@@ -23,8 +23,8 @@ function save_for_FJP(proc_path,S,notes,sequence)
     S_fileName = sprintf('G1_%s - Signal timetable for FJP - %s.mat',seqNo,saveTime);
     save(fullfile(proc_path,S_fileName),'S')
     
-    Notes_fileName = sprintf('G1_%s - Notes for FJP - %s.mat',seqNo,saveTime);
-    save(fullfile(proc_path,Notes_fileName),'notes')
+    pc.notes_fileName = sprintf('G1_%s - Notes for FJP - %s.mat',seqNo,saveTime);
+    save(fullfile(proc_path,pc.notes_fileName),'notes')
     
 
     

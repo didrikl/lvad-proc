@@ -6,6 +6,8 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 	% - Optimal curve point
 	% The info is stored in the common output struct R
 	
+	welcome('Make ROC matrix','function')
+	
 	AUC = table;
 	ROC = struct;
 
@@ -21,7 +23,9 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 
 	nPredStateRows = size(predStates,1);
 	nSpeedCols = numel(speeds);
-	
+	nClassifiers = numel(classifiers);
+	waitIncr = 1/(nPredStateRows*nSpeedCols*nClassifiers);
+	multiWaitbar('Making ROC matrix',0);
 	for i=1:nPredStateRows
 		
 		if pooled
@@ -35,8 +39,9 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 			inds = (state_inds | F.interventionType=='Control' )...
 				& F.pumpSpeed==speeds(j);
 			
-			for k=1:numel(classifiers)
-			
+			for k=1:nClassifiers
+				multiWaitbar('Making ROC matrix','Increment',waitIncr);
+	
 				[ROC.X{i,j,k},ROC.Y{i,j,k},~,ROC.AUC{i,j,k},ROC.opt_roc_pt{i,j,k}] = ...
 					perfcurve(F.(stateVar)(inds),F.(classifiers{k})(inds),...
 					predStates{i,1},"NBoot",nBootItr);

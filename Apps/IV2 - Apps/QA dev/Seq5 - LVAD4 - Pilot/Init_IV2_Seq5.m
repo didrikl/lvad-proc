@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
 sequence = 'IV2_Seq5';
-seq_subdir = [sequence,' - Water simulated HVAD thrombosis'];
+pc.seq_subdir = [sequence,' - Water simulated HVAD thrombosis'];
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -14,7 +14,7 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-labChart_fileNames = {
+pc.labChart_fileNames = {
     'IV2_Seq5 - F1_ch1-5.mat'
     'IV2_Seq5 - F2_ch1-5.mat'
     'IV2_Seq5 - F3_ch1-5.mat'
@@ -28,8 +28,8 @@ labChart_fileNames = {
 driveline_fileNames = {
     'monitor-20200512-084303\monitor-20200512-180822.txt'
     };
-notes_fileName = 'IV2_Seq5 - Notes ver3.10 - Rev0.xlsm';
-ultrasound_fileNames = {
+pc.notes_fileName = 'IV2_Seq5 - Notes ver3.10 - Rev0.xlsm';
+pc.ultrasound_fileNames = {
     'ECM_2020_05_12__19_14_11.wrf'
     'ECM_2020_05_25__18_14_34.wrf'
     'ECM_2020_05_26__17_32_36.wrf'
@@ -40,10 +40,10 @@ ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 [read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,seq_subdir,ultrasound_subdir,ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,seq_subdir,powerlab_subdir,labChart_fileNames);
-driveline_filePaths = fullfile(basePath,seq_subdir,driveline_subdir,driveline_fileNames);
-notes_filePath = fullfile(basePath, seq_subdir,notes_subdir,notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
+driveline_filePaths = fullfile(basePath,pc.seq_subdir,driveline_subdir,driveline_fileNames);
+notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity

@@ -432,7 +432,7 @@ end
 
 for ii = 1:length(xl)
 
-    iseq = ~verLessThan('matlab', '8.4.0') && isequal(lo{ii}, hi{ii}); % deal with zero-width bug in R2014b/R2015a
+    ipc.seq = ~verLessThan('matlab', '8.4.0') && isequal(lo{ii}, hi{ii}); % deal with zero-width bug in R2014b/R2015a
 
     if isvert
         if iseq

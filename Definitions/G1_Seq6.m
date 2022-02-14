@@ -1,13 +1,13 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-seq = 'G1_Seq6';
+pc.seq = 'G1_Seq6';
 
 % Folder in base path
-seq_subdir = 'Seq6 - LVAD7';
+pc.seq_subdir = 'Seq6 - LVAD7';
 
 % Which files to input from input directory 
-labChart_fileNames = {
+pc.labChart_fileNames = {
 	'G1_Seq6 - F1_Sel1 [accA].mat'
 	%'G1_Seq6 - F1_Sel1 [accB].mat'
 	'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
@@ -21,8 +21,8 @@ labChart_fileNames = {
 	%'G1_Seq6 - F2_Sel2 [accB].mat'
 	'G1_Seq6 - F2_Sel2 [pGraft,pLV,ECG].mat'
 	};
-notes_fileName = 'G1_Seq6 - Notes G1 v1.0.0 - Rev9.xlsm';
-ultrasound_fileNames = {
+pc.notes_fileName = 'G1_Seq6 - Notes G1 v1.0.0 - Rev9.xlsm';
+pc.ultrasound_fileNames = {
     'ECM_2020_10_22__11_02_46.wrf'
 };
 

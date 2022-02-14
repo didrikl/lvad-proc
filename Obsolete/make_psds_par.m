@@ -13,7 +13,7 @@ function psds = make_psds_par(S_analysis,vars)
     end
     
     parfor j=1:numel(seqs)
-        seq = seqs{j}; 
+        pc.seq = seqs{j}; 
         
         fs = 750;
         psds{j} = groupsummary(data{j},{'analysis_id','bl_id'},@(x)make_psd(x,fs),vars);   
@@ -28,7 +28,7 @@ function psds = make_psds_par(S_analysis,vars)
 %     tic
 %     pb = cell(numel(seqs),1);
 %     for j=1:numel(seqs)
-%         seq = seqs{j}; 
+%         pc.seq = seqs{j}; 
 %         
 %         
 %         pb{j} = join(ids_specs,S_analysis.(seq),'LeftKeys','analysis_id','RightKeys','analysis_id');  

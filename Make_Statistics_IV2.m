@@ -1,10 +1,13 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 % This defines the relevant ids for analysis
-Config = Data.IV2.Config;
+pc = get_processing_config_defaults_IV2;
+init_multiwaitbar_calc_stats
+	
 idSpecs = init_id_specifications(pc.idSpecs_path);
-idSpecs = idSpecs(not(ismember(idSpecs.interventionType,{'Extra'})),:);
-% idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
+idSpecs = idSpecs(not(idSpecs.extra),:);
+idSpecs = idSpecs(not(idSpecs.contingency),:);
+idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
 
 sequences = {
 	'Seq6'
@@ -36,7 +39,7 @@ accVars = {...
 	'accA_x_NF','accA_y_NF','accA_z_NF'};
 hBands =  [1.10,2.9];
 isHarmBand = true;
-Pxx = make_power_spectra(Data.IV2, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
+Pxx = make_power_spectra(Data.IV2, sequences, accVars, pc.fs, hBands, idSpecs, isHarmBand);
 F = join(F, Pxx.bandMetrics, 'Keys',{'id','analysis_id'});
 
 % Make relative and delta differences from baselines using id tags
@@ -67,9 +70,16 @@ G_del = make_group_stats(F_del, idSpecs);
 
 % Do Wilcoxens pair test and make table of median and p-values
 pVars = {
- 	'accA_x_b1_pow','accA_y_b1_pow','accA_z_b1_pow','accA_y_NF_stdev',...
-	'accA_x_NF_b1_pow','accA_y_NF_b1_pow','accA_z_NF_b1_pow','accA_y_NF_stdev',...
-	'Q_mean','P_LVAD_mean',...Q_LVAD_mean,...
+ 	'accA_x_b1_pow'
+	'accA_y_b1_pow'
+	'accA_z_b1_pow'
+	'accA_y_NF_stdev'
+	'accA_x_NF_b1_pow'
+	'accA_y_NF_b1_pow'
+	'accA_z_NF_b1_pow'
+	'accA_y_NF_stdev'
+	'Q_mean'
+	'P_LVAD_mean',...Q_LVAD_mean,...
 	...'pGrad_mean','pGrad_stdev','p_aff_mean','p_eff_stdev'...
 	};
 W = make_paired_features_for_signed_rank_test(F, pVars);
@@ -153,4 +163,4 @@ multiWaitbar('CloseAll');
 clear save_data
 clear discrVars meanVars accVars hBands isHarmBand G G_rel G_del F F_rel F_del ...
 	pVars pooled classifiers predStateVar predStates ROC F_ROC F_ROC_SPSS AUC ...
-	idSpecs Config
+	idSpecs

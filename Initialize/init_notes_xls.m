@@ -30,7 +30,6 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
         };
     
     % User-set definitions
-    missingValueRepr = {''};
     timeVarName = 'time';
     nHeaderLines = 3;
     
@@ -126,29 +125,30 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     Notes.Properties.UserData.Experiment_Info = experimentInfo;
     Notes.Properties.UserData.VarMapFile = varMapFile;
     
-    %% Parse information
+    %% Convert information
     
+	% Add dummy value -9999 to indicate interpolation breaks
 	breakInds = ismember(Notes{:,Notes.Properties.CustomProperties.Measured},'-');
 	Notes{:,Notes.Properties.CustomProperties.Measured}(breakInds) = {'-9999'};
+	
+	% Force all transitional intervals with breaks indicators
+	transInds = Notes.intervType=='Transitional';
+	Notes(transInds,Notes.Properties.CustomProperties.Measured) = {'-9999'};
+	
+    % Cast and parse time info
 	Notes = convert_columns(Notes,varMap(inFile_ind,3));
-
-    % Parse info time, date and dur
-    Notes = parse_time_cols(Notes);
+	Notes = parse_time_cols(Notes);
     Notes = derive_time_col_not_filled(Notes);
     
+	% Constant interpolation down to breaks, then up up to breaks:
+	% The build-in interpolation also apply to the dummy values -9999, but 
+	% this is filled as missing afterwards.
 	[N1,TF] = fillmissing(Notes(:,vartype('float')),"previous");
 	misInd = TF & ismember(N1{:,:},-9999);
 	Notes(:,vartype('float')) = N1;
 	Notes{:,vartype('float')}(misInd) = missing;
 	Notes = fillmissing(Notes,"next","DataVariables",@isfloat);
 	Notes = standardizeMissing(Notes,{-9999});
-
-    % Parse relevant columns, other than time columns 
-%     Notes = standardizeMissing(Notes, missingValueRepr);
-%     num_vars = get_varname_of_specific_type(Notes,'single');
-%     no_interp_rows = Notes.intervType~='Transitional' | ...
-%         Notes.part=='-' | ismissing(Notes.part);
-%     Notes(no_interp_rows,num_vars) = fillmissing(Notes(no_interp_rows,num_vars),'constant',-9999);
     
     % Add note row id to be used for data fusion and looking up data
     Notes = add_note_row_id(Notes, nHeaderLines);

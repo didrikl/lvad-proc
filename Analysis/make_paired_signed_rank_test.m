@@ -3,8 +3,8 @@ function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType)
 	welcome('Make paired signed rank test','function')
 	
 	% TODO: Make generic or with input!!!
-	%speeds=[2200,2500,2800,3100];
-	speeds=[2200,2400,2600];
+	speeds=[2200,2500,2800,3100];
+	%speeds=[2200,2400,2600];
 
 	levLab = sort_nat(string(unique(G.med.('levelLabel'))));
 

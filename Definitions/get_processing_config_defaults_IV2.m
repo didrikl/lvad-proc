@@ -1,8 +1,35 @@
 %% Defaults settings
 function pc = get_processing_config_defaults_IV2
+
+	% Experiment info
+	% --------------------------------------------------------------------------
+	
+	pc.experimentType = 'In vitro, model 2';
 	pc.experimentID = 'IV2';
 
-	% How to fuse data
+
+	% Constants
+	% --------------------------------------------------------------------------
+	
+	pc.inletInnerDiamLVAD = 12.7;
+	
+
+	% Signal processing settings
+	% --------------------------------------------------------------------------
+	
+	pc.fs = 750;
+	
+
+	% Misc. settings
+	% --------------------------------------------------------------------------
+	
+	pc.defFigRes = 300;
+
+	
+	% How to init and fuse data
+	% --------------------------------------------------------------------------
+	
+	pc.askToReInit = true;
 	pc.interNoteInclSpec = 'nearest';
 	pc.outsideNoteInclSpec = 'none';
 
@@ -12,7 +39,11 @@ function pc = get_processing_config_defaults_IV2
 	pc.systemM_varMapFile = 'VarMap_SystemM_IV2';
 	pc.notes_varMapFile = 'VarMap_Notes_IV2_v1_0_0';
 
-	% Reading/storage of each sequences
+
+	% Paths
+	% --------------------------------------------------------------------------
+	
+	pc.code_basePath = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab';
 	pc.data_basePath = 'D:\Data\IVS\Didrik\IV2 - Data';
 
 	% Output folder structure for each sequence

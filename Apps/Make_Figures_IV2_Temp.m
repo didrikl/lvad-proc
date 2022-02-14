@@ -31,7 +31,7 @@ IDs1 = {
 		};
 
 close all
-make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs, IDs1, IDs2);
+make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.pc.fs, IDs1, IDs2);
 
 clear tit s var rpm
 
@@ -70,7 +70,7 @@ home; close all
 plot_nha_power_and_flow_per_intervention(Data.IV2.Features.Absolute,...
 	Data.IV2.Feature_Statistics.Descriptive_Absolute.med, ...
 	Data.IV2.Feature_Statistics.Results, ...
-	nhaVars, levelLabels, 'arealOccl_pst', xLims, xLab, tit, 'effect');
+	nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, tit, 'effect');
 
 clear nhaVars levelLabels xLims xLab tit
 

@@ -1,5 +1,4 @@
 % Read sequence notes made with Excel file template
-Config_G1
 inputs = {
 	'G1_Seq3' % (pilot)
 	'G1_Seq6'
@@ -14,21 +13,17 @@ inputs = {
 % Do separate initialization parts
 for i=1:numel(inputs)
 	pc = get_processing_config_defaults_G1;
-	pc.askToReInit = true;
 	eval(inputs{i});
+	idSpecs = init_id_specifications(pc.idSpecs_path);	
+	pc.notes_filePath = init_notes_filepath(pc);
 
-	pc.notes_filePath = init_notes_filepath(pc, seq_subdir, notes_fileName);
 	Notes = init_notes_xls(pc.notes_filePath, '', pc.notes_varMapFile);
-
-	idSpecs = init_id_specifications(pc.idSpecs_path);
 	Notes = qc_notes_G1(Notes, idSpecs, pc.askToReInit);
+	Notes = derive_cardiac_output(Notes);
+	Notes = calc_obstruction(pc, Notes);
 
-	pc.proc_path = make_save_path(pc, seq_subdir);
-	save_notes(Notes, pc.proc_path, seq)
-	seqID = get_seq_id(seq);
-	Data.(Config.experimentID).(seqID).Notes = Notes;
+    Data = save_preprocessed_notes_only(pc, Notes, Data);
 	Preprocess_Roundup;
-
 end
 
-clear inputs i pc
+clear inputs i

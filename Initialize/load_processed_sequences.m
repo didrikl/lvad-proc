@@ -22,7 +22,6 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 		seqFilePath = seqFilePaths{i};
 		display_filename(seqFilePath,'',['\nLoading processed ',dataType,' file']);
 		try
-			%T = load(seqFilePath, '-mat', dataType);
 			load(seqFilePath)
 			Data.(seq).(dataType) = eval(dataType);
 		catch err

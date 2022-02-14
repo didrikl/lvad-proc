@@ -1,3 +1,5 @@
+pc = get_processing_config_defaults_IV2;
+
 %% Spectrograms 
 % [2x2] panels, controls to the left and balloon interventions to the right
 % Figure 3 in submission for ASAIO
@@ -31,7 +33,7 @@ IDs1 = {
 		};
 	
 close all; home
-make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs, IDs1, IDs2);
+make_spectrogram_figure_IV2(S, tit, var, rpm, pc.fs, IDs1, IDs2);
 
 clear tit S var rpm
 
@@ -67,10 +69,10 @@ tit = 'Pendulating Mass in Inlet Conduit';
 xLab = 'Areal inflow obstruction (%)';
 
 home; close all
-plot_nha_power_and_flow_per_intervention(Data.IV2.Features.Absolute,...
+plot_nha_power_and_flow_per_intervention_IV2(Data.IV2.Features.Absolute,...
 	Data.IV2.Feature_Statistics.Descriptive_Absolute.med, ...
 	Data.IV2.Feature_Statistics.Results, ...
-	nhaVars, levelLabels, 'arealOccl_pst', xLims, xLab, tit, 'effect');
+	nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, tit, 'effect');
 
 clear nhaVars levelLabels xLims xLab tit
 
@@ -108,7 +110,7 @@ xLims = [0,100];
 xLab = 'Flow rate reduction targets (%)';
 tit = 'Control intervensions';
 
-plot_nha_power_and_flow_per_intervention(Data.IV2.Features.Absolute,...
+plot_nha_power_and_flow_per_intervention_IV2(Data.IV2.Features.Absolute,...
 	Data.IV2.Feature_Statistics.Descriptive_Absolute.med, ...
 	Data.IV2.Feature_Statistics.Results, ...
 	nhaVars, levelLabels, 'QRedTarget_pst', xLims, xLab, tit,'control');

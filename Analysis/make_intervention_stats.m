@@ -20,8 +20,8 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 		error('Variables cannot be both discrVars and meanVars')
 	end
 	
-	%TODO
-	% Check for missing seqs
+	% Missing sequences in data indicates a typo. 
+	seqs = check_missing_sequences(seqs, D);
 
 	% Code if parallellization by parfor loop instead of for loop below:
 	%{
@@ -31,7 +31,6 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
         end
 	%}
 	
-	init_multiwaitbar_calc_stats
 	
 	% Aggregate uniquely tagged interventions, sequence by sequence
 	T = cell(numel(seqs),1);
@@ -44,8 +43,7 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 		
 		% Add all measured values (not categorical) from Notes
 		S = join_notes(S, Notes);
-		%S = standardizeMissing(S,-9999);
-
+		
 		discrVars = check_table_var_input(S, discrVars);
 		meanVars = check_table_var_input(S, meanVars);
 		medVars = check_table_var_input(S, medVars);
@@ -96,7 +94,6 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 	T = tidy_up_aggregate_variable_names(T);
 	T = tidy_up_row_and_column_positions(T);
 	T = remove_round_off_errors_in_discrete_vars(T, discrVars);
-	%T = order_categories(T,'levelLabel',idSpecs.levelLabel);
 	T.Properties.Description = 'Aggregate features of ID-tagged segments';
 
 function S = remove_rows_with_irrelevant_analysis_id(S, idSpecs)

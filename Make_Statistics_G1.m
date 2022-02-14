@@ -1,13 +1,14 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 % This defines the relevant ids for analysis
-Config = Data.G1.Config;
 pc = get_processing_config_defaults_G1;
+init_multiwaitbar_calc_stats
+	
 idSpecs = init_id_specifications(pc.idSpecs_path);
 idSpecs = idSpecs(not(idSpecs.extra),:);
 idSpecs = idSpecs(not(contains(string(idSpecs.analysis_id),{'E'})),:);
 idSpecs = idSpecs(not(contains(string(idSpecs.categoryLabel),{'Injection'})),:);
-idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
+%idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
 
 sequences = {
 	'Seq3' % (pilot)
@@ -26,7 +27,8 @@ sequences = {
 discrVars = {
 	'Q_LVAD'
 	'P_LVAD'
-	'balDiamEst'
+	'balDiam_xRay'
+	'balHeight_xRay'
 	'p_maxArt'
     'p_minArt'
     'MAP'             
@@ -39,9 +41,6 @@ discrVars = {
 	%'CO_cont'         
     %'CO_thermo'    
 	'CO'
-	%'accA_x' % to check direction
- 	%'accA_y' % to check direction
- 	%'accA_z' % to check direction
     };
 
 meanVars = {
@@ -70,9 +69,9 @@ accVars = {...'accA_x','accA_y','accA_z',...
 	'accA_xynorm_NF_HP'
 	'accA_yznorm_NF_HP'
 	};
-hBands =  [1.2,7];
+hBands =  [1.2,7;1.2,4.95];
 isHarmBand = true;
-Pxx = make_power_spectra(Data.G1, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
+Pxx = make_power_spectra(Data.G1, sequences, accVars, pc.fs, hBands, idSpecs, isHarmBand);
 F = join(F, Pxx.bandMetrics, 'Keys',{'analysis_id','id'});
 
 % Make relative and delta differences from baselines using id tags

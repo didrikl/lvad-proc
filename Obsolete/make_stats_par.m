@@ -12,7 +12,7 @@ function stats = make_stats(S_analysis,note_vars,meas_vars)
     end
     
     parfor j=1:numel(seqs)
-        seq = seqs{j}; 
+        pc.seq = seqs{j}; 
         
         stats_meas = groupsummary(data{j},{'analysis_id','bl_id'},...
             {'mean','std','median',@(x)prctile(x,[25,75])},{meas_vars});
@@ -26,7 +26,7 @@ function stats = make_stats(S_analysis,note_vars,meas_vars)
 %         s = split(unique(s),', ');
 %         t = table(categorical(s(:,1)),categorical(s(:,2)),'VariableNames',{'analysis_id','bl_id'});
 %         stats{j} = join(stats{j},t,'Keys','analysis_id'); 
-        stats{j}.seq = repmat(string(seq),height(stats{j}),1);
+        stats{j}.pc.seq = repmat(string(seq),height(stats{j}),1);
     end
    
     stats = merge_table_blocks(stats);

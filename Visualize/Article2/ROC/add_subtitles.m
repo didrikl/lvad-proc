@@ -1,0 +1,16 @@
+function h_ax = add_subtitles(h_ax,subTitles,panelLength,yGap,specs)
+	
+	for j=1:size(h_ax,2)
+		titBoxPos = [
+			h_ax(1,j).Position(1)
+			h_ax(1,j).Position(2)+panelLength+yGap/2
+			panelLength
+			22]';
+		annotation('textbox',[0,0.5,0.2,0.1],...
+			specs.titBox{:},...
+			specs.rocSubTit{:}, ...
+			'Position',titBoxPos,...
+			'String',subTitles{j} ...
+			);
+	end
+end

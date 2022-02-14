@@ -22,8 +22,8 @@ function make_spectrogram_figure_G1(S, supTit, var, rpm, fs, IDs1, IDs2)
 	%colorMap = parula;
 	colorRange = [-62,-40]; % for Seq13
 	
-	[T1, segStarts1, segEnds1] = make_plot_data(IDs1, S, var, fs, durLim, 'G1');
-	[T2, segStarts2, segEnds2] = make_plot_data(IDs2, S, var, fs, durLim, 'G1');
+	[T1, segStarts1, segEnds1] = make_plot_data(IDs1, S, var, fs, durLim);
+	[T2, segStarts2, segEnds2] = make_plot_data(IDs2, S, var, fs, durLim);
 	[map1,order1,~,mapTime1] = make_rpm_order_map(T1,var,fs,'pumpSpeed',res,overlapPst);
 	[map2,order2,~,mapTime2] = make_rpm_order_map(T2,var,fs,'pumpSpeed',res,overlapPst);
 
