@@ -3,7 +3,7 @@
 % Experiment sequence ID
 basePath = 'C:\Data\IVS\Didrik';
 sequence = 'Seq7 - LVAD1';
-pc.seq_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq7 - LVAD1';
+Config.seq_subdir = 'IV2 - Simulated pre-pump thrombosis in 5pst glucose\Seq7 - LVAD1';
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -14,7 +14,7 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'IV2_Seq7 - F1.mat'
     'IV2_Seq7 - F2.mat'
     'IV2_Seq7 - F3.mat'
@@ -34,8 +34,8 @@ pc.labChart_fileNames = {
     };
 cardibox_fileNames = {
     };
-pc.notes_fileName = 'IV2_Seq7 - Notes ver4.9 - Rev3.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'IV2_Seq7 - Notes ver4.9 - Rev3.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2020_08_19__13_04_02.wrf'
     'ECM_2020_08_19__13_28_05.wrf'
     'ECM_2020_08_20__12_11_36.wrf'
@@ -44,10 +44,10 @@ pc.ultrasound_fileNames = {
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-driveline_filePaths = fullfile(basePath,pc.seq_subdir,cardibox_subdir,cardibox_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+driveline_filePaths = fullfile(basePath,Config.seq_subdir,cardibox_subdir,cardibox_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity

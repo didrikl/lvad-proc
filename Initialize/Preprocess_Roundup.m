@@ -1,4 +1,4 @@
-fprintf(['\nInit <strong>',pc.seq,'</strong> done.\n']);
+fprintf(['\nInit <strong>',Config.seq,'</strong> done.\n']);
 
 clear PL US 
 % clear S S_parts Notes

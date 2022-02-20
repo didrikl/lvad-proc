@@ -1,17 +1,20 @@
-function T = add_revised_balloon_levels(T, levLims)
+function T = add_revised_balloon_levels(T, lims)
 	
-	balLev_xRay = nan(height(T),1);
-	lev0_inds = T.balDiam_xRay_mean<levLims(1);
-	lev1_inds = T.balDiam_xRay_mean>=levLims(1) & T.balDiam_xRay_mean<levLims(2);
-	lev2_inds = T.balDiam_xRay_mean>=levLims(2) & T.balDiam_xRay_mean<levLims(3);
-	lev3_inds = T.balDiam_xRay_mean>=levLims(3) & T.balDiam_xRay_mean<levLims(4);
-	lev4_inds = T.balDiam_xRay_mean>=levLims(4) & T.balDiam_xRay_mean<levLims(5);
-	lev5_inds = T.balDiam_xRay_mean>=levLims(5);
-	balLev_xRay(lev0_inds) = 0;
-	balLev_xRay(lev1_inds) = 1;
-	balLev_xRay(lev2_inds) = 2;
-	balLev_xRay(lev3_inds) = 3;
-	balLev_xRay(lev4_inds) = 4;
-	balLev_xRay(lev5_inds) = 5;
+	N = numel(lims);	
+	balLev = nan(height(T),1);
+	balLev(T.balDiam_xRay_mean<lims(1)) = 0;
+	for i=N-1:-1:1
+		
+		inds = T.balDiam_xRay_mean>=lims(i) & T.balDiam_xRay_mean<lims(i+1);
+		balLev(inds) = i;
+		
+		% Handle cases of multiple diameters within a level
+		diams = unique(T.balDiam_xRay_mean(inds));
+		if numel(diams)>1
+			extra_inds = T.balDiam_xRay_mean==diams(1:end-1);
+			balLev(extra_inds) = i-1;
+		end
 
-	T.balLev_xRay = balLev_xRay;
+	end
+	
+	T.balLev_xRay = balLev;

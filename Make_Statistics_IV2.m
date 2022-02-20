@@ -1,10 +1,10 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 % This defines the relevant ids for analysis
-pc = get_processing_config_defaults_IV2;
+Config =  get_processing_config_defaults_IV2;
 init_multiwaitbar_calc_stats
 	
-idSpecs = init_id_specifications(pc.idSpecs_path);
+idSpecs = init_id_specifications(Config.idSpecs_path);
 idSpecs = idSpecs(not(idSpecs.extra),:);
 idSpecs = idSpecs(not(idSpecs.contingency),:);
 idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
@@ -39,14 +39,15 @@ accVars = {...
 	'accA_x_NF','accA_y_NF','accA_z_NF'};
 hBands =  [1.10,2.9];
 isHarmBand = true;
-Pxx = make_power_spectra(Data.IV2, sequences, accVars, pc.fs, hBands, idSpecs, isHarmBand);
+Pxx = make_power_spectra(Data.IV2, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
 F = join(F, Pxx.bandMetrics, 'Keys',{'id','analysis_id'});
 
 % Make relative and delta differences from baselines using id tags
 % -----------------------------------------------------------
 
-F_rel = calc_relative_feats(F);
-F_del = calc_delta_diff_feats(F);
+nominalAsBaseline = true;
+F_rel = calc_relative_feats(F, nominalAsBaseline);
+F_del = calc_delta_diff_feats(F, nominalAsBaseline);
 
 Data.IV2.idSpecs = idSpecs;
 Data.IV2.Periodograms = Pxx;
@@ -154,10 +155,10 @@ Data.IV2.Feature_Statistics.ROC = ROC;
 Data.IV2.Feature_Statistics.AUC = AUC;
 
 %save_data('Periodograms', feats_path, Data.IV2.Periodograms, {'matlab'});
-save_data('Features', pc.feats_path, Data.IV2.Features, {'matlab'});
-save_data('Feature_Statistics', pc.stats_path, Data.IV2.Feature_Statistics, {'matlab'});
-save_features_as_separate_spreadsheets(Data.IV2.Features, pc.feats_path);
-save_statistics_as_separate_spreadsheets(Data.IV2.Feature_Statistics, pc.stats_path);
+save_data('Features', Config.feats_path, Data.IV2.Features, {'matlab'});
+save_data('Feature_Statistics', Config.stats_path, Data.IV2.Feature_Statistics, {'matlab'});
+save_features_as_separate_spreadsheets(Data.IV2.Features, Config.feats_path);
+save_statistics_as_separate_spreadsheets(Data.IV2.Feature_Statistics, Config.stats_path);
 
 multiWaitbar('CloseAll');
 clear save_data

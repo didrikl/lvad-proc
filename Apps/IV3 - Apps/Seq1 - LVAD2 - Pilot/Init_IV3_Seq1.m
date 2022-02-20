@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
 sequence = 'IV3_Seq1';
-pc.seq_subdir = ['IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot'];
+Config.seq_subdir = ['IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot'];
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -14,13 +14,13 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'IV3_Seq1 - F1_Sel1_ch1-5.mat'
     };
 driveline_fileNames = {
     };
-pc.notes_fileName = 'IV3_Seq1 - Notes ver3.10 - Rev1.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'IV3_Seq1 - Notes ver3.10 - Rev1.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2020_06_18__10_46_24.wrf'
     'ECM_2020_06_18__11_32_16.wrf'
 };
@@ -29,10 +29,10 @@ pc.ultrasound_fileNames = {
 %[read_path, save_path] = init_io_paths('Seq1 - LVAD2 - Pilot',basePath);
 read_path = 'C:\Data\IVS\Didrik\IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot\Recorded\';
 save_path = 'C:\Data\IVS\Didrik\IV3 - Chronic pump thrombosis formation\Seq1 - LVAD2 - Pilot\Processed';
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-driveline_filePaths = fullfile(basePath,pc.seq_subdir,driveline_subdir,driveline_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+driveline_filePaths = fullfile(basePath,Config.seq_subdir,driveline_subdir,driveline_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity

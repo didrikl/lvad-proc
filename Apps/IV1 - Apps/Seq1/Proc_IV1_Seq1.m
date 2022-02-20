@@ -19,12 +19,12 @@ init_matlab
 % User inputs
 lvad_signal_fileName = fullfile('Cardiaccs','Surface','monitor-20181207-154327.txt');
 lead_signal_fileName = fullfile('Cardiaccs','Teguar','monitor-20181207-153752.txt');
-pc.notes_fileName       = 'IV1 - Seq1 - Notes.xlsx';
+Config.notes_fileName       = 'IV1 - Seq1 - Notes.xlsx';
 powerlab_fileName    = fullfile('PowerLab','test.mat');
 ultrasound_fileName  = fullfile('M3','ECM_2019_06_28__15_58_28.wrf');
 
-pc.seq_subdir    = 'IV1_Seq1 - Thrombi injection into HVAD';
-[read_path, save_path] = init_io_paths(pc.seq_subdir);
+Config.seq_subdir    = 'IV1_Seq1 - Thrombi injection into HVAD';
+[read_path, save_path] = init_io_paths(Config.seq_subdir);
 notes_filePath = 'C:\Data\IVS\Didrik\IV1_Seq1 - Thrombi injection into HVAD\Noted\';
 
 % Initialization of Cardiaccs text files (incl. saving to binary .mat file)
@@ -39,7 +39,7 @@ notes_filePath = 'C:\Data\IVS\Didrik\IV1_Seq1 - Thrombi injection into HVAD\Note
 %powerlab_signals = init_powerlab_raw_matfile(powerlab_fileName,read_path);
 
 % Read experiment notes in Excel file template
-notes = init_notes_xlsfile(pc.notes_fileName,notes_filePath);
+notes = init_notes_xlsfile(Config.notes_fileName,notes_filePath);
 
 % Read meassured flow and emboli (volume and count) from M3 ultrasound
 %ultrasound = init_system_m_text_files(ultrasound_fileName,read_path);

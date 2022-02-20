@@ -1,3 +1,3 @@
-function filePath = init_notes_filepath(pc)
-	filePath = fullfile(pc.data_basePath, pc.seq_subdir, ...
-		pc.notes_subdir, pc.notes_fileName);
+function filePath = init_notes_filepath(Config)
+	filePath = fullfile(Config.data_basePath, Config.seq_subdir, ...
+		Config.notes_subdir, Config.notes_fileName);

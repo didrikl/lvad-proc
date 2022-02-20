@@ -1,5 +1,7 @@
-function G = make_group_stats(F,idSpecs)
+function G = make_group_stats(F, idSpecs, seqs)
     
+	if nargin>2, F = lookup_sequences(seqs, F); end
+
 	% Find and use only numeric colums
 	numIdSpecVars = idSpecs(:,vartype('numeric')).Properties.VariableNames;
 	F = F(:,not(ismember(F.Properties.VariableNames,numIdSpecVars)));
@@ -27,3 +29,4 @@ function G = make_group_stats(F,idSpecs)
 	G = structfun(@(S)change_variablename_prefix(S,prefixes,{'','','',''}),G,'UniformOutput',false);
     G = structfun(@(S)movevars(S,idSpecs.Properties.VariableNames,'Before',1),G,'UniformOutput',false);
     
+	

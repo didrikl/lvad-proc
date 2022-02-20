@@ -1,9 +1,9 @@
 %% Store data on disc and in memory
       
-welcome(['Save preprocessed sequences ',pc.seq],'module')
+welcome(['Save preprocessed sequences ',Config.seq],'module')
 
-save_s_parts(S_parts, pc.proc_path, pc.seq)
-save_s(S, pc.proc_path, pc.seq)
-save_notes(Notes, pc.proc_path, pc.seq)
-save_config(pc)
-Data = save_in_memory_struct(Data, pc, S, S_parts, Notes);
+save_s_parts(S_parts, Config.proc_path, Config.seq)
+save_s(S, Config.proc_path, Config.seq)
+save_notes(Notes, Config.proc_path, Config.seq)
+save_config(Config)
+Data = save_in_memory_struct(Data, Config, S, S_parts, Notes);

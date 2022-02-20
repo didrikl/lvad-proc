@@ -9,7 +9,6 @@ function PL = swap_channel_names(PL,channelsToswap,blocksForChannelSwap)
 		blocks = blocksForChannelSwap;
 	end
 	
-	
 	for i=blocks
 		
 		isEmpty = display_block_info(PL{i},i,numel(PL));

@@ -6,7 +6,7 @@ function make_spectrogram_figure_G1(S, supTit, var, rpm, fs, IDs1, IDs2)
 	overlapPst = 95;
 	yLim_map = [0.5,4.07];
 
-	figWidth = 1200;
+	figWidth = 1300;
 	figHeight =  785;
 	panelHeight = 250;
 	panelWidthFactor = 0.50;

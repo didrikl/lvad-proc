@@ -1,10 +1,10 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
 
 % This defines the relevant ids for analysis
-pc = get_processing_config_defaults_G1;
+Config =  get_processing_config_defaults_G1;
 init_multiwaitbar_calc_stats
 	
-idSpecs = init_id_specifications(pc.idSpecs_path);
+idSpecs = init_id_specifications(Config.idSpecs_path);
 idSpecs = idSpecs(not(idSpecs.extra),:);
 idSpecs = idSpecs(not(contains(string(idSpecs.analysis_id),{'E'})),:);
 idSpecs = idSpecs(not(contains(string(idSpecs.categoryLabel),{'Injection'})),:);
@@ -16,9 +16,11 @@ sequences = {
   	'Seq7'
   	'Seq8'
   	'Seq11'
+	%'Seq11_SwapYZ'
   	'Seq12'
   	'Seq13'
   	'Seq14'
+	%'Seq14_SwapYZ'
 	};
 
 % Make variable features of each intervention
@@ -29,30 +31,28 @@ discrVars = {
 	'P_LVAD'
 	'balDiam_xRay'
 	'balHeight_xRay'
-	'p_maxArt'
-    'p_minArt'
-    'MAP'             
-    'p_maxPulm'       
-    'p_minPulm'       
-    'HR'              
-    'CVP'             
-    'SvO2'
-	'graftEmboliVol'
-	%'CO_cont'         
-    %'CO_thermo'    
-	'CO'
+% 	'p_maxArt'
+%     'p_minArt'
+%     'MAP'             
+%     'p_maxPulm'       
+%     'p_minPulm'       
+%     'HR'              
+%     'CVP'             
+%     'SvO2'
+% 	'graftEmboliVol'
+% 	'CO'
     };
 
 meanVars = {
-    'accA_x_NF_HP'    % to get stddev
-	'accA_y_NF_HP'    % to get stddev
-	'accA_z_NF_HP'    % to get stddev
-	'accA_xynorm_NF_HP' % to get stddev
-    'accA_norm_NF_HP' % to get stddev
-    %'pGrad'           % Calculation to be revised      
-    'pGraft'          
-    'pMillar'
-    'Q'               
+   'arealObstr_xRay_pst' 
+   'accA_x_NF_HP'    % to get stddev
+   'accA_y_NF_HP'    % to get stddev
+   'accA_z_NF_HP'    % to get stddev
+%    'accA_norm_NF_HP' % to get stddev
+%    'pGrad'           % Calculation to be revised
+%    'pGraft'
+%    'pMillar'
+   'Q'
     };
 
 F = make_intervention_stats(Data.G1, sequences, discrVars, meanVars, {}, idSpecs);
@@ -65,20 +65,41 @@ accVars = {...'accA_x','accA_y','accA_z',...
 	'accA_x_NF_HP'
 	'accA_y_NF_HP'
 	'accA_z_NF_HP'
-	'accA_norm_NF_HP'
-	'accA_xynorm_NF_HP'
-	'accA_yznorm_NF_HP'
+	%'accA_norm_NF_HP'
 	};
-hBands =  [1.2,7;1.2,4.95];
+hBands = [
+	1.20, 7
+	1.20, 4.95
+	3.95, 4.05
+	];
 isHarmBand = true;
-Pxx = make_power_spectra(Data.G1, sequences, accVars, pc.fs, hBands, idSpecs, isHarmBand);
+Pxx = make_power_spectra(Data.G1, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
 F = join(F, Pxx.bandMetrics, 'Keys',{'analysis_id','id'});
 
-% Make relative and delta differences from baselines using id tags
+%% Make best axis data set
 % -----------------------------------------------------------
 
-F_rel = calc_relative_feats(F);
-F_del = calc_delta_diff_feats(F);
+sequences = {
+	'Seq3' % (pilot)
+ 	'Seq6'
+  	'Seq7'
+  	'Seq8'
+  	'Seq11'
+	'Seq12'
+  	'Seq13'
+  	'Seq14'
+	};
+vars = {'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'};
+newVar = 'accA_best_NF_HP_b2_pow';
+F = derive_best_axis_values(F, vars, newVar, sequences);
+
+
+%% Make relative and delta differences from baselines using id tags
+% -----------------------------------------------------------
+
+nominalAsBaseline = true;
+F_rel = calc_relative_feats(F, nominalAsBaseline);
+F_del = calc_delta_diff_feats(F, nominalAsBaseline);
 
 Data.G1.idSpecs = idSpecs;
 Data.G1.Periodograms = Pxx;
@@ -86,14 +107,51 @@ Data.G1.Features.Absolute = F;
 Data.G1.Features.Relative = F_rel;
 Data.G1.Features.Delta = F_del;
 
+
+%%
+
+% % Descriptive stastistics over group of experiments
+% % -----------------------------------------------------------
+% 
+% sequences = {
+% 	'Seq3' % (pilot)
+%  	'Seq6'
+%   	'Seq7'
+%   	'Seq8'
+%   	%'Seq11'
+% 	'Seq11_SwapYZ'
+%   	'Seq12'
+%   	'Seq13'
+%   	%'Seq14'
+% 	'Seq14_SwapYZ'
+% 	};
+% G_swap_yz = make_group_stats(F, idSpecs, sequences);
+% G_rel_swap_yz = make_group_stats(F_rel, idSpecs, sequences);
+% G_del_swap_yz = make_group_stats(F_del, idSpecs, sequences);
+% 
+% Data.G1.Feature_Statistics.Descriptive_Absolute_swap_yz = G_swap_yz;
+% Data.G1.Feature_Statistics.Descriptive_Relative_swap_yz = G_rel_swap_yz;
+% Data.G1.Feature_Statistics.Descriptive_Delta_swap_yz = G_del_swap_yz;
+
+
 %%
 
 % Descriptive stastistics over group of experiments
 % -----------------------------------------------------------
 
-G = make_group_stats(F, idSpecs);
-G_rel = make_group_stats(F_rel, idSpecs);
-G_del = make_group_stats(F_del, idSpecs);
+sequences = {
+	'Seq3' % (pilot)
+ 	'Seq6'
+  	'Seq7'
+  	'Seq8'
+  	'Seq11'
+	'Seq12'
+  	'Seq13'
+  	'Seq14'
+	};
+G = make_group_stats(F, idSpecs, sequences);
+G_rel = make_group_stats(F_rel, idSpecs, sequences);
+G_del = make_group_stats(F_del, idSpecs, sequences);
 
 Data.G1.Feature_Statistics.Descriptive_Absolute = G;
 Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
@@ -186,12 +244,13 @@ Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
 
 %save_data('Periodograms', feats_path, Data.G1.Periodograms, {'matlab'});
-save_data('Features', pc.feats_path, Data.G1.Features, {'matlab'});
-save_data('Statistics', pc.stats_path, Data.G1.Feature_Statistics, {'matlab'});
+save_data('Features', Config.feats_path, Data.G1.Features, {'matlab'});
+save_data('Statistics', Config.stats_path, Data.G1.Feature_Statistics, {'matlab'});
 save_features_as_separate_spreadsheets(Data.G1.Features, feats_path);
 save_statistics_as_separate_spreadsheets(Data.G1.Feature_Statistics, stats_path);
 
 multiWaitbar('CloseAll');
 clear save_data
 clear discrVars meanVars accVars hBands G G_rel G_del F F_rel F_del pVars ...
-	pooled classifiers predStateVar predStates ROC F_ROC F_ROC_SPSS AUC idSpecs
+	pooled classifiers predStateVar predStates ROC F_ROC F_ROC_SPSS AUC ...
+	idSpecs sequences isHarmBand

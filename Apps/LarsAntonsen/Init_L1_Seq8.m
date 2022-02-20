@@ -6,14 +6,14 @@ fs_new = 1000;
 
 % Which experiment
 data_basePath = 'D:\Data\IVS\Lars\L1 - Data';
-pc.seq_subdir = 'Seq8';
+Config.seq_subdir = 'Seq8';
 
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
 notes_subdir = 'Noted';
 
 % Files to use
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     
     'Pig8BaselineECMOStart [ECG,X].mat'
 	'Pig8BaselineECMOStart [Y].mat'
@@ -22,21 +22,21 @@ pc.labChart_fileNames = {
     'Pig8Flow [Y].mat'
     
 	};
-pc.notes_fileName = 'IV2_Seq19 - Notes IVS v1.0 - Rev4.xlsm';
+Config.notes_fileName = 'IV2_Seq19 - Notes IVS v1.0 - Rev4.xlsm';
 
 % Correction input
-pc.accChannelToSwap = {};
-pc.blocksForAccChannelSwap = [];
-pc.pChannelToSwap = {'p_eff','p_aff'};
-pc.pChannelSwapBlocks = [];
+Config.accChannelToSwap = {};
+Config.blocksForAccChannelSwap = [];
+Config.pChannelToSwap = {'p_eff','p_aff'};
+Config.pChannelSwapBlocks = [];
 
 
 %% Preprossesring
 % ----------------
 
 % Read PowerLab data in files exported from LabChart
-pl_filePaths = fullfile(data_basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-PL = init_labchart_mat_files(pl_filePaths,'',pc.labChart_varMapFile);
+pl_filePaths = fullfile(data_basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+PL = init_labchart_mat_files(pl_filePaths,'',Config.labChart_varMapFile);
 
 PL = resample_signal(PL, fs_new);
 

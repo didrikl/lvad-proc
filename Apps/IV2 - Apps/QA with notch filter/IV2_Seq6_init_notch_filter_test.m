@@ -2,8 +2,8 @@
 
 % Experiment sequence ID
 basePath = 'D:\Data\IVS\Didrik';
-pc.seq_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq6 - LVAD8';
-proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
+Config.seq_subdir = 'IV2 - In vitro pre-pump thrombosis simulation\Seq6 - LVAD8';
+proc_path = fullfile(basePath,Config.seq_subdir,'Processed');
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -11,7 +11,7 @@ ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'IV2_Seq6 - F1 [pEff,pAff].mat'
     'IV2_Seq6 - F1 [accA].mat'
     %'IV2_Seq6 - F1 [accB].mat'
@@ -43,17 +43,17 @@ pc.labChart_fileNames = {
     'IV2_Seq6 - F10 [accA].mat'
     %'IV2_Seq6 - F10 [accB].mat'
     };
-pc.notes_fileName = 'IV2_Seq6 - Notes IV2 v1.0 - Rev3.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'IV2_Seq6 - Notes IV2 v1.0 - Rev3.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2020_09_02__12_23_38.wrf'
     'ECM_2020_09_03__11_52_50.wrf'    
     };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -109,8 +109,8 @@ PL = add_spatial_norms(PL,2,{'accA_x','accA_y','accA_z'},'accA_norm');
 %PL = add_spatial_norms(PL,2,{'accB_x','accB_y','accB_z'},'accB_norm');
 
 interNoteInclSpec = 'nearest';
-pc.outsideNoteInclSpec = 'none';
-S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,pc.outsideNoteInclSpec);
+Config.outsideNoteInclSpec = 'none';
+S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,Config.outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 

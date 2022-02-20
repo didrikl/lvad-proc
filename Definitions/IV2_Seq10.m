@@ -1,7 +1,7 @@
             
 % Experiment sequence ID
-pc.seq = 'IV2_Seq10';
-pc.seq_subdir = 'Seq10 - LVAD9';
+Config.seq = 'IV2_Seq10';
+Config.seq_subdir = 'Seq10 - LVAD9';
 
 % Input directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -9,7 +9,7 @@ ultrasound_subdir = 'Recorded\SystemM';
 notes_subdir = 'Noted';
 
 % Files to use
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'IV2_Seq10 - F1 [pEff,pAff].mat'
     'IV2_Seq10 - F1 [accA].mat'
 %     'IV2_Seq10 - F1 [accB].mat'
@@ -53,18 +53,18 @@ pc.labChart_fileNames = {
     'IV2_Seq10 - F14 [accA].mat'
 %     'IV2_Seq10 - F14 [accB].mat'
     };
-pc.notes_fileName = 'IV2_Seq10 - Notes IV2 v1.0.0 - Rev4.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'IV2_Seq10 - Notes IV2 v1.0.0 - Rev4.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2020_09_03__16_20_48.wrf'
     'ECM_2020_09_04__10_34_31.wrf'
     };
 
 % Correction input
-pc.US_offsets = {};
-pc.US_drifts = {[],40.5};
-pc.accChannelToSwap = {};
-pc.blocksForAccChannelSwap = [];
-pc.pChannelToSwap = {};
-pc.pChannelSwapBlocks = [];
-pc.PL_offset = [];
-pc.PL_offset_files = {};
+Config.US_offsets = {};
+Config.US_drifts = {[],40.5};
+Config.accChannelToSwap = {};
+Config.blocksForAccChannelSwap = [];
+Config.pChannelToSwap = {};
+Config.pChannelSwapBlocks = [];
+Config.PL_offset = [];
+Config.PL_offset_files = {};

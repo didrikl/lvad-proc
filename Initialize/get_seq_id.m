@@ -1,3 +1,5 @@
 function seqID = get_seq_id(seq)
 	seq = split(seq,'_');
-	seqID = seq{end};
+	if numel(seq)>1
+		seqID = strjoin(seq(2:end),'_');
+	end

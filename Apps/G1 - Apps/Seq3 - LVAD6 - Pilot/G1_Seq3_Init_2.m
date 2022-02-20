@@ -3,7 +3,7 @@
 % Which experiment
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'Seq3 - LVAD6';
-pc.seq_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq3 - LVAD6 - Pilot';
+Config.seq_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq3 - LVAD6 - Pilot';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -12,7 +12,7 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'G1_Seq3 - F1 [accA].mat'
     'G1_Seq3 - F1 [accB].mat'
     'G1_Seq3 - F1 [pGraft].mat'
@@ -26,17 +26,17 @@ pc.labChart_fileNames = {
     'G1_Seq3 - F3_Sel2 [accB].mat'
     'G1_Seq3 - F3_Sel2 [pGraft].mat'
     };
-pc.notes_fileName = 'G1_Seq3 - Notes ver4.16 - Rev5.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'G1_Seq3 - Notes ver4.16 - Rev5.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2020_09_17__12_26_32.wrf'
     };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
-proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
+proc_path = fullfile(basePath,Config.seq_subdir,'Processed');
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -86,7 +86,7 @@ welcome('Preprocessing data','module')
 
 fs_new = 500;
 interNoteInclSpec = 'nearest';
-pc.outsideNoteInclSpec = 'nearest';
+Config.outsideNoteInclSpec = 'nearest';
 
 secsAhead = 50; % Just an estimate based on previous drifts
 US = adjust_for_linear_time_drift(US,secsAhead);
@@ -94,7 +94,7 @@ US = adjust_for_linear_time_drift(US,secsAhead);
 PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
-S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,pc.outsideNoteInclSpec);
+S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,Config.outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 

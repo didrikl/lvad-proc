@@ -6,7 +6,7 @@ welcome('Initializing data','module')
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
 sequence = 'Seq5 - LVAD12 - Pilot';
-pc.seq_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq5 - LVAD12';
+Config.seq_subdir = 'G1 - Simulated pre-pump and in situ thrombosis\Seq5 - LVAD12';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -15,24 +15,24 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'G1_Seq5 - F0.mat'
     'G1_Seq5 - F1_Sel1.mat'
     'G1_Seq5 - F1_Sel2.mat'
     'G1_Seq5 - F1_Sel3.mat'
     };
-pc.notes_fileName = 'G1_Seq5 - Notes ver4.13 - Rev2.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'G1_Seq5 - Notes ver4.13 - Rev2.xlsm';
+Config.ultrasound_fileNames = {
 %     'ECM_2020_10_15__11_20_40.wrf'
 %     'ECM_2020_10_15__11_34_55.wrf'
 };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
-proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
+proc_path = fullfile(basePath,Config.seq_subdir,'Processed');
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity

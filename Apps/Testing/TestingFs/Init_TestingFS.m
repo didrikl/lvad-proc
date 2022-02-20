@@ -13,17 +13,17 @@ init_matlab
 
 % Which experiment
 raw_basePath    = 'C:\Data\IVS\Didrik\Temp\recordingTesting';
-testFs_pc.notes_fileName = 'Noted\testFs - Notes ver3.5 - Rev1.xlsm';
-pc.labChart_fileNames = {
+testFs_Config.notes_fileName = 'Noted\testFs - Notes ver3.5 - Rev1.xlsm';
+Config.labChart_fileNames = {
     'testingFS - B1.mat' % 1000 Hz
     'testingFS - B2.mat' % 2000 Hz
     };
-pc.labChart_fileNames = fullfile('Recorded','PowerLab',pc.labChart_fileNames);
+Config.labChart_fileNames = fullfile('Recorded','PowerLab',Config.labChart_fileNames);
 
 testFs_sampleRate = 1000;
 
-testFs_PL = init_labchart_mat_files(pc.labChart_fileNames,raw_basePath);
-testFs_notes = init_notes_xlsfile_v3_2(testFs_pc.notes_fileName,raw_basePath);
+testFs_PL = init_labchart_mat_files(Config.labChart_fileNames,raw_basePath);
+testFs_notes = init_notes_xlsfile_v3_2(testFs_Config.notes_fileName,raw_basePath);
 
 %% Pre-processing of data from IV2_Seq1
 
@@ -38,15 +38,15 @@ IV2_Seq1_subdir    = 'IV2_Seq2 - Water simulated HVAD thrombosis - Pre-pump - Pi
 spectrum_subdir = 'Spectrum\Blocks';
 notes_subdir = 'Noted';
 
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'IV2_Seq2 - B1.mat'
      'IV2_Seq2 - B2.mat' 
       'IV2_Seq2 - B3.mat' 
       ...'IV2_Seq2 - B5.mat' 
       ...'IV2_Seq2 - B6.mat' 
     };
-IV2S1_pc.notes_fileName = 'IV2_Seq2 - Notes ver3.5 - Rev4.xlsm';
-IV2S1_pc.ultrasound_fileNames = {
+IV2S1_Config.notes_fileName = 'IV2_Seq2 - Notes ver3.5 - Rev4.xlsm';
+IV2S1_Config.ultrasound_fileNames = {
     'ECM_2020_01_08__11_06_21.wrf'
     'ECM_2020_01_09__16_14_36.wrf'
     'ECM_2020_01_09__17_05_19.wrf'
@@ -58,14 +58,14 @@ IV2S1_pc.ultrasound_fileNames = {
     };
 
 [raw_basePath, proc_basePath] = init_io_paths(IV2_Seq1_subdir);
-IV2S1_pc.ultrasound_fileNames  = fullfile(spectrum_subdir,IV2S1_pc.ultrasound_fileNames);
-pc.labChart_fileNames = fullfile('PowerLab',pc.labChart_fileNames);
-notes_filePath = fullfile(notes_subdir,IV2S1_pc.notes_fileName);
+IV2S1_Config.ultrasound_fileNames  = fullfile(spectrum_subdir,IV2S1_Config.ultrasound_fileNames);
+Config.labChart_fileNames = fullfile('PowerLab',Config.labChart_fileNames);
+notes_filePath = fullfile(notes_subdir,IV2S1_Config.notes_fileName);
 
 IV2S1_sampleRate = 1000;
 
-IV2S1_PL = init_labchart_mat_files(pc.labChart_fileNames,raw_basePath);
-IV2S1_US = init_system_m_text_files(IV2S1_pc.ultrasound_fileNames,raw_basePath);
+IV2S1_PL = init_labchart_mat_files(Config.labChart_fileNames,raw_basePath);
+IV2S1_US = init_system_m_text_files(IV2S1_Config.ultrasound_fileNames,raw_basePath);
 IV2S1_notes = init_notes_xlsfile_v3_2(notes_filePath);
 
 %% Pre-processing of data from IV2_Seq1
@@ -79,12 +79,12 @@ IV2S1_S_parts = split_into_parts(IV2S1_S, IV2S1_sampleRate);
 IV1S1_path = 'C:\Data\IVS\Didrik\IV1_Seq1 - Thrombi injection into HVAD';
 IV1S1_accA_fileName = 'Recorded\Cardiaccs\Surface\monitor-20181207-154327.txt';
 IV1S1_accB_fileName = 'Recorded\Cardiaccs\Teguar\monitor-20181207-153752.txt';
-IV1S1_pc.notes_fileName = 'Noted\IV1 - Seq1 - Notes.xlsx';
+IV1S1_Config.notes_fileName = 'Noted\IV1 - Seq1 - Notes.xlsx';
 accVarName = 'accA';
 
 IV1S1_accA = init_cardiaccs_raw_txtfile(IV1S1_accA_fileName,IV1S1_path,'accA');
 IV1S1_accB = init_cardiaccs_raw_txtfile(IV1S1_accB_fileName,IV1S1_path,'accA');
-IV1_Seq1_notes = init_notes_xlsfile(IV1S1_pc.notes_fileName,IV1S1_path);
+IV1_Seq1_notes = init_notes_xlsfile(IV1S1_Config.notes_fileName,IV1S1_path);
 
 
 %%  Pre-processing of data from IV1_Seq1

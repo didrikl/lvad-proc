@@ -1,5 +1,5 @@
 function init_multiwaitbar_preproc(i, nSeqs, seq)
-	%multiWaitbar('CloseAll');
+	multiWaitbar('CloseAll');
 	Colors_For_Processing
 	[~, hWait] = multiWaitbar('Sequences', (i-1)/nSeqs, 'Color',ColorsProcessing.Orange);
 	hWait.Name = ['Sequences, ',seq];

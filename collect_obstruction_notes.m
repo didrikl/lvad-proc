@@ -1,84 +1,227 @@
-pc = get_processing_config_defaults_G1;
+close all
+Config =  get_processing_config_defaults_G1;
 
 inputs = {
 	'Seq3' % (pilot)
-  	'Seq6'
-  	'Seq7'
-  	'Seq8'
-  	'Seq11'
-  	'Seq12'
-  	'Seq13'
-  	'Seq14'
+	'Seq6'
+	'Seq7'
+	'Seq8'
+	'Seq11'
+	%'Seq11_SwapYZ'
+	'Seq12'
+	'Seq13'
+	'Seq14'
+	%'Seq14_SwapYZ'
 	};
-xLab = 'balloon diameter (mm)\newlineareal obstruction';
+xLab = 'diameter and areal obstruction';
+yLab = 'experiments';% and pump speed (RPM)';
+xlims = [2,12.7];
+speeds = [2200,2400,2600];
+cLim = [-70,-35];
+%cLim = [];
+T = F;
+vars = {
+   'accA_best_NF_HP_b2_pow',   'NHA (dB)'
+%   'accA_x_NF_HP_b2_pow',     'NHA_{\itx\rm} (dB)'
+%	'accA_y_NF_HP_b2_pow',     'NHA_{\ity\rm} (dB)'
+%   'accA_z_NF_HP_b2_pow',     'NHA_{\itz\rm} (dB)'
+%  	'accA_yznorm_NF_HP_b2_pow','NHA_{\it|yz|\rm} (dB)'
+%  	'accA_norm_NF_HP_b2_pow',  'NHA_{\it|xyz|\rm} (dB)'
+% 	'Q_mean',                  '\itQ\rm (L/min)'
+%  	'Q_LVAD_mean',             '\itP\rm_{LVAD} (W)'
+%  	'P_LVAD_mean',             '\itP\rm_{LVAD} (W)'
+% 	'pGraft_mean',             '\itp\rm_{graft} (mmHg)'
+% 	'SvO2_mean'                'SVO_2 (%)'
+% 	'p_minArt_mean'            '\itp\rm_{art,min} (mmHg)'
+% 	'p_maxArt_mean'            '\itp\rm_{art,max} (mmHg)'
+% 	'CO_mean'                  'CO (L/min)'
+% 	'CVP_mean'                 'CVP (mmHg)'
+	};
 
-levLims = pc.levLims;
 
-close all
-seqList = {};
-balLev = [];
-balDiam = [];
-arealObstr_pst = [];
-nha = [];
-speeds = [2400,2200,2600];
-speeds = pc.speeds;
+% T = F_del;
+% vars = {
+% % 	'Q_mean',                 '\itQ\rm (L/min)'
+%  	'Q_LVAD_mean',            '\itP\rm_{LVAD} (L/min)'
+% % 	'P_LVAD_mean',            '\itP\rm_{LVAD} (W)'
+% % 	'MAP_mean'                'MAP (mmHg)'
+% % 	'p_minArt_mean'           '\itp\rm_{art,min} (mmHg)'
+% % 	'p_maxArt_mean'           '\itp\rm_{art,max} (mmHg)'
+% % 	'CO_mean'                 'CO (L/min)'
+% % 	'CVP_mean'                'CVP (mmHg)'
+% %	'SvO2_mean'               'SVO_2 (%)'
+% % 	'accA_x_NF_HP_b2_pow',    'NHA_{\itx\rm} (dB)'
+% % 	'accA_y_NF_HP_b2_pow',    'NHA_{\ity\rm} (dB)'
+% % 	'accA_z_NF_HP_b2_pow',    'NHA_{\itz\rm} (dB)'
+% 	'accA_yznorm_NF_HP_b2_pow', 'NHA_{\it|yz|\rm} (dB)'
+% 	'accA_norm_NF_HP_b2_pow', 'NHA_{\it|xyz|\rm} (dB)'
+% %	'pGraft_mean',            '\itp\rm_{eff} (mmHg)'
+% 	};
 
-for i=1:numel(inputs)
-	for j=1:numel(pc.speeds)
-	
-		F2 = F(F.pumpSpeed==speeds(j) & F.balLev~='-' & F.seq==inputs{i},:);
-		F2 = add_revised_balloon_levels(F2, levLims);
+T = lookup_plot_data(speeds, inputs, T, Config.levLims);
 
-		seqID = [inputs{i}(1:3),sprintf('%02d',str2double(inputs{i}(4:end)))];
-		ID = [seqID,' ',num2str(speeds(j))];
-		seqList = [seqList;cellstr(repmat(ID,height(F2),1))];
-		balLev = [balLev;F2.balLev_xRay];
-		balDiam = [balDiam;F2.balDiam_xRay_mean];
-		arealObstr_pst = [arealObstr_pst;F2.arealObstr_pst];
-		nha = [nha;F2.accA_x_NF_HP_b2_pow];
+h_fig = gobjects(size(vars,2)+2,1);
+
+% for i=1:size(vars,1)
+% 	h_fig(i) = plot_heat_map(T, vars{i,1}, vars{i,2}, xlims, xLab, yLab, Config);
+% 	if not(isnan(cLim)), caxis(cLim); end
+% end
+
+h_fig(end-1) = plot_balloon_levels(T, 'balDiam_xRay_mean', xlims, xLab, yLab, Config);
+%h_fig(end) = plot_balloon_levels(T, 'balHeight_xRay_mean', xlims, xLab, yLab, Config);
+
+% save_path = fullfile(Config.fig_path,'Heatmaps');
+% for i=1:numel(h_fig)-2, save_figure(h_fig(i), save_path, vars{i,1}, 300); end
+% save_figure(h_fig(end-1), save_path, 'Balloon levels - Diameter', 300)
+% save_figure(h_fig(end), save_path, 'Balloon levels - Height', 300)
+
+
+function h_fig = plot_balloon_levels(T, var, xlims, xLab, yLab, Config)
+	h_fig = figure('Position',[100,100,1000,800]);
+	h_ax = init_axes;
+	for i=1:numel(Config.levLims)
+		inds = T.balLev_xRay==i;
+		scatter(T.(var)(inds),T.seqList(inds),40,'filled','o');
 	end
+	make_plot_adjustments(h_ax, xlims, xLab, yLab, Config);
 end
 
-seqList = strrep(seqList,' ',', ');
-seqList = strrep(seqList,'Seq','E ');
-seqList = categorical(seqList);
+function h_fig = plot_heat_map(T, plotVar, colMapLab, xlims, xLab, yLab, Config)
+	h_fig = figure('Position',[100,100,1100,800]);
+	h_ax = init_axes;
+	load('ScientificColormaps')
+	
+	T.(plotVar)(T.balLev=='1') = T.bestAxisBL(T.balLev=='1');
+	ax = unique(T.bestAxis);
+	axMarker = {'square','o','pentagram'};
+	for i=1:numel(ax)
+		inds = ismember(T.bestAxis,ax{i});
+		h_s(i) = scatter(T.balDiam_xRay_mean(inds), T.seqList(inds),...
+			375, T.(plotVar)(inds), 'filled', axMarker{i});
+	end
+	legend(h_s,{'x','y','z'})
+	colMap = scientificColormaps.batlow50;
+	% colMap = flip(scientificColormaps.roma);
+	% colMap = scientificColormaps.hawaii25;
+	% colMap = scientificColormaps.lapaz50;
+	colormap(colMap);
+	colorbar(h_ax,...
+		'Position',[0.92 0.20 0.02 0.11],...
+		'TickLength',0.03,...
+		'LineWidth',1,...
+		'FontSize',15,...
+		'FontName','Arial',...
+		'Box','off');
+	
+	annotation('textbox',[0.91 0.335 0.0971 0.0643],...
+		'FitBoxToText','off',...
+		'EdgeColor','none',...
+		'FontSize',15,...
+		'FontName','Arial',...
+		'String',colMapLab);
 
-for i=1:numel(levLims)
-	inds = balLev==i;
-	%scatter(balDiam(inds),seqList(inds),80,'filled','square');
-	scatter(balDiam(inds),seqList(inds),35,'filled','o');
-	hold on
+	make_plot_adjustments(h_ax, xlims, xLab, yLab, Config);
 end
 
-xlim([7.3,12.7])
-xticks(levLims)
-xline(levLims(2:end),'LineStyle',':','Alpha',0.45,'LineWidth',1)
-yline(0.5:3:27,'LineStyle',':','Alpha',0.4,'LineWidth',1)
-
-xlabel(xLab)
-
-h_ax = gca;
-obstr_diam = string(compose('%2.1f',string(h_ax.XTick)))';
-obstr_pst = "\newline"+string(num2str(100*(h_ax.XTick'.^2)/(pc.inletInnerDiamLVAD^2),2.0))+"%";
-if h_ax.XTick(end) == pc.inletInnerDiamLVAD
-	obstr_pst(end) = '\newline100%';
-end
-h_ax.XTickLabel = obstr_diam+obstr_pst;
-text(17,1.7,'air in balloon')
-
-createtextarrow(gcf);
-
-function createtextarrow(figure1)
-	% Create textarrow
-	annotation(figure1,'textarrow',[0.928583144383317 0.903209038983175],...
-		[0.661306532663318 0.661306532663318],'String','Air in balloon','LineWidth',2,...
-		'HeadWidth',12,...
-		'HeadStyle','plain',...
-		'HeadLength',12,...
-		'FontSize',16,...
-		'FontName','Arial Narrow');
+function seqList = change_seq_list_to_ylabel(seqList)
+	seqList = strrep(seqList,'Seq12 2400','Seq12 2400*');
+	seqList = strrep(seqList,' ','  ');
+	seqList = strrep(seqList,'Seq','# ');
+	seqList = categorical(seqList);
 end
 
+function h_ax = init_axes
+	h_ax = axes(...
+		'NextPlot','add',...
+		'Clipping','off');
+	h_ax.LineWidth = 1.5;
+	h_ax.FontSize = 15;
+	h_ax.Position(1) = 0.155;
+	h_ax.Position(2) = 0.15;
+	h_ax.Position(3) = 0.72;
+	h_ax.Position(4) = 0.80;
+end
 
+function add_grid_lines(levLims, xlims)
+	xline(levLims,...
+		'LineStyle',':',...
+		'Alpha',0.5,...
+		'LineWidth',1.1,...
+		'HandleVisibility','off')
+	plot([xlims(1)-1,xlims(2)],repmat(3.5:3:24,2,1),...
+		'Color',[0 0 0 0.5],...
+		'LineStyle',':',...
+		'Clipping','off',...
+		'LineWidth',1.1,...
+		'HandleVisibility','off')
+end
 
+function h_ax = customize_axis(levLims, h_ax, Config)
+	xticks(levLims)
+	obstr_diam = string(compose('%3.1f',string(h_ax.XTick)))';
+	obstr_pst = strtrim(string(num2str(100*(h_ax.XTick'.^2)/(Config.inletInnerDiamLVAD^2),2.0)));
+	obstr_pst = "\newline"+""+compose('%3s',obstr_pst);
+	if h_ax.XTick(end) == Config.inletInnerDiamLVAD
+		obstr_pst(end) = '\newline100';
+	end
+	h_ax.XTickLabel = obstr_diam+obstr_pst;
 
+	h_ax.YTickLabel(contains(h_ax.YTickLabel,'2600')) = {'2600'};
+	h_ax.YTickLabel(contains(h_ax.YTickLabel,'2200')) = {'2200'};
+end
+
+function add_axis_labels(xLab, yLab, specs)
+	hXLab = xlabel(xLab,specs.supXLab{:});
+	hXLab.Position(2) = hXLab.Position(2)-36;
+	hYLab = ylabel(yLab,specs.supXLab{:});
+	hYLab.Position(1) = hYLab.Position(1)-5;
+end
+
+function T2 = lookup_plot_data(speeds, inputs, T1, levLims)
+	T2 = table;
+	seqList = {};
+	for j=1:numel(speeds)
+		for i=1:numel(inputs)
+			
+			F2 = T1(T1.pumpSpeed==speeds(j) & T1.balLev~='-' & T1.seq==inputs{i},:);
+			F2 = add_revised_balloon_levels(F2, levLims);
+			T2 = merge_table_blocks(T2,F2);
+			
+			inputs_i = split(inputs{i},'_');
+			seqID = [inputs_i{1}(1:3),sprintf('%02d',str2double(inputs_i{1}(4:end)))];
+			ID = [seqID,' ',num2str(speeds(j))];
+			seqList = [seqList;cellstr(repmat(ID,height(F2),1))];
+			
+		end
+	end
+	T2.seqList = change_seq_list_to_ylabel(seqList);
+	
+	nhaVars = contains(T2.Properties.VariableNames,'acc');
+	T2{:,nhaVars}=db(T2{:,nhaVars});
+end
+
+function add_annotations
+	% remark down in the corner (to be removed later?)
+	annotation('textbox',[0.030 0.0492 0.136 0.033],...
+		'String','*air in balloon',...
+		'FontSize',12,...
+		'EdgeColor','none');
+	
+	% extra labels to the two axis units
+	annotation('textbox',[0.921 0.053125 0.0582900000000002 0.090875],...
+		'String',{'(mm)','(%)'},...
+		'FontSize',15,...
+		'FontName','Arial',...
+		'FitBoxToText','off',...
+		'EdgeColor','none');
+end
+
+function h_ax = make_plot_adjustments(h_ax, xlims, xLab, yLab, Config)
+	specs = get_plot_specs;
+	levLims = Config.levLims;
+	xlim(xlims)
+	add_grid_lines(levLims, xlims);
+	add_axis_labels(xLab, yLab, specs);
+	h_ax = customize_axis(levLims, h_ax, Config);
+	add_annotations;
+end

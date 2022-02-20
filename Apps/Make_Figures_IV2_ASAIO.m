@@ -1,4 +1,4 @@
-pc = get_processing_config_defaults_IV2;
+Config =  get_processing_config_defaults_IV2;
 
 %% Spectrograms 
 % [2x2] panels, controls to the left and balloon interventions to the right
@@ -33,7 +33,7 @@ IDs1 = {
 		};
 	
 close all; home
-make_spectrogram_figure_IV2(S, tit, var, rpm, pc.fs, IDs1, IDs2);
+make_spectrogram_figure_IV2(S, tit, var, rpm, Config.fs, IDs1, IDs2);
 
 clear tit S var rpm
 

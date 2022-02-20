@@ -9,6 +9,7 @@ function Data = load_processed_sequences(seqNames, seqFilePaths)
 	Data = load_data(Data,'S',seqFilePaths,seqNames);
 	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
 	Data = load_data(Data,'Notes',seqFilePaths,seqNames);
+	Data = load_data(Data,'Config',seqFilePaths,seqNames);
 	multiWaitbar('CloseAll');
 
 function Data = load_data(Data,dataType,seqFilePaths,seqNames)

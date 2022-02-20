@@ -1,6 +1,6 @@
 % Load previously preprocessed and stored data
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Environment.m')
-pc = get_processing_config_defaults_G1;
+Config =  get_processing_config_defaults_G1;
 	
 sequences = {
     'G1_Seq3', 'Seq3 - LVAD6 - Pilot\Processed'
@@ -13,10 +13,10 @@ sequences = {
  	'G1_Seq14','Seq14 - LVAD9\Processed'
  	};
 Data.G1 = load_processed_sequences(sequences(:,1),...
-    fullfile(pc.data_basePath,sequences(:,2),sequences(:,1)));
+    fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)));
 
-[Data.G1, F, F_rel, F_del] = load_processed_features(pc, Data.G1);
-Data.G1 = load_processed_statistics(pc, Data.G1);
-%Data.G1 = load_config(pc, Data.G1);
+[Data.G1, F, F_rel, F_del] = load_processed_features(Config, Data.G1);
+Data.G1 = load_processed_statistics(Config, Data.G1);
+%Data.G1 = load_config(Config, Data.G1);
 
 clear sequences pc

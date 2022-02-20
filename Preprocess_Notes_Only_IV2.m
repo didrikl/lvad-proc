@@ -15,15 +15,15 @@ inputs = {
 
 % Do separate initialization parts
 for i=1:numel(inputs)
-	pc = get_processing_config_defaults_IV2;
+	Config =  get_processing_config_defaults_IV2;
 	eval(inputs{i});
-	idSpecs = init_id_specifications(pc.idSpecs_path);
-	pc.notes_filePath = init_notes_filepath(pc);
+	idSpecs = init_id_specifications(Config.idSpecs_path);
+	Config.notes_filePath = init_notes_filepath(Config);
 
-	Notes = init_notes_xls(pc.notes_filePath, '', pc.notes_varMapFile);
-	Notes = qc_notes_IV2(Notes, idSpecs, pc.askToReInit);
+	Notes = init_notes_xls(Config.notes_filePath, '', Config.notes_varMapFile);
+	Notes = qc_notes_IV2(Notes, idSpecs, Config.askToReInit);
 
-	Data = save_preprocessed_notes_only(pc, Notes, Data);
+	Data = save_preprocessed_notes_only(Config, Notes, Data);
 	Preprocess_Roundup;
 end
 

@@ -1,13 +1,13 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-pc.seq = 'G1_Seq11';
+Config.seq = 'G1_Seq11';
 
 % Folder in base path
-pc.seq_subdir = 'Seq11 - LVAD13';
+Config.seq_subdir = 'Seq11 - LVAD13';
 
 % Which files to input from input directory
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     
     % RPM interventions + baseline (incl startup and stablizing)
     'G1_Seq11 - F1_Sel1 [accA].mat'      
@@ -53,17 +53,17 @@ pc.labChart_fileNames = {
      %'G1_Seq11 - F9 [I1,I2,I3].mat'
     
     }; 
-pc.notes_fileName = 'G1_Seq11 - Notes G1 v1.0.0 - Rev6.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'G1_Seq11 - Notes G1 v1.0.0 - Rev6.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2020_12_10__11_07_03.wrf'
 };
 
 % Correction input
-pc.US_offsets = {};
-pc.US_drifts = {50}; % times 2???
-pc.accChannelToSwap = {};
-pc.blocksForAccChannelSwap = [];
-pc.pChannelToSwap = {};
-pc.pChannelSwapBlocks = [];
-pc.PL_offset = [];
-pc.PL_offset_files = {};
+Config.US_offsets = {};
+Config.US_drifts = {50}; % times 2???
+Config.accChannelToSwap = {};
+Config.blocksForAccChannelSwap = [];
+Config.pChannelToSwap = {};
+Config.pChannelSwapBlocks = [];
+Config.PL_offset = [];
+Config.PL_offset_files = {};

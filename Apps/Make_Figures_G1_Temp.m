@@ -1,4 +1,4 @@
-pc = get_processing_config_defaults_G1;
+Config =  get_processing_config_defaults_G1;
 import Figures_Article2.*
 
 %% Spectrograms 
@@ -6,7 +6,7 @@ import Figures_Article2.*
 % Figure 3 in submission for ASAIO
 
 tit = 'Spectrogram';
-S = Data.G1.Seq3.S;
+S = Data.G1.Seq13.S;
 var = 'accA_y_NF_HP';
 rpm = 2400;
 
@@ -26,8 +26,8 @@ IDs2 = {
 	'3.0 #2'
 	};
 
-	close all
-	make_spectrogram_figure_G1(S, tit, var, rpm, pc.fs, IDs1, IDs2);
+	%close all
+	make_spectrogram_figure_G1(S, tit, var, rpm, Config.fs, IDs1, IDs2);
 
 clear tit s var rpm
 
@@ -37,8 +37,56 @@ clear tit s var rpm
 % Figure 5 in submission for ASAIO
 
 nhaVars = {
+     'accA_best_NF_HP_b2_pow', [0,0.015]
+     'accA_y_NF_HP_b2_pow',[0, 0.008]
+     %'accA_y_NF_stdev',[]
+     %'p_eff_mean',[55,100]
+	 %'pGrad_mean',[]
+	 %'Q_LVAD_mean',[0 8]
+ };
+levelLabels = {
+	'Balloon','balloon'
+	};
+
+xLims = [2,12.5];
+xLims = [0,12.7];
+tit = 'Pendulating Mass in Inlet Conduit';
+xLab = 'Areal inflow obstruction (%)';
+
+%home; close all
+sequences = {
+	'Seq3' % (pilot)
+ 	'Seq6'
+  	'Seq7'
+  	'Seq8'
+  	'Seq11'
+	'Seq12'
+  	'Seq13'
+  	'Seq14'
+	};
+F2 = lookup_sequences(sequences, F);
+plot_nha_power_and_flow_per_intervention_G1(...
+	F2,...
+	Data.G1.Feature_Statistics.Descriptive_Absolute.med, ...
+	[], ...
+	nhaVars, levelLabels, ...
+	'balDiam', ...
+	xLims, xLab, tit, 'effect');
+
+clear nhaVars levelLabels xLims xLab tit
+
+%%
+
+%% NHA, Q and P, per catheter type
+% Pendulating Mass in Inlet Conduit
+% 3 X [nLevels] panels
+% Figure 5 in submission for ASAIO
+
+nhaVars = {
      %'accA_x_NF_b1_pow',[0,0.008]
-     'accA_norm_NF_HP_b2_pow',[0, 0.008]
+     %'accA_y_NF_HP_b2_pow',[0, 0.008]
+     'accA_y_NF_HP_b2_pow',[0, 0.008]
+     %'accA_z_NF_HP_b2_pow',[0, 0.008]
      %'accA_norm_NF_HP_b2_pow',[0, 0.008]
      %'accA_z_NF_b1_pow',[0,0.008]
  	 %'accA_y_NF_stdev',[]
@@ -47,7 +95,8 @@ nhaVars = {
 	 %'Q_LVAD_mean',[0 8]
  };
 levelLabels = {
-	'flated','balloon'
+	'Afterload', 'Outflow clamp'
+	'Preload',   'Inflow clamp'
 	};
 
 xLims = [2,12.5];
@@ -56,12 +105,31 @@ tit = 'Pendulating Mass in Inlet Conduit';
 xLab = 'Areal inflow obstruction (%)';
 
 %home; close all
-plot_nha_power_and_flow_per_intervention_G1(F,...
-	G.med, ...
+sequences = {
+	'Seq3' % (pilot)
+ 	'Seq6'
+  	'Seq7'
+  	'Seq8'
+  	%'Seq11'
+	'Seq11_SwapYZ'
+  	'Seq12'
+  	'Seq13'
+  	%'Seq14'
+	'Seq14_SwapYZ'
+	};
+F2 = lookup_sequences(sequences, F);
+plot_nha_power_and_flow_per_intervention_G1(...
+	F2,...
+	Data.G1.Feature_Statistics.Descriptive_Absolute.med, ...
+	...Data.G1.Feature_Statistics.Descriptive_Absolute_swap_yz.med, ...
 	[], ...
-	nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, tit, 'effect');
+	nhaVars, levelLabels, ...
+	'QRedTarget_pst', ...
+	...'arealObstr_xRay_pst_mean', ...
+	xLims, xLab, tit, 'control');
 
 clear nhaVars levelLabels xLims xLab tit
+
 
 %% NHA, Q and P for afterload and prelod side by side 
 % Control intervention

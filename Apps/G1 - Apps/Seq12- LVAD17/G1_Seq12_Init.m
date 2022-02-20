@@ -7,7 +7,7 @@ welcome('Initializing user-input','module')
 % Which experiment
 basePath = 'D:\Data\IVS\Didrik';
 sequence = 'Seq12 - LVAD13';
-pc.seq_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq12 - LVAD17';
+Config.seq_subdir = 'G1 - In vivo pre-pump thrombosis simulation\Seq12 - LVAD17';
 
 % Directory structure
 powerlab_subdir = 'Recorded\PowerLab';
@@ -16,7 +16,7 @@ notes_subdir = 'Noted';
 
 % Which files to input from input directory
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
     'G1_Seq12 - F1 [accA].mat'
     'G1_Seq12 - F1 [accB].mat'
     'G1_Seq12 - F1 [pGraft,ECG,pLV].mat'
@@ -43,17 +43,17 @@ pc.labChart_fileNames = {
     'G1_Seq12 - F5 [V1,V2,V3].mat'
     'G1_Seq12 - F5 [I1,I2,I3].mat'
     };
-pc.notes_fileName = 'G1_Seq12 - Notes ver4.16 - Rev6.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'G1_Seq12 - Notes ver4.16 - Rev6.xlsm';
+Config.ultrasound_fileNames = {
     'ECM_2021_01_07__12_08_22.wrf'
     };
 
 % Add subdir specification to filename lists
 %[read_path, save_path] = init_io_paths(sequence,basePath);
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
-proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
+proc_path = fullfile(basePath,Config.seq_subdir,'Processed');
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Target fs  Type        Continuity
@@ -110,7 +110,7 @@ welcome('Preprocessing data','module')
 
 fs_new = 500;
 interNoteInclSpec = 'nearest';
-pc.outsideNoteInclSpec = 'nearest';
+Config.outsideNoteInclSpec = 'nearest';
 
 secsAhead = 52;
 US = adjust_for_linear_time_drift(US,secsAhead);
@@ -118,7 +118,7 @@ US = adjust_for_linear_time_drift(US,secsAhead);
 %PL = resample_signal(PL, fs_new);
 
 % S = fuse_data_parfor(notes,PL,US);
-S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,pc.outsideNoteInclSpec);
+S = fuse_data(notes,PL,US,fs_new,interNoteInclSpec,Config.outsideNoteInclSpec);
 
 S_parts = split_into_parts(S,fs_new);
 

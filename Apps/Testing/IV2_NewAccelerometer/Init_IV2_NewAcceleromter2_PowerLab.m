@@ -2,7 +2,7 @@
 
 % Which experiment
 basePath = 'C:\Data\IVS\Didrik';
-pc.seq_subdir = ['IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer2'];
+Config.seq_subdir = ['IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer2'];
 % TODO: look up all subdirs that contains the sequence in the dirname. 
 
 % Directory structure
@@ -15,7 +15,7 @@ cb_lvad_subdir = 'Recorded\Cardibox - LVAD';
 
 % Which files to input from input directory 
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames = {
+Config.labChart_fileNames = {
 %      'IV2_NewAccelerometer2_PowerLab - F1.mat'
 %      'IV2_NewAccelerometer2_PowerLab - F2.mat'
 %      'IV2_NewAccelerometer2_PowerLab - F3_Sel1.mat'
@@ -26,8 +26,8 @@ pc.labChart_fileNames = {
      'IV2_NewAccelerometer2_PowerLab - F6.mat'
      'IV2_NewAccelerometer2_PowerLab - F7.mat'
     };
-pc.notes_fileName = 'IV2_NewAccelerometer2 - Notes ver3.10 - Rev1.xlsm';
-pc.ultrasound_fileNames = {
+Config.notes_fileName = 'IV2_NewAccelerometer2 - Notes ver3.10 - Rev1.xlsm';
+Config.ultrasound_fileNames = {
 %    'ECM_2020_08_13__13_58_56.wrf'
 %    'ECM_2020_08_14__15_17_16.wrf'
     'ECM_2020_08_17__12_01_46.wrf'
@@ -45,11 +45,11 @@ cb_lvad_fileNames = {
 % Add subdir specification to filename lists
 read_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer2\Recorded';
 save_path = 'C:\Data\IVS\Didrik\IV2 - Simulated pre-pump thrombosis in 5pst glucose\Testing\NewAccelerometer2\Processed';
-ultrasound_filePaths  = fullfile(basePath,pc.seq_subdir,ultrasound_subdir,pc.ultrasound_fileNames);
-powerlab_filePaths = fullfile(basePath,pc.seq_subdir,powerlab_subdir,pc.labChart_fileNames);
-notes_filePath = fullfile(basePath, pc.seq_subdir,notes_subdir,pc.notes_fileName);
-cb_driveline_filePaths = fullfile(basePath,pc.seq_subdir,cb_driveline_subdir,cb_driveline_fileNames);
-cb_lvad_filePaths = fullfile(basePath,pc.seq_subdir,cb_lvad_subdir,cb_lvad_fileNames);
+ultrasound_filePaths  = fullfile(basePath,Config.seq_subdir,ultrasound_subdir,Config.ultrasound_fileNames);
+powerlab_filePaths = fullfile(basePath,Config.seq_subdir,powerlab_subdir,Config.labChart_fileNames);
+notes_filePath = fullfile(basePath, Config.seq_subdir,notes_subdir,Config.notes_fileName);
+cb_driveline_filePaths = fullfile(basePath,Config.seq_subdir,cb_driveline_subdir,cb_driveline_fileNames);
+cb_lvad_filePaths = fullfile(basePath,Config.seq_subdir,cb_lvad_subdir,cb_lvad_fileNames);
 
 powerlab_variable_map = {
     % LabChart name  Matlab name  Max frequency  Type        Continuity

@@ -60,6 +60,10 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 			'mean',discrVars,...
 			'IncludeEmptyGroups',false);
 
+		idStatsNoteRow = groupsummary(S,{'analysis_id','bl_id'},...
+			@(x)listNoteRows(x),'noteRow',...
+			'IncludeEmptyGroups',false);
+
 		% Code example (for idStats_meas only) to include missing-rows:
 		%{
         S_analysis.(seq).group_id = categorical(...
@@ -77,6 +81,7 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 		% Joining the aggregats per sequence into one tables
 		T{j} = join(idStatsMeans,idStatsDiscr,'Keys',{'analysis_id','bl_id'});
 		T{j} = join(T{j},idStatsMedians,'Keys',{'analysis_id','bl_id'});
+		T{j} = join(T{j},idStatsNoteRow,'Keys',{'analysis_id','bl_id'});
 
 		% Adding unique categorical info for every intervention and sequence
 		T{j} = join(T{j},idSpecs,"Keys","analysis_id");
@@ -106,6 +111,7 @@ function S = remove_rows_with_irrelevant_analysis_id(S, idSpecs)
 
 function stats = tidy_up_aggregate_variable_names(stats)
 	% Tidy up names
+	stats.Properties.VariableNames{'fun1_noteRow'} = 'noteRow';
 	q1q3_vars = startsWith(stats.Properties.VariableNames,"fun1_");
 	q1q3_vars = stats.Properties.VariableNames(q1q3_vars);
 	for i=1:numel(q1q3_vars)
@@ -119,7 +125,7 @@ function stats = tidy_up_aggregate_variable_names(stats)
 function stats = tidy_up_row_and_column_positions(stats)
 	% Tidy up row and column positions
 	catCols = ismember(stats.Properties.VariableNames,...
-		{'id','analysis_id','bl_id','seq','idLabel',...
+		{'id','analysis_id','bl_id','seq','noteRow','idLabel',...
 		'categoryLabel','levelLabel','interventionType','contingency','duration',...
 		'pumpSpeed','catheter','balLev','balDiam','balVol','QRedTarget_pst'});
 	stats = movevars(stats,catCols,'Before',1);
@@ -136,3 +142,5 @@ function stats = remove_round_off_errors_in_discrete_vars(stats, discrVars)
 	% Important to avoid round off errors when testing median effects
 	stats{:,discrVars+"_mean"} = round(stats{:,discrVars+"_mean"},2);
 
+function noteRowList = listNoteRows(noteRow)
+	noteRowList = {unique(noteRow)'};

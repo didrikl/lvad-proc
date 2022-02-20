@@ -6,14 +6,14 @@ welcome('Initializing user-input','module')
 
 % Which experiment
 basePath = 'D:\Data\IVS\Einar';
-pc.seq_subdir = 'Dolly-002';
+Config.seq_subdir = 'Dolly-002';
 save_path = 'C:\Users\Didrik\Desktop\Dolly';
 %save_path = 'D:\Data\IVS\Einar\Dolly-002';
 %save_path = 'E:\';
 
 % Which files to input from input directory
 % NOTE: Could be implemented to be selected interactively using uigetfiles
-pc.labChart_fileNames{1} = {
+Config.labChart_fileNames{1} = {
     'SingleChannels\Ch1\LeuvenDolly1.2PumpTest2020_day1.mat'
     'SingleChannels\Ch2\LeuvenDolly1.2PumpTest2020_day1.mat'
     'SingleChannels\Ch4\LeuvenDolly1.2PumpTest2020_day1.mat'
@@ -30,7 +30,7 @@ pc.labChart_fileNames{1} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day1.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day1.mat'
     };
-pc.labChart_fileNames{2} = {
+Config.labChart_fileNames{2} = {
 %     'SingleChannels\Ch1\LeuvenDolly1.2PumpTest2020_day2.mat'
 %     'SingleChannels\Ch2\LeuvenDolly1.2PumpTest2020_day2.mat'
 %     'SingleChannels\Ch4\LeuvenDolly1.2PumpTest2020_day2.mat'
@@ -47,7 +47,7 @@ pc.labChart_fileNames{2} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day2.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day2.mat'
     };
-pc.labChart_fileNames{3} = {
+Config.labChart_fileNames{3} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day3.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day3.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day3.mat'
@@ -60,7 +60,7 @@ pc.labChart_fileNames{3} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day3.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day3.mat'
     };
-pc.labChart_fileNames{4} = {
+Config.labChart_fileNames{4} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day4.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day4.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day4.mat'
@@ -73,7 +73,7 @@ pc.labChart_fileNames{4} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day4.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day4.mat'
     };
-pc.labChart_fileNames{5} = {
+Config.labChart_fileNames{5} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day5.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day5.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day5.mat'
@@ -86,7 +86,7 @@ pc.labChart_fileNames{5} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day5.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day5.mat'
     };
-pc.labChart_fileNames{6} = {
+Config.labChart_fileNames{6} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day6.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day6.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day6.mat'
@@ -99,7 +99,7 @@ pc.labChart_fileNames{6} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day6.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day6.mat'
     };
-pc.labChart_fileNames{7} = {
+Config.labChart_fileNames{7} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day7.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day7.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day7.mat'
@@ -112,7 +112,7 @@ pc.labChart_fileNames{7} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day7.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day7.mat'
     };
-pc.labChart_fileNames{8} = {
+Config.labChart_fileNames{8} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day8.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day8.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day8.mat'
@@ -125,7 +125,7 @@ pc.labChart_fileNames{8} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day8.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day8.mat'
     };
-pc.labChart_fileNames{9} = {
+Config.labChart_fileNames{9} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day9.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day9.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day9.mat'
@@ -138,7 +138,7 @@ pc.labChart_fileNames{9} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day9.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day9.mat'
     };
-pc.labChart_fileNames{10} = {
+Config.labChart_fileNames{10} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day10.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day10.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day10.mat'
@@ -151,7 +151,7 @@ pc.labChart_fileNames{10} = {
     'SingleChannels\Ch15\LeuvenDolly1.2PumpTest2020_day10.mat'
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day10.mat'
     };
-pc.labChart_fileNames{11} = {
+Config.labChart_fileNames{11} = {
     'SingleChannels\Ch6\LeuvenDolly1.2PumpTest2020_day11.mat'
     'SingleChannels\Ch7\LeuvenDolly1.2PumpTest2020_day11.mat'
     'SingleChannels\Ch8\LeuvenDolly1.2PumpTest2020_day11.mat'
@@ -165,7 +165,7 @@ pc.labChart_fileNames{11} = {
     'SingleChannels\Ch16\LeuvenDolly1.2PumpTest2020_day11.mat'
     };
 
-proc_path = fullfile(basePath,pc.seq_subdir,'Processed');
+proc_path = fullfile(basePath,Config.seq_subdir,'Processed');
 
 powerlab_variable_map = {
     % LabChart name  SingleChannels name   Type        Continuity
@@ -193,7 +193,7 @@ powerlab_variable_map = {
 welcome('Initializing individual channel data','module')
 
 for i=1:11
-    powerlab_filePaths = fullfile(basePath,pc.seq_subdir,pc.labChart_fileNames{i});
+    powerlab_filePaths = fullfile(basePath,Config.seq_subdir,Config.labChart_fileNames{i});
     PL = init_labchart_mat_files(powerlab_filePaths,'',powerlab_variable_map);
     T = merge_table_blocks(PL);
     T = resample_signal(T, 500);

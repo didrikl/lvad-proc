@@ -31,7 +31,7 @@ IDs1 = {
 		};
 
 close all
-make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.pc.fs, IDs1, IDs2);
+make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs, IDs1, IDs2);
 
 clear tit s var rpm
 

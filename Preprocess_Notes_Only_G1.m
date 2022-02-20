@@ -12,17 +12,20 @@ inputs = {
 
 % Do separate initialization parts
 for i=1:numel(inputs)
-	pc = get_processing_config_defaults_G1;
+	Config =  get_processing_config_defaults_G1;
 	eval(inputs{i});
-	idSpecs = init_id_specifications(pc.idSpecs_path);	
-	pc.notes_filePath = init_notes_filepath(pc);
+	idSpecs = init_id_specifications(Config.idSpecs_path);	
+	Config.notes_filePath = init_notes_filepath(Config);
 
-	Notes = init_notes_xls(pc.notes_filePath, '', pc.notes_varMapFile);
-	Notes = qc_notes_G1(Notes, idSpecs, pc.askToReInit);
+	Notes = init_notes_xls(Config.notes_filePath, '', Config.notes_varMapFile);
+	Notes = qc_notes_G1(Notes, idSpecs, Config.askToReInit);
+	
 	Notes = derive_cardiac_output(Notes);
-	Notes = calc_obstruction(pc, Notes);
+	Notes = add_obstruction_pst(Config, Notes);
+	Notes = add_balloon_levels_from_xray(Notes, Config.levLims);
+	Notes = update_id_to_revised_balloon_levels(Notes);
 
-    Data = save_preprocessed_notes_only(pc, Notes, Data);
+    Data = save_preprocessed_notes_only(Config, Notes, Data);
 	Preprocess_Roundup;
 end
 
