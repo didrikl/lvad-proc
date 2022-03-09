@@ -8,23 +8,19 @@ function Config =  get_processing_config_defaults_IV2
 	Config.experimentID = 'IV2';
 
 
-	% Constants
-	% --------------------------------------------------------------------------
-	
-	Config.inletInnerDiamLVAD = 12.7;
-	
-
 	% Signal processing settings
 	% --------------------------------------------------------------------------
 	
 	Config.fs = 750;
-	
+	Config.harmonicNotchFreqWidth = [1,1,1,2.5,1,1,1,1,1,1];
+
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
 	
 	Config.defFigRes = 300;
-
+	Config.inletInnerDiamLVAD = 12.7;
+	Config.speeds = [2200,2500,2800,3100];
 	
 	% How to init and fuse data
 	% --------------------------------------------------------------------------

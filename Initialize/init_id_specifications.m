@@ -9,8 +9,8 @@ function idSpecs = init_id_specifications(workbookFile)
     
     % TODO: Make object oriented
     % Specify column names and types
-    opts.VariableNames = ["categoryLabel", "levelLabel",  "idLabel",     "analysis_id", "analysisDuration", "interventionType", "extra",       "contingency", "QRedTarget_pst", "pumpSpeed", "catheter",    "balLev",      "balDiam", "balVol", "arealObstr_pst"];
-    opts.VariableTypes = ["categorical",   "categorical", "categorical", "categorical", "single",           "categorical",      "categorical", "categorical", "single",         "single",    "categorical", "categorical", "single",  "single", "single"];
+    opts.VariableNames = ["categoryLabel", "levelLabel",  "idLabel",     "analysis_id", "analysisDuration", "interventionType", "extra",       "contingency", "QRedTarget_pst", "pumpSpeed", "catheter",    "balLev",      "balDiam", "balHeight", "arealObstr_pst"];
+    opts.VariableTypes = ["categorical",   "categorical", "categorical", "categorical", "single",           "categorical",      "categorical", "categorical", "single",         "single",    "categorical", "categorical", "single",  "single",    "single"];
     
     % TODO: Make object oriented
     % Specify variable properties

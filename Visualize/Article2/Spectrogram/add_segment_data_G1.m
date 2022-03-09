@@ -1,5 +1,10 @@
 function T = add_segment_data_G1(T,BL,accVar,inds,fs)
 	
+	if nnz(inds)==0
+		warning('No indices for segment')
+		return
+	end
+	
 	T = join_notes(T,T.Properties.UserData.Notes);
 	BL = join_notes(BL,BL.Properties.UserData.Notes);
 	

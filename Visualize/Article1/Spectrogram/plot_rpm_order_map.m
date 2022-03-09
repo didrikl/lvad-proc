@@ -3,9 +3,9 @@ function plot_rpm_order_map(h_ax, colorRange, colorMap, time, order, map, yLim, 
 	axes(h_ax)
 	imagesc(time,order,map);
 
-	caxis(colorRange);
 	colormap(colorMap)
-	
+	caxis(colorRange);
+
 	h = gca;
 	set(h,'ydir','normal');
 	yticks(0:1:max(order));

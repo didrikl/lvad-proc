@@ -3,13 +3,12 @@ function Notes = update_id_to_revised_balloon_levels(Notes)
 	% Note: Level 0 is unaltered always.
 	inds = find(Notes.balLev_xRay>0);
 	
-	echo = false;
 	for i=1:numel(inds)
 		
 		lev = Notes.balLev_xRay(inds(i));
 		speed = Notes.pumpSpeed(inds(i));
 		
-		if contains(string(Notes.analysis_id(inds(i))),'_E'), echo = true; end
+		echo = contains(string(Notes.analysis_id(inds(i))),' E');
 
 		if lev==1 && speed==2200, Notes.analysis_id(inds(i)) = '4.1'; end
 		if lev==2 && speed==2200, Notes.analysis_id(inds(i)) = '4.2'; end
@@ -30,7 +29,7 @@ function Notes = update_id_to_revised_balloon_levels(Notes)
 		if lev==5 && speed==2600, Notes.analysis_id(inds(i)) = '5.5'; end
 
 		if echo
-			Notes.analysis_id(inds(i)) = [Notes.analysis_id(inds(i)),'_E'];
+			Notes.analysis_id(inds(i)) = string(Notes.analysis_id(inds(i)))+" E";
 		end
 
 	end

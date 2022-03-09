@@ -1,5 +1,5 @@
 function T_parts = add_harmonics_filtered_variables(...
-		T_parts, varNames, newVarNames)
+		T_parts, varNames, newVarNames, harmNotchWidth)
     % Add harmonics filtered varibles by a combined notch filter
     % 
 	% Inputs
@@ -9,7 +9,6 @@ function T_parts = add_harmonics_filtered_variables(...
 	% Array of harmonic numbers to filter, with respect to pump speed and
 	% corresponding notch widths
 	harmonics = 1:10;
-	harmonicsWidth = [1,1,1,2.5,1,1,1,1,1,1];
 	
 	% Hardcoded array of fixed frequencies and widths to be filtered,
 	% irrespective of pump speed.
@@ -61,7 +60,7 @@ function T_parts = add_harmonics_filtered_variables(...
 			% Design the filter based on all frequencies specified, and 
 			% corresponding notch widths,within the effective bandwidt
 		    allFreq = [hFreq(hFreq<fs/2),fixFreq(fixFreq<fs/2)];
-            BW = [harmonicsWidth(hFreq<fs/2),fixFreqWidth(fixFreq<fs/2)];     
+            BW = [harmNotchWidth(hFreq<fs/2),fixFreqWidth(fixFreq<fs/2)];   
             hFilt = make_multiple_notch_filter(allFreq,fs,BW);
             
 			block_inds = start_inds(j):end_inds(j);

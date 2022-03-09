@@ -161,6 +161,7 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     
     % Convert to timetable with timestamp as the time column
     Notes = table2timetable(Notes,'RowTimes',timeVarName);
+	
     
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data

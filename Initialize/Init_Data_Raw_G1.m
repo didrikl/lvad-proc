@@ -33,4 +33,5 @@ US = adjust_for_system_m_time_offset(US, Config.US_offsets);
 PL = adjust_for_constant_time_offset_for_filenames(PL, Config.PL_offset_files, Config.PL_offset);
 PL = swap_channel_names(PL, Config.accChannelToSwap, Config.blocksForAccChannelSwap);
 PL = swap_channel_names(PL, Config.pChannelToSwap, Config.pChannelSwapBlocks);
+PL = exclude_bad_signal(PL, Config.channelToExcl, Config.channelExclRanges);
 check_lvad_pressure_gradient_channels(PL, Config.pGradVars);

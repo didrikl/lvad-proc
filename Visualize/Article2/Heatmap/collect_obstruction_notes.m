@@ -1,4 +1,4 @@
-close all
+%close all
 Config =  get_processing_config_defaults_G1;
 
 inputs = {
@@ -17,57 +17,42 @@ xLab = 'diameter and areal obstruction';
 yLab = 'experiments';% and pump speed (RPM)';
 xlims = [2,12.7];
 speeds = [2200,2400,2600];
-cLim = [-70,-35];
-%cLim = [];
+
 T = F;
 vars = {
-   'accA_best_NF_HP_b2_pow',   'NHA (dB)'
-%   'accA_x_NF_HP_b2_pow',     'NHA_{\itx\rm} (dB)'
-%	'accA_y_NF_HP_b2_pow',     'NHA_{\ity\rm} (dB)'
-%   'accA_z_NF_HP_b2_pow',     'NHA_{\itz\rm} (dB)'
-%  	'accA_yznorm_NF_HP_b2_pow','NHA_{\it|yz|\rm} (dB)'
-%  	'accA_norm_NF_HP_b2_pow',  'NHA_{\it|xyz|\rm} (dB)'
-% 	'Q_mean',                  '\itQ\rm (L/min)'
-%  	'Q_LVAD_mean',             '\itP\rm_{LVAD} (W)'
-%  	'P_LVAD_mean',             '\itP\rm_{LVAD} (W)'
-% 	'pGraft_mean',             '\itp\rm_{graft} (mmHg)'
-% 	'SvO2_mean'                'SVO_2 (%)'
-% 	'p_minArt_mean'            '\itp\rm_{art,min} (mmHg)'
-% 	'p_maxArt_mean'            '\itp\rm_{art,max} (mmHg)'
-% 	'CO_mean'                  'CO (L/min)'
-% 	'CVP_mean'                 'CVP (mmHg)'
-	};
-
+%    'accA_best_NF_HP_b2_pow_per_speed', 'NHA (dB)',               [-70,-35]
+    'accA_best_NF_HP_b2_pow',           'NHA (dB)',               []
+%    'accA_x_NF_HP_b2_pow',              'NHA_{\itx\rm} (dB)',     [-70,-35]
+%    'accA_y_NF_HP_b2_pow',              'NHA_{\ity\rm} (dB)',     [-70,-35]
+%    'accA_z_NF_HP_b2_pow',              'NHA_{\itz\rm} (dB)',     [-70,-35]
+%    'accA_norm_NF_HP_b2_pow',           'NHA_{\it|xyz|\rm} (dB)', [-70,-35]
+%     'Q_CO_pst',                         '\itQ\rm-\itCO\rm ratio', [0 100]
+%'Q_mean', 'Q', [0 5]
+	 };
 
 % T = F_del;
 % vars = {
-% % 	'Q_mean',                 '\itQ\rm (L/min)'
-%  	'Q_LVAD_mean',            '\itP\rm_{LVAD} (L/min)'
-% % 	'P_LVAD_mean',            '\itP\rm_{LVAD} (W)'
-% % 	'MAP_mean'                'MAP (mmHg)'
-% % 	'p_minArt_mean'           '\itp\rm_{art,min} (mmHg)'
-% % 	'p_maxArt_mean'           '\itp\rm_{art,max} (mmHg)'
-% % 	'CO_mean'                 'CO (L/min)'
-% % 	'CVP_mean'                'CVP (mmHg)'
-% %	'SvO2_mean'               'SVO_2 (%)'
-% % 	'accA_x_NF_HP_b2_pow',    'NHA_{\itx\rm} (dB)'
-% % 	'accA_y_NF_HP_b2_pow',    'NHA_{\ity\rm} (dB)'
-% % 	'accA_z_NF_HP_b2_pow',    'NHA_{\itz\rm} (dB)'
-% 	'accA_yznorm_NF_HP_b2_pow', 'NHA_{\it|yz|\rm} (dB)'
-% 	'accA_norm_NF_HP_b2_pow', 'NHA_{\it|xyz|\rm} (dB)'
-% %	'pGraft_mean',            '\itp\rm_{eff} (mmHg)'
+%  	'P_LVAD_mean',  '\itP\rm_{LVAD} (W)',      [-2,0.5]
+% 	'Q_mean',       '\itQ\rm (L/min)',         []
+%    	'Q_LVAD_mean',  '\itQ\rm_{LVAD} (W)',      []
+% %  	'pGraft_mean',  '\itp\rm_{graft} (mmHg)'  
+% %  	'SvO2_mean'     'SVO_2 (%)'
+% %  	'p_minArt_mean' '\itp\rm_{art,min} (mmHg)'
+% % 	'p_maxArt_mean' '\itp\rm_{art,max} (mmHg)'
+% % 	'CO_mean'       'CO (L/min)'
+% % 	'CVP_mean'      'CVP (mmHg)'
 % 	};
 
 T = lookup_plot_data(speeds, inputs, T, Config.levLims);
 
 h_fig = gobjects(size(vars,2)+2,1);
 
-% for i=1:size(vars,1)
-% 	h_fig(i) = plot_heat_map(T, vars{i,1}, vars{i,2}, xlims, xLab, yLab, Config);
-% 	if not(isnan(cLim)), caxis(cLim); end
-% end
+ for i=1:size(vars,1)
+ 	h_fig(i) = plot_heat_map(T, vars{i,1}, vars{i,2}, xlims, xLab, yLab, Config);
+ 	if not(isnan(vars{i,3})), caxis(vars{i,3}); end
+ end
 
-h_fig(end-1) = plot_balloon_levels(T, 'balDiam_xRay_mean', xlims, xLab, yLab, Config);
+%h_fig(end-1) = plot_balloon_levels(T, 'balDiam_xRay_mean', xlims, xLab, yLab, Config);
 %h_fig(end) = plot_balloon_levels(T, 'balHeight_xRay_mean', xlims, xLab, yLab, Config);
 
 % save_path = fullfile(Config.fig_path,'Heatmaps');
@@ -91,29 +76,24 @@ function h_fig = plot_heat_map(T, plotVar, colMapLab, xlims, xLab, yLab, Config)
 	h_ax = init_axes;
 	load('ScientificColormaps')
 	
-	T.(plotVar)(T.balLev=='1') = T.bestAxisBL(T.balLev=='1');
-	ax = unique(T.bestAxis);
-	axMarker = {'square','o','pentagram'};
-	for i=1:numel(ax)
-		inds = ismember(T.bestAxis,ax{i});
-		h_s(i) = scatter(T.balDiam_xRay_mean(inds), T.seqList(inds),...
-			375, T.(plotVar)(inds), 'filled', axMarker{i});
+	blVar = [plotVar,'_BL'];
+	if contains(plotVar,'best')
+		T.(plotVar)(T.balLev=='1') = T.(blVar)(T.balLev=='1');
 	end
-	legend(h_s,{'x','y','z'})
-	colMap = scientificColormaps.batlow50;
-	% colMap = flip(scientificColormaps.roma);
-	% colMap = scientificColormaps.hawaii25;
-	% colMap = scientificColormaps.lapaz50;
+	scatter(T.balDiam_xRay_mean, T.seqList, 375, T.(plotVar), 'filled');
+	%colMap = scientificColormaps.batlow50;
+	%colMap = flip(scientificColormaps.roma);
+	colMap = scientificColormaps.roma;
 	colormap(colMap);
 	colorbar(h_ax,...
-		'Position',[0.92 0.20 0.02 0.11],...
+		'Position',[0.92 0.20 0.018 0.2],...
 		'TickLength',0.03,...
 		'LineWidth',1,...
 		'FontSize',15,...
 		'FontName','Arial',...
 		'Box','off');
 	
-	annotation('textbox',[0.91 0.335 0.0971 0.0643],...
+	annotation('textbox',[0.91 0.44 0.0971 0.0643],...
 		'FitBoxToText','off',...
 		'EdgeColor','none',...
 		'FontSize',15,...
@@ -196,7 +176,8 @@ function T2 = lookup_plot_data(speeds, inputs, T1, levLims)
 	end
 	T2.seqList = change_seq_list_to_ylabel(seqList);
 	
-	nhaVars = contains(T2.Properties.VariableNames,'acc');
+	nhaVars = contains(T2.Properties.VariableNames,'acc') & ...
+		not(contains(T2.Properties.VariableNames,'_var'));
 	T2{:,nhaVars}=db(T2{:,nhaVars});
 end
 

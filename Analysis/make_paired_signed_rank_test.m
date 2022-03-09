@@ -1,20 +1,20 @@
-function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType)
+function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType, groupVar)
 
 	welcome('Make paired signed rank test','function')
 	
-	% TODO: Make generic or with input!!!
-	speeds=[2200,2500,2800,3100];
-	%speeds=[2200,2400,2600];
-
-	levLab = sort_nat(string(unique(G.med.('levelLabel'))));
-
+	groups = unique(W.(groupVar));
+	
 	% Store temporarily results into cell arrays before merging cells into one table
-	R = cell(numel(speeds),1);
-	P = cell(numel(speeds),1);
+	R = cell(numel(groups),1);
+	P = cell(numel(groups),1);
 
-	for s=1:numel(speeds)
-		R{s} = table;
-		P{s} = table;
+	for g=1:numel(groups)
+		R{g} = table;
+		P{g} = table;
+		
+		g_inds = G.med.(groupVar)==groups(g);
+		levLab = sort_nat(string(unique(G.med.levelLabel(g_inds))));
+
 		for i=1:numel(pVars)
 
 			var = pVars{i};
@@ -27,68 +27,67 @@ function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType)
 
 				% TODO: Use function handle input instead
 				bl_var = get_baseline_varible_name(var, iv_var{j}, exprType);
-
-				if all(isnan(W.(iv_var{j})(W.pumpSpeed==speeds(s))))
+				if all(isnan(W.(iv_var{j})(W.pumpSpeed==groups(g))))
 					p(j) = nan;
 				else
 					p(j) = signrank(...
-						W.(bl_var)(W.pumpSpeed==speeds(s)),...
-						W.(iv_var{j})(W.pumpSpeed==speeds(s)));
+						W.(bl_var)(W.pumpSpeed==groups(g)),...
+						W.(iv_var{j})(W.pumpSpeed==groups(g)));
 				end
 			end
 
 			% Add categorical info for the states in results table R
-			R{s}.pumpSpeed = repmat(speeds(s),numel(levLab),1);
-			R{s}.levelLabel = categorical(cellstr(levLab));
-			P{s}.pumpSpeed = repmat(speeds(s),numel(levLab),1);
-			P{s}.levelLabel = categorical(cellstr(levLab));
+			R{g}.pumpSpeed = repmat(groups(g),numel(levLab),1);
+			R{g}.levelLabel = removecats(categorical(cellstr(levLab)));
+			P{g}.pumpSpeed = repmat(groups(g),numel(levLab),1);
+			P{g}.levelLabel = removecats(categorical(cellstr(levLab)));
 
 			% Look up variable median effects and quartiles
-			eff = G.med(G.med.pumpSpeed==speeds(s),{'levelLabel',var});
-			iqr = G.iqr(G.iqr.pumpSpeed==speeds(s),{'levelLabel',var});
-			q1 = G.q1(G.q1.pumpSpeed==speeds(s),{'levelLabel',var});
-			q3 = G.q3(G.q3.pumpSpeed==speeds(s),{'levelLabel',var});
+			eff = G.med(G.med.pumpSpeed==groups(g),{'levelLabel',var});
+			iqr = G.iqr(G.iqr.pumpSpeed==groups(g),{'levelLabel',var});
+			q1 = G.q1(G.q1.pumpSpeed==groups(g),{'levelLabel',var});
+			q3 = G.q3(G.q3.pumpSpeed==groups(g),{'levelLabel',var});
 			eff.Properties.VariableNames(2) = "med "+var;
 			iqr.Properties.VariableNames(2) = "iqr "+var;
 			q1.Properties.VariableNames(2) = "q1 "+var;
 			q3.Properties.VariableNames(2) = "q3 "+var;
 
 			% Store the looked up info in results table R
-			R{s} = join(R{s}, eff, 'Keys','levelLabel');
-			R{s} = join(R{s}, iqr, 'Keys','levelLabel');
-			R{s} = join(R{s}, q1, 'Keys','levelLabel');
-			R{s} = join(R{s}, q3, 'Keys','levelLabel');
+			R{g} = join(R{g}, eff, 'Keys','levelLabel');
+			R{g} = join(R{g}, iqr, 'Keys','levelLabel');
+			R{g} = join(R{g}, q1, 'Keys','levelLabel');
+			R{g} = join(R{g}, q3, 'Keys','levelLabel');
 			
 			% Add p values as formatted text columns in results table R
-			R{s}.(['p ',var]) = compose("%1.3f",p);
+			R{g}.(['p ',var]) = compose("%1.3f",p);
 
 			% Convert values as formatted text columns in results table R
 			if contains(var,{'Q','P','pGrad'})
 				% Relevant for all except acc vars
-				R{s}.("med "+var) = compose("%2.2f",R{s}.("med "+var));
-				R{s}.("iqr "+var) = compose("%2.2f",R{s}.("iqr "+var));
-				R{s}.("q1 "+var) = compose("%2.2f",R{s}.("q1 "+var));
-				R{s}.("q3 "+var) = compose("%2.2f",R{s}.("q3 "+var));
+				R{g}.("med "+var) = compose("%2.2f",R{g}.("med "+var));
+				R{g}.("iqr "+var) = compose("%2.2f",R{g}.("iqr "+var));
+				R{g}.("q1 "+var) = compose("%2.2f",R{g}.("q1 "+var));
+				R{g}.("q3 "+var) = compose("%2.2f",R{g}.("q3 "+var));
 			else
 				% Relevant for acc vars: Report in 10^(~3) to save table space
-				R{s}.("med "+var) = compose("%1.1f",1000*R{s}.("med "+var));
-				R{s}.("iqr "+var) = compose("%1.1f",1000*R{s}.("iqr "+var));
-				R{s}.("q1 "+var) = compose("%1.1f",1000*R{s}.("q1 "+var));
-				R{s}.("q3 "+var) = compose("%1.1f",1000*R{s}.("q3 "+var));
+				R{g}.("med "+var) = compose("%1.1f",1000*R{g}.("med "+var));
+				R{g}.("iqr "+var) = compose("%1.1f",1000*R{g}.("iqr "+var));
+				R{g}.("q1 "+var) = compose("%1.1f",1000*R{g}.("q1 "+var));
+				R{g}.("q3 "+var) = compose("%1.1f",1000*R{g}.("q3 "+var));
 			end
 
 			% Merge column in R into formatted text columns in R
-			R{s}.(var) = R{s}.(['med ',var])+" ["+R{s}.(['iqr ',var])+"] ("+R{s}.(['p ',var])+")";
+			R{g}.(var) = R{g}.(['med ',var])+" ["+R{g}.(['iqr ',var])+"] ("+R{g}.(['p ',var])+")";
 			% 			R{s}.(var) = R{s}.(['med ',var])+" ["+R{s}.(['q1 ',var])+" "+R{s}.(['q3 ',var])+"]"+", p="+R{s}.(['p ',var]);
-			R{s}(:,{['p ',var],['med ',var],['iqr ',var],['q1 ',var],['q3 ',var]}) = [];
+			R{g}(:,{['p ',var],['med ',var],['iqr ',var],['q1 ',var],['q3 ',var]}) = [];
 
 			% Store p values numbers in a dedicated table (for convenience)
-			P{s}.(var) = p;
+			P{g}.(var) = p;
 
 		end
 
 		% Sort according to analysis_id, before merging RPM-blocks
-		[R{s},P{s}] = sort_results_per_analysis_id(R{s},P{s},G,speeds(s));
+		[R{g},P{g}] = sort_results_per_analysis_id(R{g},P{g},G,groups(g));
 
 	end
 
@@ -99,13 +98,16 @@ function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType)
 function bl_var = get_baseline_varible_name(var, iv_var, exprType)
 	switch exprType
 		case 'G1'
-			if contains(iv_var,'Clamp')
-				bl_var = var+"_Nominal, Clamp";
-			elseif contains(iv_var,'Injection')
-				bl_var = var+"_Nominal, Injection";
-			else
-				bl_var = var+"_Deflated, Lev0";
-			end
+			if contains(iv_var,'RPM'), bl_var = var+"_RPM, Nominal"; end
+			
+			if contains(iv_var,'Clamp'), bl_var = var+"_Clamp, Nominal";     end 
+			if contains(iv_var,'Clamp, Nominal'), bl_var = var+"_RPM, Nominal";     end 
+			
+			if contains(iv_var,'Injection'), bl_var = var+"_Injection, Nominal"; end
+			if contains(iv_var,'Injection, Nominal'), bl_var = var+"_Injection, Nominal"; end
+			
+			if contains(iv_var,'Balloon'), bl_var = var+"_Balloon, Nominal";   end
+			if contains(iv_var,'Balloon, Nominal'), bl_var = var+"_RPM, Nominal";   end
 
 		case 'IV2'
 			if contains(iv_var,'Afterload')

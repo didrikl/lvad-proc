@@ -28,7 +28,7 @@ sequences = {
 discrVars = {'Q_LVAD','P_LVAD'};
 meanVars = {'p_eff','pGrad','Q','accA_x','accA_y','accA_z',...
 	'accA_norm_NF','accA_x_NF','accA_y_NF','accA_z_NF'};
-F = make_intervention_stats(Data.IV2, sequences, discrVars, meanVars, {}, idSpecs);
+F = make_intervention_stats(Data.IV2, sequences, discrVars, meanVars, {}, {}, idSpecs);
 F.P_LVAD_drop = -F.P_LVAD_mean;
 
 % Add calculate band powers to the features

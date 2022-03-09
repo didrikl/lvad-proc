@@ -50,7 +50,7 @@ function save_figure(varargin)
     % Replace illegal characters in fileName with a valid replacement char
     fileName = make_valid_filename(fileName);
 
-    fprintf('\nSaving Figure %d %s',h_fig.Number,h_fig.Name)
+	fprintf('\nSaving Figure %d %s',h_fig.Number,h_fig.Name)
     fprintf('\n\tAs .png with resolution: %d\n',resolution)
     if alwaysSaveFigFile
         fprintf('\tAs .fig\n')

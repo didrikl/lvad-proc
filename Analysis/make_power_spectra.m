@@ -3,7 +3,6 @@ function psds = make_power_spectra(Data, seqs, vars, fs, hBands, idSpecs, isHarm
 	welcome('Make power spectra','function')
 	
 	if nargin<6, isHarmBand = false; end
-	
 	speeds = unique(idSpecs.pumpSpeed);
 	pxx = cell(numel(seqs),1);
     for j=1:numel(seqs)
@@ -11,6 +10,9 @@ function psds = make_power_spectra(Data, seqs, vars, fs, hBands, idSpecs, isHarm
         welcome([seqs{j},'\n'],'iteration')
        
         S = Data.(seqs{j}).S;
+		vars = check_table_var_input(S, vars);
+	
+		S = join_notes(S, Data.(seqs{j}).Notes);
 		S = S(ismember(S.analysis_id,idSpecs.analysis_id),:);
        
 		summaryBlock4Speed = cell(numel(speeds),1);

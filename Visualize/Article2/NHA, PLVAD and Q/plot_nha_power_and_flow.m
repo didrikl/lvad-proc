@@ -1,4 +1,4 @@
-function h_figs = plot_nha_power_and_flow_per_intervention_G1(...
+function h_figs = plot_nha_power_and_flow(...
 		F,G,R,nhaVar,levelLabels,xVar,xLims,xLab,supTit,intervention)
 	% Plot NHA for each catheter type
 	%
@@ -19,12 +19,12 @@ function h_figs = plot_nha_power_and_flow_per_intervention_G1(...
 	% - object positions is adjusted in this function
 	% - Visibility of background points and lines is here toggled on/off.
 	
-	yVar_row1 = {'Q_mean',[0 19]};
-	yVar_row2 = {'P_LVAD_mean',[0 19]};
+	yVar_row1 = {'Q_mean',[0 5]};
+	yVar_row2 = {'P_LVAD_mean',[0 5]};
 	yLabels = {
 		{'\itQ\rm'}
 		{'\itP_{\rmLVAD}\rm'}
-		{'NHA_{\ity}\rm'}
+		{'NHA\rm'}
 		};
 	legTit = {'RPM'};
 	speeds = [2200,2400,2600];
@@ -101,6 +101,8 @@ function h_figs = plot_nha_power_and_flow_per_intervention_G1(...
 			if j==1, h_yax(3) = copyobj(h_ax(3,j),gcf); end
 			h_xax(j) = copyobj(h_ax(3,j),gcf);
 			
+% 			F.(nhaVar{v,1})(F_inds) = pow2db(F.(nhaVar{v,1})(F_inds));
+% 			G.(nhaVar{v,1})(G_inds) = pow2db(G.(nhaVar{v,1})(G_inds));
 			h_nha = plot_group_and_individual_data_G1(h_ax(3,j),G(G_inds,:),...
 				F(F_inds,:),speeds,xVar,xLims,nhaVar(v,:),spec,[]);
 					

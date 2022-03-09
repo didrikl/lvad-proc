@@ -1,4 +1,4 @@
-function S = reduce_to_analysis_G1(S, Notes, idSpecs)
+function S = reduce_to_analysis_G1(S, Notes, idSpecs, remEchoRows)
 	
 	welcome('Reduce data to analysis ID segments','function')
 	
@@ -6,6 +6,11 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 	S.analysis_id = standardizeMissing(S.analysis_id,'-');
 	S = S(not(ismissing(S.analysis_id)),:);
 	
+	% Remove data for echo measurements
+	if remEchoRows
+		S = S(not(contains(string(S.analysis_id),'E')),:);
+	end
+
 	ids = categories(idSpecs.analysis_id);
 	
 	for i=1:numel(ids)
@@ -30,7 +35,9 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 	% Remove irrelevant columns
 	% S will retain noted values for statistical mean calculations
 	colsToRem = {
-		'event'
+		'analysis_id'
+		'bl_id'
+	    'event'
 		'intervType'
 		'part'
 		'balLev'
@@ -51,6 +58,7 @@ function S = reduce_to_analysis_G1(S, Notes, idSpecs)
 		};
 	S(:,ismember(S.Properties.VariableNames,colsToRem)) = [];
 
-	S = move_key_columns_first(S);
+	%S = move_key_columns_first(S);
+	S = movevars(S,{'noteRow'},"Before",1);
 	S.Properties.Description = 'Fused data - Analysis ID segments';
 	

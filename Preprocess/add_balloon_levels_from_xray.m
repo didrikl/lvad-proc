@@ -2,7 +2,7 @@ function T = add_balloon_levels_from_xray(T, lims)
 	
 	N = numel(lims);	
 	balLev = nan(height(T),1);
-	balLev(T.balDiam_xRay<lims(1)) = 0;
+	balLev(T.balDiam_xRay<lims(2)) = 0;
 	
 	speeds = unique(T.pumpSpeed);
 	for j=1:numel(speeds)

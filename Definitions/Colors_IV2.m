@@ -12,12 +12,12 @@ Colors.Fig.Cats.Speeds4 = [
 
 % Colorblind safe from Colorbrewer: 5-class YlGnBu (yellow-ish to blue)
 Colors.Fig.Seqs.ROC4 = [
-	%255,255,204 % yellow-ish
+	%5,255,204 % yellow-ish
 	161,218,180  % light green-yellow-ish
 	65,182,196   % turquise
 	44,127,184   % light blue
 	37,52,148    % dark blue
-	];          
+	]/256;          
 Colors.Fig.Cats.ROC_Diagonal = [228,26,28]/256; % red
 
 % Colorblind safe from www.fabiocrameri.ch/: Samples from Batlow10
@@ -43,7 +43,34 @@ Colors.Fig.Cats.Components4 = [
 	255,127,0  % orange for norm
 	]/256;
 
-% TODO: Read all colormaps into 
+Colors.Fig.Cats.Intervention5 = [
+	 0.0052    0.0982    0.3498
+    0.1097    0.3531    0.3842
+    0.6445    0.0586    0.0820 %0.4095    0.4824    0.2413
+    0.8255    0.5777    0.2642
+	0.4095    0.4824    0.2413
+    0.9923    0.7162    0.7371
+	];
+
+Colors.Fig.Cats.Intervention5 = [
+	0.8255    0.5777    0.2642 %0.0052    0.0982    0.3498
+    0.0052    0.0982    0.3498 %.6 .6 .6                     %0.8255    0.5777    0.2642%0.4095    0.4824    0.2413%.5 .5 .5
+    0.6445    0.0586    0.0820  %0.4095    0.4824    0.2413
+    .6 .6 .6 %0.8255    0.5777    0.2642   %.65 .65 .65 %0.8255    0.5777    0.2642
+	.8 .8 .8
+	0.4095    0.4824    0.2413
+   ];
+
+Colors.Fig.Cats.Intervention5 = [
+	 0.0052    0.0982    0.3498 
+    0.1097    0.3531    0.3842 
+   0.8255    0.5777    0.2642
+   .75 .75 .75
+	.88 .88 .88
+	0.4095    0.4824    0.2413
+   ];
+
+% TODO: Read all colormaps into
 %Colors.Fig.Maps.Spectrogram = 
 
 

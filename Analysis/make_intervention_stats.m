@@ -1,4 +1,4 @@
-function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSpecs)
+function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, minMaxVars, idSpecs)
 	% In groups of tagged interventions from column analysis_id in D,
 	% calculate aggregates.
 	%
@@ -37,16 +37,18 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 	for j=1:numel(seqs)
 		welcome([seqs{j},'\n'],'iteration')
 
-		% Extract relevant intervals/interventions tagged with analysis_id
 		Notes = D.(seqs{j}).Notes;
-		S = remove_rows_with_irrelevant_analysis_id(D.(seqs{j}).S, idSpecs);
-		
-		% Add all measured values (not categorical) from Notes
+		S = D.(seqs{j}).S;
+
+		% Add protocol info and all measured values (not categorical) from 
+		% the notes table and extract relevant intervals/interventions
 		S = join_notes(S, Notes);
+		S = remove_rows_with_irrelevant_analysis_id(S, idSpecs);
 		
 		discrVars = check_table_var_input(S, discrVars);
 		meanVars = check_table_var_input(S, meanVars);
 		medVars = check_table_var_input(S, medVars);
+		minMaxVars = check_table_var_input(S, minMaxVars);
 
 		idStatsMeans = groupsummary(S,{'analysis_id','bl_id'},...
 			{'mean','std'},{meanVars},...
@@ -58,6 +60,10 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 
 		idStatsDiscr = groupsummary(S,{'analysis_id','bl_id'},...
 			'mean',discrVars,...
+			'IncludeEmptyGroups',false);
+
+		idMinMax = groupsummary(S,{'analysis_id','bl_id'},...
+			{'min','max'}, minMaxVars,...
 			'IncludeEmptyGroups',false);
 
 		idStatsNoteRow = groupsummary(S,{'analysis_id','bl_id'},...
@@ -81,6 +87,7 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, idSp
 		% Joining the aggregats per sequence into one tables
 		T{j} = join(idStatsMeans,idStatsDiscr,'Keys',{'analysis_id','bl_id'});
 		T{j} = join(T{j},idStatsMedians,'Keys',{'analysis_id','bl_id'});
+		T{j} = join(T{j},idMinMax,'Keys',{'analysis_id','bl_id'});
 		T{j} = join(T{j},idStatsNoteRow,'Keys',{'analysis_id','bl_id'});
 
 		% Adding unique categorical info for every intervention and sequence
@@ -119,8 +126,8 @@ function stats = tidy_up_aggregate_variable_names(stats)
 			{[q1q3_vars{i}(6:end),'_25prct'],[q1q3_vars{i}(6:end),'_75prct']});
 	end
 	stats = change_variablename_prefix_to_suffix(stats,...
-		{'mean','std','median','q1','q2'},...
-		{'mean','stdev','median','_25prct','_75prct'},'_');
+		{'mean','std','median','q1','q2','min','max'},...
+		{'mean','stdev','median','_25prct','_75prct','min','max'},'_');
 
 function stats = tidy_up_row_and_column_positions(stats)
 	% Tidy up row and column positions

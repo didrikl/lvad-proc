@@ -15,7 +15,6 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 		{'\bf45%\rm','obstruction'}
 		{'\bf75%\rm','obstruction'}
 		};
-	speeds = [2200,2500,2800,3100];
 	classifier_labels = classifiers_to_use(:,2);
 	classifier_inds = find(ismember(ROC.classifiers,classifiers_to_use(:,1)));
 	classifiers = ROC.classifiers(classifier_inds);
@@ -31,7 +30,7 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 	mainAxGap = 15;
 	
 	nRows = size(predStates,1);
-	nCols = numel(speeds);
+	nCols = numel(ROC.speeds);
 	h_fig = figure(spec.fig{:},...
 		'Name',titleStr,...
 		'Position',[10,40,figWidth,figHeight]);
@@ -91,7 +90,7 @@ function h_fig = plot_roc_curve_matrix_per_intervention_and_speed(ROC,...
 	format_tick_labels(h_ax,h_xax, h_yax);
 	
 	h_leg = legend(h_nha,classifier_labels,spec.leg{:},'Units','points');
-	add_subtitles(h_ax,cellstr("\bf"+string(speeds)+"\rm RPM"),panelLength,gap,spec);
+	add_subtitles(h_ax,cellstr("\bf"+string(ROC.speeds)+"\rm RPM"),panelLength,gap,spec);
 	
 	set([hXLab,hYLab],spec.supXLab{:})
 	hYLab.Position(1) = hYLab.Position(1)-20;

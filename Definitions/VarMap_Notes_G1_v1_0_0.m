@@ -27,7 +27,7 @@ varMap = {...
 	'Interval'            'intervType'       'categorical'   'unset'
 	'Event'               'event'            'categorical'   'unset'
 	'Par. tag'            'parTag'           'categorical'   'unset'
-	'Embolus vol.'        'embVol'           'single'        'unset'
+	'Embolus vol.'        'embVol'           'categorical'   'unset'
 	'Embolus type'        'embType'          'categorical'   'unset'
 	'Pump speed'          'pumpSpeed'        'int16'         'step'
 	%'Balloon level'       'balLev'           'categorical'   'unset'

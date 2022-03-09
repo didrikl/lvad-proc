@@ -17,6 +17,5 @@ Data.G1 = load_processed_sequences(sequences(:,1),...
 
 [Data.G1, F, F_rel, F_del] = load_processed_features(Config, Data.G1);
 Data.G1 = load_processed_statistics(Config, Data.G1);
-%Data.G1 = load_config(Config, Data.G1);
 
 clear sequences pc

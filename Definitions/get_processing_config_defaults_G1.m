@@ -8,24 +8,19 @@ function Config =  get_processing_config_defaults_G1
 	Config.experimentID = 'G1';
 
 
-	% Constants
-	% --------------------------------------------------------------------------
-	
-	Config.inletInnerDiamLVAD = 12.7;
-	
-
 	% Signal processing settings
 	% --------------------------------------------------------------------------
 	
 	Config.fs = 750;
-	Config.harmCut = 1;
-	Config.harmCutFreqShift = 1;
+	Config.harmCut = 1.15;
+	Config.harmCutFreqShift = 0;
 	Config.cutFreq = 40;
-	
+	Config.harmonicNotchFreqWidth = [1,1,1,2.5,1,1,1,1,1,1];
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
 	
+	Config.inletInnerDiamLVAD = 12.7;
 	Config.defFigRes = 300;
 	Config.speeds = [2200,2400,2600];
 
@@ -42,7 +37,9 @@ function Config =  get_processing_config_defaults_G1
 	Config.notes_varMapFile = 'VarMap_Notes_G1_v1_0_0';
 
 	Config.pGradVars = {'pMillar','pGraft'};
-	
+    
+	Config.remEchoRows = true;
+
 
 	% List of possible fixes and ajustments
 	% ----------------------------------------------------------------------- ---
@@ -53,7 +50,9 @@ function Config =  get_processing_config_defaults_G1
 	Config.blocksForAccChannelSwap = [];
 	Config.pChannelToSwap = {};
 	Config.pChannelSwapBlocks = [];
-	
+	Config.channelToExcl = {};
+	Config.channelExclRanges = {};
+
 	Config.levLims = [2,7.4,9,10.2,11,11.70,12.7];
 	
 
