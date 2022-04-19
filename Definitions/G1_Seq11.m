@@ -67,3 +67,16 @@ Config.pChannelToSwap = {};
 Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
+
+% Parts (or combined parts) for quality control and description
+Config.partSpec = {
+%   BL    parts   Label
+	[],       [2],           'RPM change'
+	[],       [3],           'Clamping'
+	[],       [5],           'Balloon'
+	[],       [6],           'Balloon'
+	[],       [7],           'Balloon'
+ 	[],       [8,9,10,11],   'Thrombus [Sal,1,2,3]'
+ 	[11,151], [12,12,14],    'Thrombus [4,5,6]'
+ 	[14,178], [15,16,17,18], 'Thrombus [7,8,9,10]'
+	};

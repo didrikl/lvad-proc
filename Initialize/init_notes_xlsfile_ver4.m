@@ -1,4 +1,4 @@
-function Notes = init_notes_xls(fileName, path, varMapFile)
+function notes = init_notes_xlsfile_ver4(fileName, path, varMapFile)
     % 
     % Read named ranges from Notes Excel file. Ranges must be defined by Excel
     % name manager. (Named ranges make the Excel file more flexible w.r.t.
@@ -8,13 +8,12 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     % notes table
     
     if nargin<2, path = ''; end  
+    %if nargin<3, varMapFile = 'VarMap_G1_Notes_Ver4p16'; end
     eval(varMapFile);
     
     % Sheets and ranges to read from Excel sheet (tab names in Excel)
     % NOTE: Notes range defined in name manager is a bit confusing/ error prone
     %       It is therefore avoided to be used.
-	% NOTE: To give which variable that are measured and controll would be 
-	%       better off to state in varMap instead
     notes_sheet = 'Recording notes';
     varsNames_controlled_range = 'Controlled_VarNames';
     varNames_measured_range = 'Measured_VarNames';
@@ -30,13 +29,15 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
         };
     
     % User-set definitions
+    % TODO: For OO
+    missingValueRepr = {''};
     timeVarName = 'time';
     nHeaderLines = 3;
     
   
     %% Read from Excel file
     
-    welcome('Initialize Excel notes file')
+    welcome('Reading notes file')
     
     filePath = check_file_name_and_path_input(fileName,path,{'xlsm','xls','xlsx'});
     display_filename(filePath);
@@ -47,18 +48,11 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     catVarsInFile = catVarsInMap(ismember(catVarsInMap,opts.VariableNames));
     opts = setvartype(opts,catVarsInFile,'categorical');
 
-	numVarsInMap = varMap(ismember(varMap(:,3),{'single','float','double'}),1); %#ok<USENS>
-    numVarsInFile = numVarsInMap(ismember(numVarsInMap,opts.VariableNames));
-    opts = setvartype(opts,numVarsInFile,'char');
-
-    Notes = readtable(filePath,opts,...
+    notes = readtable(filePath,opts,...
         'Sheet',notes_sheet...
         );
-
-	% Omit first row containg variable units
-	Notes = Notes(2:end,:);
     
-	% Read auxillary info
+    % Read auxillary info
     varNamesInFile = table2cell(readtable(filePath,...
         'Sheet',notes_sheet,...
         'Range',varNames_range,...
@@ -84,8 +78,7 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
         'Range',experiment_info_range,...
         'ReadVariableNames',false,...
         'basic', true))';
-    experimentInfo = cell2struct(...
-		experimentInfo(2,:),genvarname(experimentInfo(1,:)),2);
+    
     
     %% Map variables 
     % Map variable names in file over to variable names that are used in 
@@ -93,10 +86,10 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     % Keep only variables that are matched.
     
     % 1) Set variable names from header in file (regardsless of mapping)
-    Notes.Properties.VariableNames = varNamesInFile;
+    notes.Properties.VariableNames = varNamesInFile;
     
     % 2) do mapping with what this code expects to be present and what to keep
-    [Notes, inFile_ind] = map_varnames(Notes, varMap(:,1), varMap(:,2));
+    [notes, inFile_ind] = map_varnames(notes, varMap(:,1), varMap(:,2));
     
     varNames_xls = varMap(inFile_ind,1);
     
@@ -104,65 +97,57 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     %% Add metadata
     
     % Structured table metadata
-    Notes.Properties.DimensionNames{1} = 'intervals'; 
-    Notes.Properties.DimensionNames{2} = 'protocol and variables';
-    Notes.Properties.Description = 'Pre-processed notes from xls file';
-
-	% Structured column metadata, used for populating non-matched rows and 
+    notes.Properties.Description = 'Experiment notes in Excel';
+    notes.Properties.DimensionNames{1} = 'intervals'; 
+    notes.Properties.DimensionNames{2} = 'protocol and variables';
+    
+    % Structured column metadata, used for populating non-matched rows and 
     % for syncing/data fusion
-    Notes = addprop(Notes,{'Controlled','Measured'},{'variable','variable'}); 
-    Notes.Properties.CustomProperties.Controlled(...
+    notes = addprop(notes,{'Controlled','Measured'},{'variable','variable'}); 
+    notes.Properties.CustomProperties.Controlled(...
         ismember(varNames_xls,varNames_controlled)) = true;
-    Notes.Properties.CustomProperties.Measured(...
+    notes.Properties.CustomProperties.Measured(...
         ismember(varNames_xls,varNames_measured)) = true;
-    Notes.Properties.VariableContinuity = varMap(inFile_ind,4);
+    notes.Properties.VariableContinuity = varMap(inFile_ind,4);
     
     % Other column metadata
-    Notes.Properties.VariableDescriptions = cellstr(varNames_xls);
-    Notes.Properties.VariableUnits = ...
+    notes.Properties.VariableDescriptions = cellstr(varNames_xls);
+    notes.Properties.VariableUnits = ...
         cellstr(strrep(string(varUnits(inFile_ind)),'NaN',''));
-    Notes.Properties.UserData = make_init_userdata(filePath);
-    Notes.Properties.UserData.Experiment_Info = experimentInfo;
-    Notes.Properties.UserData.VarMapFile = varMapFile;
+    notes.Properties.UserData = make_init_userdata(filePath);
+    notes.Properties.UserData.Experiment_Info = experimentInfo;
+    notes.Properties.UserData.VarMapFile = varMapFile;
     
-    %% Convert information
+    %% Parse information
     
-	% Add dummy value -9999 to indicate interpolation breaks
-	breakInds = ismember(Notes{:,Notes.Properties.CustomProperties.Measured},'-');
-	Notes{:,Notes.Properties.CustomProperties.Measured}(breakInds) = {'-9999'};
-	Notes = force_break_at_transitional_and_missing(Notes);
+    notes = convert_columns(notes,varMap(inFile_ind,3));
 
-    % Cast and parse time info
-	Notes = convert_columns(Notes,varMap(inFile_ind,3));
-	Notes = parse_time_cols(Notes);
-    Notes = derive_time_col_not_filled(Notes);
+    % Parse info time, date and dur
+    notes = parse_time_cols(notes);
+    notes = derive_time_col_not_filled(notes);
     
-	% Constant interpolation down to breaks, then up up to breaks:
-	% The build-in interpolation also apply to the dummy values -9999, but 
-	% this is filled as missing afterwards.
-	[N1,TF] = fillmissing(Notes(:,vartype('float')),"previous");
-	misInd = TF & ismember(N1{:,:},-9999);
-	Notes(:,vartype('float')) = N1;
-	Notes{:,vartype('float')}(misInd) = missing;
-	Notes = fillmissing(Notes,"next","DataVariables",@isfloat);
-	Notes = standardizeMissing(Notes,{-9999});
+    % Parse relevant columns, other than time columns 
+    notes = standardizeMissing(notes, missingValueRepr);
+    num_vars = get_varname_of_specific_type(notes,'float');
+    no_interp_rows = notes.intervType~='Transitional' | ...
+        notes.part=='-' | ismissing(notes.part);
+    notes(no_interp_rows,num_vars) = fillmissing(notes(no_interp_rows,num_vars),'constant',-9999);
     
     % Add note row id to be used for data fusion and looking up data
-    Notes = add_note_row_id(Notes, nHeaderLines);
+    notes = add_note_row_id(notes, nHeaderLines);
     
     
     %% Remove unneeded columns and finalize with converting to timetable
     
     % Remove specficed columns to be removed
-    Notes(:,ismember(Notes.Properties.VariableNames,varNamesToRemove)) = [];
+    notes(:,ismember(notes.Properties.VariableNames,varNamesToRemove)) = [];
     
     % Convert to timetable with timestamp as the time column
-    Notes = table2timetable(Notes,'RowTimes',timeVarName);
-	
+    notes = table2timetable(notes,'RowTimes',timeVarName);
     
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
-    notes.noteRow = int16((1:height(notes))' + n_header_lines' +1);
+    notes.noteRow = int16((1:height(notes))' + n_header_lines');
     notes = movevars(notes, 'noteRow', 'Before', 'partDurTime');
     notes.Properties.VariableContinuity('noteRow') = 'step';
        
@@ -213,13 +198,3 @@ function notes_sheet = check_notes_sheet_name(filePath,notes_sheet)
              'Epoch',notes.date(1));
     end
     
-function Notes = force_break_at_transitional_and_missing(Notes)
-	transInds = find(Notes.intervType=='Transitional');
-	for i=1:numel(transInds)
-		numCols = find(Notes.Properties.CustomProperties.Measured);
-		for j=1:numCols
-			if ismissing(Notes(transInds(i),numCols(j)))
-				Notes(transInds(i),numCols(j)) = {'-9999'};
-			end
-		end
-	end

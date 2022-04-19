@@ -4,7 +4,12 @@ function S = join_notes(S, Notes, vars)
 		vars = Notes.Properties.VariableNames(...
 				Notes.Properties.CustomProperties.Measured);
 	end
-	vars = [{'analysis_id','bl_id'},vars];
+	keyVars = {
+		'analysis_id'
+		'bl_id'
+		};
+	vars = vars(not(ismember(vars,keyVars)));
+	vars = [keyVars;vars(:)];
 	
 	[returnAsCell,S] = get_cell(S);
 		
@@ -13,7 +18,7 @@ function S = join_notes(S, Notes, vars)
 		% Do not join variables already in S
 		vars = vars(not(ismember(vars,S{i}.Properties.VariableNames)));
 
-		S{i} = join(S{i},Notes(:,[{'noteRow'},vars]),'Keys','noteRow');
+		S{i} = join(S{i},Notes(:,[{'noteRow'};vars(:)]),'Keys','noteRow');
 		S{i} = movevars(S{i},{'noteRow','analysis_id','bl_id'},"Before",1);
 
 	end

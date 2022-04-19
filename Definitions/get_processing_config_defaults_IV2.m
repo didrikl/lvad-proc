@@ -13,13 +13,14 @@ function Config =  get_processing_config_defaults_IV2
 	
 	Config.fs = 750;
 	Config.harmonicNotchFreqWidth = [1,1,1,2.5,1,1,1,1,1,1];
+	Config.outlierStdevFactor = 2;
 
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
 	
-	Config.defFigRes = 300;
 	Config.inletInnerDiamLVAD = 12.7;
+	Config.defFigRes = 300;
 	Config.speeds = [2200,2500,2800,3100];
 	
 	% How to init and fuse data

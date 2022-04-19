@@ -50,3 +50,18 @@ Config.channelExclRanges = {
 	'11/12/2020 14:05:42', '11/12/2020 14:13:00' % balloon, 2200 RPM
     '11/12/2020 14:20:26', '11/12/2020 14:48:30' % balloon, 2200-2600 RPM
 	};
+
+% Parts (or combined parts) for quality control and description
+Config.partSpec = {
+%   BL    parts   Label
+	[],        [2],      'RPM change'
+	[],        [3],      'Clamping'
+	[],        [5],      'Balloon'
+	[],        [6],      'Balloon'
+	[],        [7],      'Balloon'
+ 	[],        [8:11],   'Thrombus [1,Sal,2,3]'
+ 	[11,141],  [12:14],  'Thrombus [4,5,6]'
+ 	[14,157],  [15:18],  'Thrombus [7,8,9,10]'
+ 	[14,157],  [19:22],  'Fat [1,2,3,4]'
+  	[],        [23]      'Anticoagulant reversal'
+	};

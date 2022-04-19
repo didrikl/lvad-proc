@@ -43,7 +43,7 @@ vars = {
 % % 	'CVP_mean'      'CVP (mmHg)'
 % 	};
 
-T = lookup_plot_data(speeds, inputs, T, Config.levLims);
+T = lookup_plot_data(speeds, inputs, T, Config.balLevDiamLims);
 
 h_fig = gobjects(size(vars,2)+2,1);
 
@@ -64,7 +64,7 @@ h_fig = gobjects(size(vars,2)+2,1);
 function h_fig = plot_balloon_levels(T, var, xlims, xLab, yLab, Config)
 	h_fig = figure('Position',[100,100,1000,800]);
 	h_ax = init_axes;
-	for i=1:numel(Config.levLims)
+	for i=1:numel(Config.balLevDiamLims)
 		inds = T.balLev_xRay==i;
 		scatter(T.(var)(inds),T.seqList(inds),40,'filled','o');
 	end
@@ -198,7 +198,7 @@ end
 
 function h_ax = make_plot_adjustments(h_ax, xlims, xLab, yLab, Config)
 	specs = get_plot_specs;
-	levLims = Config.levLims;
+	levLims = Config.balLevDiamLims;
 	xlim(xlims)
 	add_grid_lines(levLims, xlims);
 	add_axis_labels(xLab, yLab, specs);

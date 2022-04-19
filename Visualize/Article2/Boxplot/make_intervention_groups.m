@@ -11,8 +11,8 @@ function group = make_intervention_groups(F, levs)
 	
 	% Assign rows into groups
 	group(ismember(F.levelLabel,{'Balloon, Nominal','Clamp, Nominal','RPM, Nominal'})) = grpLab{1};
-	group(ismember(F.balLev,levs)) = grpLab{2};
+	group(ismember(categorical(F.balLev),levs)) = grpLab{2};
 	group(ismember(F.levelLabel,{'Clamp,  25%','Clamp,  50%','Clamp,  75%'})) = grpLab{3};
 	group(ismember(F.interventionType,'Reversal')) = grpLab{4};
-	group(ismember(F.balLev,{'5'})) = grpLab{5};
+	group(ismember(categorical(F.balLev),{'5'})) = grpLab{5};
 end

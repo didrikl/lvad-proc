@@ -49,3 +49,25 @@ Config.pChannelToSwap = {};
 Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
+
+parts = {
+    [],   [2],  [],   '1. RPM changes'
+%     [],   [8],  [],   '1. RPM changes - Second time'
+%     [],   [3],  [],   '2. Graft clamping'
+%     {},   [5],  [],  '3. Balloon inflation'
+%     {},   [6],  [],  '4. Balloon inflation'
+%     [],   [7],  [],  '5. Balloon inflation'
+%     [],   [9],  [],   '6. Saline bolus injections'
+    };
+
+% Parts (or combined parts) for quality control and description
+Config.partSpec = {
+%   BL    parts   Label
+	[],   [2],    'RPM change'
+	[],   [3],    'Clamping'
+	[],   [5],    'Balloon'
+	[],   [6],    'Balloon'
+	[],   [7],    'Balloon'
+	[],   [8],    'RPM change #2'
+	[],   [9],    'Injection [Sal]'
+	};

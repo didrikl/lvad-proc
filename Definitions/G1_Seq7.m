@@ -43,3 +43,18 @@ Config.pChannelToSwap = {};
 Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
+
+% Parts (or combined parts) for quality control and description
+Config.partSpec = {
+%   BL        Parts      Label
+	[],       [2],     'RPM change'
+	[],       [4],     'Balloon'
+ 	[],       [5],     'Balloon'
+ 	[],       [6],     'Balloon'
+ 	[],       [7],     'Clamping'
+  	[],       [8:11],  'Thrombus [1,2,3,4]'
+%   	[11,127], [12:15], 'Thrombus [5,6,7,8]'
+%   	[15,141], [16:18], 'Thrombus [Sal,9,10]'
+%   	[11,127], [16:18], 'Thrombus [Sal,9,10]' % for testing only
+%   	[],       [19]     'Anticoagulant reversal'
+	};

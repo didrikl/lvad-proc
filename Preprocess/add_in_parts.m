@@ -19,6 +19,9 @@ function T_parts = add_in_parts(fnc,T_parts,inVars,outVars,varargin)
 	[returnAsCellOutput,outVars] = get_cell(outVars);
 	[returnAsCellInput,inVars] = get_cell(inVars);
 
+	waitStr = ['Running: ',func2str(fnc)];
+	multiWaitbar(waitStr,0);
+
 	for i=1:numel(T_parts)
 
 		if numel(T_parts)>1
@@ -62,5 +65,6 @@ function T_parts = add_in_parts(fnc,T_parts,inVars,outVars,varargin)
 
 	%dbs = dbstack;
 	%fprintf('\n%s done.\n',dbs(end).name);
+	fprintf('\n')
 	multiWaitbar(waitStr,'Close');
 	

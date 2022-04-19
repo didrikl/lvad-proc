@@ -28,7 +28,7 @@ function T = add_segment_data_G1(T,BL,accVar,inds,fs)
 	T.accStd_diff(inds) = calc_diff_from_baseline_avg(T.accStd(inds),BL.accStd,'delta');
 	T.accStd_diff(inds) = calc_diff_from_baseline_avg(T.accMovStd(inds),BL.accStd,'delta');
 
-	T.Q_relDiff(inds) = calc_diff_from_baseline_avg(acc,BL.(accVar),'delta');
+	T.Q_relDiff(inds) = calc_diff_from_baseline_avg(acc,BL.(accVar),'relative');
 	T.P_LVAD_relDiff(inds) = calc_diff_from_baseline_avg(T.P_LVAD(inds),BL.P_LVAD,'relative');
 	T.accStd_relDiff(inds) = calc_diff_from_baseline_avg(T.accStd(inds),BL.accStd,'relative');
 	T.accStd_relDiff(inds) = calc_diff_from_baseline_avg(T.accMovStd(inds),BL.accStd,'relative');

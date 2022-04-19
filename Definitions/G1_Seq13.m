@@ -53,3 +53,16 @@ Config.pChannelToSwap = {};
 Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
+
+% Parts (or combined parts) for quality control and description
+Config.partSpec = {
+%   BL    parts         Label
+	[],   [2],         'RPM change'
+	[],   [4],         'Balloon'
+	[],   [5],         'Balloon'
+	[],   [6],         'Balloon'
+	[],   [7],         'Clamping'
+	[],   [8,9,10,11],       'Injection [Sal,1,2,3]'
+	[11,121], [12,13,14,15], 'Injection [4,5,6,7]'
+	[15,149], [16,17,18,19], 'Injection [8,9,10,11]'
+	};

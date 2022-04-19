@@ -1,5 +1,5 @@
 function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
-		F, classifiers, stateVar, predStates, pooled, bestAxVar)
+		F, classifiers, stateVar, predStates, pooledLevs, bestAxVar, pooledSpeed)
 	% Make ROC matrix per speed and balloon states, with following info:
 	% - x and y curve points
 	% - AUC
@@ -8,51 +8,54 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 	
 	welcome('Make ROC matrix','function')
 	
+	if nargin<7, pooledSpeed = false; end
+	lookupBL = nargin>5 && not(pooledLevs) && not(pooledSpeed);
+
 	AUC = table;
 	ROC = struct;
 	speeds = unique(F.pumpSpeed);
 	
 	% No of bootstrap iterations to calculate AUC confidence intervals
-	nBootItr = 1000;
+	nBootItr = 1;
 	
-	ROC.pooled = pooled;
+	ROC.pooledSpeed = pooledSpeed;
+	ROC.pooledLevs = pooledLevs;
 	ROC.classifiers = classifiers;
 	ROC.stateVar = stateVar;
 	ROC.predStates = predStates;
 	ROC.speeds = speeds;
 
 	nPredStateRows = size(predStates,1);
-	nSpeedCols = numel(speeds);
-	nClassifiers = numel(classifiers);
-	waitIncr = 1/(nPredStateRows*nSpeedCols*nClassifiers);
+	nCols = numel(speeds);
+	if pooledSpeed, nCols = 1; end
+	waitIncr = 1/(nPredStateRows*nCols*numel(classifiers));
 	multiWaitbar('Making ROC matrix',0);
+	
 	for i=1:nPredStateRows
 		
-		if pooled,      state_inds = F.(stateVar)>=predStates{i,1}; end
-		if not(pooled), state_inds = F.(stateVar)==predStates{i,1}; end
-				
-		for j=1:nSpeedCols
+		[state_inds, F] = add_bool_state_for_roc(pooledLevs, F, stateVar, predStates{i,1});
+
+		for j=1:nCols
 			
 			ctrl_inds = F.interventionType=='Control';
-			inds = (state_inds | ctrl_inds ) & F.pumpSpeed==speeds(j);
-			
-			for k=1:nClassifiers
-				multiWaitbar('Making ROC matrix','Increment',waitIncr);
+			inds = (state_inds | ctrl_inds );
+			if not(pooledSpeed)
+				speed_inds = F.pumpSpeed==speeds(j);
+				inds = inds & speed_inds;
+			end
+
+			for k=1:numel(classifiers)
+				multiWaitbar('Making ROC matrix', 'Increment',waitIncr);
 	
 				% Lookup control data for corresponding best axis 
-				if contains(classifiers{k},bestAxVar) && not(pooled)
-					best_ctrl_inds = find(ctrl_inds & F.pumpSpeed==speeds(j));
-					for l=1:numel(best_ctrl_inds)
-						ctrl_ax = F.([classifiers{k},'_var']){best_ctrl_inds(l)};
-						F.(classifiers{k})(best_ctrl_inds(l)) = ...
-							F.(ctrl_ax)(best_ctrl_inds(l));
-					end
+				if lookupBL && contains(classifiers{k},bestAxVar)
+					F = get_best_axis_bl(F, ctrl_inds, speed_inds, classifiers{k});
 				end
 
 				% Can use best axis var to lookup up the control intervention.
 				[ROC.X{i,j,k},ROC.Y{i,j,k},~,ROC.AUC{i,j,k},ROC.opt_roc_pt{i,j,k}] = ...
-					perfcurve(F.(stateVar)(inds), F.(classifiers{k})(inds),...
-					predStates{i,1}, "NBoot",nBootItr);
+					perfcurve(F.state(inds), F.(classifiers{k})(inds),...
+					1, "NBoot",nBootItr);
 
 				% Compile a output text table sorted by speed and predState
 				ind = i+(j-1)*nPredStateRows;
@@ -66,5 +69,5 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 		
 	end
 	
-	
+
 	

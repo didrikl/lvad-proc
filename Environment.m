@@ -6,8 +6,8 @@ addpath(genpath('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab'));
 % Make command window empty (but keeping command history in memory)
 fprintf(repmat('\n',1,20))
 home
+cd('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab')
 ls
-
 
 %% Clearing of memory
 
@@ -35,11 +35,6 @@ warning('off','backtrace')
 
 %% Plotting
 
-% Make plots silently with invisible figures, which may be handy when producing 
-% many plots in a batch
-%current_default_figure_visible = get(0,'DefaultFigureVisible');
-%set(0,'DefaultFigureVisible','off');
-
 % Control whether to use separate windows for figures or not
 %set(0,'DefaultFigureWindowStyle','docked')
 %set(0,'DefaultFigureWindowStyle','normal')
@@ -52,5 +47,8 @@ set(groot,'defaultAxesCreateFcn','disableDefaultInteractivity(gca)')
 
 %set(groot,'DefaultFigureGraphicsSmoothing','on')
 set(0, 'DefaultFigureRenderer', 'painters');
+
+% To run plotting in the background
+%set(0,'DefaultFigureVisible','off');
 
 clear e

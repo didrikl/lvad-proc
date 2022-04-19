@@ -1,5 +1,5 @@
 function T = add_highpass_RPM_filter_variables(T, vars, newVars, cut, ...
-		cutType, cutFreqShift)
+		cutType, cutFreqShift, fs)
     
     if nargin<6, cutFreqShift = 0; end
     
@@ -17,17 +17,17 @@ function T = add_highpass_RPM_filter_variables(T, vars, newVars, cut, ...
 	switch lower(cutType)
 		case 'harm'
 			fnc = @harmonic_cut_filter_data;
-			T = add_in_parts(fnc, T, vars, newVars, cut, cutFreqShift);
+			T = add_in_parts(fnc, T, vars, newVars, cut, cutFreqShift, fs);
 		case 'freq'
 			fnc = @frequency_cut_filter_data;
-			T = add_in_parts(fnc, T, vars, newVars, cut);
+			T = add_in_parts(fnc, T, vars, newVars, cut, fs);
 	end
 
 	T = convert_to_single(T, newVars);
 	if not(returnAsCell), T = T{1}; end
 
-function T = frequency_cut_filter_data(T, vars, newVars, Fpass)
-   [fs,T] = get_sampling_rate(T);
+function T = frequency_cut_filter_data(T, vars, newVars, Fpass, fs)
+   %[fs,T] = get_sampling_rate(T);
    vars = cellstr(vars);
    newVars = cellstr(newVars);
   
@@ -43,8 +43,8 @@ function T = frequency_cut_filter_data(T, vars, newVars, Fpass)
 
 	T.Properties.VariableContinuity(newVars) = 'continuous';
 
-function T = harmonic_cut_filter_data(T, vars, newVars, harmCut, cutFreqShift)
-   [fs,T] = get_sampling_rate(T);
+function T = harmonic_cut_filter_data(T, vars, newVars, harmCut, cutFreqShift, fs)
+   %[fs,T] = get_sampling_rate(T);
    vars = cellstr(vars);
    newVars = cellstr(newVars);
    

@@ -16,15 +16,25 @@ function Config =  get_processing_config_defaults_G1
 	Config.harmCutFreqShift = 0;
 	Config.cutFreq = 40;
 	Config.harmonicNotchFreqWidth = [1,1,1,2.5,1,1,1,1,1,1];
+	Config.outlierStdevFactor = 2;
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
 	
 	Config.inletInnerDiamLVAD = 12.7;
+	Config.balLevDiamLims = [2,7.4,9,10.2,11,11.70,12.7];
 	Config.defFigRes = 300;
 	Config.speeds = [2200,2400,2600];
+	Config.partSpec = {
+		%   BL    parts   Label
+		[],   [],   'RPM'
+		[],   [],   'Clamp'
+		[],   [],   'RPM #2'
+		[],   [],   'Balloon'
+		[],   [],   'Balloon'
+		[],   [],   'Balloon'
+		};
 
-	
 	% How to init and fuse data
 	% --------------------------------------------------------------------------
 	
@@ -53,8 +63,6 @@ function Config =  get_processing_config_defaults_G1
 	Config.channelToExcl = {};
 	Config.channelExclRanges = {};
 
-	Config.levLims = [2,7.4,9,10.2,11,11.70,12.7];
-	
 
 	% Paths
 	% --------------------------------------------------------------------------

@@ -19,8 +19,8 @@ function h_figs = plot_nha_power_and_flow(...
 	% - object positions is adjusted in this function
 	% - Visibility of background points and lines is here toggled on/off.
 	
-	yVar_row1 = {'Q_mean',[0 5]};
-	yVar_row2 = {'P_LVAD_mean',[0 5]};
+	yVar_row1 = {'Q_mean',[-1 1]};
+	yVar_row2 = {'P_LVAD_mean',[-1 1]};
 	yLabels = {
 		{'\itQ\rm'}
 		{'\itP_{\rmLVAD}\rm'}
@@ -57,8 +57,8 @@ function h_figs = plot_nha_power_and_flow(...
 	h_figs = gobjects(nFigs,1);
 
 	% Use g^2/kHz as unit instead
- 	G{:,nhaVar(:,1)} = 1000*G{:,nhaVar(:,1)};
- 	F{:,nhaVar(:,1)} = 1000*F{:,nhaVar(:,1)};
+%  	G{:,nhaVar(:,1)} = 1000*G{:,nhaVar(:,1)};
+%  	F{:,nhaVar(:,1)} = 1000*F{:,nhaVar(:,1)};
 
 	for v=1:nFigs
 		

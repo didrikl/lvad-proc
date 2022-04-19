@@ -52,7 +52,7 @@ function make_spectrogram_and_curve_figure_per_ids_G1(...
 	hLeg = legend(hPlt,legStr,spec.leg{:},'FontSize',15);
 	hColBar = add_colorbar(hSub, spec);
 	hYLab1(1) = ylabel(hSub(1,1),{'accelerometer signal,','harmonic order'});
-	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm, order2);
+	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm);
 	hXLab = xlabel('(sec)',spec.xLab{:});
 	
 	% Adjustments

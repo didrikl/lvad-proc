@@ -1,5 +1,5 @@
 function T_parts = add_harmonics_filtered_variables(...
-		T_parts, varNames, newVarNames, harmNotchWidth)
+		T_parts, varNames, newVarNames, harmNotchWidth, fs)
     % Add harmonics filtered varibles by a combined notch filter
     % 
 	% Inputs
@@ -26,13 +26,6 @@ function T_parts = add_harmonics_filtered_variables(...
     
     fprintf('\nInput\n\t%s\n',strjoin(varNames,', '))
     fprintf('Output\n\t%s\n\n',strjoin(newVarNames,', '))
- 
-	% if parallell toolbox is started
-    %{
-	if not(isempty(gcp('nocreate')))
-        ...run in parallell by parfor implementation
-    end
-    %}
 	
 	% TODO: Implement with add_in_parts, c.f. add_highpass_RPM_filter_variables
 
@@ -50,7 +43,7 @@ function T_parts = add_harmonics_filtered_variables(...
         
         T{:,newVarNames} = nan(height(T),numel(newVarNames));
         
-        [fs,T] = get_sampling_rate(T);
+        %[fs,T] = get_sampling_rate(T);
         [start_inds, end_inds, rpms] = find_rpm_blocks(T);
         
         for j=1:numel(rpms)
