@@ -48,7 +48,10 @@ function hFig = make_figure(T, Notes, map, accVar, seqID, partSpec, fs)
 	
 	plot_rpm_order_map(hSub(1), mapScale, colorMap, map.time, map.order, map.map, yLim_map);
 	add_linked_map_hz_yyaxis(hSub(1), '', rpms);
- 	add_transition_annotations(hSub, T, segs);
+ 	
+	make_xticks_and_time_str(hSub, segs);
+	add_xlines_and_grid(hSub, segs);
+	add_transition_annotations(hSub, T, segs);
  	add_steady_state_annotations(hSub, segs);
 	hYLab(1) = ylabel(hSub(1),{'harmonic order'}, 'Units','pixels');
 	[hLeg, hCol] = add_legend_and_colorbar(hSub, hPlt, T, accVar);
@@ -58,8 +61,6 @@ function hFig = make_figure(T, Notes, map, accVar, seqID, partSpec, fs)
 	linkaxes(hSub,'x')
 	set(hSub,'TickDir','out','TickLength',[.006 .006])
 	adjust_yticks(hSub);
-	make_xticks_and_time_str(hSub, segs);
-	add_xlines_and_grid(hSub, segs);
 	adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol);
 	
 function h = plot_curves(hAx, T, accVar, yLims, Colors)
@@ -135,7 +136,7 @@ function [hLeg, hCol] = add_legend_and_colorbar(hSub, hPlt, T, accVar)
 	
 function adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol)
 	pWidth = min(1000*T.dur(end)/(30*60),1000);
-	pStartX = 130;
+	pStartX = 125;
 	pStartY = 49;
 	gap = 21;
 	set(hSub,'Units','pixels');
@@ -148,10 +149,10 @@ function adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol)
 	hSub(1).Position(2) = pStartY+hSub(2).Position(4)+gap;
 	hSub(2).Position(2) = pStartY;
 	hYLab(1).Position(1) = -55;
-	hLeg.Position = [pWidth+pStartX+10, hSub(2).Position(2), hLeg.Position(3:4)]; 
-	hCol.Position = [pWidth+pStartX+110, hCol.Position(2), 10, 75];
-	hYyTxt.Position(1) = sum(hSub(1).Position([1,3]));
-
+	hLeg.Position = [pWidth+pStartX+8, hSub(2).Position(2), hLeg.Position(3:4)];
+	hCol.Position = [pWidth+pStartX+90, hCol.Position(2), 10, 75];
+	hYyTxt.Position(1) = sum(hSub(2).Position([1,3])-20);
+	
 function tit = make_figure_title(rpms, seqID, partSpec, accVar, mapColScale, colorMapName)
 	
 	if not(isempty(partSpec{1}))
@@ -159,10 +160,10 @@ function tit = make_figure_title(rpms, seqID, partSpec, accVar, mapColScale, col
 	else
 		parts = partSpec{2};
 	end	
-	parts =  mat2str(str2double(string(parts)));
+	parts = strjoin(string(parts),',');
 	rpm = strjoin(string(rpms),',');
 	mapColScale = mat2str(mapColScale);
-	tit = sprintf('%s - Part %s - %s - [%s] RPM - %s - %s %s', ...
+	tit = sprintf('%s - Part [%s] - %s - [%s] RPM - %s - %s %s', ...
 		seqID, parts, partSpec{3}, rpm, accVar, colorMapName, mapColScale);
 
 function add_seg_info_box(hFig, tit)
@@ -180,8 +181,8 @@ function add_seg_info_box(hFig, tit)
 		'BackgroundColor',[1 1 1],...
 		'FaceAlpha',0.35,...
 		'FitBoxToText','on',...
-		'FontName','Arial Narrow',...'Roboto Condensed Medium',...Arial Narrow',...
-		'FontSize',9.5);
+		'FontName','Roboto Condensed Medium',...Arial Narrow',...
+		'FontSize',7.5);
 
 function add_segment_annotation(hAx, segs, whichSegs, labStr, labRot, color)
 	if nargin<5, labRot = 0; end
@@ -192,20 +193,27 @@ function add_segment_annotation(hAx, segs, whichSegs, labStr, labRot, color)
 		vertAlign = 'top';%'middle';%'top';
 	elseif labRot==90 
 		horAlign = 'right'; 
-		vertAlign = 'middle';
+		vertAlign = 'top';
 	else
 		horAlign = 'center'; 
 		vertAlign = 'middle';
 	end
 	
 	yLims = ylim(hAx);
+	whichSegs = find(whichSegs);
 	durs = segs.all.startDur(whichSegs);
 		
 	for i=1:numel(durs)
-		midDur = segs.main.MidDur(...
-			find(segs.main.StartDur==durs(i),1,'first'));
-		if not(isempty(midDur))
-			text(hAx, midDur, yLims(2)*0.98, labStr, ...
+		if labRot==90
+			x = segs.all.startDur(whichSegs(i));
+			y = yLims(2)*0.985;
+		else	
+			x = segs.main.MidDur(...
+				find(segs.main.StartDur==durs(i),1,'first'));
+			y = yLims(2)*0.985;
+		end
+		if not(isempty(x))
+			text(hAx, x, y, labStr, ...
 				'Color',color,...
 				'HorizontalAlignment',horAlign,...
 				'VerticalAlignment',vertAlign,...
@@ -217,16 +225,18 @@ function add_segment_annotation(hAx, segs, whichSegs, labStr, labRot, color)
 
 function add_steady_state_annotations(hSub, segs)
 	
+	% RPM levels and segment baselines
 	speeds = unique(segs.all.pumpSpeed);
+	speeds = speeds(not(ismember(speeds,0)));
 	if numel(speeds)>1
 		for i=1:numel(speeds)
-			lab = [num2str(speeds(i)),''];
-
-			whichSegs = segs.all.pumpSpeed==speeds(i) & segs.all.isNominal;
+			
+			whichSegs = segs.all.pumpSpeed==speeds(i) & segs.all.isNominal & not(ismember(lower(string(segs.all.event)),'hands on'));
+			lab = ['\bf',num2str(speeds(i)),'\rm'];
 			add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
 
 			whichSegs = segs.all.pumpSpeed==speeds(i) & segs.all.isBaseline;
-			lab = {lab,'\bfbaseline\rm'};
+			lab = {['\bf',num2str(speeds(i)),'\rm'],'\bfbaseline\rm'};
 			add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
 
 		end
@@ -236,19 +246,19 @@ function add_steady_state_annotations(hSub, segs)
 		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
 	end
 
-
+	% balloon levels
 	levs = unique(segs.all.balLev_xRay);
-	for i=1:numel(levs)
-		lab = 'level '+string(levs(i));
-		
+	for i=1:numel(levs)	
 		whichSegs = segs.all.balLev_xRay==levs(i) & segs.all.isBalloon & segs.all.isSteadyState;
+		lab = "\bf"+"level "+string(levs(i));
 		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
 	end
 
+	% clamp levels
 	levs = unique(segs.all.QRedTarget_pst);
 	for i=1:numel(levs)
 		whichSegs = segs.all.QRedTarget_pst==levs(i) & segs.all.isSteadyState & segs.all.isAfterload;
-		lab = string(levs(i))+'%';
+		lab = "\bf"+string(levs(i))+"%";
 		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
 	end
 
@@ -272,8 +282,8 @@ function adjust_yticks(hSub)
 	ytickformat(hSub(2), 'percentage')
 
 function hSub = add_xlines_and_grid(hSub, segs)
-	xline(hSub(1), segs.main.EndDur(1:end-1), 'Alpha',0.7, 'LineWidth',.6, 'LineStyle','--','Color',[1 1 1]);
-	%xline(hSub(2), segs.main.EndDur(1:end-1), 'Alpha',1.0, 'LineWidth',.75, 'LineStyle','--','Color',[1 1 1]);
+	%xline(hSub(1), segs.main.EndDur(1:end-1), 'Alpha',0.7, 'LineWidth',.6, 'LineStyle','--','Color',[1 1 1]);
+	xline(hSub(2), segs.main.EndDur(1:end-1), 'Alpha',1.0, 'LineWidth',.75, 'LineStyle','--','Color',[1 1 1]);
 	
 	hSub(2).YGrid = 'on';
 	hSub(2).GridLineStyle = '-';

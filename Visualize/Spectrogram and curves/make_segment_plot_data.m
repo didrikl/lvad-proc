@@ -1,6 +1,6 @@
 function [T_parts, rpmOrderMap] = make_segment_plot_data(Data, accVar, Config)
 
-	res = 0.01;
+	res = 0.011;
 	overlapPst = 80; 
 	movStdWin = 10;
 	
@@ -50,7 +50,6 @@ end
 function T = add_relative_diff(T, accVar, fs, movStdWin)
 	
 	bl_inds = get_baseline_inds(T);
-	
 	BL = T(bl_inds,:);
 	
 	% NOTE: Take fs and movStdWin from Config?

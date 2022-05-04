@@ -33,7 +33,6 @@ Config.outsideNoteInclSpec = 'none';
 
 % Correction input
 Config.US_offsets = {};
-%Config.US_drifts = {50}; % Just an estimate based on previous drifts
 Config.US_drifts = {[]}; 
 Config.accChannelToSwap = {};
 Config.blocksForAccChannelSwap = [];

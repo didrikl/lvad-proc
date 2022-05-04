@@ -24,7 +24,10 @@ function segs = get_segment_info(T)
   	segs.all.isBalloon = double(string(T.balLev_xRay(segs.all.startInd)))>0;
 	segs.all.isNominal = segs.all.isSteadyState & not(segs.all.isAfterload) & not(segs.all.isBalloon);
 
-	segs.all.isIntraSeg = [false;diff(segs.all.isTransitional)==0] & [false;diff(segs.all.isEcho)==0];
+	segs.all.isIntraSeg = ...
+		[false;diff(segs.all.isTransitional)==0] & ...
+		([false;diff(double(segs.all.event))==0] | not(segs.all.event~='-')) & ...
+		[false;diff(segs.all.isEcho)==0];
 
 	segs.main = table;
 	mainSegRows = unique([1;find(not(segs.all.isIntraSeg));numel(not(segs.all.isIntraSeg))]);

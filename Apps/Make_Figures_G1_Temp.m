@@ -3,7 +3,7 @@ cd 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Visualize\Article2'
  
 %%
 
-close all
+%close all
 saveFig = false;
 
 vars = {
@@ -13,7 +13,7 @@ vars = {
 %  	'accA_norm_NF_HP_b2_pow', 'NHA_{norm} (dB)', []
 %  	'accA_best_NF_HP_b2_pow', 'NHA_{best} (dB)', []
 %  	'accA_xyz_NF_HP_b2_pow_sum', 'NHA_{sum(\itx,y,z\rm)} (dB)', []
-  	'accA_xyz_NF_HP_b2_pow_norm', 'NHA_{norm(\itx,y,z\rm)} (dB)', [-.5,2.5]
+  	'accA_xyz_NF_HP_b1_pow_norm', 'NHA_{norm(\itx,y,z\rm)} (dB)', [-.5,2.5]
 % 	'accA_best_NF_HP_b2_pow_per_speed', 'NHA_{best,per rpm}', [] %'sup\{\SigmaNHA_{{\itx},{\ity},{\itz}}\} (dB)', []
 % 	'accA_x_NF_HP_b3_pow', 'NHA_{{\itx}} (dB), band=[1.20, 4.95] ', []
 % 	'accA_y_NF_HP_b3_pow', 'NHA_{{\ity}} (dB), band=[1.20, 4.95] ', []
@@ -46,7 +46,7 @@ vars = {
 	'Q_mean',                     '\itQ'
 	'P_LVAD_mean',                '\itP_{\rmLVAD}'
 	%'accA_xyz_NF_HP_b2_pow_sum',  'sum(NHA_{\itx,y,z})'
-	'accA_xyz_NF_HP_b2_pow_norm', 'norm(NHA_{\itx,y,z})'
+	'accA_xyz_NF_HP_b1_pow_norm', 'norm(NHA_{\itx,y,z})'
 	};
 cats = {
      'Clamp,  75%' 
@@ -108,7 +108,7 @@ make_spectrogram_and_curve_figure_per_ids_G1(...
 
 nhaVars = {
 	%'accA_best_NF_HP_b2_pow_per_speed', [0,15]
-	'accA_best_NF_HP_b2_pow', [-1,5]
+	'accA_best_NF_HP_b1_pow', [-1,5]
 	%'accA_y_NF_HP_b2_pow',[-1, 10]
 	%'accA_y_NF_stdev',[]
 	%'p_eff_mean',[55,100]
@@ -125,19 +125,19 @@ legTit = 'Pendulating Mass in Inlet Conduit';
 xLab = 'Areal inflow obstruction (%)';
 
 %home; close all
-sequences = {
-	'Seq3' % (pilot)
-	'Seq6'
-	'Seq7'
-	'Seq8'
-	'Seq11'
-	'Seq12'
-	'Seq13'
-	'Seq14'
-	};
-F2 = lookup_sequences(sequences, F_rel);
+% sequences = {
+% 	'Seq3' % (pilot)
+% 	'Seq6'
+% 	'Seq7'
+% 	'Seq8'
+% 	'Seq11'
+% 	'Seq12'
+% 	'Seq13'
+% 	'Seq14'
+% 	};
+% F2 = lookup_sequences(sequences, F_rel);
 G_rel = Data.G1.Feature_Statistics.Descriptive_Relative.med;
-plot_nha_power_and_flow(F2, G_rel, [], nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, legTit, 'effect');
+plot_nha_power_and_flow(F_rel, G_rel, [], nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, legTit, 'effect');
 
 %clear nhaVars levelLabels xLims xLab tit
 
@@ -150,7 +150,7 @@ plot_nha_power_and_flow(F2, G_rel, [], nhaVars, levelLabels, 'arealObstr_pst', x
 nhaVars = {
 	%'accA_x_NF_b1_pow',[0,0.008]
 	%'accA_y_NF_HP_b2_pow',[0, 0.008]
-	'accA_y_NF_HP_b2_pow',[0, 0.008]
+	'accA_y_NF_HP_b1_pow',[0, 0.008]
 	%'accA_z_NF_HP_b2_pow',[0, 0.008]
 	%'accA_norm_NF_HP_b2_pow',[0, 0.008]
 	%'accA_z_NF_b1_pow',[0,0.008]
@@ -227,9 +227,9 @@ xLims = [0,100];
 xLab = 'Flow rate reduction targets (%)';
 legTit = 'Control intervensions';
 
-plot_nha_power_and_flow_per_intervention(Data.IV2.Features.Absolute,...
-	Data.IV2.Feature_Statistics.Descriptive_Absolute.med, ...
-	Data.IV2.Feature_Statistics.Results, ...
+plot_nha_power_and_flow_per_intervention(Data.G1.Features.Absolute,...
+	Data.G1.Feature_Statistics.Descriptive_Absolute.med, ...
+	Data.G1.Feature_Statistics.Results, ...
 	nhaVars, levelLabels, 'QRedTarget_pst', xLims, xLab, legTit,'control');
 
 clear nhaVars levelLabels xLims xLab legTit
@@ -240,9 +240,9 @@ clear nhaVars levelLabels xLims xLab legTit
 % Figure 6 in submission for ASAIO
 
 classifiers_to_plot = {
-	'accA_xyz_NF_HP_b2_pow_sum', 'sum(NHA_{x,y,z})'
-	'accA_xyz_NF_HP_b2_pow_norm', 'norm(NHA_{x,y,z})'
-	'accA_best_NF_HP_b2_pow_per_speed', 'NHA_{best, per speed}'
+	'accA_xyz_NF_HP_b1_pow_sum', 'sum(NHA_{x,y,z})'
+	'accA_xyz_NF_HP_b1_pow_norm', 'norm(NHA_{x,y,z})'
+	'accA_best_NF_HP_b1_pow_per_speed', 'NHA_{best, per speed}'
 	%   'accA_best_NF_HP_b2_pow', 'NHA_{best, per interv.}';
 	% 	'accA_x_NF_HP_b2_pow', 'NHA_{\itx}';
 	%  	'accA_y_NF_HP_b2_pow', 'NHA_{\ity}';

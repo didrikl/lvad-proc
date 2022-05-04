@@ -9,6 +9,7 @@ Config.proc_path = make_save_path(Config);
 Config.pl_filePaths = init_pl_filepaths(Config);
 Config.us_filePaths = init_us_filepaths(Config);
 Config.notes_filePath = init_notes_filepath(Config);
+Config.idSpecs = init_id_specifications(Config.idSpecs_path);
 
 % Read PowerLab data in files exported from LabChart
 PL = init_labchart_mat_files(Config.pl_filePaths, '', Config.labChart_varMapFile);
@@ -18,8 +19,6 @@ US = init_system_m_text_files(Config.us_filePaths, '', Config.systemM_varMapFile
 
 % Read sequence notes made with Excel file template
 Notes = init_notes_xls(Config.notes_filePath, '', Config.notes_varMapFile);
-
-Config.idSpecs = init_id_specifications(Config.idSpecs_path);
 
 %% Quality control and fixes
 

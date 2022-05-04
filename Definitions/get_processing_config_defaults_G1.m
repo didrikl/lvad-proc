@@ -54,7 +54,7 @@ function Config =  get_processing_config_defaults_G1
 	% List of possible fixes and ajustments
 	% ----------------------------------------------------------------------- ---
 	
-	Config.US_offsets = {};
+	Config.US_offsets = {}; % negative number: shift graph towards right
 	Config.US_drifts = {};
 	Config.accChannelToSwap = {};
 	Config.blocksForAccChannelSwap = [];

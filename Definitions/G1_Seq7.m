@@ -35,8 +35,8 @@ Config.ultrasound_fileNames = {
 	};
 
 % Correction input
-Config.US_offsets = {3600};
-Config.US_drifts = {5}; % Just an estimate based on previous drifts
+Config.US_offsets = {3600-0.5};
+Config.US_drifts = {[]}; %5??
 Config.accChannelToSwap = {};
 Config.blocksForAccChannelSwap = [];
 Config.pChannelToSwap = {};
@@ -53,8 +53,7 @@ Config.partSpec = {
  	[],       [6],     'Balloon'
  	[],       [7],     'Clamping'
   	[],       [8:11],  'Thrombus [1,2,3,4]'
-%   	[11,127], [12:15], 'Thrombus [5,6,7,8]'
-%   	[15,141], [16:18], 'Thrombus [Sal,9,10]'
-%   	[11,127], [16:18], 'Thrombus [Sal,9,10]' % for testing only
-%   	[],       [19]     'Anticoagulant reversal'
+   	[11,127], [12:15], 'Thrombus [5,6,7,8]'
+   	[15,141], [16:18], 'Thrombus [Sal,9,10]'
+   	[],       [19]     'Anticoagulant reversal'
 	};

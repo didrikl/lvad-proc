@@ -16,7 +16,7 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 	speeds = unique(F.pumpSpeed);
 	
 	% No of bootstrap iterations to calculate AUC confidence intervals
-	nBootItr = 1;
+	nBootItr = 1000;
 	
 	ROC.pooledSpeed = pooledSpeed;
 	ROC.pooledLevs = pooledLevs;

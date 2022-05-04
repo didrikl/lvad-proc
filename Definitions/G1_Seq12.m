@@ -48,6 +48,10 @@ Config.pChannelToSwap = {};
 Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
+Config.channelToExcl = {'accA_x','accA_y','accA_z'};
+Config.channelExclRanges = {	
+	'01/07/2021 17:50:46', '01/07/2021 17:50:51' % Signal loss during clamp reversal
+   };
 
 % Parts (or combined parts) for quality control and description
 Config.partSpec = {

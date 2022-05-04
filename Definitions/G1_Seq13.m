@@ -45,7 +45,7 @@ Config.ultrasound_fileNames = {
     };
 
 % Correction input
-Config.US_offsets = {1};
+Config.US_offsets = {-0.5};
 Config.US_drifts = {40};
 Config.accChannelToSwap = {};
 Config.blocksForAccChannelSwap = [];

@@ -35,7 +35,7 @@ Config.ultrasound_fileNames = {
 	};
 
 % Correction input
-Config.US_offsets = {};
+Config.US_offsets = {-1};
 Config.US_drifts = {49}; % Just an estimate based on previous drifts
 Config.accChannelToSwap = {};
 Config.blocksForAccChannelSwap = [];
@@ -45,7 +45,8 @@ Config.PL_offset = [];
 Config.PL_offset_files = {};
 Config.channelToExcl = {'accA_y'};
 Config.channelExclRanges = {	
-	'11/12/2020 12:53:07', '11/12/2020 12:58:35' % clamp
+	'11/12/2020 12:06:55', '11/12/2020 12:45:00' % RPM changes
+    '11/12/2020 12:53:07', '11/12/2020 12:58:35' % clamp
     '11/12/2020 13:27:50', '11/12/2020 13:58:42' % balloon, 2400 RPM 
 	'11/12/2020 14:05:42', '11/12/2020 14:13:00' % balloon, 2200 RPM
     '11/12/2020 14:20:26', '11/12/2020 14:48:30' % balloon, 2200-2600 RPM

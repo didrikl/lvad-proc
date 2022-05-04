@@ -1,4 +1,4 @@
-function [relVars, R] = compile_results_table(R, levSortOrder, rpm_order, R_rel)
+function R = compile_results_table(R, levSortOrder, rpm_order, R_rel)
 	relVars = {
 		'Q_LVAD_mean'
 		'P_LVAD_mean'

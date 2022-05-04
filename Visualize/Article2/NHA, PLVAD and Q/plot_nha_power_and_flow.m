@@ -30,9 +30,9 @@ function h_figs = plot_nha_power_and_flow(...
 	speeds = [2200,2400,2600];
 	
 	spec = get_plot_specs;
-	figWidth = 1180;
-	figHeight =  890; %955
-    panelHeight = 185; %200
+	figWidth = 1170;
+	figHeight =  920; %955
+    panelHeight = 195; %200
 	yStart = 74;
 	yGap = 7;
 

@@ -1,4 +1,4 @@
-function Notes = init_notes_xls(fileName, path, varMapFile)
+function NotesTT = init_notes_xls(fileName, path, varMapFile)
     % 
     % Read named ranges from Notes Excel file. Ranges must be defined by Excel
     % name manager. (Named ranges make the Excel file more flexible w.r.t.
@@ -157,12 +157,12 @@ function Notes = init_notes_xls(fileName, path, varMapFile)
     Notes(:,ismember(Notes.Properties.VariableNames,varNamesToRemove)) = [];
     
     % Convert to timetable with timestamp as the time column
-    Notes = table2timetable(Notes,'RowTimes',timeVarName);
+    NotesTT = table2timetable(Notes,'RowTimes',timeVarName);
 	
-    
+	
 function notes = add_note_row_id(notes, n_header_lines)
     % Add note row ID, useful when merging with sensor data
-    notes.noteRow = int16((1:height(notes))' + n_header_lines' +1);
+    notes.noteRow = int16((1:height(notes))' + n_header_lines');
     notes = movevars(notes, 'noteRow', 'Before', 'partDurTime');
     notes.Properties.VariableContinuity('noteRow') = 'step';
        

@@ -22,15 +22,6 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, minM
 	
 	% Missing sequences in data indicates a typo. 
 	seqs = check_missing_sequences(seqs, D);
-
-	% Code if parallellization by parfor loop instead of for loop below:
-	%{
-        data = cell(numel(seqs),1);
-        for j=1:numel(seqs)
-            data{j} = S_analysis.(seqs{j});
-        end
-	%}
-	
 	
 	% Aggregate uniquely tagged interventions, sequence by sequence
 	T = cell(numel(seqs),1);
@@ -70,20 +61,6 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, minM
 			@(x)listNoteRows(x),'noteRow',...
 			'IncludeEmptyGroups',false);
 
-		% Code example (for idStats_meas only) to include missing-rows:
-		%{
-        S_analysis.(seq).group_id = categorical(...
-            string(S_analysis.(seq).analysis_id)+" - "+...
-            string(S_analysis.(seq).bl_id));
-        stats_meas = groupsummary(S_analysis.(seq),group_id,...
-            {'mean','std','median',@(x)prctile(x,[25,75])},{meas_vars},...
-            'IncludeEmptyGroups',true);
-        group_id = split(string(idStats_meas.group_id)," - ");
-        idStats_meas.analysis_id = cateogrical(group_id(:,1));
-        idStats_meas.bl_id = categorical(group_id(:,2));
-        idStats_meas.group_id = []; 
-		%}
-
 		% Joining the aggregats per sequence into one tables
 		T{j} = join(idStatsMeans,idStatsDiscr,'Keys',{'analysis_id','bl_id'});
 		T{j} = join(T{j},idStatsMedians,'Keys',{'analysis_id','bl_id'});
@@ -113,6 +90,8 @@ function S = remove_rows_with_irrelevant_analysis_id(S, idSpecs)
 	% Remove rows with extra ids in data not listed in id spec file
 	extraIDs = not(ismember(S.analysis_id,idSpecs.analysis_id));
 	S(extraIDs,:) = [];
+
+	% Update categories (metadata) after removal
 	S.analysis_id = removecats(S.analysis_id);
 	S.bl_id = removecats(S.bl_id);
 

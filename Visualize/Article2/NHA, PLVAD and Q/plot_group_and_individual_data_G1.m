@@ -14,6 +14,7 @@ for j=1:numel(speeds)
 	h_ax.ColorOrderIndex=j;
 	
 	F_rpm_inds = F.pumpSpeed==speeds(j);
+	
 	F_y = F.(yVar)(F_rpm_inds);
 	F_x = F.(xVar)(F_rpm_inds);
 	F_x(isnan(F_x)) = 0;
@@ -26,6 +27,7 @@ for j=1:numel(speeds)
 		F_x = F.(xVar)(F_rpm_inds & F.seq==seqs(k));
 		F_y = F.(yVar)(F_rpm_inds & F.seq==seqs(k));
 		F_x(isnan(F_x)) = 0;
+		if isempty(F_y), continue; end
 		h_backLines(j,k) = plot(F_x, F_y, spec.backLines{:});
 		h_backLines(j,k).Color = [h_backLines(j).Color,0.5];
 	end
