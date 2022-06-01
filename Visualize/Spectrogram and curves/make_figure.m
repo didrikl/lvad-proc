@@ -21,6 +21,9 @@ function hFig = make_figure(T, Notes, map, accVar, seqID, partSpec, fs)
 		'balDiam_xRay'
 		'balLev_xRay'         
 		'arealObstr_xRay_pst'
+		'balDiam'
+		'balLev'         
+		'arealObstr_pst'
 		'embVol'             
 		'embType'            
 		'pumpSpeed'          
@@ -43,8 +46,8 @@ function hFig = make_figure(T, Notes, map, accVar, seqID, partSpec, fs)
 	hSub(2) = subplot(2,1,2,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);
 	
 	hPlt = plot_curves(hSub(2), T, accVar, yLims);
-	add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.20, [1.05*yLims(1) 70])
-	add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.4, [1.05*yLims(1) 70])
+	%add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.20, [1.05*yLims(1) 70])
+	%add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.4, [1.05*yLims(1) 70])
 	
 	plot_rpm_order_map(hSub(1), mapScale, colorMap, map.time, map.order, map.map, yLim_map);
 	add_linked_map_hz_yyaxis(hSub(1), '', rpms);
@@ -247,19 +250,31 @@ function add_steady_state_annotations(hSub, segs)
 	end
 
 	% balloon levels
-	levs = unique(segs.all.balLev_xRay);
-	for i=1:numel(levs)	
-		whichSegs = segs.all.balLev_xRay==levs(i) & segs.all.isBalloon & segs.all.isSteadyState;
-		lab = "\bf"+"level "+string(levs(i));
-		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+	try
+		levs = unique(segs.all.balLev_xRay);
+		for i=1:numel(levs)
+			whichSegs = segs.all.balLev_xRay==levs(i) & segs.all.isBalloon & segs.all.isSteadyState;
+			lab = "\bf"+"level "+string(levs(i));
+			add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+		end
+	catch
+		levs = unique(segs.all.balLev);
+		for i=1:numel(levs)
+			whichSegs = segs.all.balLev==levs(i) & segs.all.isBalloon & segs.all.isSteadyState;
+			lab = "\bf"+"level "+string(levs(i));
+			add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+		end
 	end
-
+	
 	% clamp levels
-	levs = unique(segs.all.QRedTarget_pst);
-	for i=1:numel(levs)
-		whichSegs = segs.all.QRedTarget_pst==levs(i) & segs.all.isSteadyState & segs.all.isAfterload;
-		lab = "\bf"+string(levs(i))+"%";
-		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+	try
+		levs = unique(segs.all.QRedTarget_pst);
+		for i=1:numel(levs)
+			whichSegs = segs.all.QRedTarget_pst==levs(i) & segs.all.isSteadyState & segs.all.isClamp;
+			lab = "\bf"+string(levs(i))+"%";
+			add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+		end
+	catch
 	end
 
 	add_segment_annotation(hSub(2), segs, segs.all.isEcho, 'echo', 0)

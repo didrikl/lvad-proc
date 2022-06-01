@@ -22,7 +22,8 @@ function Config =  get_processing_config_defaults_G1
 	% --------------------------------------------------------------------------
 	
 	Config.inletInnerDiamLVAD = 12.7;
-	Config.balLevDiamLims = [2,7.4,9,10.2,11,11.70,12.7];
+	Config.balLevDiamLims = [2,7.4,9,10.2,11,11.6,12.7];
+	
 	Config.defFigRes = 300;
 	Config.speeds = [2200,2400,2600];
 	Config.partSpec = {

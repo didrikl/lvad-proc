@@ -1,6 +1,5 @@
-function make_spectrogram_and_curve_plot_figure(Data, seqDefs, accVar, saveFig)
+function make_spectrogram_and_curve_plot_figure(Data, seqDefs, accVar, saveFig, Config)
 	
-	Config = get_processing_config_defaults_G1;
 	nVars = numel(accVar);
 	for k=1:numel(seqDefs)
 		
@@ -9,10 +8,10 @@ function make_spectrogram_and_curve_plot_figure(Data, seqDefs, accVar, saveFig)
 		seq = get_seq_id(Config.seq);
 		seqID = [Config.experimentID,'_',seq];
 		partSpec = Config.partSpec;
-
-		nPartSegments = numel(Data.(seq).Plot_Data.T);
 		savePath = fullfile(Config.data_basePath, Config.seq_subdir, ...
 			Config.proc_plot_subdir, 'Spectrogram and curve plots');
+		
+		nPartSegments = numel(Data.(seq).Plot_Data.T);
 		for i=1:nPartSegments
 			for j=1:nVars
 				T = Data.(seq).Plot_Data.T{i};

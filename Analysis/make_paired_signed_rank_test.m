@@ -25,10 +25,15 @@ function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType, groupVar)
 				% For each variable/modality do the paired non-parametric
 				% statsitical test for each state level against the nominal state
 
-				% TODO: Use function handle input instead
+				% TODO: Use function handle input instead or make it OO
 				bl_var = get_baseline_varible_name(var, iv_var{j}, exprType);
-				if all(isnan(W.(iv_var{j})(W.pumpSpeed==groups(g))))
+				if all(isnan(W.(iv_var{j})(W.pumpSpeed==groups(g)))) || ...
+					all(isnan(W.(bl_var)(W.pumpSpeed==groups(g))))
 					p(j) = nan;
+					iv_var{j}
+					bl_var
+					groups(g)
+					
 				else
 					p(j) = signrank(...
 						W.(bl_var)(W.pumpSpeed==groups(g)),...
@@ -96,19 +101,24 @@ function [P,R] = make_paired_signed_rank_test(W, G, pVars, exprType, groupVar)
 	P = merge_table_blocks(P);
 
 function bl_var = get_baseline_varible_name(var, iv_var, exprType)
+	% For BL stored in a pairwise structure, with one colum/variable per
+	% level and per measurement: 
+	% - Define what is baseline for each intervention. 
+	% - The baseline name is speed-independent. 
 	switch exprType
 		case 'G1'
+			
+			% For intervention set baseline 
 			if contains(iv_var,'RPM'), bl_var = var+"_RPM, Nominal"; end
-			
 			if contains(iv_var,'Clamp'), bl_var = var+"_Clamp, Nominal";     end 
-			if contains(iv_var,'Clamp, Nominal'), bl_var = var+"_RPM, Nominal";     end 
-			
 			if contains(iv_var,'Injection'), bl_var = var+"_Injection, Nominal"; end
+			if contains(iv_var,'Balloon'), bl_var = var+"_Balloon, Nominal";   end
+			
+			% For baseline-to-baseline comparisons
+			if contains(iv_var,'Balloon, Nominal'), bl_var = var+"_RPM, Nominal";   end
+			if contains(iv_var,'Clamp, Nominal'), bl_var = var+"_RPM, Nominal";     end
 			if contains(iv_var,'Injection, Nominal'), bl_var = var+"_Injection, Nominal"; end
 			
-			if contains(iv_var,'Balloon'), bl_var = var+"_Balloon, Nominal";   end
-			if contains(iv_var,'Balloon, Nominal'), bl_var = var+"_RPM, Nominal";   end
-
 		case 'IV2'
 			if contains(iv_var,'Afterload')
 				bl_var = var+"_Afterload, Nominal";

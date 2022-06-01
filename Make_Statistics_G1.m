@@ -43,9 +43,9 @@ discrVars = {
  	'CO'
     };
 meanVars = {
-	'accA_x_NF_HP'    % to get stddev
-	'accA_y_NF_HP'    % to get stddev
-	'accA_z_NF_HP'    % to get stddev
+	%'accA_x_NF_HP'    % to get stddev
+	%'accA_y_NF_HP'    % to get stddev
+	%'accA_z_NF_HP'    % to get stddev
 	%'accA_norm_NF_HP' % to get stddev
 	'pGraft'
 	'pMillar'
@@ -64,7 +64,8 @@ accVars = {
 	%'accA_norm_NF_HP'
 	};
 hBands = [
-	1.20, 3.85
+	1.25, 7
+	%1.20, 3.85
 	];
 isHarmBand = true;
 Pxx = make_power_spectra(Data.G1, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
@@ -75,7 +76,7 @@ Pxx.bandMetrics{:,vartype('numeric')} = 1000*Pxx.bandMetrics{:,vartype('numeric'
 % Add derived features
 F = join(F, Pxx.bandMetrics, 'Keys',{'analysis_id','id'});
 F.Q_CO_pst = 100*(F.Q_mean./F.CO_mean);
-F.P_LVAD_drop = -F.P_LVAD_mean;
+F.P_LVAD_change = abs(F.P_LVAD_mean);
 
 % Add derived best axes based on highest absolute NHA values
 % vars = {'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'};
@@ -86,91 +87,118 @@ F.P_LVAD_drop = -F.P_LVAD_mean;
 % F = derive_best_axis_values(F, vars, newVar, sequences);
 
 % Add aggregated (sum and norm) bandbower over x, y, and z
-F.accA_xyz_NF_HP_b1_pow_sum = sum([F.accA_x_NF_HP_b1_pow,F.accA_y_NF_HP_b1_pow,F.accA_z_NF_HP_b1_pow],2);
-F.accA_xyz_NF_HP_b2_pow_sum = sum([F.accA_x_NF_HP_b2_pow,F.accA_y_NF_HP_b2_pow,F.accA_z_NF_HP_b2_pow],2);
-F.accA_xyz_NF_HP_b1_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'}}.^2,2));
-F.accA_xyz_NF_HP_b2_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'}}.^2,2));
+% F.accA_xyz_NF_HP_b1_pow_sum = sum([F.accA_x_NF_HP_b1_pow,F.accA_y_NF_HP_b1_pow,F.accA_z_NF_HP_b1_pow],2,'omitnan');
+% F.accA_xyz_NF_HP_b2_pow_sum = sum([F.accA_x_NF_HP_b2_pow,F.accA_y_NF_HP_b2_pow,F.accA_z_NF_HP_b2_pow],2);
+F.accA_xyz_NF_HP_b1_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'}}.^2,2,"omitnan"));
+F.accA_xyz_NF_HP_b2_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'}}.^2,2,"omitnan"));
 
 % Make relative and delta differences from baselines using id tags
 % -----------------------------------------------------------
 
-nominalAsBaseline = true;
+nominalAsBaseline = false;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
+
+
+% Model statistics
+% -----------------------------------------------------------
+
+weight = nan(numel(sequences),1);
+for i=1:numel(sequences)
+	weight(i) = str2double(Data.G1.(sequences{i}). ...
+		Notes.Properties.UserData.Experiment_Info.PigWeight0x28kg0x29);
+end
+mean(weight)
 
 
 %% Descriptive stastistics over group of experiments
 % -----------------------------------------------------------
 
 % Exclude friction
-%F(contains(F.id,'Seq14_Bal'),:) = [];
-%F_rel(contains(F.id,'Seq14_Bal'),:) = [];
-%F_del(contains(F.id,'Seq14_Bal'),:) = [];
+% F(contains(F.id,'Seq14_Bal'),:) = [];
+% F_rel(contains(F.id,'Seq14_Bal'),:) = [];
+% F_del(contains(F.id,'Seq14_Bal'),:) = [];
 
 G = make_group_stats(F, idSpecs, sequences);
 G_rel = make_group_stats(F_rel, idSpecs, sequences);
 G_del = make_group_stats(F_del, idSpecs, sequences);
-
 
 % Hypothesis test
 % -----------------------------------------------------------
 
 % Do Wilcoxens pair test and make table of median and p-values
 pVars = {
-	'accA_x_NF_HP_b1_pow'
-	'accA_y_NF_HP_b1_pow'
-	'accA_z_NF_HP_b1_pow'
+% 	'accA_x_NF_HP_b1_pow'
+% 	'accA_y_NF_HP_b1_pow'
+% 	'accA_z_NF_HP_b1_pow'
 	'accA_xyz_NF_HP_b1_pow_norm'
 	%'accA_xyz_NF_HP_b1_pow_sum'
 	%'accA_best_NF_HP_b1_pow'
 	%'accA_best_NF_HP_b1_pow_per_speed'
  	%'accA_norm_NF_HP_b1_pow'
-	'accA_x_NF_HP_b2_pow'
- 	'accA_y_NF_HP_b2_pow'
- 	'accA_z_NF_HP_b2_pow'
- 	'accA_xyz_NF_HP_b2_pow_norm'
+% 	'accA_x_NF_HP_b2_pow'
+%  	'accA_y_NF_HP_b2_pow'
+%  	'accA_z_NF_HP_b2_pow'
+  	'accA_xyz_NF_HP_b2_pow_norm'
 	%'accA_xyz_NF_HP_b2_pow_sum'
  	%'accA_best_NF_HP_b2_pow'
 	%'accA_best_NF_HP_b2_pow_per_speed'
  	%'accA_norm_NF_HP_b2_pow'
 	'Q_mean'
 	'P_LVAD_mean'
-	'Q_LVAD_mean'
+%	'Q_LVAD_mean'
 	'pGraft_mean'
 };
 
-W = make_paired_features_for_signed_rank_test(F, pVars);
-W_rel = make_paired_features_for_signed_rank_test(F_rel, pVars);
-[P,R] = make_paired_signed_rank_test(W, G, pVars, 'G1', 'pumpSpeed');
-[P_rel,R_rel] = make_paired_signed_rank_test(W_rel, G_rel, pVars, 'G1', 'pumpSpeed');
+W = make_paired_features_for_signed_rank_test(F, pVars,{'seq'});
+W_rel = make_paired_features_for_signed_rank_test(F_rel, pVars,{'seq'});
+[P,R] = make_paired_signed_rank_test_G1(W, G, pVars);
+[P_rel,R_rel] = make_paired_signed_rank_test_G1(W_rel, G_rel, pVars);
 
+
+%% Compile results table
 
 % One sorted and combined results table with absolute and relative results
 levOrder = {
-	'RPM, Nominal'
-	'RPM, Nominal #2'
-	'Balloon, Nominal'
-	'Balloon, Lev1'
-	'Balloon, Lev2'
-	'Balloon, Lev3'
-	'Balloon, Lev4'
-	'Balloon, Lev5'
-	'Balloon, Reversal'
-	'Clamp, Nominal'
-	'Clamp,  25%'
-	'Clamp,  50%'
-	'Clamp,  75%'
-	'Clamp, Reversal'
+	'RPM, 2400, Nominal'
+	'RPM, 2400, Nominal #2'
+	'RPM, 2200, Nominal'
+	'RPM, 2200, Nominal #2'
+	'RPM, 2600, Nominal'
+	'RPM, 2600, Nominal #2'
+	'Clamp, 2400, Nominal'
+	'Clamp, 2400, 25%'
+	'Clamp, 2400, 50%'
+	'Clamp, 2400, 75%'
+	'Clamp, 2400, Reversal'
+	'Balloon, 2400, Nominal'
+	'Balloon, 2400, Lev1'
+	'Balloon, 2400, Lev2'
+	'Balloon, 2400, Lev3'
+	'Balloon, 2400, Lev4'
+	'Balloon, 2400, Lev5'
+	'Balloon, 2400, Reversal'
+	'Balloon, 2200, Nominal'
+	'Balloon, 2200, Lev1'
+	'Balloon, 2200, Lev2'
+	'Balloon, 2200, Lev3'
+	'Balloon, 2200, Lev4'
+	'Balloon, 2200, Lev5'
+	'Balloon, 2200, Reversal'
+	'Balloon, 2600, Nominal'
+	'Balloon, 2600, Lev1'
+	'Balloon, 2600, Lev2'
+	'Balloon, 2600, Lev3'
+	'Balloon, 2600, Lev4'
+	'Balloon, 2600, Lev5'
+	'Balloon, 2600, Reversal'
 	};
-rpmOrder = [2400,2600,2200];
 
-[F, F_rel, F_del, G, G_rel, G_del] = sort_by_level_order(...
-	F, levOrder, F_rel, F_del, G, G_rel, G_del);
-R = compile_results_table(R, levOrder, rpmOrder, R_rel);
+Results = compile_results_table(R, levOrder, R_rel);
 
 
-%% Calculate ROC curves and corresponding confidence intervals
-% -----------------------------------------------------------
+%% Calculate ROC curves
+% ----------------------
 
 classifiers = {
 	'accA_x_NF_HP_b1_pow'
@@ -187,7 +215,7 @@ classifiers = {
 %	'accA_xyz_NF_HP_b1_pow_sum'
 %	'accA_best_NF_HP_b1_pow'
 % 	'accA_best_NF_HP_b1_pow_per_speed'
-	'P_LVAD_drop'
+	'P_LVAD_change'
 	'P_LVAD_mean'
 	};
 
@@ -201,25 +229,28 @@ bestAxVars = {
 % Input for states of concrete occlusions 
 predStateVar = 'levelLabel';
 predStates = {
-	'Balloon, Lev1', '\bf34%-47%\rm\newlineobstruction'
-	'Balloon, Lev2', '\bf52%-64%\rm\newlineobstruction'
-	'Balloon, Lev3', '\bf65%-72%\rm\newlineobstruction'
-	'Balloon, Lev4', '\bf78%-84%\rm\newlineobstruction'
+	'Balloon, 2400, Lev1', '\bf34%-47%\rm\newlineobstruction'
+	'Balloon, 2400, Lev2', '\bf52%-64%\rm\newlineobstruction'
+	'Balloon, 2400, Lev3', '\bf65%-72%\rm\newlineobstruction'
+	'Balloon, 2400, Lev4', '\bf78%-84%\rm\newlineobstruction'
 	%'Balloon, Lev5', '\bf85%-94%\rm\newlineobstruction'
 	};
-[ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
-	F, classifiers, predStateVar, predStates, false, bestAxVars);
+[ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(F(F.pumpSpeed==single(2400),:), classifiers, predStateVar, predStates, false);
 Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
+
+
+%% Calculate pooled ROC curves
+% ------------------------------
 
 % Input for states of pooled occlusions above a threshold
 predStateVar = 'balLev';
 F.balLev = double(string(F.balLev));
 predStates = {
-	1, ' Lev 1-4' % minimum level 1
-	2, ' Lev 2-4' % minimum level 2
-	3, ' Lev 3,4' % minimum level 3
-	[2,3], 'Lev 2,3' % level 2 and 3 specifically, without level 4
+	1, ' Lev 1-5' % all levels
+	%2, ' Lev 2-5' % minimum level 2
+	%3, ' Lev 3-5' % minimum level 3
+	[2,3,4], 'Lev 2-4' % level 2, 3 and 4 specifically
 	};
 [ROC_pooled,AUC_pooled] = make_roc_curve_matrix_per_intervention_and_speed(...
 	F(F.balLev~=5,:), classifiers, predStateVar, predStates, true, {}, false);
@@ -251,7 +282,7 @@ Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
 Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
 Data.G1.Feature_Statistics.Test_P_Values_Absolute = P;
 Data.G1.Feature_Statistics.Test_P_Values_Relative = P_rel;
-Data.G1.Feature_Statistics.Results = R;
+Data.G1.Feature_Statistics.Results = Results;
 Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
 Data.G1.Feature_Statistics.ROC_pooled = ROC_pooled;
@@ -270,8 +301,7 @@ save_statistics_as_separate_spreadsheets(Data.G1.Feature_Statistics, Config.stat
 multiWaitbar('CloseAll');
 clear save_data check_table_var_input
 %clear F G F_rel G_rel F_del G_del 
-clear Pxx idSpecs
+%clear Pxx idSpecs sequences
 clear discrVars meanVars minMaxVars accVars hBands  pVars nominalAsBaseline ...
-    bestAxVars levOrder...
-	pooled classifiers predStateVar predStates ROC F_ROC F_ROC_SPSS AUC ...
-	sequences isHarmBand W W_rel relVars newVar vars ans
+    bestAxVars levOrder pooled classifiers predStateVar predStates ROC AUC ...
+	isHarmBand W W_rel relVars newVar vars ans

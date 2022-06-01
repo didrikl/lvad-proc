@@ -9,7 +9,6 @@ function save_statistics_as_separate_spreadsheets(Stats, path)
 	
 	g_path = fullfile(path,'Descriptive');
 
-	save_data('Results', g_path, R, 'spreadsheet');
 	save_data('Means', g_path, G.avg, 'spreadsheet');
 	save_data('St.devs', g_path, G.std, 'spreadsheet');
 	save_data('Medians', g_path, G.med, 'spreadsheet');
@@ -31,6 +30,6 @@ function save_statistics_as_separate_spreadsheets(Stats, path)
 	% ---------------------------------------------------------
 	t_path = fullfile(path,'Non-parametric paired test');
 	
-	save_data('Formatted results', t_path, Stats.Results, 'spreadsheet');
+	save_data('Results', t_path, Stats.Results, 'spreadsheet');
 	save_data('P-values - Absolute', t_path, Stats.Test_P_Values_Absolute, 'spreadsheet');
 	save_data('P-values - Relative', t_path, Stats.Test_P_Values_Relative, 'spreadsheet');

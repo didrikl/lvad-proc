@@ -46,10 +46,10 @@ Config.PL_offset_files = {};
 Config.channelToExcl = {'accA_y'};
 Config.channelExclRanges = {	
 	'11/12/2020 12:06:55', '11/12/2020 12:45:00' % RPM changes
-    '11/12/2020 12:53:07', '11/12/2020 12:58:35' % clamp
+    '11/12/2020 12:53:07', '11/12/2020 12:57:16' % clamp
     '11/12/2020 13:27:50', '11/12/2020 13:58:42' % balloon, 2400 RPM 
-	'11/12/2020 14:05:42', '11/12/2020 14:13:00' % balloon, 2200 RPM
-    '11/12/2020 14:20:26', '11/12/2020 14:48:30' % balloon, 2200-2600 RPM
+	'11/12/2020 14:08:27', '11/12/2020 14:13:00' % balloon, 2200 RPM
+    '11/12/2020 14:21:35', '11/12/2020 14:48:05' % balloon, 2200-2600 RPM
 	};
 
 % Parts (or combined parts) for quality control and description
@@ -60,9 +60,9 @@ Config.partSpec = {
 	[],        [5],      'Balloon'
 	[],        [6],      'Balloon'
 	[],        [7],      'Balloon'
- 	[],        [8:11],   'Thrombus [1,Sal,2,3]'
- 	[11,141],  [12:14],  'Thrombus [4,5,6]'
- 	[14,157],  [15:18],  'Thrombus [7,8,9,10]'
- 	[14,157],  [19:22],  'Fat [1,2,3,4]'
-  	[],        [23]      'Anticoagulant reversal'
+  	[],        [8:11],   'Thrombus [1,Sal,2,3]'
+%   	[11,141],  [12:14],  'Thrombus [4,5,6]'
+%   	[14,157],  [15:18],  'Thrombus [7,8,9,10]'
+%   	[14,157],  [19:22],  'Fat [1,2,3,4]'
+%    	[],        [23]      'Anticoagulant reversal'
 	};

@@ -82,11 +82,16 @@ function inds = get_baseline_inds(T)
 	inds = ismember(T.intervType,{'Baseline','baseline'}) &...
 		not(contains(lower(string(T.event)),{'echo'}));
 	if nnz(inds)==0
-		warning('No baseline denoted in Notes')
-		%Ask_List_ui()
+		warning('No baseline denoted in Notes, first steady-state is used instead.')
+		segs = get_segment_info(T);
+		firstSS = find(ismember(segs.main.intervType,'Steady-state'),1,'first');
+		inds = segs.all.startInd(firstSS):segs.all.endInd(firstSS);
 	elseif diff(find(inds))>1
 		warning('Multiple baseline segments in Notes')
 		%Ask_List_ui()
+ 		%segs = get_segment_info(T);
+ 		%firstBL = find(ismember(segs.main.intervType,'Baseline',1,'first'));
+ 		%inds = segs.all.startInd(firstBL):segs.all.endInd(firstBL);
 	end
 end
 
@@ -110,7 +115,7 @@ function T = add_derived_variables(accVar, T, Config)
 	end
 
 	if any( contains(accVar,'y_NF') & not(contains(accVar,'_HP')) )
-		T = add_harmonics_filtered_variables(T, {'accA_y'}, {'accA_x_NF'},...
+		T = add_harmonics_filtered_variables(T, {'accA_y'}, {'accA_y_NF'},...
 			Config.harmonicNotchFreqWidth, Config.fs);
 	elseif any(contains(accVar,'y_NF_HP'))
 		T = add_harmonics_filtered_variables(T, {'accA_y'}, {'accA_y_NF'},...

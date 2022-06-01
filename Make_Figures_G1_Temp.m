@@ -1,7 +1,7 @@
 Config =  get_processing_config_defaults_G1;
 cd 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Visualize\Article2'
  
-%%
+%% Boxplot, pooled
 
 %close all
 saveFig = false;
@@ -10,24 +10,13 @@ vars = {
 % 	'accA_x_NF_HP_b2_pow', 'NHA_{{\itx}} (dB)', []
 % 	'accA_y_NF_HP_b2_pow', 'NHA_{{\ity}} (dB)', []
 % 	'accA_z_NF_HP_b2_pow', 'NHA_{{\itz}} (dB)', []
-%  	'accA_norm_NF_HP_b2_pow', 'NHA_{norm} (dB)', []
-%  	'accA_best_NF_HP_b2_pow', 'NHA_{best} (dB)', []
-%  	'accA_xyz_NF_HP_b2_pow_sum', 'NHA_{sum(\itx,y,z\rm)} (dB)', []
   	'accA_xyz_NF_HP_b1_pow_norm', 'NHA_{norm(\itx,y,z\rm)} (dB)', [-.5,2.5]
-% 	'accA_best_NF_HP_b2_pow_per_speed', 'NHA_{best,per rpm}', [] %'sup\{\SigmaNHA_{{\itx},{\ity},{\itz}}\} (dB)', []
-% 	'accA_x_NF_HP_b3_pow', 'NHA_{{\itx}} (dB), band=[1.20, 4.95] ', []
-% 	'accA_y_NF_HP_b3_pow', 'NHA_{{\ity}} (dB), band=[1.20, 4.95] ', []
-% 	'accA_z_NF_HP_b3_pow', 'NHA_{{\itz}} (dB), band=[1.20, 4.95] ', []
-% 	'accA_norm_NF_HP_b3_pow', 'NHA_{norm} (dB), band=[1.20, 4.95] ', []
-% 	'accA_best_NF_HP_b3_pow', 'NHA_{best} (dB), band=[1.20, 4.95] ', []
-% 	'accA_best_NF_HP_b3_pow_per_speed', 'NHA_{best,per rpm}, band=[1.20, 4.95] ',[]
 % 	'P_LVAD_mean', '{\itP}_{LVAD} (W)', [-.5,2.5]
 	'P_LVAD_drop', '{\itP}_{LVAD} (W)', [-.5,2.5]
-% 	'Q_mean' '{\itQ} (L/min)', [-.5,2.5]
-	'Q_drop' '{\itQ} (L/min)', [-.5,2.5]
+ 	'Q_mean' '{\itQ} (L/min)', [-.5,2.5]
+%	'Q_drop' '{\itQ} (L/min)', [-.5,2.5]
 %	'pGraft_mean' '{\itp}_{graft} (mmHg)', []
 	};
-bpAsdB = false;
 
 % TODO: Expand support for list of different groups and group labels in the
 %       functions make_intervention_groups and make_level_sting_for_save_name
@@ -36,32 +25,37 @@ levs = {
 	'3'
 	'4'
 	};
-intervention_boxplot_by_color_per_rpm(F_rel, levs, vars, bpAsdB, saveFig, Config);
-intervention_boxplot(F_rel, levs, vars, bpAsdB, saveFig, Config);
+
+bpAsdB = true;
+intervention_boxplot_by_color_per_rpm(F, levs, vars, bpAsdB, saveFig, Config);
+intervention_boxplot(F, levs, vars, bpAsdB, saveFig, Config);
+
+%bpAsdB = false;
+% intervention_boxplot_by_color_per_rpm(F_rel, levs, vars, bpAsdB, saveFig, Config);
+% intervention_boxplot(F_rel, levs, vars, bpAsdB, saveFig, Config);
 
 
 %% BL deviation bar chart
 
 vars = {
-	'Q_mean',                     '\itQ'
-	'P_LVAD_mean',                '\itP_{\rmLVAD}'
-	%'accA_xyz_NF_HP_b2_pow_sum',  'sum(NHA_{\itx,y,z})'
-	'accA_xyz_NF_HP_b1_pow_norm', 'norm(NHA_{\itx,y,z})'
+	'Q_mean',                     'pump flow rate'
+	'P_LVAD_mean',                'energy consumption'
+	'accA_xyz_NF_HP_b2_pow_norm', 'vibrations, nonharmonic'
 	};
 cats = {
-     'Clamp,  75%' 
-     'Clamp,  50%' 
-     'Clamp,  25%'
-     'Balloon, Lev1' 
-     'Balloon, Lev2' 
-     'Balloon, Lev3' 
-     'Balloon, Lev4' 
-     'Balloon, Lev5' 
+     'Clamp, 2400, 25%', '1'
+     'Clamp, 2400, 50%', '2'
+     'Clamp, 2400, 75%', '3'
+     'Balloon, 2400, Lev1', '40%' 
+     'Balloon, 2400, Lev2', '55%'
+     'Balloon, 2400, Lev3', '70%'
+     'Balloon, 2400, Lev4', '80%' 
+     'Balloon, 2400, Lev5', '90%' 
      };
 
 close all
-saveFig = true;
-make_baseline_deviation_bar_chart_figure(G_rel, 'mean', vars, cats, Config, saveFig);
+saveFig = false;
+% saveFig = true;
 make_baseline_deviation_bar_chart_figure(G_rel, 'median', vars, cats, Config, saveFig);
 
 %% Spectrograms
@@ -140,6 +134,13 @@ G_rel = Data.G1.Feature_Statistics.Descriptive_Relative.med;
 plot_nha_power_and_flow(F_rel, G_rel, [], nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, legTit, 'effect');
 
 %clear nhaVars levelLabels xLims xLab tit
+
+
+%TODO
+% - Continious segment instead?
+% - Include thombus injection?
+% - Include RPM variation?
+% - Keep NHA in a separate panel?
 
 
 %% NHA, Q and P, per catheter type
@@ -240,21 +241,21 @@ clear nhaVars levelLabels xLims xLab legTit
 % Figure 6 in submission for ASAIO
 
 classifiers_to_plot = {
-	'accA_xyz_NF_HP_b1_pow_sum', 'sum(NHA_{x,y,z})'
+	%'accA_xyz_NF_HP_b1_pow_sum', 'sum(NHA_{x,y,z})'
 	'accA_xyz_NF_HP_b1_pow_norm', 'norm(NHA_{x,y,z})'
-	'accA_best_NF_HP_b1_pow_per_speed', 'NHA_{best, per speed}'
+	%'accA_best_NF_HP_b1_pow_per_speed', 'NHA_{best, per speed}'
 	%   'accA_best_NF_HP_b2_pow', 'NHA_{best, per interv.}';
-	% 	'accA_x_NF_HP_b2_pow', 'NHA_{\itx}';
-	%  	'accA_y_NF_HP_b2_pow', 'NHA_{\ity}';
-	%  	'accA_z_NF_HP_b2_pow', 'NHA_{\itz}';
-	'P_LVAD_mean',   '\itP\rm_{LVAD}';
+% 	'accA_x_NF_HP_b2_pow', 'NHA_{\itx}';
+% 	'accA_y_NF_HP_b2_pow', 'NHA_{\ity}';
+% 	'accA_z_NF_HP_b2_pow', 'NHA_{\itz}';
+	'P_LVAD_change',   '\itP\rm_{LVAD}';
 	};
 
 close all
-legTit = 'ROC curves - Pooled balloon levels - Pooled RPM';
-h(1) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiers_to_plot, legTit);
-legTit = 'ROC curves - Pooled balloon levels';
-h(2) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled, classifiers_to_plot, legTit);
+% legTit = 'ROC curves - Pooled balloon levels - Pooled RPM';
+% h(1) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiers_to_plot, legTit);
+% legTit = 'ROC curves - Pooled balloon levels';
+% h(2) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled, classifiers_to_plot, legTit);
 legTit = 'ROC curves - Concrete balloon levels';
 h(3) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC, classifiers_to_plot, legTit);
 

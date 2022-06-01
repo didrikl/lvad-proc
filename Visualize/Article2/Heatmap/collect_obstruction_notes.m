@@ -7,11 +7,9 @@ inputs = {
 	'Seq7'
 	'Seq8'
 	'Seq11'
-	%'Seq11_SwapYZ'
 	'Seq12'
 	'Seq13'
 	'Seq14'
-	%'Seq14_SwapYZ'
 	};
 xLab = 'diameter and areal obstruction';
 yLab = 'experiments';% and pump speed (RPM)';
@@ -20,12 +18,7 @@ speeds = [2200,2400,2600];
 
 T = F;
 vars = {
-%    'accA_best_NF_HP_b2_pow_per_speed', 'NHA (dB)',               [-70,-35]
-    'accA_best_NF_HP_b2_pow',           'NHA (dB)',               []
-%    'accA_x_NF_HP_b2_pow',              'NHA_{\itx\rm} (dB)',     [-70,-35]
-%    'accA_y_NF_HP_b2_pow',              'NHA_{\ity\rm} (dB)',     [-70,-35]
-%    'accA_z_NF_HP_b2_pow',              'NHA_{\itz\rm} (dB)',     [-70,-35]
-%    'accA_norm_NF_HP_b2_pow',           'NHA_{\it|xyz|\rm} (dB)', [-70,-35]
+    'accA_xyz_NF_HP_b2_pow_norm',           'NHA (dB)',               []
 %     'Q_CO_pst',                         '\itQ\rm-\itCO\rm ratio', [0 100]
 %'Q_mean', 'Q', [0 5]
 	 };
@@ -72,14 +65,18 @@ function h_fig = plot_balloon_levels(T, var, xlims, xLab, yLab, Config)
 end
 
 function h_fig = plot_heat_map(T, plotVar, colMapLab, xlims, xLab, yLab, Config)
+	
 	h_fig = figure('Position',[100,100,1100,800]);
 	h_ax = init_axes;
 	load('ScientificColormaps')
 	
+	plotVar = check_table_var_input(T,plotVar);
 	blVar = [plotVar,'_BL'];
+	
 	if contains(plotVar,'best')
 		T.(plotVar)(T.balLev=='1') = T.(blVar)(T.balLev=='1');
 	end
+	
 	scatter(T.balDiam_xRay_mean, T.seqList, 375, T.(plotVar), 'filled');
 	%colMap = scientificColormaps.batlow50;
 	%colMap = flip(scientificColormaps.roma);
@@ -165,6 +162,7 @@ function T2 = lookup_plot_data(speeds, inputs, T1, levLims)
 			
 			F2 = T1(T1.pumpSpeed==speeds(j) & T1.balLev~='-' & T1.seq==inputs{i},:);
 			F2 = add_revised_balloon_levels(F2, levLims);
+			if isempty(F2), continue; end
 			T2 = merge_table_blocks(T2,F2);
 			
 			inputs_i = split(inputs{i},'_');
@@ -174,6 +172,7 @@ function T2 = lookup_plot_data(speeds, inputs, T1, levLims)
 			
 		end
 	end
+	change_seq_list_to_ylabel(seqList)
 	T2.seqList = change_seq_list_to_ylabel(seqList);
 	
 	nhaVars = contains(T2.Properties.VariableNames,'acc') & ...

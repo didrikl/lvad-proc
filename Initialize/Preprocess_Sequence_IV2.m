@@ -7,6 +7,8 @@
 
 welcome(['Preprocess data ',Config.seq],'module')
 
+Notes = pre_proc_notes_IV2(Notes, Config);
+
 US = merge_Q_blocks(US);
 US = aggregate_effQ_and_affQ(US);
 

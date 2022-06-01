@@ -22,6 +22,7 @@ for i=1:numel(inputs)
 
 	Notes = init_notes_xls(Config.notes_filePath, '', Config.notes_varMapFile);
 	Notes = qc_notes_IV2(Notes, idSpecs, Config.askToReInit);
+	Notes = pre_proc_notes_IV2(Notes, Config);
 
 	Data = save_preprocessed_notes_only(Config, Notes, Data);
 	Preprocess_Roundup;

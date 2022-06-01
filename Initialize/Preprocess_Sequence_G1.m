@@ -7,7 +7,7 @@
 
 welcome(['Preprocess data ',Config.seq],'module')
 
-Notes = pre_proc_notes(Notes, Config);
+Notes = pre_proc_notes_G1(Notes, Config);
 
 US = merge_Q_blocks(US);
 

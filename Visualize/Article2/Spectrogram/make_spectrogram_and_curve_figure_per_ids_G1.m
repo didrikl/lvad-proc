@@ -20,12 +20,12 @@ function make_spectrogram_and_curve_figure_per_ids_G1(...
 	spec = get_plot_specs;
 	colorMap = scientificColormaps.batlowW; 
 	%colorMap = scientificColormaps.lisbon;
-	colorRange = [-65,-40]; % for Seq13
+	colorRange = [-65,-36]; % for Seq13
 	
 	[T1, segStarts1, segEnds1] = make_plot_data_G1(IDs1, S, var, fs, durLim);
 	[T2, segStarts2, segEnds2] = make_plot_data_G1(IDs2, S, var, fs, durLim);
-	[map1,order1,rpm1,mapTime1] = make_rpm_order_map(T1,var,fs,'pumpSpeed',res,overlapPst);
-	[map2,order2,rpm2,mapTime2] = make_rpm_order_map(T2,var,fs,'pumpSpeed',res,overlapPst);
+	[map1,order1,rpm1,mapTime1] = make_rpm_order_map(T1, var, fs, 'pumpSpeed', res, overlapPst);
+	[map2,order2,rpm2,mapTime2] = make_rpm_order_map(T2, var, fs, 'pumpSpeed', res, overlapPst);
 % 	T1 = add_order_track(map1, order1, rpm1, mapTime1, T1, [var,'_H3']);
 % 	T2 = add_order_track(map2, order2, rpm2, mapTime2, T2, [var,'_H3']);
 	
@@ -35,9 +35,10 @@ function make_spectrogram_and_curve_figure_per_ids_G1(...
 	
 	hSub(1,1) = subplot(2,2,1,spec.subPlt{:});
 	plot_rpm_order_map(hSub(1,1), colorRange, colorMap, mapTime1, order1, map1, yLim_map, segEnds1);
-	
 	hSub(1,2) = subplot(2,2,2,spec.subPlt{:});
 	plot_rpm_order_map(hSub(1,2),colorRange, colorMap, mapTime2, order2, map2, yLim_map, segEnds2);
+	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm);
+	
 	hSub(2,1) = subplot(2,2,3,spec.subPlt{:});
 	plot_curves_G1(T1);
 	hSub(2,2) = subplot(2,2,4,spec.subPlt{:});
@@ -52,7 +53,6 @@ function make_spectrogram_and_curve_figure_per_ids_G1(...
 	hLeg = legend(hPlt,legStr,spec.leg{:},'FontSize',15);
 	hColBar = add_colorbar(hSub, spec);
 	hYLab1(1) = ylabel(hSub(1,1),{'accelerometer signal,','harmonic order'});
-	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm);
 	hXLab = xlabel('(sec)',spec.xLab{:});
 	
 	% Adjustments

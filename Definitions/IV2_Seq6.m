@@ -56,3 +56,37 @@ Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
 
+% Part mapping for quality control and description
+Config.partSpec = {
+%   BL    parts   Label
+	[],   [1],   'RPM change #1'
+ 	[],   [2],   'Balloon, 4.5mm X 20mm'
+  	[],   [3],   'Balloon, 4.5mm X 20mm'
+ 	[],   [4],   'Balloon, 4.5mm X 20mm'
+ 	[],   [5],   'Balloon, 4.5mm X 20mm'
+ 	[],   [6],   'Balloon, 4.5mm X 20mm'
+ 	[],   [7],   'Balloon, 6.0mm X 20mm'
+ 	[],   [8],   'Balloon, 6.0mm X 20mm'
+ 	[],   [9],   'Balloon, 6.0mm X 20mm'
+ 	[],   [10],  'Balloon, 6.0mm X 20mm'
+ 	[],   [11],  'Balloon, 8.0mm X 30mm'
+ 	[],   [12],  'Balloon, 8.0mm X 30mm'
+ 	[],   [13],  'Balloon, 8.0mm X 30mm'
+ 	[],   [14],  'Balloon, 8.0mm X 30mm'
+ 	[],   [15],  'Balloon, 11.0mm'
+ 	[],   [16],  'Balloon, 11.0mm'
+ 	[],   [17],  'Balloon, 11.0mm'
+ 	[],   [18],  'Balloon, 11.0mm'
+	[],   [19],  'RPM change #2'
+	[],   [20],  'Afterload'
+	[],   [21],  'Afterload'
+	[],   [22],  'Afterload'
+	[],   [23],  'Afterload'
+	[],   [24],  'RPM change #3'
+	[],   [25],  'Preload'
+	[],   [26],  'Preload'
+	[],   [27],  'Preload'
+	[],   [28],  'Preload'
+	[],   [29],  'RPM change #4'
+	[],   [30],  'RPM change, extra'
+	};

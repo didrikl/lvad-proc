@@ -7,7 +7,8 @@ function T = extract_from_data(Data, partSpec)
 		'event'              
 		'Q_LVAD'             
 		'P_LVAD'             
-		'pumpSpeed'          
+		'pumpSpeed'
+		'balLev'
 		};
 	Notes = Data.Notes;
 	partNo = partSpec{2};
@@ -38,27 +39,34 @@ function T = add_specified_baseline_first(partSpec, Data, Notes, noteVars, partN
 	if not(isempty(partSpec{1}))
 		blPartNo = partSpec{1}(1);
 		blRow = partSpec{1}(2);
+		
+		% Extract BL part 
 		if blPartNo>numel(Data.S_parts)
 			error('Given BL part (%d) exceeds number of parts in data (%d)',...
 				blPartNo, numel(S_parts));
 		end
 		BL = Data.S_parts{blPartNo};
-		BL = join_notes(BL, Notes, noteVars);
-		
+		BL = join_notes(BL, Notes, noteVars);		
 		if height(BL)==0
 			error('BL part (%d) is empty',partNo);
 		end
 
+		% Check if specificed BL row actually exist in data 
 		bl_inds = BL.noteRow==blRow;
 		if nnz(bl_inds)==0
-			error('Given BL row (%d) in not in BL part (%d)', blRow, blPartNo)
+			error(['Given BL row (%d) in not in BL part (%d)'...
+			'\nCheck the Notes for correct BL line specfication'],...
+			blRow, blPartNo)
 		end
+
+		% Ensure that specificed BL row is denoted Baseline in intervType
 		if not(contains(lower(string(Notes.event(blRow))),'baseline'))
 			warning(['Given baseline note row %d is not stored as ',...
 				'Baseline in Notes file.'],blRow)
 			Notes(blRow,:)
 			BL.intervType(bl_inds) = {'Baseline'};
 		end
+
 		BL = BL(bl_inds,:);
 		T = merge_table_blocks(BL,T);
 	end

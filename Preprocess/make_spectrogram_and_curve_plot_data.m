@@ -1,6 +1,4 @@
-function Data = make_spectrogram_and_curve_plot_data(Data, seqDefs, accVar)
-
-	Config =  get_processing_config_defaults_G1;
+function Data = make_spectrogram_and_curve_plot_data(Data, seqDefs, accVar, Config)
 
 	nSeqs = numel(seqDefs);
 	for i=1:nSeqs

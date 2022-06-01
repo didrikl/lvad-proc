@@ -1,7 +1,6 @@
-function Notes = add_obstruction_pst(Config, Notes)
+function Notes = add_obstruction_pst(Config, Notes, var, newVar)
 
-	Notes.arealObstr_xRay_pst = ...
-		100*(Notes.balDiam_xRay.^2)/(Config.inletInnerDiamLVAD^2);
-	Notes.Properties.CustomProperties.Measured('arealObstr_xRay_pst') = true;
-	
-	Notes = movevars(Notes,"arealObstr_xRay_pst","After","balDiam_xRay");
+	Notes.(var) = double(string(Notes.(var)));
+	Notes.(newVar) = 100*(Notes.(var).^2)/(Config.inletInnerDiamLVAD^2);
+	Notes.Properties.CustomProperties.Measured(newVar) = true;
+	Notes = movevars(Notes,newVar,"After",var);
