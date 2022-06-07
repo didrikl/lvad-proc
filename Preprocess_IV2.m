@@ -1,5 +1,7 @@
 %#ok<*NASGU> 
 
+run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
+
 % Initialize from raw data, preprocess and store (in memory and to disc)
 data = struct;
 inputs = {

@@ -12,7 +12,7 @@ function Config =  get_processing_config_defaults_G1
 	% --------------------------------------------------------------------------
 	
 	Config.fs = 750;
-	Config.harmCut = 1.15;
+	Config.harmCut = 1.25;
 	Config.harmCutFreqShift = 0;
 	Config.cutFreq = 40;
 	Config.harmonicNotchFreqWidth = [1,1,1,2.5,1,1,1,1,1,1];

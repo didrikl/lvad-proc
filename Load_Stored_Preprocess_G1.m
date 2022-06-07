@@ -1,5 +1,5 @@
 % Load previously preprocessed and stored data
-run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Environment.m')
+run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 Config =  get_processing_config_defaults_G1;
 	
 sequences = {
@@ -18,6 +18,6 @@ Data.G1 = load_processed_sequences(sequences(:,1),...
     fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)));
 
 [Data.G1, F, F_rel, F_del] = load_processed_features(Config, Data.G1);
-Data_test.G1 = load_processed_statistics(Config, Data.G1);
+Data.G1 = load_processed_statistics(Config, Data.G1);
 
 clear sequences pc

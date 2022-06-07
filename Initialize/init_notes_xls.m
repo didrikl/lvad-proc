@@ -46,17 +46,16 @@ function NotesTT = init_notes_xls(fileName, path, varMapFile)
     catVarsInMap = varMap(ismember(varMap(:,3),'categorical'),1); %#ok<USENS>
     catVarsInFile = catVarsInMap(ismember(catVarsInMap,opts.VariableNames));
     opts = setvartype(opts,catVarsInFile,'categorical');
-
+	
 	numVarsInMap = varMap(ismember(varMap(:,3),{'single','float','double'}),1); %#ok<USENS>
     numVarsInFile = numVarsInMap(ismember(numVarsInMap,opts.VariableNames));
     opts = setvartype(opts,numVarsInFile,'char');
-
-    Notes = readtable(filePath,opts,...
-        'Sheet',notes_sheet...
-        );
+	opts.DataRange = 'A4';
+	opts.Sheet = notes_sheet;
+    Notes = readtable(filePath,opts);
 
 	% Omit first row containg variable units
-	Notes = Notes(2:end,:);
+	%Notes = Notes(2:end,:);
     
 	% Read auxillary info
     varNamesInFile = table2cell(readtable(filePath,...

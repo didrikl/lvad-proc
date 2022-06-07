@@ -23,9 +23,10 @@ function [T_parts, rpmOrderMap] = make_segment_plot_data(Data, accVar, Config)
 	for j=1:nVars	
 		for i=1:nParts
 			
-			multiWaitbar('Calculate spectrogram','Increment',waitIncr);
+			% TODO: Make separate function, that uses add_in_parts
 			T_parts{i} = add_relative_diff(T_parts{i}, accVar{j}, Config.fs, movStdWin);
  			
+			multiWaitbar('Calculate spectrogram','Increment',waitIncr);
 			[map,order,rpm,time] = make_rpm_order_map(T_parts{i}, accVar{j}, ...
 				Config.fs, 'pumpSpeed', res, overlapPst);
 

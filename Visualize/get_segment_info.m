@@ -1,5 +1,7 @@
-function segs = get_segment_info(T)
+function segs = get_segment_info(T, durVar)
 	
+	if nargin<2, durVar = ''; end
+
 	segs = struct;
 	segs.all = table;
 	segs.main = table;
@@ -18,6 +20,7 @@ function segs = get_segment_info(T)
 	segs.all.isBaseline = ismember(T.intervType(segs.all.startInd),'Baseline') & not(segs.all.isEcho);
 	
 	% Parse additional model-dependent column info
+	% TODO: Refactor to separate function
 	try
 		segs.all.balLev_xRay = T.balLev_xRay(segs.all.startInd);
 		segs.all.arealObstr_xRay_pst = T.arealObstr_xRay_pst(segs.all.startInd);
@@ -45,13 +48,11 @@ function segs = get_segment_info(T)
  	segs.main.EndInd = [segs.main.StartInd(2:end);segs.all.endInd(end)];
  	
 	% Add duration info
-	if not(ismember(T.Properties.VariableNames,'dur'))
-		fs = get_sampling_rate(T);
-		T.dur = linspace(0,1/fs*height(T),height(T))';
+	if durVar
+		segs.all.startDur = round(T.(durVar)(segs.all.startInd));
+		segs.all.endDur = round(T.(durVar)(segs.all.endInd));
+		segs.all.midDur = segs.all.startDur+(segs.all.endDur-segs.all.startDur)./2;
+		segs.main.StartDur = segs.all.startDur(mainSegRows);
+		segs.main.EndDur = [segs.main.StartDur(2:end);segs.all.endDur(end)];
+		segs.main.MidDur = segs.main.StartDur+(segs.main.EndDur-segs.main.StartDur)./2;
 	end
-	segs.all.startDur = round(T.dur(segs.all.startInd));
-	segs.all.endDur = round(T.dur(segs.all.endInd));
-	segs.all.midDur = segs.all.startDur+(segs.all.endDur-segs.all.startDur)./2;
-	segs.main.StartDur = segs.all.startDur(mainSegRows);
-	segs.main.EndDur = [segs.main.StartDur(2:end);segs.all.endDur(end)];
-	segs.main.MidDur = segs.main.StartDur+(segs.main.EndDur-segs.main.StartDur)./2;

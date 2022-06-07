@@ -52,8 +52,8 @@ Config.partSpec = {
  	[],       [5],     'Balloon'
  	[],       [6],     'Balloon'
  	[],       [7],     'Clamping'
-%   	[],       [8:11],  'Thrombus [1,2,3,4]'
-%    	[11,127], [12:15], 'Thrombus [5,6,7,8]'
-%    	[15,141], [16:18], 'Thrombus [Sal,9,10]'
-%    	[],       [19]     'Anticoagulant reversal'
+   	[],       [8:11],  'Thrombus [1,2,3,4]'
+	[11,127], [12:15], 'Thrombus [5,6,7,8]'
+	[15,141], [16:18], 'Thrombus [Sal,9,10]'
+	[],       [19]     'Anticoagulant reversal'
 	};

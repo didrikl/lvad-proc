@@ -52,12 +52,12 @@ Config.PL_offset_files = {};
 
 parts = {
     [],   [2],  [],   '1. RPM changes'
-%     [],   [8],  [],   '1. RPM changes - Second time'
-%     [],   [3],  [],   '2. Graft clamping'
-%     {},   [5],  [],  '3. Balloon inflation'
-%     {},   [6],  [],  '4. Balloon inflation'
-%     [],   [7],  [],  '5. Balloon inflation'
-%     [],   [9],  [],   '6. Saline bolus injections'
+    [],   [8],  [],   '1. RPM changes - Second time'
+    [],   [3],  [],   '2. Graft clamping'
+    {},   [5],  [],   '3. Balloon inflation'
+    {},   [6],  [],   '4. Balloon inflation'
+    [],   [7],  [],   '5. Balloon inflation'
+    [],   [9],  [],   '6. Saline bolus injections'
     };
 
 % Parts (or combined parts) for quality control and description

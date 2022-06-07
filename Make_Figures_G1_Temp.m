@@ -7,12 +7,9 @@ cd 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Visualize\Article2'
 saveFig = false;
 
 vars = {
-% 	'accA_x_NF_HP_b2_pow', 'NHA_{{\itx}} (dB)', []
-% 	'accA_y_NF_HP_b2_pow', 'NHA_{{\ity}} (dB)', []
-% 	'accA_z_NF_HP_b2_pow', 'NHA_{{\itz}} (dB)', []
-  	'accA_xyz_NF_HP_b1_pow_norm', 'NHA_{norm(\itx,y,z\rm)} (dB)', [-.5,2.5]
+  	'accA_xyz_NF_HP_b2_pow_norm', 'NHA_{norm(\itx,y,z\rm)} (dB)', [-.5,2.5]
 % 	'P_LVAD_mean', '{\itP}_{LVAD} (W)', [-.5,2.5]
-	'P_LVAD_drop', '{\itP}_{LVAD} (W)', [-.5,2.5]
+	'P_LVAD_change', '{\itP}_{LVAD} (W)', [-.5,2.5]
  	'Q_mean' '{\itQ} (L/min)', [-.5,2.5]
 %	'Q_drop' '{\itQ} (L/min)', [-.5,2.5]
 %	'pGraft_mean' '{\itp}_{graft} (mmHg)', []
@@ -61,10 +58,8 @@ make_baseline_deviation_bar_chart_figure(G_rel, 'median', vars, cats, Config, sa
 %% Spectrograms
 % [2x2] panels, controls to the left and balloon interventions to the right
 % Based on ID-segments, not parts
-% Figure 3 in submission for ASAIO
 
 var = 'accA_y_NF_HP';
-%var = 'ecg';
 tit = 'Spectromgram';
 rpm = 2400;
 IDs1 = {
@@ -75,11 +70,6 @@ IDs1 = {
 	'2.4'
 	%'2.0 #2'
 	};
-%  IDs1 = {
-%  	'1.0 #1'
-%  	'1.1 #1'
-%  	'1.2 #2'
-%  	};
 IDs2 = {
 	'3.0 #1'
 	'3.1'
@@ -92,8 +82,6 @@ IDs2 = {
 close all
 make_spectrogram_and_curve_figure_per_ids_G1(...
 	Data.G1.Seq13.S, tit, var, rpm, Config.fs, IDs1, IDs2);
-
-%clear var rpm
 
 %% NHA, Q and P, per catheter type
 % Pendulating Mass in Inlet Conduit

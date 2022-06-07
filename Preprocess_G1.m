@@ -2,6 +2,8 @@
 % Do all or separate initialization of sequences (experiments)
 % Initialize from raw data, preprocess and store (in memory and to disc)
 
+run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
+
 inputs = {
    	'G1_Seq3' % (pilot)
   	'G1_Seq6'

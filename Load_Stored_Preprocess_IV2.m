@@ -1,5 +1,5 @@
 % Load previously preprocessed and stored data
-run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Environment.m')
+run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 Config =  get_processing_config_defaults_IV2;
 
 sequences = {
