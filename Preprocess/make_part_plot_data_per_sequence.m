@@ -1,4 +1,4 @@
-function Data = make_spectrogram_and_curve_plot_data(Data, seqDefs, accVar, Config)
+function Data = make_part_plot_data_per_sequence(Data, seqDefs, accVar, Config)
 
 	nSeqs = numel(seqDefs);
 	for i=1:nSeqs
@@ -8,20 +8,22 @@ function Data = make_spectrogram_and_curve_plot_data(Data, seqDefs, accVar, Conf
 		
 		% Update Config for current sequence
 		eval(seqDefs{i});
-		
 		if isempty([Config.partSpec{:,2}])
 			warning('partSpec is not specified')
 			continue
 		end
 		seq = get_seq_id(Config.seq);
 		
-		D = Data.(seq);
-		[T, rpmOrderMap] = make_segment_plot_data(D, accVar, Config);
-
-		Data.(seq).Plot_Data.T = T;
-		Data.(seq).Plot_Data.rpmOrderMap = rpmOrderMap;
 		Data.(seq).Plot_Data.partSpec = Config.partSpec;
 		
+		T_parts = make_curve_plot_data_per_part(Data.(seq), accVar, Config);
+		Data.(seq).Plot_Data.T = T_parts;
+		
+% 		if not(isfield(Data.(seq).Plot_Data,'RPM_Order_Map'))
+% 			rpmOrderMap = make_rpm_order_map_per_part(T_parts, accVar, Config);
+% 			Data.(seq).Plot_Data.RPM_Order_Map = rpmOrderMap;
+% 		end
+
 	end
 
 	multiWaitbar('CloseAll');

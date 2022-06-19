@@ -35,4 +35,9 @@ S_parts = add_highpass_RPM_filter_variables(S_parts,...
 
 S = merge_table_blocks(S_parts);
 S = reduce_to_analysis_G1(S, Notes, Config.idSpecs, Config.remEchoRows);
+
+rpmOrderMap = make_rpm_order_map_per_part(S_parts, ...
+	{'accA_x','accA_y','accA_z','accA_x_NF_HP','accA_y_NF_HP','accA_z_NF_HP'},...
+	Config);
+
 S_parts = remove_unneeded_variables_in_parts(S_parts);

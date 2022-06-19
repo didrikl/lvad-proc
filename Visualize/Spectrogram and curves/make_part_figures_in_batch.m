@@ -1,4 +1,4 @@
-function make_continous_part_figures_in_batch(Data, seqDefs, accVar, saveFig, Config)
+function make_part_figures_in_batch(Data, seqDefs, accVar, saveFig, Config)
 	
 	nVars = numel(accVar);
 	for k=1:numel(seqDefs)
@@ -24,12 +24,15 @@ function make_continous_part_figures_in_batch(Data, seqDefs, accVar, saveFig, Co
 				Notes = Data.(seq).Notes;
 				map = Data.(seq).Plot_Data.rpmOrderMap{i};
 				
-				hFig = make_continous_part_figure(T, Notes, map.(accVar{j}), ...
+% 				hFig = make_part_figure_2panels(T, Notes, map.(accVar{j}), ...
+% 					accVar{j}, seqID, partSpec(i,:), Config.fs);
+				hFig = make_part_figure_3panels(T, Notes, map.(accVar{j}), ...
 					accVar{j}, seqID, partSpec(i,:), Config.fs);
 				
 				if saveFig
-					save_figure(hFig, savePath, hFig.Name, 600)
+					save_figure(hFig, savePath, hFig.Name, 300)
 					%save_figure(hFig, savePath, hFig.Name, 600)
+					print(hFig,hFig.Name,'-dsvg')
 				end
 
 			end

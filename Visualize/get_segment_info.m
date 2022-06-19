@@ -40,12 +40,14 @@ function segs = get_segment_info(T, durVar)
 	% Find boundaries in cases of several Notes were made under same segment
 	segs.all.isIntraSeg = ...
 		[false;diff(segs.all.isTransitional)==0] & ...
-		([false;diff(double(segs.all.event))==0] | not(segs.all.event~='-')) & ...
+		([false;diff(double(segs.all.event))==0] & not(segs.all.event~='-')) & ...
 		[false;diff(segs.all.isEcho)==0];
-	mainSegRows = unique([1;find(not(segs.all.isIntraSeg));numel(not(segs.all.isIntraSeg))]);
+	mainSegRows = unique([1;find(not(segs.all.isIntraSeg))]);%;numel(not(segs.all.isIntraSeg))]);
 	segs.main = segs.all(mainSegRows,:);
  	segs.main.StartInd = segs.all.startInd(mainSegRows);
- 	segs.main.EndInd = [segs.main.StartInd(2:end);segs.all.endInd(end)];
+
+	% TODO: Check possible bug!
+ 	segs.main.EndInd = [segs.main.StartInd(2:end);height(T)];
  	
 	% Add duration info
 	if durVar

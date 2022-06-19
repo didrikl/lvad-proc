@@ -1,4 +1,4 @@
-function [T_parts, rpmOrderMap] = make_segment_plot_data(Data, accVar, Config)
+function [T_parts, rpmOrderMap] = make_segment_curve_plot_data(Data, T_parts, accVar, Config)
 
 	res = 0.011;
 	overlapPst = 80; 
@@ -6,39 +6,30 @@ function [T_parts, rpmOrderMap] = make_segment_plot_data(Data, accVar, Config)
 	
 	partSpec = Config.partSpec;
 	accVar = cellstr(accVar);
-
+	fs = Config.fs; 
 	nParts = size(partSpec,1);
 	T_parts = cell(nParts,1);
 	rpmOrderMap = cell(nParts,1);
 	
-	% Extract relevant part, BL and Notes info
-	for i=1:nParts
-		T_parts{i} = extract_from_data(Data, partSpec(i,:));
-	end
-
-	T_parts = add_derived_variables(accVar, T_parts, Config);
-	
 	nVars = numel(accVar);
 	waitIncr = 1/(nParts*nVars);
+
 	for j=1:nVars	
-		for i=1:nParts
-			
-			% TODO: Make separate function, that uses add_in_parts
-			T_parts{i} = add_relative_diff(T_parts{i}, accVar{j}, Config.fs, movStdWin);
- 			
-			multiWaitbar('Calculate spectrogram','Increment',waitIncr);
-			[map,order,rpm,time] = make_rpm_order_map(T_parts{i}, accVar{j}, ...
-				Config.fs, 'pumpSpeed', res, overlapPst);
+		var = accVar{j};
+		parfor i=1:nParts
+			%multiWaitbar('Calculate spectrogram','Increment',waitIncr);
+			[map,order,rpm,time] = make_rpm_order_map(T_parts{i}, var, ...
+				fs, 'pumpSpeed', res, overlapPst);
 
 			% For now not needed:
 			% if not(contains(accVar,'_NF'))
 			%     ordertrack(...,'Amplitude','power')
 			% end
 			
-			rpmOrderMap{i}.(accVar{j}).map = map;
-			rpmOrderMap{i}.(accVar{j}).order = order;
-			rpmOrderMap{i}.(accVar{j}).rpm = rpm;
-			rpmOrderMap{i}.(accVar{j}).time = time;
+			rpmOrderMap{i}.(var).map = map;
+			rpmOrderMap{i}.(var).order = order;
+			rpmOrderMap{i}.(var).rpm = rpm;
+			rpmOrderMap{i}.(var).time = time;
 
 		end
 	end

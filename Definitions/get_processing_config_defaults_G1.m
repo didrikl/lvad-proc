@@ -18,6 +18,9 @@ function Config =  get_processing_config_defaults_G1
 	Config.harmonicNotchFreqWidth = [1,1,1,2.5,1,1,1,1,1,1];
 	Config.outlierStdevFactor = 2;
 
+	Config.rpmOrderMapRes = 0.011;
+	Config.rpmOrderMapOverlapPst = 80; 
+
 	% Misc. settings
 	% --------------------------------------------------------------------------
 	

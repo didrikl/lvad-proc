@@ -11,6 +11,11 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
     if nargin<5, order_res = 0.02; end
     if nargin<6, overlap_pst = 80; end
     
+	map = [];
+	order = [];
+	rpmOut = [];
+	time = [];
+	
     n_rows = check_table_height(T);
     [maxFreq,T] = check_sampling_rate(maxFreq,T);
     if isnan(maxFreq) || n_rows==0

@@ -50,5 +50,6 @@ set(0, 'DefaultFigureRenderer', 'painters');
 
 % To run plotting in the background
 %set(0,'DefaultFigureVisible','off');
+set(0,'DefaultFigureVisible','on');
 
 clear e

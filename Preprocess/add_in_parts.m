@@ -15,6 +15,26 @@ function T_parts = add_in_parts(fnc,T_parts,inVars,outVars,varargin)
 
 	% NOTE: This function could e.g. be made generic or common in master class.
 	% Function handle can then be passed as input
+	
+	if is_in_parallel
+		T_parts = add_without_ui(fnc, T_parts, inVars, outVars, varargin{:});
+	else
+		T_parts = add_with_ui(fnc, T_parts, inVars, outVars, varargin{:});
+	end
+end
+
+function T_parts = add_without_ui(fnc,T_parts,inVars,outVars,varargin)
+	welcome(['Running: ',func2str(fnc)],'iteration');
+	for i=1:numel(T_parts)
+		if height(T_parts{i})==0
+			warning('Empty part: %d',i)
+			continue;
+		end
+		T_parts{i} = fnc(T_parts{i},inVars,outVars,varargin{:});
+	end
+end
+
+function T_parts = add_with_ui(fnc,T_parts,inVars,outVars,varargin)
 
 	[returnAsCellOutput,outVars] = get_cell(outVars);
 	[returnAsCellInput,inVars] = get_cell(inVars);
@@ -67,4 +87,15 @@ function T_parts = add_in_parts(fnc,T_parts,inVars,outVars,varargin)
 	%fprintf('\n%s done.\n',dbs(end).name);
 	fprintf('\n')
 	multiWaitbar(waitStr,'Close');
-	
+end
+
+function answer = is_in_parallel()
+	try
+		answer = ~isempty(getCurrentTask());
+	catch err
+		if ~strcmp(err.identifier, 'MATLAB:UndefinedFunction')
+			rethrow(err);
+		end
+		answer = false;
+	end
+end

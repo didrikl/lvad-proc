@@ -10,6 +10,8 @@ function Data = load_processed_sequences(seqNames, seqFilePaths)
 	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
 	Data = load_data(Data,'Notes',seqFilePaths,seqNames);
 	Data = load_data(Data,'Config',seqFilePaths,seqNames);
+	Data = load_data(Data,'RPM order map',seqFilePaths,seqNames);
+	
 	multiWaitbar('CloseAll');
 
 function Data = load_data(Data,dataType,seqFilePaths,seqNames)
@@ -22,6 +24,7 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 		seq = get_seq_id(seqNames{i});
 		seqFilePath = seqFilePaths{i};
 		display_filename(seqFilePath,'',['\nLoading processed ',dataType,' file']);
+		
 		try
 			load(seqFilePath)
 			Data.(seq).(dataType) = eval(dataType);
@@ -30,6 +33,7 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 			disp(err)
 			continue
 		end
+		
 		cancel = multiWaitbar(['Loading processed ',dataType,' files'],i/nSeqs);
 		if cancel, break, end
 

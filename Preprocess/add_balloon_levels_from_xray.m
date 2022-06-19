@@ -15,9 +15,12 @@ function T = add_balloon_levels_from_xray(T, lims)
 			% Handle cases of multiple diameters within a level
 			diams = unique(T.balDiam_xRay(inds));
 			if numel(diams)>1
-				extra_inds = T.balDiam_xRay==diams(1:end-1);
+				extra_inds = T.balDiam_xRay==diams(1:end-1) & inds;
 				balLev(extra_inds) = i-2;
-				warning('Balloon level inconsistency with diameter')
+				warning(['Multiple diameters found within the same level',...
+					'\n\tSpeed: %s\n\tNote rows: %s\n\tDiameters: %s'],...
+					string(speeds(j)),strjoin(string(T.noteRow(extra_inds)),', '),...
+					strjoin(string(diams),', '));
 			end
 
 		end

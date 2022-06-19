@@ -80,53 +80,58 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, minM
 	T = merge_table_blocks(T);
 
 	T = convert_intervention_sample_counts_to_durations(T);
+	T = remove_unneeded_columns(T);
 	T = tidy_up_aggregate_variable_names(T);
 	T = tidy_up_row_and_column_positions(T);
 	T = remove_round_off_errors_in_discrete_vars(T, discrVars);
 	T.Properties.Description = 'Aggregate features of ID-tagged segments';
 
-function S = remove_rows_with_irrelevant_analysis_id(S, idSpecs)
+function T = remove_rows_with_irrelevant_analysis_id(T, idSpecs)
 
 	% Remove rows with extra ids in data not listed in id spec file
-	extraIDs = not(ismember(S.analysis_id,idSpecs.analysis_id));
-	S(extraIDs,:) = [];
+	extraIDs = not(ismember(T.analysis_id,idSpecs.analysis_id));
+	T(extraIDs,:) = [];
 
 	% Update categories (metadata) after removal
-	S.analysis_id = removecats(S.analysis_id);
-	S.bl_id = removecats(S.bl_id);
+	T.analysis_id = removecats(T.analysis_id);
+	T.bl_id = removecats(T.bl_id);
 
-function stats = tidy_up_aggregate_variable_names(stats)
+function T = tidy_up_aggregate_variable_names(T)
 	% Tidy up names
-	stats.Properties.VariableNames{'fun1_noteRow'} = 'noteRow';
-	q1q3_vars = startsWith(stats.Properties.VariableNames,"fun1_");
-	q1q3_vars = stats.Properties.VariableNames(q1q3_vars);
+	T.Properties.VariableNames{'fun1_noteRow'} = 'noteRow';
+	q1q3_vars = startsWith(T.Properties.VariableNames,"fun1_");
+	q1q3_vars = T.Properties.VariableNames(q1q3_vars);
 	for i=1:numel(q1q3_vars)
-		stats = splitvars(stats,q1q3_vars{i},'NewVariableNames',...
+		T = splitvars(T,q1q3_vars{i},'NewVariableNames',...
 			{[q1q3_vars{i}(6:end),'_25prct'],[q1q3_vars{i}(6:end),'_75prct']});
 	end
-	stats = change_variablename_prefix_to_suffix(stats,...
+	T = change_variablename_prefix_to_suffix(T,...
 		{'mean','std','median','q1','q2','min','max'},...
 		{'mean','stdev','median','_25prct','_75prct','min','max'},'_');
 
-function stats = tidy_up_row_and_column_positions(stats)
+function T = remove_unneeded_columns(T)
+	remCols = contains(T.Properties.VariableNames,{'GroupCount'});
+	T(:,remCols) = [];
+
+function T = tidy_up_row_and_column_positions(T)
 	% Tidy up row and column positions
-	catCols = ismember(stats.Properties.VariableNames,...
+	catCols = ismember(T.Properties.VariableNames,...
 		{'id','analysis_id','bl_id','seq','noteRow','idLabel',...
 		'categoryLabel','levelLabel','interventionType','contingency','duration',...
 		'pumpSpeed','catheter','balLev','balDiam','balVol','QRedTarget_pst'});
-	stats = movevars(stats,catCols,'Before',1);
-	stats = sortrows(stats,'id','ascend');
+	T = movevars(T,catCols,'Before',1);
+	T = sortrows(T,'id','ascend');
 
-function stats = convert_intervention_sample_counts_to_durations(stats)
-	aggGroupCountsMade = stats.Properties.VariableNames(ismember(...
-		stats.Properties.VariableNames,{'GroupCount_idStatsMeans',...
+function T = convert_intervention_sample_counts_to_durations(T)
+	aggGroupCountsMade = T.Properties.VariableNames(ismember(...
+		T.Properties.VariableNames,{'GroupCount_idStatsMeans',...
 		'GroupCount_idStatsMedians','GroupCount_idStatsDiscr'}));
-	stats.duration = string(seconds(stats.(aggGroupCountsMade{1})/750),'hh:mm:ss');
-	stats(:,[aggGroupCountsMade,'analysisDuration']) = [];
+	T.duration = string(seconds(T.(aggGroupCountsMade{1})/750),'hh:mm:ss');
+	T(:,[aggGroupCountsMade,'analysisDuration']) = [];
 
-function stats = remove_round_off_errors_in_discrete_vars(stats, discrVars)
+function T = remove_round_off_errors_in_discrete_vars(T, discrVars)
 	% Important to avoid round off errors when testing median effects
-	stats{:,discrVars+"_mean"} = round(stats{:,discrVars+"_mean"},2);
+	T{:,discrVars+"_mean"} = round(T{:,discrVars+"_mean"},2);
 
 function noteRowList = listNoteRows(noteRow)
 	noteRowList = {unique(noteRow)'};

@@ -1,17 +1,17 @@
-function hFig = make_continous_part_figure(T, Notes, map, accVar, seqID, partSpec, fs)
+function hFig = make_part_figure_2panels(T, Notes, map, accVar, seqID, partSpec, fs)
 	
 	spec = get_plot_specs;
 	Colors_IV2
 	colorMapName = 'batlowW';
 	colorMap = scientificColormaps.(colorMapName);
-	%colorMap = parula;
 	mapScale = [-65, -36];
+	shadeColor = [.9 .9 .9];
+	echoShadeColor = [.9 .9 .9];
+	
 	figWidth = 1300;
 	figHeight =  800;
 	yLims = [-100,55];
 	yLim_map = [0.75, 5.95];
-	shadeColor = [.9 .9 .9];
-	echoShadeColor = [.9 .9 .9];
 	noteVarsNeeded = {
 		'part'               
 		'intervType'         
@@ -24,8 +24,6 @@ function hFig = make_continous_part_figure(T, Notes, map, accVar, seqID, partSpe
 		'balDiam'
 		'balLev'         
 		'arealObstr_pst'
-		'embVol'             
-		'embType'            
 		'pumpSpeed'          
 		'QRedTarget_pst'
 		};
@@ -62,7 +60,19 @@ function hFig = make_continous_part_figure(T, Notes, map, accVar, seqID, partSpe
 	set(hSub,'TickDir','out','TickLength',[.006 .006])
 	adjust_yticks(hSub);
 	adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol);
+
+function plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
 	
+	imagesc(hAx, t, order, map);
+
+	colormap(hAx, colMap)
+	caxis(hAx, colRange);
+
+	set(hAx,'ydir','normal');
+	yticks(hAx, 0:1:max(order));
+	hAx.YLim = yLim;
+	xlim(hAx, t([1,end]))
+
 function h = plot_curves(hAx, T, accVar, yLims, Colors)
 	
 	stdColor = [0.76,0.0,0.15];
@@ -83,33 +93,6 @@ function h = plot_curves(hAx, T, accVar, yLims, Colors)
 	hAx.Clipping = 'off';
 	ylim(yLims);
 	xlim([0,max(T.dur)])
-
-function plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
-	
-	imagesc(hAx, t, order, map);
-
-	colormap(hAx, colMap)
-	caxis(hAx, colRange);
-
-	set(hAx,'ydir','normal');
-	yticks(hAx, 0:1:max(order));
-	hAx.YLim = yLim;
-	xlim(hAx, t([1,end]))
-	
-function xLabels = make_xticks_and_time_str(hSub, segs)
-	xt = [0;segs.all.endDur];
-	
-	xticks(hSub(2),xt);
-	xLabels = hSub(2).XTick;
-	xLabels = seconds(xLabels);
-	xLabels.Format = 'mm:ss';
-	xLabels = string(xLabels);
-	xLabels(not(ismember(xt,segs.main.EndDur))) = '';
-	xticklabels(hSub(2), xLabels);
-	xtickangle(hSub(2), 45);
-	xticklabels(hSub(1),{})
-	xt = xticks(hSub(2));
-	xticks(hSub(1),xt);
 
 function [hLeg, hCol] = add_legend_and_colorbar(hSub, hPlt, T, accVar)
 	bl_inds = T.intervType=='Baseline';

@@ -1,7 +1,7 @@
-function plot_rpm_order_map(h_ax, colorRange, colorMap, time, order, map, yLim, segEnds)
+function hImg = plot_rpm_order_map(h_ax, colorRange, colorMap, time, order, map, yLim, segEnds)
 	
 	axes(h_ax)
-	imagesc(time,order,map);
+	hImg = imagesc(time,order,map);
 
 	colormap(colorMap)
 	caxis(colorRange);

@@ -10,7 +10,7 @@ function T = adjust_for_constant_time_offset_for_filenames(...
 		return
 	end
 
-	welcome('Adjusting for constant time offset')
+	welcome('Adjust for constant time offset')
 
 	if not(isduration(offsetBehind))
 		offsetBehind = seconds(offsetBehind);

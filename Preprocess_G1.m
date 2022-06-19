@@ -5,9 +5,9 @@
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 
 inputs = {
-   	'G1_Seq3' % (pilot)
+   	%'G1_Seq3' % (pilot)
   	'G1_Seq6'
-   	'G1_Seq7'
+   	%'G1_Seq7'
    	'G1_Seq8'
     'G1_Seq11'
   	'G1_Seq12'

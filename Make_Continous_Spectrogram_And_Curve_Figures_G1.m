@@ -1,8 +1,8 @@
 %Make_Continous_Part_Plot_Data
 
 seqDefs = {
-     %'G1_Seq3'
-	 'G1_Seq6'
+     'G1_Seq3'
+% 	 'G1_Seq6'
 % 	 'G1_Seq7'
 % 	 'G1_Seq8'
 % 	 'G1_Seq11'
@@ -25,5 +25,5 @@ accVar = {
 close all
 saveFig = true;
 set(0,'DefaultFigureVisible','off');
-make_continous_part_figures_in_batch(Data.G1, seqDefs, accVar, saveFig, Config)
+make_part_figures_in_batch(Data.G1, seqDefs, accVar, saveFig, Config)
 set(0,'DefaultFigureVisible','on');

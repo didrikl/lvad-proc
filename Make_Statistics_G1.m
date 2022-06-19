@@ -82,13 +82,9 @@ F.P_LVAD_change = abs(F.P_LVAD_mean);
 % vars = {'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'};
 % newVar = 'accA_best_NF_HP_b1_pow';
 % F = derive_best_axis_values(F, vars, newVar, sequences);
-% vars = {'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'};
-% newVar = 'accA_best_NF_HP_b2_pow';
-% F = derive_best_axis_values(F, vars, newVar, sequences);
 
 % Add aggregated (sum and norm) bandbower over x, y, and z
 % F.accA_xyz_NF_HP_b1_pow_sum = sum([F.accA_x_NF_HP_b1_pow,F.accA_y_NF_HP_b1_pow,F.accA_z_NF_HP_b1_pow],2,'omitnan');
-% F.accA_xyz_NF_HP_b2_pow_sum = sum([F.accA_x_NF_HP_b2_pow,F.accA_y_NF_HP_b2_pow,F.accA_z_NF_HP_b2_pow],2);
 F.accA_xyz_NF_HP_b1_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'}}.^2,2,"omitnan"));
 F.accA_xyz_NF_HP_b2_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'}}.^2,2,"omitnan"));
 
@@ -108,7 +104,7 @@ for i=1:numel(sequences)
 	weight(i) = str2double(Data.G1.(sequences{i}). ...
 		Notes.Properties.UserData.Experiment_Info.PigWeight0x28kg0x29);
 end
-mean(weight)
+%mean(weight)
 
 
 %% Descriptive stastistics over group of experiments
@@ -118,6 +114,19 @@ mean(weight)
 % F(contains(F.id,'Seq14_Bal'),:) = [];
 % F_rel(contains(F.id,'Seq14_Bal'),:) = [];
 % F_del(contains(F.id,'Seq14_Bal'),:) = [];
+
+% Exclude unstable flow recordings (more than 20% within segment)
+F(ismember(F.id,"Seq11_Bal_2200_Lev1")) = [];
+F(ismember(F.id,"Seq11_Bal_2200_Lev2")) = [];
+F(ismember(F.id,"Seq11_Bal_2200_Lev3")) = [];
+F(ismember(F.id,"Seq11_Bal_2200_Lev4")) = [];
+F(ismember(F.id,"Seq11_Bal_2200_Lev5")) = [];
+F(ismember(F.id,"Seq11_RPM_2200_Nom_Rep1")) = []; % Missing PLVAD & QLVAD
+% F(ismember(F.id,"Seq11_RPM_2400_Nom_Rep1")) = []; % Good for inter-experiment comparisons
+% F(ismember(F.id,"Seq11_RPM_2600_Nom_Rep1")) = []; % Was not even recorded
+F(ismember(F.id,"Seq11_RPM_2200_Nom_Rep2")) = [];
+F(ismember(F.id,"Seq11_RPM_2400_Nom_Rep2")) = [];
+F(ismember(F.id,"Seq11_RPM_2600_Nom_Rep2")) = [];
 
 G = make_group_stats(F, idSpecs, sequences);
 G_rel = make_group_stats(F_rel, idSpecs, sequences);
