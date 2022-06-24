@@ -1,179 +1,261 @@
-function h_figs = plot_nha_power_and_flow(...
-		F,G,R,nhaVar,levelLabels,xVar,xLims,xLab,supTit,intervention)
+function hFig = plot_nha_power_and_flow(F, G, R, var3, yLims3)
 	% Plot NHA for each catheter type
 	%
-	% Panel 3x[no of levels] matrix setup: 
+	% Panel 3x[no of levels] matrix setup:
 	% - one panel row for Q
 	% - one panel row for Power
-	% - one row with NHA at the bottom	
+	% - one row with NHA at the bottom
 	% - one panel colum per levelLabel
 	%
 	% Each panel is plotted with the plot_group_and_individual_data function
 	% - Group static data points (as given in input G)
 	% - Individual points (as given in F) in the background
 	% - Individual points connection line in the background
-	% 
+	%
 	% Hardcoding and adjusmtents made in this function:
 	% - annotations
 	% - panel and axis format specified in the get_plot_specs function
 	% - object positions is adjusted in this function
 	% - Visibility of background points and lines is here toggled on/off.
-	
-	yVar_row1 = {'Q_mean',[-1 1]};
-	yVar_row2 = {'P_LVAD_mean',[-1 1]};
-	yLabels = {
-		{'\itQ\rm'}
-		{'\itP_{\rmLVAD}\rm'}
-		{'NHA\rm'}
-		};
-	legTit = {'RPM'};
-	speeds = [2200,2400,2600];
+
+	yLims1 = [-0.85 0.2];
+	%yLims2 = [-0.45 0.15];
+	yLims2 = yLims1+0.25;
+	yTicks1 = -0.75:0.25:0;
+	%yTicks2 = -0.4:0.1:0.1;
+	yTicks2 = yTicks1+0.25;
+	yTicks3 = 0:1:5.5;
 	
 	spec = get_plot_specs;
-	figWidth = 1170;
-	figHeight =  920; %955
-    panelHeight = 195; %200
-	yStart = 74;
-	yGap = 7;
-
-	switch intervention
-		case 'control'
-			xGap = 60;
-			panelWidth = 300;
-			xStart = 105;
-		case 'effect'
-			xGap = 22;
-			xStart = 68;
-			panelWidth = 700;
-	end
 	
-	% Offsets for common axes
-	mainXAxGap = 0.01;
-	mainYAxGap = mainXAxGap*(figHeight/figWidth);
+	figWidth = 710;
+	figHeight =  710;
+	pHeight = 145;
+	xGap = 8;
+	yGap = 8;
 	
-	nFigs = size(nhaVar,1);
-	nCols = size(levelLabels(:,1),2);
-	nRows = 3;	
-	h_figs = gobjects(nFigs,1);
+	%R_inds = contains(string(R.levelLabel),levelLabels(j,1));
+	G_ctrl = G(G.categoryLabel=='Clamp' & G.interventionType~='Reversal',:);
+	G_bal = G(G.categoryLabel=='Balloon' & G.interventionType~='Reversal',:);
+	F_ctrl = F(F.categoryLabel=='Clamp' & F.interventionType~='Reversal',:);
+	F_bal = F(F.categoryLabel=='Balloon' & F.interventionType~='Reversal',:);
+	speeds = unique(G_bal.pumpSpeed);
+	
+	hFig = figure(spec.fig{:},...
+		'Name',sprintf('NHA, PLVAD and Q curves - %s as NHA',var3),...
+		'Position',[150,150,figWidth,figHeight],...
+		'PaperUnits','centimeters',...
+		'PaperSize',[19,30]...
+		);
 
-	% Use g^2/kHz as unit instead
-%  	G{:,nhaVar(:,1)} = 1000*G{:,nhaVar(:,1)};
-%  	F{:,nhaVar(:,1)} = 1000*F{:,nhaVar(:,1)};
+	hAx = init_axes(spec);
+	adjust_panel_positions(hAx, pHeight, yGap);
+	hAx = adjust_axes(hAx, yLims1, yLims2, yLims3, G_ctrl, yTicks1, yTicks2, yTicks3);
+	[hXAx,~] = make_offset_axes(hAx, xGap, yGap);
+	
+	
+	% Extract inds for overall baseline and for interventions in G and F
+	% ---------------------------------------------------
+	
+	xVar = 'QRedTarget_pst';
+	plot_panel_colum(hAx(:,1), G_ctrl, F_ctrl, speeds, xVar, var3, spec);
 
-	for v=1:nFigs
+  	xVar = 'arealObstr_xRay_pst_mean';
+  	xVar = 'balLev_xRay_mean';
+  	plot_panel_colum(hAx(:,2), G_bal, F_bal, speeds, xVar, var3, spec);
 		
-		h_figs(v) = figure(spec.fig{:},...
-			'Name',sprintf('%s - %s as NHA',supTit,nhaVar{v,1}),...
-			'Position',[10,40,figWidth,figHeight]);
-		
-		h_ax = gobjects(nRows,nCols);
-		for j=1:nCols
+	add_legend(G, hAx, spec);
+	add_annotation(hAx, hXAx);
 
-			% Extract inds for overall baseline and for interventions in G and F
-			% ---------------------------------------------------
-			F_inds = ...
-				(contains(string(F.levelLabel),levelLabels(j,1)) & contains(string(F.idLabel),'Lev0') & F.interventionType=='Control') | ...
-				(contains(string(F.levelLabel),levelLabels(j,1)) & F.interventionType=='Effect');
-			G_inds = ...
-				(contains(string(G.levelLabel),levelLabels(j,1)) & contains(string(G.idLabel),'Lev0') & G.interventionType=='Control') | ...
-				(contains(string(G.levelLabel),levelLabels(j,1)) & G.interventionType=='Effect');
-			%R_inds = contains(string(R.levelLabel),levelLabels(j,1));
-			
-			% Plot panel row 1 with flow rate data
-			% ---------------------------------------------------
-			h_ax(1,j) = subplot(nRows,nCols,j,spec.subPlt{:});
-			if j==1, h_yax(1) = copyobj(h_ax(1,j),gcf); end
-			
-			plot_group_and_individual_data_G1(h_ax(1,j),G(G_inds,:),F(F_inds,:),...
-				speeds,xVar,xLims,yVar_row1,spec,[]);
-			
-			% Plot panel row 2 with LVAD power data
-			% ---------------------------------------------------
-			h_ax(2,j) = subplot(nRows,nCols,nCols+j,spec.subPlt{:});
-			if j==1, h_yax(2) = copyobj(h_ax(2,j),gcf); end
-			
-			plot_group_and_individual_data_G1(h_ax(2,j),G(G_inds,:),F(F_inds,:),...
-				speeds,xVar,xLims,yVar_row2,spec,[]);
-			
-			% Panel row with 3 NHA data
-			% ---------------------------------------------------
-			h_ax(3,j) = subplot(nRows,nCols,2*nCols+j,spec.subPlt{:});
-			if j==1, h_yax(3) = copyobj(h_ax(3,j),gcf); end
-			h_xax(j) = copyobj(h_ax(3,j),gcf);
-			
-% 			F.(nhaVar{v,1})(F_inds) = pow2db(F.(nhaVar{v,1})(F_inds));
-% 			G.(nhaVar{v,1})(G_inds) = pow2db(G.(nhaVar{v,1})(G_inds));
-			h_nha = plot_group_and_individual_data_G1(h_ax(3,j),G(G_inds,:),...
-				F(F_inds,:),speeds,xVar,xLims,nhaVar(v,:),spec,[]);
-					
-		end
-		
-		format_axes_in_plot_NHA(h_ax,spec);
-		format_axes_in_plot_NHA([h_xax,h_yax],spec);
- 				
-		% Adjust axes positions (after all content is made)
-		% ---------------------------------------------------
-		
-		adjust_panel_positions(h_ax,xGap,yGap,yStart,xStart,...
-			panelWidth,panelHeight);
-	    
-		% Add annotations 
-		% ------------------
-		
-		h_ax = add_shaded_boxes_and_subtitles(h_ax,levelLabels(:,2),...
-			panelHeight,panelWidth,yGap,spec);
-		
-		h_leg = add_legend_to_plot_NHA(h_nha,speeds,spec,legTit);
-		h_leg.Position(1) = h_ax(end,end).Position(1)+h_ax(end,end).Position(3)+15;
-		h_leg.Position(2) = 65;		
-  		
-		% Add row y-labels
-		h_yLab = add_subYLabels_to_plot_NHA(h_yax,yLabels,spec);
-		
-		% Add common x label, must be done after other repositioning
-		h_supLab = add_supLabel(xLab,spec,'x');
+function plot_panel_colum(hAx, G, F, speeds, xVar, var, spec)
+	
+	plot_individual_data(hAx(1), F, speeds, xVar, 'Q_mean', spec);
+	plot_group_statistic(hAx(1), G, speeds, xVar, 'Q_mean', spec, []);
+	plot_group_statistic(hAx(2), G, speeds, xVar, 'P_LVAD_mean', spec, []);
+	plot_individual_data(hAx(2), F, speeds, xVar, 'P_LVAD_mean', spec);
+	plot_group_statistic(hAx(3), G, speeds, xVar, var, spec, []);
+	plot_individual_data(hAx(3), F, speeds, xVar, var, spec);
+	
+function hPlt = plot_group_statistic(hAx, G, speeds, xVar, var, spec, R)
+	
+	G = sortrows(G, xVar);
+	hPlt = gobjects(numel(speeds),1);
+	for j=1:numel(speeds)
 
-		h_ax = make_intervention_ticks_bold(h_ax);
-		adjust_axis_label_positions(h_yLab,h_supLab);
+		% Plot background points
+		hAx.ColorOrderIndex=j;
 
-		% Make main axes offset and "actual data axes" invisible
-		offset_main_ax(h_ax,h_xax,h_yax,mainXAxGap,mainYAxGap);
-  		%make_xy_halfframe(h_ax)
-
-		fix_overlapping_labels(intervention,h_xax,h_yax);
+		G_rpm_inds = G.pumpSpeed==speeds(j);
+		if all(not(G_rpm_inds)), continue; end
 		
+		% Plot aggregated values in heavy lines
+		x = G.(xVar)(G_rpm_inds);
+		y = G.(var)(G_rpm_inds);
+		
+		hPlt(j) = plot(hAx, x, y, ...
+			'Marker', spec.speedMarkers{j},...
+			'LineWidth',1 ...
+			...,'LineStyle','none'
+			); 		
+  		%hPlt(j).MarkerFaceColor = hPlt(j).Color;
+
+% 		% Add p value label at line endpoints
+% 		if not(isempty(R))
+% 			p = R.(var)(ismember(R.pumpSpeed,speeds(j)));
+% 			%text(G_x(end)+0.055*diff(xLims),G_y(end),'p='+extractAfter(p,'p='),'FontSize',9);
+% 			if double(extractBetween(p,' (',')'))<=0.05
+% 				text(G_x(end)+0.05*diff(xLims),G_y(end),'*',...
+% 					spec.asterix{:});
+% 			end
+% 		end
+% 
 	end
 
-function h_ax = adjust_panel_positions(h_ax,xGap,yGap,rowStart,colStart,width,height)
-	nRows = size(h_ax,1);
-	nCols = size(h_ax,2);
+function [hPts,hLines] = plot_individual_data(hAx, F, speeds, xVar, var, spec)
+ 
+	seqs = unique(F.seq);
+	%F.(xVar) = double(string((F.(xVar))));
+	F = sortrows(F,xVar);
+	
+	for j=1:numel(speeds)
+
+		% Plot background points
+		hAx.ColorOrderIndex=j;
+
+		F_rpm_inds = F.pumpSpeed==speeds(j);
+
+		F_y = F.(var)(F_rpm_inds);
+		F_x = F.(xVar)(F_rpm_inds);
+		F_x(isnan(F_x)) = 0;
+		hPts(j) = scatter(hAx, F_x, F_y, spec.backPts{:},...
+			'Marker',spec.speedMarkers{j},...
+			'MarkerEdgeAlpha',0.8,...
+			'HandleVisibility','off');
+
+% 		% Plot background lines
+% 		for k=1:numel(seqs)
+% 			hAx.ColorOrderIndex=j;
+% 			F_x = F.(xVar)(F_rpm_inds & F.seq==seqs(k));
+% 			F_y = F.(var)(F_rpm_inds & F.seq==seqs(k));
+% 			F_x(isnan(F_x)) = 0;
+% 			if isempty(F_y), continue; end
+% 			hLines(j,k) = plot(hAx, F_x, F_y, spec.backLines{:},'HandleVisibility','off');
+% 			hLines(j,k).Color = [hLines(j).Color,0.5];
+% 		end
+	end
+
+function [hXAx, hYAx] = make_offset_axes(hAx, xGap, yGap)
+	% Make main axes offset and "actual data axes" invisible
+
+	% Make extra axes to offset
+	for i=1:size(hAx,1)
+		hYAx(i) = copyobj(hAx(i,1), gcf); 
+	end
+	for j=1:size(hAx,2)
+		hXAx(j) = copyobj(hAx(end,j), gcf); 
+	end
+
+ 	offset_main_ax(hAx, hXAx, hYAx, xGap, yGap);
+ 	%make_xy_halfframe(hAx)
+
+function hAx = adjust_panel_positions(hAx, pHeight, yGap)
+	
+	pStartX = 70;
+	pStartY = 50;
+	xGap = 25;
+	pWidth1 = 125;
+	pWidth2 = pWidth1*1.8;
+
+    nRows = size(hAx,1);
+	nCols = size(hAx,2);
+	
 	for i=1:nRows
-		rowPos = (nRows-i)*(height+yGap)+rowStart;
-		for j=1:nCols
-			colPos = (j-1)*(width+xGap)+colStart;
-			h_ax(i,j).Position = [colPos,rowPos,width,height];
-		end
-	end
-
-function h_yLab = adjust_axis_label_positions(h_yLab,h_supLab)
-	for i=1:numel(h_yLab)
-		h_yLab(i).Position(2) = h_yLab(i).Position(2)+22;
-	end
-
-	h_yLab(1).Position(1) = -37;
-	h_yLab(2).Position(1) = -31;
-	h_yLab(3).Position(1) = -29;
-	
-	h_supLab.Position(2) = h_supLab.Position(2)+12;
-
-function [h_xax,h_yax] = fix_overlapping_labels(intervention,h_xax,h_yax)
-	nCols = numel(h_xax);
-	nRows = numel(h_yax);
-	if strcmp(intervention,'effect')
-		for j=1:nCols-1, h_xax(j).XTickLabel{end} = '100  ';end
-		for j=2:nCols, h_xax(j).XTickLabel{1} = ' 0';end
+		hAx(i,1).Position([3,4]) = [pWidth1,pHeight];
+		hAx(i,2).Position([3,4]) = [pWidth2,pHeight];
 	end
 
 	for i=1:nRows
-		h_yax(i).YTick(end) = '';
+		hAx(i,1).Position(1) = pStartX;
+		hAx(i,2).Position(1) = pStartX + pWidth1 + xGap;
 	end
+
+	for j=1:nCols
+		hAx(3,j).Position(2) = pStartY;
+		hAx(2,j).Position(2) = pStartY + pHeight + yGap;
+		hAx(1,j).Position(2) = pStartY + pHeight + yGap + pHeight + yGap;
+	end	
+	
+function hAx = init_axes(spec)
+	nCols = 2;
+	nRows = 3;
+	for i=1:nRows
+		for j=1:nCols
+			hAx(i,j) = subplot(nRows,nCols,nCols*(i-1)+j,...
+				spec.subPlt{:},...
+				'FontSize',9.25,...
+				'FontName','Arial',...
+				'Color',[.96 .96 .96],...
+				...'Color',[1 1 1],...
+				'TickDir','out',...
+				'TickLength',[0.015, 0.015],...
+			    'XColor',[1 1 1],...
+			    'YColor',[1 1 1],...
+				'GridColor',[1 1 1],...
+				...'GridColor',[0 0 0],...
+				'XGrid','on',...
+				'YGrid','on',...
+				'LineWidth',1.5,...
+				'GridAlpha',1 ...
+				...'GridAlpha',0.075...
+				);
+				
+		end
+	end
+	
+function add_legend(G, hAx, spec)
+	leg = string(unique(G.pumpSpeed));%{'2200','2400','2600'};
+	hLeg = legend(hAx(end,end), leg, spec.leg{:}, 'FontSize',10);
+	hLeg.Title.String = 'speed (RPM)';
+	set(hLeg.Title, spec.legTit{:}, 'FontSize',10, 'FontWeight','normal')
+	hLeg.Position(1) = hLeg.Position(1)+95;
+	hLeg.Position(2) = 0;
+
+function add_annotation(hAx, hXAx)
+	
+	hYLab = suplabel('deviation from baseline','y');
+	hYLab.FontSize = 10.5;
+	hYLab.FontName = 'Arial';
+	
+	xLab1 = 'afterload levels';
+	xLab2 = 'inflow obstruction levels';
+	hXLab(1) = xlabel(hXAx(1), xLab1, "FontSize",10.5, 'Units','points');
+	hXLab(2) = xlabel(hXAx(2), xLab2, "FontSize",10.5, 'Units','points');
+	hXLab(1).Position(2) = -27;
+	hXLab(2).Position(2) = -27;
+	
+	y = hAx(1,2).YLim(1)+0.5*diff(hAx(1,2).YLim);
+	text(hAx(1,2), 5.9, y, '\itQ\rm','FontSize',10.5);
+	y = hAx(2,2).YLim(1)+0.5*diff(hAx(2,2).YLim);
+	text(hAx(2,2), 5.9, y,'\itP\rm_{LVAD}','FontSize',10.5);
+	y = hAx(3,2).YLim(1)+0.5*diff(hAx(3,2).YLim);
+	text(hAx(3,2), 5.9, y, 'NHA', 'FontSize',10.5);
+	text(hAx(1,1), hAx(1,1).YLim(1), .30, 'A', 'FontSize',15, 'FontName','Arial');
+	text(hAx(1,2), 0, .30, 'B', 'FontSize',15, 'FontName','Arial');
+
+function hAx = adjust_axes(hAx, yLims1, yLims2, yLims3, G_ctrl, yTicks1, yTicks2, yTicks3)
+	xlim(hAx(:,1),[-5,80]);
+	xlim(hAx(:,2),[-0.2,5.2]);
+	ylim(hAx(1,:),yLims1);
+	ylim(hAx(2,:),yLims2);
+	ylim(hAx(3,:),yLims3);
+	xticks(hAx(end,1), unique(G_ctrl.QRedTarget_pst));	
+	yticks(hAx(1,:),yTicks1)
+	yticks(hAx(2,:),yTicks2)
+	yticks(hAx(3,:),yTicks3)
+	for i=1:size(hAx,1)
+		yTickLabels = 100*yticks(hAx(i,1))+"%";
+		%yTickLabels(2:2:end) = "";
+		yticklabels(hAx(i,1),yTickLabels)
+	end
+	hAx(end,1).XTickLabel = {'BL','1','2','3'};
+	hAx(end,2).XTickLabel{1} = 'BL';

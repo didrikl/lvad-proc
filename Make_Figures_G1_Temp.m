@@ -1,5 +1,6 @@
 Config =  get_processing_config_defaults_G1;
 cd 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Visualize\Article2'
+Make_Part_Plot_Data
 
 %% Diameter map
 
@@ -113,7 +114,7 @@ widthFactor = 60*60;
 	
 % Clamping
 i=8;
-map1 = Data.G1.(seq).Plot_Data.rpmOrderMap{i};
+map1 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T1 = Data.G1.(seq).Plot_Data.T{i};
 T1(1:0.9*60*750,:) = [];
 cutInd = find(T1.noteRow==104,1,'first');
@@ -123,7 +124,7 @@ T1(cutInd+2*60*650:end,:) = [];
 % Balloon, 2400 RPM; 
 % NB with air in balloon at 2400 RPM
 i=4;
-map2 = Data.G1.(seq).Plot_Data.rpmOrderMap{i};
+map2 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T2 = Data.G1.(seq).Plot_Data.T{i};
 cutInd = find(T2.noteRow==63);
 T2(cutInd(end)-20000:end,:) = [];
@@ -147,14 +148,14 @@ widthFactor = 70*60;
 
 % Clamping
 i=2;
-map1 = Data.G1.(seq).Plot_Data.rpmOrderMap{i};
+map1 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T1 = Data.G1.(seq).Plot_Data.T{i};
 cutInd = find(T1.noteRow==39,1,'first');
 T1(cutInd:end,:) = [];
 
 % Balloon, 2400 RPM; 
 i=3;
-map2 = Data.G1.(seq).Plot_Data.rpmOrderMap{i};
+map2 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T2 = Data.G1.(seq).Plot_Data.T{i};
 %T2(1:1*60*750,:) = [];
 cutInd = find(T2.noteRow==68,1,'first');
@@ -172,7 +173,6 @@ var = 'accA_y_NF_HP';
 seq = 'Seq13'; 
 Notes = Data.G1.(seq).Notes;
 partSpec = Data.G1.(seq).Config.partSpec;
-close all
 
 yLims1 = [0.8, 5.5];
 yLims2 = [-100,50];
@@ -183,7 +183,7 @@ widthFactor = 85*60;
 
 % Clamping
 i=5;
-map1 = Data.G1.(seq).Plot_Data.rpmOrderMap{i};
+map1 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T1 = Data.G1.(seq).Plot_Data.T{i};
 % T1(1:0.9*60*750,:) = [];
 cutInd = find(T1.noteRow==84,1,'first');
@@ -191,7 +191,7 @@ T1(cutInd:end,:) = [];
 
 % Balloon, 2400 RPM; 
 i=2;
-map2 = Data.G1.(seq).Plot_Data.rpmOrderMap{i};
+map2 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T2 = Data.G1.(seq).Plot_Data.T{i};
 % cutInds = find(T2.noteRow==41,1,'first');
 % T2(cutInds+1*60*750:end,:) = [];
@@ -229,51 +229,30 @@ IDs2 = {
 close all
 make_spectrogram_and_curve_figure_per_ids_G1(Data.G1.Seq13.S, tit, var, rpm, Config.fs, IDs1, IDs2);
 
-%% NHA, Q and P, per catheter type
-% Pendulating Mass in Inlet Conduit
-% 3 X [nLevels] panels
-% Figure 5 in submission for ASAIO
+%% NHA, Q and PLVAD - 3X2 panels
 
-nhaVars = {
-	%'accA_best_NF_HP_b2_pow_per_speed', [0,15]
-	'accA_y_NF_HP_b1_pow',[-1, 10]
-	%'accA_y_NF_stdev',[]
-	%'p_eff_mean',[55,100]
-	%'pGrad_mean',[]
-	%'Q_LVAD_mean',[0 8]
+var = 'accA_xyz_NF_HP_b1_pow_norm';
+yLims3 = [-0.75 6];
+
+close all
+G_rel_med = Data.G1.Feature_Statistics.Descriptive_Relative.med;
+plot_nha_power_and_flow(F_rel, G_rel_med, [], var, yLims3);
+
+%% NHA, Q and P - 3X4 panels
+
+var = 'accA_xyz_NF_HP_b1_pow_norm';
+var = 'accA_xyz_NF_HP_b2_pow_norm';
+yLims = {
+	[-0.85 0.3]
+	[-0.85 0.3]+0.25
+	[-0.75 5.5]
 	};
-levelLabels = {
-	'Balloon','balloon'
-	};
 
-xLims = [0,12.7];
-xLims = [0,1];
-legTit = 'Pendulating Mass in Inlet Conduit';
-xLab = 'Areal inflow obstruction (%)';
-
-%home; close all
-% sequences = {
-% 	'Seq3' % (pilot)
-% 	'Seq6'
-% 	'Seq7'
-% 	'Seq8'
-% 	'Seq11'
-% 	'Seq12'
-% 	'Seq13'
-% 	'Seq14'
-% 	};
-% F2 = lookup_sequences(sequences, F_rel);
-G_rel = Data.G1.Feature_Statistics.Descriptive_Relative.med;
-plot_nha_power_and_flow(F_rel, G_rel, [], nhaVars, levelLabels, 'arealObstr_pst', xLims, xLab, legTit, 'effect');
-
-%clear nhaVars levelLabels xLims xLab tit
-
-
-%TODO
-% - Continious segment instead?
-% - Include thombus injection?
-% - Include RPM variation?
-% - Keep NHA in a separate panel?
+%close all
+G_rel_med = Data.G1.Feature_Statistics.Descriptive_Relative.med;
+G_del_med = Data.G1.Feature_Statistics.Descriptive_Delta.med;
+plot_nha_power_and_flow_3x4panels(F_rel, G_rel_med, [], var, yLims);
+plot_nha_power_and_flow_3x5panels(F_rel, G_rel_med, [], var, yLims);
 
 
 %% NHA, Q and P, per catheter type
@@ -281,7 +260,7 @@ plot_nha_power_and_flow(F_rel, G_rel, [], nhaVars, levelLabels, 'arealObstr_pst'
 % 3 X [nLevels] panels
 % Figure 5 in submission for ASAIO
 
-nhaVars = {
+var = {
 	%'accA_x_NF_b1_pow',[0,0.008]
 	%'accA_y_NF_HP_b2_pow',[0, 0.008]
 	'accA_y_NF_HP_b1_pow',[0, 0.008]
@@ -319,12 +298,12 @@ plot_nha_power_and_flow_per_intervention_G1(...
 	Data.G1.Feature_Statistics.Descriptive_Relative.med, ...
 	...Data.G1.Feature_Statistics.Descriptive_Absolute_swap_yz.med, ...
 	[], ...
-	nhaVars, levelLabels, ...
+	var, levelLabels, ...
 	'QRedTarget_pst', ...
 	...'arealObstr_xRay_pst_mean', ...
 	xLims, xLab, legTit, 'control');
 
-clear nhaVars levelLabels xLims xLab legTit
+clear var levelLabels xLims xLab legTit
 
 
 %% NHA, Q and P for afterload and prelod side by side
@@ -334,7 +313,7 @@ clear nhaVars levelLabels xLims xLab legTit
 
 close all
 
-nhaVars = {
+var = {
 	%'accA_x_NF_b1_pow',[0,8]
 	'accA_y_NF_b2_pow',[0 8]
 	%'accA_z_NF_b1_pow',[0,8]
@@ -364,9 +343,9 @@ legTit = 'Control intervensions';
 plot_nha_power_and_flow_per_intervention(Data.G1.Features.Absolute,...
 	Data.G1.Feature_Statistics.Descriptive_Absolute.med, ...
 	Data.G1.Feature_Statistics.Results, ...
-	nhaVars, levelLabels, 'QRedTarget_pst', xLims, xLab, legTit,'control');
+	var, levelLabels, 'QRedTarget_pst', xLims, xLab, legTit,'control');
 
-clear nhaVars levelLabels xLims xLab legTit
+clear var levelLabels xLims xLab legTit
 
 %% ROC curves for each diameter states and each speed
 % Overlaid component curves

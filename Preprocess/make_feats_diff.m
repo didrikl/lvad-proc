@@ -7,8 +7,8 @@ function F_diff = make_feats_diff(F, fnc, nominalAsBaseline)
 	
 	cols = get_varname_of_specific_type(F,'numeric');
 	ctrlVars = F.Properties.VariableNames(F.Properties.CustomProperties.Controlled);
-	constCols = contains(cols, [ctrlVars,{'GroupCount'}], 'IgnoreCase',true);
-	cols = cols(not(constCols));
+	varsToIgnore = contains(cols, [ctrlVars,{'GroupCount','xRay'}], 'IgnoreCase',true);
+	cols = cols(not(varsToIgnore));
 	    
 	% Separate each sequence of feats to look for baseline reference values
     for i=1:numel(seqs)

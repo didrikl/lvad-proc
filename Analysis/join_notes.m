@@ -3,7 +3,7 @@ function S = join_notes(S, Notes, vars)
 	% Take all measured variables from Notes, if not specified
 	if nargin<3
 		vars = Notes.Properties.VariableNames(...
-				Notes.Properties.CustomProperties.Measured);
+			Notes.Properties.CustomProperties.Measured);
 	end
 
 	% 

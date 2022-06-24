@@ -1,8 +1,8 @@
 function hPlt = plot_curves(T1)
 	Colors_IV2
-	nhaColor = [228,26,28]/256;
-	flowColor = Colors.Fig.Cats.Speeds4(1,:);
-	plvadColor = Colors.Fig.Cats.Speeds4(2,:);
+	nhaColor = [228,26,28]/256
+	flowColor = Colors.Fig.Cats.Speeds4(1,:)
+	plvadColor = Colors.Fig.Cats.Speeds4(2,:)
 
 	hPlt(1) = plot(T1.dur,T1.Q,'LineWidth',1.75,'Color',flowColor);
 	hPlt(2) = plot(T1.dur,T1.P_LVAD,'--','LineWidth',2.2,'Color',plvadColor);

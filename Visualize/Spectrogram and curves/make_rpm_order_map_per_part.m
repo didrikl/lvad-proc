@@ -19,23 +19,29 @@ function rpmOrderMap = make_rpm_order_map_per_part(T_parts, vars, Config)
 			var = vars{j};
 
 			multiWaitbar('Calculate RPM order map','Increment',waitIncr);
-			
+
 			[map,order,rpm,time] = make_rpm_order_map(T_parts{i}, var, ...
 				fs, 'pumpSpeed', res, overlapPst);
-
-			% Make use of map (but for now not needed):
-			% if not(contains(accVar,'_NF'))
-			%     ordertrack(...,'Amplitude','power')
-			% end
-
 			rpmOrderMap{i}.([var,'_map']) = map;
+			
+			% Make use of map to track specific orders
+			if not(contains(var,'_NF')) && not(isempty(map))
+				mags = ordertrack(db2pow(map),order,rpm,time,Config.rpmOrdersToTrack);
+				rpmOrderMap{i}.([var,'_mags']) = mags;
+			end
 
+			% Make use of map to calculate spectrum
+			[spectrum,specorder] = orderspectrum(map, order);
+            rpmOrderMap{i}.([var,'_spectrum']) = spectrum;
+			rpmOrderMap{i}.([var,'_spectrum_order']) = specorder;
+						
 		end
 
 		% Store just one set of order, rpm and time (equal for all variables)
 		rpmOrderMap{i}.order = order;
 		rpmOrderMap{i}.rpm = rpm;
 		rpmOrderMap{i}.time = time;
+		rpmOrderMap{i}.mags = mags;
 
 	end
 

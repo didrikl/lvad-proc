@@ -19,11 +19,9 @@ function Data = make_part_plot_data_per_sequence(Data, seqDefs, accVar, Config)
 		T_parts = make_curve_plot_data_per_part(Data.(seq), accVar, Config);
 		Data.(seq).Plot_Data.T = T_parts;
 		
-% 		if not(isfield(Data.(seq).Plot_Data,'RPM_Order_Map'))
-% 			rpmOrderMap = make_rpm_order_map_per_part(T_parts, accVar, Config);
-% 			Data.(seq).Plot_Data.RPM_Order_Map = rpmOrderMap;
-% 		end
-
+		rpmOrderMap = make_rpm_order_map_per_part(T_parts, accVar, Config);
+		Data.(seq).Plot_Data.RPM_Order_Map = rpmOrderMap;
+ 		
 	end
 
 	multiWaitbar('CloseAll');

@@ -21,6 +21,8 @@ sequences = {
    	'Seq14'
 	};
 
+Data.G1.Features.idSpecs = idSpecs;
+Data.G1.Features.sequences = sequences;
 
 %% Make variable features of each intervention
 % -----------------------------------------------------------
@@ -28,6 +30,7 @@ sequences = {
 discrVars = {
 	'Q_LVAD'
 	'P_LVAD'
+ 	'balLev_xRay'
  	'balDiam_xRay'
  	'balHeight_xRay'
  	'arealObstr_xRay_pst' 
@@ -64,14 +67,13 @@ accVars = {
 	%'accA_norm_NF_HP'
 	};
 hBands = [
-	1.25, 7
-	%1.20, 3.85
+	1.25, 3.85
 	];
 isHarmBand = true;
 Pxx = make_power_spectra(Data.G1, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
 
 % Report NHA as g^2/kHz instead of g^2/Hz
-Pxx.bandMetrics{:,vartype('numeric')} = 1000*Pxx.bandMetrics{:,vartype('numeric')};
+Pxx.bandMetrics{:,vartype('numeric')} = 1000*Pxx.bandMetrics{:,vartype('numeric')};Data.G1.Periodograms = Pxx;
 
 % Add derived features
 F = join(F, Pxx.bandMetrics, 'Keys',{'analysis_id','id'});
@@ -91,7 +93,7 @@ F.accA_xyz_NF_HP_b2_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b2_pow','accA_y_NF_
 % Make relative and delta differences from baselines using id tags
 % -----------------------------------------------------------
 
-nominalAsBaseline = false;
+nominalAsBaseline = true;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
 
@@ -104,33 +106,48 @@ for i=1:numel(sequences)
 	weight(i) = str2double(Data.G1.(sequences{i}). ...
 		Notes.Properties.UserData.Experiment_Info.PigWeight0x28kg0x29);
 end
-%mean(weight)
+
+Data.G1.Periodograms = Pxx;
+Data.G1.Features.Model.weight = weight;
+Data.G1.Features.Absolute = F;
+Data.G1.Features.Relative = F_rel;
+Data.G1.Features.Delta = F_del;
 
 
 %% Descriptive stastistics over group of experiments
 % -----------------------------------------------------------
 
 % Exclude friction
-% F(contains(F.id,'Seq14_Bal'),:) = [];
-% F_rel(contains(F.id,'Seq14_Bal'),:) = [];
-% F_del(contains(F.id,'Seq14_Bal'),:) = [];
+%  F(contains(F.id,'Seq14_Bal'),:) = [];
+%  F_rel(contains(F_rel.id,'Seq14_Bal'),:) = [];
+%  F_del(contains(F_del.id,'Seq14_Bal'),:) = [];
 
 % Exclude unstable flow recordings (more than 20% within segment)
-F(ismember(F.id,"Seq11_Bal_2200_Lev1")) = [];
-F(ismember(F.id,"Seq11_Bal_2200_Lev2")) = [];
-F(ismember(F.id,"Seq11_Bal_2200_Lev3")) = [];
-F(ismember(F.id,"Seq11_Bal_2200_Lev4")) = [];
-F(ismember(F.id,"Seq11_Bal_2200_Lev5")) = [];
-F(ismember(F.id,"Seq11_RPM_2200_Nom_Rep1")) = []; % Missing PLVAD & QLVAD
-% F(ismember(F.id,"Seq11_RPM_2400_Nom_Rep1")) = []; % Good for inter-experiment comparisons
-% F(ismember(F.id,"Seq11_RPM_2600_Nom_Rep1")) = []; % Was not even recorded
-F(ismember(F.id,"Seq11_RPM_2200_Nom_Rep2")) = [];
-F(ismember(F.id,"Seq11_RPM_2400_Nom_Rep2")) = [];
-F(ismember(F.id,"Seq11_RPM_2600_Nom_Rep2")) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev1"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev2"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev3"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev4"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev5"),:) = [];
+F(ismember(F.id,"Seq6_RPM_2200_Nom_Rep1"),:) = []; % Missing PLVAD & QLVAD
+% F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep1"),:) = []; % Good for inter-experiment comparisons
+% F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep1"),:) = []; % Was not even recorded
+F(ismember(F.id,"Seq6_RPM_2200_Nom_Rep2"),:) = [];
+F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep2"),:) = [];
+F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep2"),:) = [];
 
 G = make_group_stats(F, idSpecs, sequences);
 G_rel = make_group_stats(F_rel, idSpecs, sequences);
 G_del = make_group_stats(F_del, idSpecs, sequences);
+
+Data.G1.Feature_Statistics.Descriptive_Absolute = G;
+Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
+Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
+
+% Comment out the following to not store the exclusions in the Feature struct
+Data.G1.Features.Absolute = F;
+Data.G1.Features.Relative = F_rel;
+Data.G1.Features.Delta = F_del;
+
 
 % Hypothesis test
 % -----------------------------------------------------------
@@ -144,66 +161,26 @@ pVars = {
 	%'accA_xyz_NF_HP_b1_pow_sum'
 	%'accA_best_NF_HP_b1_pow'
 	%'accA_best_NF_HP_b1_pow_per_speed'
- 	%'accA_norm_NF_HP_b1_pow'
-% 	'accA_x_NF_HP_b2_pow'
-%  	'accA_y_NF_HP_b2_pow'
-%  	'accA_z_NF_HP_b2_pow'
   	'accA_xyz_NF_HP_b2_pow_norm'
-	%'accA_xyz_NF_HP_b2_pow_sum'
- 	%'accA_best_NF_HP_b2_pow'
-	%'accA_best_NF_HP_b2_pow_per_speed'
- 	%'accA_norm_NF_HP_b2_pow'
 	'Q_mean'
 	'P_LVAD_mean'
-%	'Q_LVAD_mean'
+	'Q_LVAD_mean'
 	'pGraft_mean'
 };
 
 W = make_paired_features_for_signed_rank_test(F, pVars,{'seq'});
 W_rel = make_paired_features_for_signed_rank_test(F_rel, pVars,{'seq'});
+Data.G1.Features.Paired_Absolute = W;
+Data.G1.Features.Paired_Relative = W_rel;
+
 [P,R] = make_paired_signed_rank_test_G1(W, G, pVars);
 [P_rel,R_rel] = make_paired_signed_rank_test_G1(W_rel, G_rel, pVars);
+Data.G1.Feature_Statistics.Test_P_Values_Absolute = P;
+Data.G1.Feature_Statistics.Test_P_Values_Relative = P_rel;
 
-
-%% Compile results table
-
-% One sorted and combined results table with absolute and relative results
-levOrder = {
-	'RPM, 2400, Nominal'
-	'RPM, 2400, Nominal #2'
-	'RPM, 2200, Nominal'
-	'RPM, 2200, Nominal #2'
-	'RPM, 2600, Nominal'
-	'RPM, 2600, Nominal #2'
-	'Clamp, 2400, Nominal'
-	'Clamp, 2400, 25%'
-	'Clamp, 2400, 50%'
-	'Clamp, 2400, 75%'
-	'Clamp, 2400, Reversal'
-	'Balloon, 2400, Nominal'
-	'Balloon, 2400, Lev1'
-	'Balloon, 2400, Lev2'
-	'Balloon, 2400, Lev3'
-	'Balloon, 2400, Lev4'
-	'Balloon, 2400, Lev5'
-	'Balloon, 2400, Reversal'
-	'Balloon, 2200, Nominal'
-	'Balloon, 2200, Lev1'
-	'Balloon, 2200, Lev2'
-	'Balloon, 2200, Lev3'
-	'Balloon, 2200, Lev4'
-	'Balloon, 2200, Lev5'
-	'Balloon, 2200, Reversal'
-	'Balloon, 2600, Nominal'
-	'Balloon, 2600, Lev1'
-	'Balloon, 2600, Lev2'
-	'Balloon, 2600, Lev3'
-	'Balloon, 2600, Lev4'
-	'Balloon, 2600, Lev5'
-	'Balloon, 2600, Reversal'
-	};
-
-Results = compile_results_table(R, levOrder, R_rel);
+% Compile results table
+Results = compile_results_table(R, R_rel);
+Data.G1.Feature_Statistics.Results = Results;
 
 
 %% Calculate ROC curves
@@ -242,9 +219,10 @@ predStates = {
 	'Balloon, 2400, Lev2', '\bf52%-64%\rm\newlineobstruction'
 	'Balloon, 2400, Lev3', '\bf65%-72%\rm\newlineobstruction'
 	'Balloon, 2400, Lev4', '\bf78%-84%\rm\newlineobstruction'
-	%'Balloon, Lev5', '\bf85%-94%\rm\newlineobstruction'
+	%'Balloon, 2400, Lev5', '\bf85%-94%\rm\newlineobstruction'
 	};
-[ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(F(F.pumpSpeed==single(2400),:), classifiers, predStateVar, predStates, false);
+[ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
+	F(F.pumpSpeed==single(2400),:), classifiers, predStateVar, predStates, false);
 Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
 
@@ -274,28 +252,6 @@ Data.G1.Feature_Statistics.AUC_Pooled_RPM = AUC_pooled_rpm;
 
 %% Save 
 % -----------------------------------------------------------
-
-Data.G1.Features.idSpecs = idSpecs;
-Data.G1.Features.sequences = sequences;
-Data.G1.Features.Absolute = F;
-Data.G1.Features.Relative = F_rel;
-Data.G1.Features.Delta = F_del;
-Data.G1.Features.Paired_Absolute = W;
-Data.G1.Features.Paired_Relative = W_rel;
-Data.G1.Features.Absolute = F;
-
-Data.G1.Periodograms = Pxx;
-
-Data.G1.Feature_Statistics.Descriptive_Absolute = G;
-Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
-Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
-Data.G1.Feature_Statistics.Test_P_Values_Absolute = P;
-Data.G1.Feature_Statistics.Test_P_Values_Relative = P_rel;
-Data.G1.Feature_Statistics.Results = Results;
-Data.G1.Feature_Statistics.ROC = ROC;
-Data.G1.Feature_Statistics.AUC = AUC;
-Data.G1.Feature_Statistics.ROC_pooled = ROC_pooled;
-Data.G1.Feature_Statistics.AUC_pooled = AUC_pooled;
 
 %save_data('Periodograms', feats_path, Data.G1.Periodograms, {'matlab'});
 save_data('Features', Config.feats_path, Data.G1.Features, {'matlab'});

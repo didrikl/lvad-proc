@@ -8,12 +8,10 @@ function hFig = make_part_figure_3panels_with_nha(T1, T2, map1, map2, Notes, ...
 	spec = get_plot_specs;
 
 	figWidth = 800;
-	figHeight =  750;
+	figHeight =  790;
 	pHeight1 = 195;
-	pHeight23 = 215;
+	pHeight23 = 225;
 
-	map1 = map1.([var,'_map']);
-	map2 = map2.([var,'_map']);
 %   If clipping of transitional segments in between
 % 	[map1.map,map1.order,~,map1.mapTime] = make_rpm_order_map(T1, var, fs, 'pumpSpeed', res, overlapPst);
 % 	[map2.map,map2.order,~,map2.mapTime] = make_rpm_order_map(T2, var, fs, 'pumpSpeed', res, overlapPst);
@@ -22,7 +20,7 @@ function hFig = make_part_figure_3panels_with_nha(T1, T2, map1, map2, Notes, ...
 	
 	[hFig, hSub] = init_panels(spec, figWidth, figHeight);
 	make_panels_colum(hSub(:,1), T1, map1, fs, segs1, cMapScale, cMap, yLims1, yLims2, yLims3, yTicks2, yTicks3);
-	hPlt = make_panels_colum(hSub(:,2), T2, map2, fs, segs2, cMapScale, cMap, yLims1, yLims2, yLims3, yTicks2, yTicks3);
+	hPlt = make_panels_colum(hSub(:,2), T2, var, map2, fs, segs2, cMapScale, cMap, yLims1, yLims2, yLims3, yTicks2, yTicks3);
 
  	rpms = unique(T2.pumpSpeed(segs2.all.startInd),'stable');
   	add_linked_map_hz_yyaxis(hSub(1,2), '', rpms);
@@ -71,9 +69,9 @@ function adjust_panel_positions(T1, T2, hSub, widthFactor, pHeight1, pHeight23)
 	pWidth1 = min(1000*T1.dur(end)/widthFactor,1000);
 	pWidth2 = min(1000*T2.dur(end)/widthFactor,1000);
 	
-	pStartX = 67;
+	pStartX = 70;
 	pStartY = 50;
-	yGap = 12;
+	yGap = 10;
 	xGap = 37;
 	set(hSub,'Units','pixels');
 	
@@ -117,9 +115,46 @@ function adjust_annotation_positions(hSub, hYLab, hYyTxt, hLeg)
 	hYyTxt.Position(2) = 0.5*hSub(1,2).Position(4);
  	hYyTxt.FontSize = hYLab(1).FontSize;
 
-function hPlt = make_panels_colum(hSub, T, map, fs, segs, mapScale, colorMap, yLims1, yLims2, yLimsNHA, yTicks2, yTicksNHA)
+function h = plot_curves(hAx, hAxNHA, T, segs, fs, yLims, yLimsNHA)
 	
-	plot_rpm_order_map(hSub(1), mapScale, colorMap, map.time, map.order, map.map, yLims1);
+	flowColor = [0.03,0.26,0.34,1];%Colors.Fig.Cats.Speeds4(1,:);
+	plvadColor = [0.9961,0.4961,0];%Colors.Fig.Cats.Speeds4(2,:);
+	qlvadColor = [0.39,0.83,0.07];%[0.00,0.78,0];%Colors.Fig.Cats.Speeds4(4,:);
+
+	h(1) = plot(hAx, T.dur, T.Q_relDiff,...
+ 		'LineWidth',.9,'Color',flowColor);  	
+	
+	nha_bl = calc_nha_at_baseline(segs, T, fs);
+	h(4) = plot_nha(hAxNHA, segs, T, nha_bl, yLimsNHA, fs);
+	
+	h(2) = plot(hAx, T.dur,T.Q_LVAD_relDiff,...
+ 		':','LineWidth',2,'Color',[qlvadColor,1]);
+	h(3) = plot(hAx, T.dur,T.P_LVAD_relDiff,...
+ 		'-.','LineWidth',2,'Color',[plvadColor,1]);
+	
+	hAx.Clipping = 'off';
+	ylim(yLims);
+	xlim([0,max(T.dur)])
+
+function hPlt = plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
+	
+	hPlt = imagesc(hAx, t, order, map);
+
+	colormap(hAx, colMap)
+	caxis(hAx, colRange);
+
+	set(hAx,'ydir','normal');
+	yticks(hAx, 0:1:max(order));
+	hAx.YLim = yLim;
+	xlim(hAx, t([1,end]))
+
+function hPlt = make_panels_colum(hSub, T, var, map, fs, segs, mapScale, colorMap, yLims1, yLims2, yLimsNHA, yTicks2, yTicksNHA)
+	
+	t = map.time;
+	order = map.order;
+	map = map.([var,'_map']);
+	
+	plot_rpm_order_map(hSub(1), mapScale, colorMap, t, order, map, yLims1);
 	hPlt = plot_curves(hSub(3), hSub(2), T, segs, fs, yLims2, yLimsNHA);
 	
  	make_xticks_and_time_str(hSub, segs);

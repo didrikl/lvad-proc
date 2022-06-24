@@ -19,9 +19,9 @@ for i=1:numel(prefixes)
 
 		% TODO: Checks if varibles already exists by check_table_var_output
 		try
-		T.Properties.VariableNames{vars{j}} = newVar;          
-		catch
-		vars{j}
-	    end
+			T.Properties.VariableNames{vars{j}} = newVar;
+ 		catch
+ 			vars{j}
+ 	    end
     end
 end

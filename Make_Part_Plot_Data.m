@@ -22,6 +22,4 @@ accVar = {
 
 Config =  get_processing_config_defaults_G1;
 
-tic
 Data.G1 = make_part_plot_data_per_sequence(Data.G1, seqDefs, accVar, Config);
-toc
