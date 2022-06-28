@@ -30,20 +30,21 @@ Data.G1.Features.sequences = sequences;
 discrVars = {
 	'Q_LVAD'
 	'P_LVAD'
+ 	'balLev'
  	'balLev_xRay'
  	'balDiam_xRay'
  	'balHeight_xRay'
  	'arealObstr_xRay_pst' 
-	'p_maxArt'
-	'p_minArt'
-	'MAP'
-	'p_maxPulm'
-	'p_minPulm'
-	'HR'
-	'CVP'
-	'SvO2'
-	'graftEmboliVol'
- 	'CO'
+ 	'p_maxArt'
+ 	'p_minArt'
+ 	'MAP'
+ 	'p_maxPulm'
+ 	'p_minPulm'
+ 	'HR'
+ 	'CVP'
+ 	'SvO2'
+ 	'graftEmboliVol'
+  	'CO'
     };
 meanVars = {
 	%'accA_x_NF_HP'    % to get stddev
@@ -90,10 +91,35 @@ F.P_LVAD_change = abs(F.P_LVAD_mean);
 F.accA_xyz_NF_HP_b1_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'}}.^2,2,"omitnan"));
 F.accA_xyz_NF_HP_b2_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'}}.^2,2,"omitnan"));
 
+% Make exclusions before stastitical processing
+% ----------------------------------------------
+
+% Exclude PLVAD from experiment with friction
+F.P_LVAD_mean(contains(F.id,'Seq14_Bal')) = nan;
+
+% F2 = F;
+% F(contains(F.id,'Seq14_Bal'),:) = [];
+% F = F2;
+
+% Exclude unstable flow recordings (more than 20% within segment)
+F(ismember(F.id,"Seq6_Bal_2200_Lev1"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev2"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev3"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev4"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Lev5"),:) = [];
+F(ismember(F.id,"Seq6_Bal_2200_Nom_Rep2"),:) = [];
+F(ismember(F.id,"Seq6_RPM_2200_Nom_Rep1"),:) = []; % Missing PLVAD & QLVAD
+% F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep1"),:) = []; % Good for inter-experiment comparisons
+% F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep1"),:) = []; % Was not even recorded
+F(ismember(F.id,"Seq6_RPM_2200_Nom_Rep2"),:) = [];
+F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep2"),:) = [];
+F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep2"),:) = [];
+
+
 % Make relative and delta differences from baselines using id tags
 % -----------------------------------------------------------
 
-nominalAsBaseline = true;
+nominalAsBaseline = false;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
 
@@ -117,24 +143,6 @@ Data.G1.Features.Delta = F_del;
 %% Descriptive stastistics over group of experiments
 % -----------------------------------------------------------
 
-% Exclude friction
-%  F(contains(F.id,'Seq14_Bal'),:) = [];
-%  F_rel(contains(F_rel.id,'Seq14_Bal'),:) = [];
-%  F_del(contains(F_del.id,'Seq14_Bal'),:) = [];
-
-% Exclude unstable flow recordings (more than 20% within segment)
-F(ismember(F.id,"Seq6_Bal_2200_Lev1"),:) = [];
-F(ismember(F.id,"Seq6_Bal_2200_Lev2"),:) = [];
-F(ismember(F.id,"Seq6_Bal_2200_Lev3"),:) = [];
-F(ismember(F.id,"Seq6_Bal_2200_Lev4"),:) = [];
-F(ismember(F.id,"Seq6_Bal_2200_Lev5"),:) = [];
-F(ismember(F.id,"Seq6_RPM_2200_Nom_Rep1"),:) = []; % Missing PLVAD & QLVAD
-% F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep1"),:) = []; % Good for inter-experiment comparisons
-% F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep1"),:) = []; % Was not even recorded
-F(ismember(F.id,"Seq6_RPM_2200_Nom_Rep2"),:) = [];
-F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep2"),:) = [];
-F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep2"),:) = [];
-
 G = make_group_stats(F, idSpecs, sequences);
 G_rel = make_group_stats(F_rel, idSpecs, sequences);
 G_del = make_group_stats(F_del, idSpecs, sequences);
@@ -142,11 +150,6 @@ G_del = make_group_stats(F_del, idSpecs, sequences);
 Data.G1.Feature_Statistics.Descriptive_Absolute = G;
 Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
 Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
-
-% Comment out the following to not store the exclusions in the Feature struct
-Data.G1.Features.Absolute = F;
-Data.G1.Features.Relative = F_rel;
-Data.G1.Features.Delta = F_del;
 
 
 % Hypothesis test
@@ -207,10 +210,10 @@ classifiers = {
 
 % If any of the above classifiers contains any of these names, then treat them
 % specifically as "best axis" when comparing against corresponding baseline
-bestAxVars = {
-   'accA_best_NF_HP_b1_pow'
-   'accA_best_NF_HP_b2_pow'
-	};
+% bestAxVars = {
+%    'accA_best_NF_HP_b1_pow'
+%    'accA_best_NF_HP_b2_pow'
+% 	};
 
 % Input for states of concrete occlusions 
 predStateVar = 'levelLabel';

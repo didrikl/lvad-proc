@@ -19,9 +19,9 @@ function hFig = make_part_figure_3panels_with_nha(T1, T2, map1, map2, Notes, ...
 	[T2, segs2] = make_dur_and_seg_info(T2, Notes, fs);
 	
 	[hFig, hSub] = init_panels(spec, figWidth, figHeight);
-	make_panels_colum(hSub(:,1), T1, map1, fs, segs1, cMapScale, cMap, yLims1, yLims2, yLims3, yTicks2, yTicks3);
+	make_panels_colum(hSub(:,1), T1, var, map1, fs, segs1, cMapScale, cMap, yLims1, yLims2, yLims3, yTicks2, yTicks3);
+	
 	hPlt = make_panels_colum(hSub(:,2), T2, var, map2, fs, segs2, cMapScale, cMap, yLims1, yLims2, yLims3, yTicks2, yTicks3);
-
  	rpms = unique(T2.pumpSpeed(segs2.all.startInd),'stable');
   	add_linked_map_hz_yyaxis(hSub(1,2), '', rpms);
   	

@@ -25,11 +25,12 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 	spec = get_plot_specs;
 	
 	figWidth = 710;
-	figHeight =  715;
-	pHeight = 90;
-	pHeigh3 = 160;
-	xGap = 9;
-	yGap = 7;
+	figHeight =  458;
+	pHeight = 64;
+	pHeigh3 = 125;
+	xGap = 7;
+	xGapExtra = 14;
+	yGap = 6;
 	
 	%R_inds = contains(string(R.levelLabel),levelLabels(j,1));
 	G_rpm = G(G.categoryLabel=='RPM' & G.interventionType~='Reversal',:);
@@ -43,34 +44,31 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 		'Name',sprintf('NHA, PLVAD and Q curves - %s as NHA',var3),...
 		'Position',[150,150,figWidth,figHeight],...
 		'PaperUnits','centimeters',...
-		'PaperSize',[19,30]...
+		'PaperSize',[19,19*(figHeight/figWidth)+0.1]...
 		);
 
 	hAx = init_axes(spec);
-	adjust_panel_positions(hAx, pHeight, pHeigh3, yGap, xGap);
+	adjust_panel_positions(hAx, pHeight, pHeigh3, yGap, xGap, xGapExtra);
 	hAx = adjust_axes(hAx, yLims, yTicks1, yTicks2, yTicks3);
 	[hXAx,~] = make_offset_axes(hAx, xGap, yGap);
 	
-	% 	G_ctrl.rpm = categorical(G_ctrl.pumpSpeed);
-	% 	F_ctrl.rpm = categorical(F_ctrl.pumpSpeed);
-	%	xVar = 'rpm';
 	xVar = 'pumpSpeed';
 	plot_panel_colum(hAx(:,1), G_rpm, F_rpm, [nan], xVar, var3, spec);
 
 	xVar = 'QRedTarget_pst';
-	plot_panel_colum(hAx(:,2), G_cla, F_cla, [2400], xVar, var3, spec);
+	plot_panel_colum(hAx(:,2), G_cla, F_cla, 2400, xVar, var3, spec);
 
   	xVar = 'balLev_xRay_mean';
-  	plot_panel_colum(hAx(:,3), G_bal, F_bal, [2400], xVar, var3, spec);
-	plot_panel_colum(hAx(:,4), G_bal, F_bal, [2200], xVar, var3, spec);
-	hPlt = plot_panel_colum(hAx(:,5), G_bal, F_bal, [2600], xVar, var3, spec);
+  	plot_panel_colum(hAx(:,3), G_bal, F_bal, 2200, xVar, var3, spec);
+	plot_panel_colum(hAx(:,4), G_bal, F_bal, 2400, xVar, var3, spec);
+	hPlt = plot_panel_colum(hAx(:,5), G_bal, F_bal, 2600, xVar, var3, spec);
 		
 	add_legend([hPlt{:}], spec);
 	add_annotation(hAx, hXAx);
 
 function hPlt = plot_panel_colum(hAx, G, F, speeds, xVar, var, spec)
-	flowColor = [0.17,0.47,0.59];%[0.03,0.26,0.34];
-	plvadColor = [0.87,0.50,0.13];%[0.9961,0.4961,0];%[0.84,0.61,0.39];%Colors.Fig.Cats.Speeds4(2,:);
+	flowColor = [0.07,0.39,0.50];
+	plvadColor = [0.87,0.50,0.13];
 	varColor = [0.76,0.0,0.2];
 	
 	plot_individual_data(hAx(1), F, speeds, xVar, 'Q_mean', spec);
@@ -83,13 +81,12 @@ function hPlt = plot_panel_colum(hAx, G, F, speeds, xVar, var, spec)
 function hPlt = plot_group_statistic(hAx, G, speeds, xVar, var, color, marker)
 	
 	G = sortrows(G, xVar);
-	%hPlt = gobjects(numel(speeds),1);
+	G = make_bl_deviation_zero(G, var);
+	
+		
 	for j=1:numel(speeds)
-		if not(isnan(speeds(j))) 
-			G_inds = G.pumpSpeed==speeds(j); 
-		else
-			G_inds = true(height(G),1);
-		end
+		
+		G_inds = get_speed_inds(speeds(j), G);
 		if all(not(G_inds)), continue; end
 		
 		% Plot aggregated values in heavy lines
@@ -121,16 +118,15 @@ function plot_individual_data(hAx, F, speeds, xVar, var, spec)
  
 	seqs = unique(F.seq);
 	F = sortrows(F,xVar);
+	F = make_bl_deviation_zero(F, var);
 	
 	for j=1:numel(speeds)
 
-		% Plot background points
-		hAx.ColorOrderIndex=j;
+		F_inds = get_speed_inds(speeds(j), F);
+		if all(not(F_inds)), continue; end
 
-		F_rpm_inds = F.pumpSpeed==speeds(j);
-
-		F_y = F.(var)(F_rpm_inds);
-		F_x = F.(xVar)(F_rpm_inds);
+		F_y = F.(var)(F_inds);
+		F_x = F.(xVar)(F_inds);
 		F_x(isnan(F_x)) = 0;
 		scatter(hAx, F_x, F_y, 10, ...'filled',...spec.backPts{:},...
 			'Marker',spec.speedMarkers{j},...
@@ -138,18 +134,17 @@ function plot_individual_data(hAx, F, speeds, xVar, var, spec)
 			'MarkerEdgeAlpha',0.2,...
 			...'MarkerFaceColor',[0 0 0],...
 			...'MarkerFaceAlpha',0.1,...
-			...'MarkerFaceAlpha',0.1,...
 			'HandleVisibility','off');
 
 		% Plot background lines
 		for k=1:numel(seqs)
 			hAx.ColorOrderIndex=j;
-			F_x = F.(xVar)(F_rpm_inds & F.seq==seqs(k));
-			F_y = F.(var)(F_rpm_inds & F.seq==seqs(k));
+			F_x = F.(xVar)(F_inds & F.seq==seqs(k));
+			F_y = F.(var)(F_inds & F.seq==seqs(k));
 			F_x(isnan(F_x)) = 0;
 			if isempty(F_y), continue; end
-			hLines = plot(hAx, F_x, F_y, spec.backLines{:});
-			hLines.Color = [0,0,0,0.2];
+			hLines = plot(hAx, F_x, F_y, spec.backLines{:},'LineWidth',1.0);
+			hLines.Color = [0,0,0,0.25];
 		end
 	end
 
@@ -167,13 +162,13 @@ function [hXAx, hYAx] = make_offset_axes(hAx, xGap, yGap)
  	offset_main_ax(hAx, hXAx, hYAx, xGap, yGap);
  	%make_xy_halfframe(hAx)
 
-function hAx = adjust_panel_positions(hAx, pHeight, pHeight3,yGap, xGap)
+function adjust_panel_positions(hAx, pHeight, pHeight3, yGap, xGap, xGapExtra)
 	
-	pStartX = 37;
-	pStartY = 92;
-	pWidth1 = 60;
-	pWidth2 = 74;
-	pWidth3 = pWidth1*1.77;
+	pStartX = 35;
+	pStartY = 61;
+	pWidth1 = 44;
+	pWidth2 = 59;
+	pWidth3 = pWidth1*2;
 
     nRows = size(hAx,1);
 	nCols = size(hAx,2);
@@ -193,10 +188,10 @@ function hAx = adjust_panel_positions(hAx, pHeight, pHeight3,yGap, xGap)
 	
 	for i=1:nRows
 		hAx(i,1).Position(1) = pStartX;
-		hAx(i,2).Position(1) = pStartX + pWidth1 + xGap;
-		hAx(i,3).Position(1) = pStartX + pWidth1 + pWidth2 + 2*xGap;
-		hAx(i,4).Position(1) = pStartX + pWidth1 + pWidth2 + pWidth3 + 3*xGap;
-		hAx(i,5).Position(1) = pStartX + pWidth1 + pWidth2 + 2*pWidth3 + 4*xGap;
+		hAx(i,2).Position(1) = pStartX + pWidth1 + xGap + xGapExtra;
+		hAx(i,3).Position(1) = pStartX + pWidth1 + pWidth2 + 2*xGap + 2*xGapExtra;
+		hAx(i,4).Position(1) = pStartX + pWidth1 + pWidth2 + pWidth3 + 3*xGap + 2*xGapExtra;
+		hAx(i,5).Position(1) = pStartX + pWidth1 + pWidth2 + 2*pWidth3 + 4*xGap + 2*xGapExtra;
 	end
 
 	for j=1:nCols
@@ -212,7 +207,7 @@ function hAx = init_axes(spec)
 		for j=1:nCols
 			hAx(i,j) = subplot(nRows,nCols,nCols*(i-1)+j,...
 				spec.subPlt{:},...
-				'FontSize',9.25,...
+				'FontSize',9,...
 				'FontName','Arial',...
 				'Color',[.96 .96 .96],...
 				...'Color',[1 1 1],...
@@ -234,35 +229,36 @@ function hAx = init_axes(spec)
 	
 function add_legend(hPlt, spec)
 	leg = {'\itQ\rm','\itP\rm_{LVAD}','NHA'};
-	hLeg = legend(hPlt, leg, spec.leg{:}, 'FontSize',11);
-	hLeg.Position(1) = hLeg.Position(1)+10;
+	hLeg = legend(hPlt, leg, spec.leg{:}, 'FontSize',10);
+	hLeg.Position(1) = hLeg.Position(1)+82;
 	hLeg.Position(2) = 0;
-
+	
 function add_annotation(hAx, hXAx)
 	
 	% 	hYLab = suplabel('deviation from baseline','y');
 	% 	hYLab.FontSize = 10.5;
 	% 	hYLab.FontName = 'Arial';
 
-	xLab1 = 'RPM';
-	xLab2 = 'afterload levels';
-	xLab3 = 'inflow balloon obstruction levels';
-	hXLab(1) = xlabel(hXAx(1), xLab1, "FontSize",11, 'Units','points');
-	hXLab(2) = xlabel(hXAx(2), xLab2, "FontSize",11, 'Units','points');
-	hXLab(3) = xlabel(hXAx(4), xLab3, "FontSize",11, 'Units','points');
-	hXLab(1).Position(2) = -27;
-	hXLab(2).Position(2) = -27;
+	xLab1 = {'speeds','(RPM)'};
+	xLab2 = {'afterload \itQ\rm','reductions'};
+	xLab3 = {'','balloon inflow obstruction levels'};
+	hXLab(1) = xlabel(hXAx(1), xLab1, "FontSize",10, 'Units','points');
+	hXLab(2) = xlabel(hXAx(2), xLab2, "FontSize",10, 'Units','points');
+	hXLab(3) = xlabel(hXAx(4), xLab3, "FontSize",10, 'Units','points');
+	hXLab(1).Position(2) = -30;
+	hXLab(2).Position(2) = -30;
+	hXLab(3).Position(2) = -19;
 		
-	text(hAx(1,1), hAx(1,1).XLim(1), .4, {'A'}, 'FontSize',15, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,2), hAx(1,2).XLim(1), .4, {'B'}, 'FontSize',15, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,3), hAx(1,3).XLim(1), .4, {'C'}, 'FontSize',15, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,4), hAx(1,4).XLim(1), .4, {'D'}, 'FontSize',15, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,5), hAx(1,5).XLim(1), .4, {'E'}, 'FontSize',15, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,1), 2150+0.5*diff(hAx(1,1).XLim), .35, {'pump','speed'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
-	text(hAx(1,2), 0.5*diff(hAx(1,2).XLim), .35, {'clamp','2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
-	text(hAx(1,3), 0.5*diff(hAx(1,3).XLim), .35, {'balloon','2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
-	text(hAx(1,4), 0.5*diff(hAx(1,4).XLim), .35, {'balloon','2200 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
-	text(hAx(1,5), 0.5*diff(hAx(1,5).XLim), .35, {'balloon','2600 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+	text(hAx(1,1), hAx(1,1).XLim(1), .35, {' A'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,2), hAx(1,2).XLim(1), .35, {' B'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,3), hAx(1,3).XLim(1), .35, {' C'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,4), hAx(1,4).XLim(1), .35, {' D'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,5), hAx(1,5).XLim(1), .35, {' E'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+% 	text(hAx(1,1), 2150+0.5*diff(hAx(1,1).XLim), .35, {'pump','speed'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+% 	text(hAx(1,2), 0.5*diff(hAx(1,2).XLim), .35, {'clamp','2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+%  	text(hAx(1,3), 0.5*diff(hAx(1,3).XLim), .35, {'2200 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+%  	text(hAx(1,4), 0.5*diff(hAx(1,4).XLim), .35, {'2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+%  	text(hAx(1,5), 0.5*diff(hAx(1,5).XLim), .35, {'2600 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 	
 function hAx = adjust_axes(hAx, yLims, yTicks1, yTicks2, yTicks3)
 	
@@ -287,7 +283,26 @@ function hAx = adjust_axes(hAx, yLims, yTicks1, yTicks2, yTicks3)
 	xticks(hAx(end,2), [0, 25, 50, 75]);	
 	xticks(hAx(:,3:end), 0:5);	
 	hAx(end,1).XTickLabel = {'2200','2400','2600'};
-	hAx(end,2).XTickLabel = {'BL','1','2','3'};
+	%hAx(end,2).XTickLabel = {'BL','1','2','3'};
+	hAx(end,2).XTickLabel = {'BL','25%','50%','75%'};
 	set(hAx(end,3:end),'XTickLabel',{'BL','1','2','3','4','5'});
 	set(hAx(end,1),'XTickLabelRotation',45);
-	set(hAx(end,2:end),'XTickLabelRotation',0);
+	set(hAx(end,2),'XTickLabelRotation',45);
+	set(hAx(end,3:end),'XTickLabelRotation',0);
+
+function G = make_bl_deviation_zero(G, var)
+	bl_inds = ismember(G.idLabel,{
+		'Bal_2200_Nom_Rep1'
+		'Bal_2400_Nom_Rep1'
+		'Bal_2600_Nom_Rep1'
+		'RPM_2400_Nom_Rep1'
+		'Cla_2400_Nom_Rep1'
+		});
+	G{bl_inds,var} = 0;
+
+function G_inds = get_speed_inds(speed, G)
+	if not(isnan(speed)) 
+		G_inds = G.pumpSpeed==speed; 
+	else
+		G_inds = true(height(G),1);
+	end

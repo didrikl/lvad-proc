@@ -33,7 +33,14 @@ function T = make_intervention_stats(D, seqs, discrVars, meanVars, medVars, minM
 
 		% Add protocol info and all measured values (not categorical) from 
 		% the notes table and extract relevant intervals/interventions
-		S = join_notes(S, Notes);
+		noteVars = unique([discrVars; meanVars; medVars; minMaxVars]);
+		ismember(noteVars,Notes.Properties.VariableNames);
+		noteVars = noteVars(ismember(noteVars,Notes.Properties.VariableNames));
+		catNoteVars = get_varname_of_specific_type(Notes(:,noteVars),'categorical');
+		for i=1:numel(catNoteVars)
+			Notes.(catNoteVars{i}) = double(string(Notes.(catNoteVars{i})));
+		end
+		S = join_notes(S, Notes, noteVars);
 		S = remove_rows_with_irrelevant_analysis_id(S, idSpecs);
 		
 		discrVars = check_table_var_input(S, discrVars);

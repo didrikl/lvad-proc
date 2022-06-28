@@ -10,7 +10,7 @@ function Data = load_processed_sequences(seqNames, seqFilePaths)
 	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
 	Data = load_data(Data,'Notes',seqFilePaths,seqNames);
 	Data = load_data(Data,'Config',seqFilePaths,seqNames);
-	Data = load_data(Data,'RPM order map',seqFilePaths,seqNames);
+	Data = load_data(Data,'RPM_order_maps',seqFilePaths,seqNames);
 	
 	multiWaitbar('CloseAll');
 

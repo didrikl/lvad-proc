@@ -52,7 +52,14 @@ function R = compile_results_table(R, R_rel)
 	% Sort according to ordinal order
 	R = sortrows(R, {'levelLabel'});
 	R_rel = sortrows(R_rel, {'levelLabel'});
+	
+	%R = keep_median_only(R_rel, relVars, R);
+	R_rel = convert_to_percent(R_rel, relVars);
+	%R = join(R,R_rel, 'Keys',{'levelLabel'}, 'RightVariables',relVars);
+	R = [R,R_rel];
+	R = movevars(R,'GroupCount','After','levelLabel');
 
+function R = keep_median_only(R_rel, relVars, R)
 	P = split(R_rel{:,relVars});
 	% 	P1 = P(:,:,1);
 	% 	P2 = P(:,:,2);
@@ -60,8 +67,12 @@ function R = compile_results_table(R, R_rel)
 	P = P(:,:,1);
 	P = table(P);
 	P = splitvars(P,'P','NewVariableNames',relVars+"_rel");
-	R = [R,P];
-
-
-	%R = join(R,R_rel, 'Keys',{'levelLabel'}, 'RightVariables',relVars);
-	R = movevars(R,'GroupCount','After','levelLabel');
+	
+function T = convert_to_percent(R_rel, relVars)
+	T = split(R_rel{:,relVars});
+	P1 = string(100*double(T(:,:,1)));
+	P2 = "["+100*double(erase(T(:,:,2),{'[',']'}))+"]";
+	T = P1+" "+P2+" "+T(:,:,3);
+	T = table(T);
+	T = splitvars(T,'T','NewVariableNames',relVars+"_rel");
+	

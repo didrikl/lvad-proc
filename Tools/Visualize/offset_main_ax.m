@@ -1,4 +1,4 @@
-function [h_ax,h_xax,h_yax] = offset_main_ax(h_ax,h_xax,h_yax,mainXAxGap,mainYAxGap)
+function [h_ax,h_xax,h_yax] = offset_main_ax(h_ax, h_xax, h_yax, mainXAxGap, mainYAxGap)
 	% Make neccessary formating and offsets for extra set of common axis to 
 	% sets of plot panels. Make "actual data axes" invisible.
 		

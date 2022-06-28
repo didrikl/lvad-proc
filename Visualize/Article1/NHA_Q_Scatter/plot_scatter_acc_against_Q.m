@@ -9,7 +9,8 @@ sc_specs = {
     'LineWidth',0.40
     };
 
-speeds = [2200,2500,2800,3100];
+speeds = unique(F.pumpSpeed);%[2200,2500,2800,3100];
+    
 for i=1:size(vars,1)
     var = vars{i,1};
     h_figs(i) = figure(...

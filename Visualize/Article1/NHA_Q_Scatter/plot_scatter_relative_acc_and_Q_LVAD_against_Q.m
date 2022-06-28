@@ -9,7 +9,7 @@ function h_figs = plot_scatter_relative_acc_and_Q_LVAD_against_Q(F,F_rel,vars)
         'LineWidth',0.4
         };
     
-    speeds = [2200,2500,2800,3100];
+    speeds = unique(F.pumpSpeed);%[2200,2500,2800,3100];
     
     for i=1:size(vars,1)
         var = vars{i,1};

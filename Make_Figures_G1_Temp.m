@@ -141,9 +141,9 @@ seq = 'Seq8';
 Notes = Data.G1.(seq).Notes;
 partSpec = Data.G1.(seq).Config.partSpec;
 
-yLims1 = [0.8, 5.5];
-yLims2 = [-90,225];
-yTicks2 = -75:25:175;
+yLims1 = [0.85, 5.5];
+yLims2 = [-90,190];
+yTicks2 = -75:25:190;
 widthFactor = 70*60;
 
 % Clamping
@@ -157,14 +157,44 @@ T1(cutInd:end,:) = [];
 i=3;
 map2 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
 T2 = Data.G1.(seq).Plot_Data.T{i};
-%T2(1:1*60*750,:) = [];
 cutInd = find(T2.noteRow==68,1,'first');
 T2(cutInd:end,:) = [];
-%T2(cutInd+0.5*60*750:end,:) = [];
 
 close all
 make_part_figure_2panels_with_nha(T1, T2, map1, map2, Notes, var, partSpec(i,:), Config.fs, yLims1, yLims2, yTicks2, widthFactor);
 
+%% Spectrograms and curves - Continious - Relative - 2 panel rows
+ 
+var = 'accA_y_NF_HP';
+ 
+seq = 'Seq7'; 
+Notes = Data.G1.(seq).Notes;
+partSpec = Data.G1.(seq).Config.partSpec;
+
+yLims1 = [0.85, 5.5];
+yLims2 = [-90,200];
+yTicks2 = -75:25:190;
+widthFactor = 70*60;
+
+% Clamping
+i=5;
+map1 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
+T1 = Data.G1.(seq).Plot_Data.T{i};
+cutInd = find(T1.noteRow==109,1,'first');
+T1(cutInd:end,:) = [];
+
+% Balloon, 2600 RPM; 
+i=4;
+map2 = Data.G1.(seq).Plot_Data.RPM_Order_Map{i};
+T2 = Data.G1.(seq).Plot_Data.T{i};
+%T2(1:1*60*750,:) = [];
+%cutInd = find(T2.noteRow==68,1,'first');
+%T2(cutInd:end,:) = [];
+%T2(cutInd+0.5*60*750:end,:) = [];
+
+close all
+
+make_part_figure_2panels_with_nha(T1, T2, map1, map2, Notes, var, partSpec(i,:), Config.fs, yLims1, yLims2, yTicks2, widthFactor);
 
 %% Spectrograms and curves - Continious - Relative - 3 panel rows
  
@@ -238,114 +268,19 @@ close all
 G_rel_med = Data.G1.Feature_Statistics.Descriptive_Relative.med;
 plot_nha_power_and_flow(F_rel, G_rel_med, [], var, yLims3);
 
-%% NHA, Q and P - 3X4 panels
+%% NHA, Q and P - 3X5 panels
 
 var = 'accA_xyz_NF_HP_b1_pow_norm';
-var = 'accA_xyz_NF_HP_b2_pow_norm';
+%var = 'accA_xyz_NF_HP_b2_pow_norm';
 yLims = {
 	[-0.85 0.3]
 	[-0.85 0.3]+0.25
-	[-0.75 5.5]
+	[-0.75 5.505]
 	};
 
 %close all
-G_rel_med = Data.G1.Feature_Statistics.Descriptive_Relative.med;
-G_del_med = Data.G1.Feature_Statistics.Descriptive_Delta.med;
-plot_nha_power_and_flow_3x4panels(F_rel, G_rel_med, [], var, yLims);
-plot_nha_power_and_flow_3x5panels(F_rel, G_rel_med, [], var, yLims);
+plot_nha_power_and_flow_3x5panels(F_rel, G_rel.med, [], var, yLims);
 
-
-%% NHA, Q and P, per catheter type
-% Pendulating Mass in Inlet Conduit
-% 3 X [nLevels] panels
-% Figure 5 in submission for ASAIO
-
-var = {
-	%'accA_x_NF_b1_pow',[0,0.008]
-	%'accA_y_NF_HP_b2_pow',[0, 0.008]
-	'accA_y_NF_HP_b1_pow',[0, 0.008]
-	%'accA_z_NF_HP_b2_pow',[0, 0.008]
-	%'accA_norm_NF_HP_b2_pow',[0, 0.008]
-	%'accA_z_NF_b1_pow',[0,0.008]
-	%'accA_y_NF_stdev',[]
-	%'p_eff_mean',[55,100]
-	%'pGrad_mean',[]
-	%'Q_LVAD_mean',[0 8]
-	};
-levelLabels = {
-	'Clamp', 'Outflow clamp'
-	};
-
-xLims = [2,12.5];
-xLims = [0,100];
-legTit = 'Pendulating Mass in Inlet Conduit';
-xLab = 'Areal inflow obstruction (%)';
-
-%home; close all
-sequences = {
-	'Seq3' % (pilot)
-	'Seq6'
-	'Seq7'
-	'Seq8'
-	'Seq11'
-	'Seq12'
-	'Seq13'
-	'Seq14'
-	};
-F2 = lookup_sequences(sequences, F_rel);
-plot_nha_power_and_flow_per_intervention_G1(...
-	F2,...
-	Data.G1.Feature_Statistics.Descriptive_Relative.med, ...
-	...Data.G1.Feature_Statistics.Descriptive_Absolute_swap_yz.med, ...
-	[], ...
-	var, levelLabels, ...
-	'QRedTarget_pst', ...
-	...'arealObstr_xRay_pst_mean', ...
-	xLims, xLab, legTit, 'control');
-
-clear var levelLabels xLims xLab legTit
-
-
-%% NHA, Q and P for afterload and prelod side by side
-% Control intervention
-% 3 X 2 panels
-% Figure 4 in submission for ASAIO
-
-close all
-
-var = {
-	%'accA_x_NF_b1_pow',[0,8]
-	'accA_y_NF_b2_pow',[0 8]
-	%'accA_z_NF_b1_pow',[0,8]
-	};
-
-% Level categories plotted together
-levelLabels = {
-	'Afterload', 'Outflow clamp'
-	'Preload',   'Inflow clamp'
-	};
-
-% Levels in separate panels
-%{
-levelLabels = {
-	'Preload Q red., 10%', 'Q reduced 10%'
-	'Preload Q red., 20%', 'Q reduced 20%'
-	'Preload Q red., 40%', 'Q reduced 40%'
-	'Preload Q red., 60%', 'Q reduced 60%'
-	'Preload Q red., 80%', 'Q reduced 80%'
-};
-%}
-
-xLims = [0,100];
-xLab = 'Flow rate reduction targets (%)';
-legTit = 'Control intervensions';
-
-plot_nha_power_and_flow_per_intervention(Data.G1.Features.Absolute,...
-	Data.G1.Feature_Statistics.Descriptive_Absolute.med, ...
-	Data.G1.Feature_Statistics.Results, ...
-	var, levelLabels, 'QRedTarget_pst', xLims, xLab, legTit,'control');
-
-clear var levelLabels xLims xLab legTit
 
 %% ROC curves for each diameter states and each speed
 % Overlaid component curves
@@ -376,23 +311,7 @@ save_figure(h(2), fullfile(Config.fig_path,'ROC'), h(2).Name, 300)
 save_figure(h(3), fullfile(Config.fig_path,'ROC'), h(3).Name, 300)
 %clear classfiers tit
 
-%% ROC curves for each diameter states and each component
-% % Overlaid speed curves
-% % [no of states]x[3] panels
-%
-% classifiers = {
-%  	'accA_x_NF_b1_pow', 'NHA_{\itx}';
-%  	'accA_y_NF_b1_pow', 'NHA_{\ity}';
-%  	'accA_z_NF_b1_pow', 'NHA_{\itz}';
-% 	};
-% tit = 'ROC Curves for Pendulating Mass States by Spatial Component';
-%
-% plot_roc_curve_matrix_per_intervention_and_xyz(...
-% 	Data.IV2.Feature_Statistics.ROC, classifiers, tit);
-%
-% clear classfiers tit
-%
-% %% ROC curves for each pooled diameter states
+%% ROC curves for each pooled diameter states
 % % Overlaid each speed
 % % 1x[no of states] panels
 %
@@ -419,53 +338,16 @@ save_figure(h(3), fullfile(Config.fig_path,'ROC'), h(3).Name, 300)
 %
 % clear classfiers predStates tit
 %
-% %% Absolute NHA versus flow scatter
-% % Intervention type grouping by color
-% % 2x2 panels, one panel per speed
-%
-% vars = {
-% %    'accA_y_NF_stdev',[0.01,0.19]
-%     'accA_x_NF_b1_pow',[0,0.018]
-%     'accA_y_NF_b1_pow',[0,0.018]
-%    };
-%
-% close all
-% plot_scatter_acc_against_Q(Data.IV2.Features.Absolute, vars);
-% plot_scatter_relative_acc_and_Q_LVAD_against_Q(Data.IV2.Features.Absolute, ...
-% 	Data.IV2.Features.Relative, vars);
-%
-% clear vars
-%
-% %% Individual effects aginst categories of Q red. and balloon occlusions
-% % [no of speeds]x1panels
-% % Includes all diameters (incl. intermediate levels)
-% % D is numerical (unevenly distributed)
-%
-% vars = {
-% 	'accA_y_NF_b1_pow', [0,0.011]
-% 	%'accA_y_NF_b1_mpf', [90,210]
-% 	};
-%
-% close all
-% plot_individual_effects_against_interv_cats_per_speed(vars, ...
-% 	{'Absolute','Medians'}, Data.IV2.Features.Absolute, ...
-% 	'Absolute median effects');
-%
-% clear vars
-%
-% %% Aggregated effects aginst categories of Q red. and balloon occlusions
-% %  [no of speeds]x1panels
-% % Includes all diameters (incl. intermediate levels)
-% % D is numerical (unevenly distributed)
-%
-% vars = {
-% 	'accA_y_NF_b1_pow', [0,0.011]
-% 	%'accA_y_NF_b1_mpf', [90,210]
-% 	};
-%
-% close all
-% G = Data.IV2.Feature_Statistics.Descriptive.Absolute;
-% plot_aggregate_effects_against_interv_cats_per_speed(...
-% 	G.med, vars,{'median','absolute'}, G.q1, G.q3);
-%
-% clear G vars
+%% Absolute NHA versus flow scatter
+% Intervention type grouping by color
+% 2x2 panels, one panel per speed
+
+vars = {
+    'accA_xyz_NF_HP_b1_pow_norm',[]
+   };
+
+close all
+plot_scatter_acc_against_Q(Data.G1.Features.Absolute, vars);
+plot_scatter_relative_acc_and_Q_LVAD_against_Q(Data.G1.Features.Absolute, ...
+  	Data.G1.Features.Relative, vars);
+

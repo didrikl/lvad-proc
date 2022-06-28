@@ -25,24 +25,25 @@ function rpmOrderMap = make_rpm_order_map_per_part(T_parts, vars, Config)
 			rpmOrderMap{i}.([var,'_map']) = map;
 			
 			% Make use of map to track specific orders
-			if not(contains(var,'_NF')) && not(isempty(map))
-				mags = ordertrack(db2pow(map),order,rpm,time,Config.rpmOrdersToTrack);
-				rpmOrderMap{i}.([var,'_mags']) = mags;
+			if not(isempty(map))
+				if not(contains(var,'_NF'))
+					mags = ordertrack(db2pow(map),order,rpm,time,Config.rpmOrdersToTrack);
+					rpmOrderMap{i}.([var,'_mags']) = mags;
+				end
+
+				% Make use of map to calculate spectrum
+				[spectrum,specorder] = orderspectrum(map, order);
+				rpmOrderMap{i}.([var,'_spectrum']) = spectrum;
+				rpmOrderMap{i}.([var,'_spectrum_order']) = specorder;
 			end
 
-			% Make use of map to calculate spectrum
-			[spectrum,specorder] = orderspectrum(map, order);
-            rpmOrderMap{i}.([var,'_spectrum']) = spectrum;
-			rpmOrderMap{i}.([var,'_spectrum_order']) = specorder;
-						
 		end
 
 		% Store just one set of order, rpm and time (equal for all variables)
 		rpmOrderMap{i}.order = order;
 		rpmOrderMap{i}.rpm = rpm;
 		rpmOrderMap{i}.time = time;
-		rpmOrderMap{i}.mags = mags;
-
+	
 	end
 
 end
