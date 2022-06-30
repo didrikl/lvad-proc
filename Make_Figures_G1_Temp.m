@@ -271,7 +271,7 @@ plot_nha_power_and_flow(F_rel, G_rel_med, [], var, yLims3);
 %% NHA, Q and P - 3X5 panels
 
 var = 'accA_xyz_NF_HP_b1_pow_norm';
-%var = 'accA_xyz_NF_HP_b2_pow_norm';
+var = 'accA_xyz_NF_HP_b2_pow_norm';
 yLims = {
 	[-0.85 0.3]
 	[-0.85 0.3]+0.25
@@ -282,62 +282,52 @@ yLims = {
 plot_nha_power_and_flow_3x5panels(F_rel, G_rel.med, [], var, yLims);
 
 
-%% ROC curves for each diameter states and each speed
-% Overlaid component curves
-% [no of states]x[no of speeds] panels
-% Figure 6 in submission for ASAIO
+%% ROC curves for each specific obstruction level states
+% [no of levels]x1 panels
 
-classifiers_to_plot = {
-	%'accA_xyz_NF_HP_b1_pow_sum', 'sum(NHA_{x,y,z})'
+classifiersToUse = {
+	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
+%	'accA_xyz_NF_HP_b2_pow_norm', 'NHA)'
+	'P_LVAD_change',              '\itP\rm_{LVAD}'
+%	'P_LVAD_mean',              '\itP\rm_{LVAD}';
+	};
+
+%close all
+plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
+
+%
+
+%% ROC curves for each specific obstruction level states
+% [no of levels]x1 panels
+
+classifiersToUse = {
+	'accA_xyz_NF_HP_b2_pow_norm', 'NHA)'
+	'P_LVAD_change',              '\itP\rm_{LVAD}'
+	};
+
+close all
+plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
+
+
+
+%% ROC curves, pooled for obstruction levels/pooled for RPM
+
+classifiersToUse = {
 	'accA_xyz_NF_HP_b1_pow_norm', 'norm(NHA_{x,y,z})'
 	%'accA_best_NF_HP_b1_pow_per_speed', 'NHA_{best, per speed}'
-	%   'accA_best_NF_HP_b2_pow', 'NHA_{best, per interv.}';
-% 	'accA_x_NF_HP_b2_pow', 'NHA_{\itx}';
-% 	'accA_y_NF_HP_b2_pow', 'NHA_{\ity}';
-% 	'accA_z_NF_HP_b2_pow', 'NHA_{\itz}';
+	%'accA_best_NF_HP_b2_pow', 'NHA_{best, per interv.}';
+	%'accA_x_NF_HP_b2_pow', 'NHA_{\itx}';
+	%'accA_y_NF_HP_b2_pow', 'NHA_{\ity}';
+	%'accA_z_NF_HP_b2_pow', 'NHA_{\itz}';
 	'P_LVAD_change',   '\itP\rm_{LVAD}';
 	};
 
 close all
-% legTit = 'ROC curves - Pooled balloon levels - Pooled RPM';
-% h(1) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiers_to_plot, legTit);
-% legTit = 'ROC curves - Pooled balloon levels';
-% h(2) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled, classifiers_to_plot, legTit);
-legTit = 'ROC curves - Concrete balloon levels';
-h(3) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC, classifiers_to_plot, legTit);
+legTit = 'ROC curves - Pooled balloon levels - Pooled RPM';
+h(1) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiersToUse, legTit);
+legTit = 'ROC curves - Pooled balloon levels';
+h(2) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled, classifiersToUse, legTit);
 
-save_figure(h(1), fullfile(Config.fig_path,'ROC'), h(1).Name, 300)
-save_figure(h(2), fullfile(Config.fig_path,'ROC'), h(2).Name, 300)
-save_figure(h(3), fullfile(Config.fig_path,'ROC'), h(3).Name, 300)
-%clear classfiers tit
-
-%% ROC curves for each pooled diameter states
-% % Overlaid each speed
-% % 1x[no of states] panels
-%
-% classifiers = {
-%  	'accA_y_NF_b1_pow';
-% 	};
-% predStates = {
-% 	%'diam_4.30mm_or_more', '>= 4.30mm'
-% 	'diam_4.73mm_or_more', '>= 4.73mm'
-% 	%'diam_6.00mm_or_more', '>= 6.0mm'
-% 	'diam_6.60mm_or_more', '>= 6.6mm'
-% 	%'diam_7.30mm_or_more', '>= 7.30mm'
-% 	'diam_8.52mm_or_more', '>= 8.52mm'
-% 	%'diam_9mm_or_more', '>= 9mm'
-% 	%'diam_10mm_or_more', '>= 10mm'
-% 	'diam_11mm_or_more', '>= 11mm'
-% 	%'diam_12mm', '= 12mm'
-% 	};
-% tit = 'ROC Curves for Pool of Pendulating Mass States';
-%
-% close all
-% plot_roc_curves_per_pooled_interventions(Data.IV2.Features.Absolute_Pooled_ROC, ...
-% 	classifiers, predStates, tit);
-%
-% clear classfiers predStates tit
-%
 %% Absolute NHA versus flow scatter
 % Intervention type grouping by color
 % 2x2 panels, one panel per speed

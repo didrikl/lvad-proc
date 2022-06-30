@@ -79,7 +79,6 @@ Pxx.bandMetrics{:,vartype('numeric')} = 1000*Pxx.bandMetrics{:,vartype('numeric'
 % Add derived features
 F = join(F, Pxx.bandMetrics, 'Keys',{'analysis_id','id'});
 F.Q_CO_pst = 100*(F.Q_mean./F.CO_mean);
-F.P_LVAD_change = abs(F.P_LVAD_mean);
 
 % Add derived best axes based on highest absolute NHA values
 % vars = {'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'};
@@ -122,6 +121,8 @@ F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep2"),:) = [];
 nominalAsBaseline = false;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
+
+F.P_LVAD_change = -F_del.P_LVAD_mean;
 
 
 % Model statistics

@@ -1,13 +1,6 @@
-function h_fig = plot_roc_per_balloon_level(ROC, classifiersToUse, titleStr)
-	% Specific/max inflations by speeds in subplots
-	% Plot ROC curves for states of specific or pooled intervention levels.
-	%
-	% Panel [no of states]x4 matrix setup:
-	% - one panel row for each speed
-	% - one panel colum for each state
-	%
-	% Curves overlaid in each panels for:
-	% - NHA as classifier, component-wise
+function hFig = plot_roc_per_balloon_level(ROC, classifiersToUse)
+	% Plot ROC curves for states of specific intervention levels.
+	% - One panel for each balloon level state
 
 	classifierLabels = classifiersToUse(:,2);
 	classifier_inds = find(ismember(ROC.classifiers,classifiersToUse(:,1)));
@@ -15,99 +8,149 @@ function h_fig = plot_roc_per_balloon_level(ROC, classifiersToUse, titleStr)
 	
 	spec = get_plot_specs;
 		
-	nRows = size(ROC.predStates,1);
-	nCols = size(ROC.X,2);
-	figHeight = 1050;%900; %955
-	figWidth = (750/3)*nCols+430;
-	panelLength = 150;
-	gap = 20;
-	mainAxGap = 15;
-	h_fig = figure(spec.fig{:},...
-		'Name',titleStr,...
-		'Position',[10,40,figWidth,figHeight]);
+	figHeight = 422;%900; %955
+	figWidth = 340;
+	pLength = 82.5;
+	gap = 13;
 	
-	for i=1:nRows
+	[hFig, hSub] = init_panels(spec, figWidth, figHeight);
+	adjust_panel_positions(hSub, pLength, gap)
+	[hXAx, hYAx] = make_ax_offset(hSub, hFig);
+	
+	levels = 2:4;
 
-		for j=1:nCols
+	for i=1:numel(levels)
 
-			h_ax(i,j) = subplot(nRows,nCols,(i-1)*nCols+j,spec.subPlt{:});
-			if j==1, h_yax(i) = copyobj(h_ax(i,j),gcf); end
-			if i==nRows, h_xax(j) = copyobj(h_ax(i,j),gcf); end
+		% Plot classifiers overlaid with consistent colors for each panel
+		for k=1:numel(classifiers)
+		
+			% Plot diagonal guide line
+			plot(hSub(i), [0,1], [0,1], spec.rocDiag{:},'LineWidth',0.8,'LineStyle','-','Color',[.6 .6 .6]);
 
-			% Plot classifiers overlaid with consistent colors for each panel
-			for k=1:numel(classifiers)
-				X = ROC.X{i,j,classifier_inds(k)};
-				Y = ROC.Y{i,j,classifier_inds(k)};
-				AUC = ROC.AUC{i,j,classifier_inds(k)};
+			lev = levels(i);
+			X = ROC.X{lev,1,classifier_inds(k)};
+			Y = ROC.Y{lev,1,classifier_inds(k)};
+			
+			hSub(i).ColorOrderIndex = k;
+			hPlt(k) = plot(hSub(i), X(:,1), Y(:,1));
 
-				h_ax(i,j).ColorOrderIndex = k;
-				h_nha(k) = plot(h_ax(i,j),X(:,1),Y(:,1));
-
-				if contains(classifiers{k},'sum')
-					set(h_nha(k),'LineWidth',4);
-   					area(X(:,1),Y(:,1),'FaceColor',h_nha(k).Color,...
-						'EdgeColor','none', 'FaceAlpha',0.06,'HandleVisibility','Off')
-% 					plot_shaded(X(:,1),Y(:,1),'LineWidth',0.1,'Color',h_nha(k).Color);
-  					text(0.625,0.3,[num2str(AUC(1),'%1.2f')],spec.rocText{:})
-				elseif contains(classifiers{k},'norm')
-					set(h_nha(k),'LineWidth',2.25,'LineStyle',':','Color',min(1.1*h_nha(k).Color,[1 1 1]));
-				elseif contains(classifiers{k},'best')
-					set(h_nha(k),'LineWidth',2.25,'LineStyle',':','Color',min(1.1*h_nha(k).Color,[1 1 1]));
-				elseif contains(classifiers{k},'P_LVAD')
-					if i<nRows, set(h_nha(k),'Visible','on'); end
-					set(h_nha(k),'LineWidth',1.5,'LineStyle',':',...
-						'Color',[h_nha(k).Color,0.9]);
-				end
-
-
+			if contains(classifiers{k},'norm')
+				
+				set(hPlt(k), 'LineWidth',1.5, 'Color',[0.76,0.0,0.2]);
+     				area(hSub(i), X(:,1), Y(:,1), 'FaceColor',[0.40,0.0,0.2],...
+     					'EdgeColor','none', 'FaceAlpha',0.028, 'HandleVisibility','Off')
+				nhaAUC(i,:) = ROC.AUC{lev,1,classifier_inds(k)};
+			
+			elseif contains(classifiers{k},'P_LVAD')
+				
+				set(hPlt(k), 'LineWidth',1.5, 'LineStyle','-.', 'Color',[0.857,0.50,0.13]);
+  				area(hSub(i), X(:,1), Y(:,1), 'FaceColor',[0.65,0.50,0.13],...
+    					'EdgeColor','none', 'FaceAlpha',0.04, 'HandleVisibility','Off')
+				plvadAUC(i,:) = ROC.AUC{lev,1,classifier_inds(k)};
+			
 			end
 
-			% Plot diagonal guide line
-			plot([0,1],[0,1],spec.rocDiag{:});
 
 		end
 
-		text(1.15,0.5, ROC.predStates{i,2}, spec.rocText{:});
-
+		
 	end
 	
-	hXLab = suplabel('1 - specificity','x');
-	hYLab = suplabel('Sensitivity','y');
+	add_annotations(hSub, hXAx, hYAx, classifierLabels, nhaAUC, plvadAUC, spec);
+	%	set(hSub,'Color',[.965,.965,.965],'GridColor',[1 1 1],'GridLineStyle','-','GridAlpha',1)
 	
-	% Format axes
-	format_axes_in_plot_NHA(h_ax,spec);
-	format_axes_in_plot_NHA([h_xax,h_yax],spec);
-	set(h_ax,spec.rocAx{:})
-	h_ax = position_panels(panelLength,h_ax,gap);
-	offset_main_ax(h_ax,h_xax,h_yax,mainAxGap,mainAxGap);			
-  	format_tick_labels(h_ax, h_xax, h_yax);
-	set(h_ax,'YTickLabel',{},'XTickLabel',{},'GridLineStyle','-','GridColor',[.9 .9 .9]);
-	set(h_ax,'LineWidth',1,'XTick',0:0.2:1,'YTick',0:0.2:1);
+
+function [hFig, hSub] = init_panels(spec, figWidth, figHeight)
 	
-	h_leg = legend(h_ax(end), classifierLabels, spec.leg{:});
-	if ROC.pooledSpeed
-		add_subtitles(h_ax,"\bf{All}\rm RPM",panelLength,gap,spec);
-	else
-		add_subtitles(h_ax,cellstr("\bf"+string(ROC.speeds)+"\rm RPM"),panelLength,gap,spec);
-	end	
-	set([hXLab,hYLab],spec.supXLab{:})
-	hYLab.Position(1) = 60;
-    hXLab.Position(1) = 0;%(10/3)*nCols;
-	h_leg.Position(1) = h_leg.Position(1) + 275;
-
-	h_leg.Position(2) = 0;%hXLab.Position(2);
-
-function h_ax = position_panels(panelLength,h_ax,gap_x,gap_y)
+	hFig = figure(spec.fig{:},...
+		'Name','ROC curves per balloon level',...
+	    'Position',[300,300,figWidth,figHeight],...
+		'PaperUnits','centimeters',...
+		'PaperSize',[9,9*(figHeight/figWidth)+0.1]...
+		);
 	
-	if nargin==3, gap_y = gap_x; end
+	hSub(1) = subplot(3,1,1, spec.subPlt{:}, 'FontSize',9, 'LineWidth',1);
+	hSub(2) = subplot(3,1,2, spec.subPlt{:}, 'FontSize',9, 'LineWidth',1);
+	hSub(3) = subplot(3,1,3, spec.subPlt{:}, 'FontSize',9, 'LineWidth',1);
+	
+	set(hSub, spec.subPlt{:}, ...
+		'FontSize',9, ...
+	     'LineWidth',1, ...
+		 'XTick',0:0.2:1, ...
+		 'YTick',0:0.2:1, ...
+		 'XTickLabel',{'0','.2','.4','.6','.8','1'},...
+		 'YTickLabel',{'0','.2','.4','.6','.8','1'},...
+		 'XTickLabelRotation',0, ...
+		 'YTickLabelRotation',0, ...
+		 'GridColor',[0 0 0], ...
+		 'GridAlpha',0.22, ...
+		 'GridLineStyle',':', ...
+		 'XGrid','on', ...
+		 'YGrid','on', ...
+		 'TickDir','out',...
+		 'TickLength',[0.025,0] ...
+		 );
+	linkaxes(hSub)
 
-	rowStart = 80;
-	colStart = 80;
-	[nRows,nCols] = size(h_ax);
-	for i=1:nRows
-		rowPos = (nRows-i)*(panelLength+gap_y)+rowStart;
-		for j=1:nCols
-			colPos = (j-1)*(panelLength+gap_x)+colStart;
-			h_ax(i,j).Position = [colPos,rowPos,panelLength,panelLength];
-		end
+function adjust_panel_positions(hSub, pLength, gap)
+	
+	yStart = 40;
+	xStart = 36;
+	hSub(3).Position = [xStart, yStart, pLength, pLength];
+	hSub(2).Position = [xStart, yStart + gap + pLength, pLength, pLength];
+	hSub(1).Position = [xStart, yStart + 2*gap + 2*pLength, pLength, pLength];
+
+function add_annotations(hSub, hXAx, hYAx, classifierLabels,nhaAUC, plvadAUC, spec)
+	
+	text(hSub(1), 1.2, 0.5, {...
+		'\bfLevel 2\rm',...
+		'50%-65% obstrution',...
+		'','AUC:'...
+		['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(1,1),nhaAUC(1,2),nhaAUC(1,3))], ...
+		['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(1,1),plvadAUC(1,2),plvadAUC(1,3))]}, ...
+		"FontSize", 9, "FontName",'Arial', 'VerticalAlignment','middle');
+	text(hSub(2), 1.2, 0.5, {...
+		'\bfLevel 3\rm',...
+		'65%-75% obstruction',...
+		'','AUC:'...
+		['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(2,1),nhaAUC(2,2),nhaAUC(2,3))], ...
+		['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(2,1),plvadAUC(2,2),plvadAUC(2,3))]}, ...
+		"FontSize", 9, "FontName",'Arial', 'VerticalAlignment','middle');
+	text(hSub(3), 1.2, 0.45, {...
+		'\bfLevel 4\rm',...
+		'75%-83% obstruction',...
+		'','AUC:'...
+		['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(3,1),nhaAUC(3,2),nhaAUC(3,3))], ...
+		['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(3,1),plvadAUC(3,2),plvadAUC(3,3))]}, ...
+		"FontSize", 9, "FontName",'Arial', 'VerticalAlignment','middle');
+	
+	hXLab = xlabel(hXAx, '1 - specificity', 'FontSize',10, 'FontName','Arial', 'Units', 'pixels');
+	hYLab = ylabel(hYAx(2), 'Sensitivity', 'FontSize',10, 'FontName','Arial', 'Units', 'pixels');
+	hXLab.Position(2) = hXLab.Position(2)-5;
+	hYLab.Position(1) = -29;
+	hLeg = legend(hSub(end), classifierLabels, spec.leg{:}, "FontSize", 10, 'Units','pixels');
+ 	hLeg.Position(1) = 255;
+	hLeg.Position(2) = 0;
+
+function [hXAx,hYAx] = make_ax_offset(hSub, hFig)
+	
+	hYAx = copyobj(hSub, hFig);
+	hXAx = copyobj(hSub(3), hFig);
+	
+	for i=1:3
+		hSub(i).XAxis.Color = 'none';
+		hSub(i).YAxis.Color = 'none';
+		set(hSub, 'XTick',.2:.2:.8, 'YTick',.2:.2:.8);
 	end
+
+	set([hXAx;hYAx], 'LineWidth',1.5, 'box','off', 'Color','none', ...
+		'YGrid','off', 'XGrid','off')
+	
+	hXAx.Position(2) = hXAx.Position(2)-3;
+	set(hXAx.YAxis, 'Color','none')
+
+	for i=1:numel(hYAx)
+		hYAx(i).Position(1) = hYAx(i).Position(1)-3;
+		set(hYAx(i).XAxis, 'Color','none')
+	end
+

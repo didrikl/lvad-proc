@@ -6,7 +6,6 @@ Make_Part_Plot_Data
 
 h_fig = make_diameter_map(F, Config);
 
-
 %% Bar chart - Relative
 
 vars = {
@@ -34,7 +33,6 @@ var = 'accA_x_NF_HP';
 seq = 'Seq8'; 
 Notes = Data.G1.(seq).Notes;
 partSpec = Data.G1.(seq).Config.partSpec;
-
 yLims1 = [0.85, 5.5];
 yLims2 = [-90,190];
 yTicks2 = -75:25:190;
@@ -67,3 +65,13 @@ yLims = {
 	};
 
 plot_nha_power_and_flow_3x5panels(F_rel, G_rel.med, [], var, yLims);
+
+%% ROC curves for each specific obstruction level states
+
+classifiersToUse = {
+	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
+	'P_LVAD_change',              '\itP\rm_{LVAD}'
+	};
+
+plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
+
