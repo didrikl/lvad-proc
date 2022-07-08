@@ -20,7 +20,7 @@ function make_spectrogram_and_curve_figure_per_ids_G1(...
 	spec = get_plot_specs;
 	colorMap = scientificColormaps.batlowW; 
 	%colorMap = scientificColormaps.lisbon;
-	colorRange = [-65,-36]; % for Seq13
+	colorRange = [-65,-36];
 	
 	[T1, segStarts1, segEnds1] = make_plot_data_G1(IDs1, S, var, fs, durLim);
 	[T2, segStarts2, segEnds2] = make_plot_data_G1(IDs2, S, var, fs, durLim);

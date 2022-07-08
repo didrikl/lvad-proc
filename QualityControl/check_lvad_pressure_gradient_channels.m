@@ -9,6 +9,7 @@ function check_lvad_pressure_gradient_channels(PL,pGradVars)
 	
 	welcome('Check LVAD pressure gradient channels','function')
 	
+	warnDlgMsg = '';
 	for i=1:numel(PL)
 		
 		isEmpty = display_block_info(PL{i},i,numel(PL));

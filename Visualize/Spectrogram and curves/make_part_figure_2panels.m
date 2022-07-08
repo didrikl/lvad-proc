@@ -1,4 +1,4 @@
-function hFig = make_part_figure_2panels(T, Notes, map, accVar, seqID, partSpec, fs)
+function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, fs)
 	
 	spec = get_plot_specs;
 	Colors_IV2
@@ -7,7 +7,7 @@ function hFig = make_part_figure_2panels(T, Notes, map, accVar, seqID, partSpec,
 	mapScale = [-65, -36];
 	shadeColor = [.9 .9 .9];
 	echoShadeColor = [.9 .9 .9];
-	
+
 	figWidth = 1300;
 	figHeight =  800;
 	yLims = [-100,55];
@@ -23,28 +23,31 @@ function hFig = make_part_figure_2panels(T, Notes, map, accVar, seqID, partSpec,
 		'arealObstr_xRay_pst'
 		'balDiam'
 		'balLev'         
-		'arealObstr_pst'
 		'pumpSpeed'          
 		'QRedTarget_pst'
 		};
 	T = join_notes(T, Notes, noteVarsNeeded);
 	T.dur = linspace(0,1/fs*height(T),height(T))';
 
+	t = map.time;
+	order = map.order;
+	map = map.([var,'_map']);
+
 	segs = get_segment_info(T, 'dur');
  	
 	rpms = unique(T.pumpSpeed(segs.all.startInd),'stable');
-	tit = make_figure_title(rpms, seqID, partSpec, accVar, mapScale, colorMapName);
+	tit = make_figure_title(rpms, seqID, partSpec, var, mapScale, colorMapName);
 	hFig = figure(spec.fig{:},...
 		'Name',tit,...
 		'Position',[250,150,figWidth,figHeight]);
 	hSub(1) = subplot(2,1,1,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);
 	hSub(2) = subplot(2,1,2,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);
 	
-	hPlt = plot_curves(hSub(2), T, accVar, yLims);
+	hPlt = plot_curves(hSub(2), T, var, yLims);
 	add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.18, [1.05*yLims(1) 60])
 	add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.4, [1.05*yLims(1) 60])
 	
-	plot_rpm_order_map(hSub(1), mapScale, colorMap, map.time, map.order, map.map, yLim_map);
+	plot_rpm_order_map(hSub(1), mapScale, colorMap, t, order, map, yLim_map);
 	add_linked_map_hz_yyaxis(hSub(1), '', rpms);
  	
 	make_xticks_and_time_str(hSub, segs);
@@ -52,7 +55,7 @@ function hFig = make_part_figure_2panels(T, Notes, map, accVar, seqID, partSpec,
 	add_transition_annotations(hSub, T, segs);
  	add_steady_state_annotations(hSub, segs);
 	hYLab(1) = ylabel(hSub(1),{'harmonic order'}, 'Units','pixels');
-	[hLeg, hCol] = add_legend_and_colorbar(hSub, hPlt, T, accVar);
+	[hLeg, hCol] = add_legend_and_colorbar(hSub, hPlt, T, var);
 	hYyTxt = add_text_as_yylabel(hSub);
 	add_seg_info_box(hFig, tit);
 	

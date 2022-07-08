@@ -1,11 +1,11 @@
 %% Defaults settings
-function Config =  get_processing_config_defaults_G1
+function Config =  get_processing_config_defaults_G1B
 	
 	% Experiment info
 	% --------------------------------------------------------------------------
 	
-	Config.experimentType = 'In vivo, porcine model 1';
-	Config.experimentID = 'G1';
+	Config.experimentType = 'In vivo, porcine model 1B, with driveline accelerometer';
+	Config.experimentID = 'G1B';
 
 
 	% Signal processing settings
@@ -49,7 +49,7 @@ function Config =  get_processing_config_defaults_G1
 	Config.interNoteInclSpec = 'nearest';
 	Config.outsideNoteInclSpec = 'none';
 
-	Config.labChart_varMapFile = 'VarMap_LabChart_G1';
+	Config.labChart_varMapFile = 'VarMap_LabChart_G1B';
 	Config.systemM_varMapFile = 'VarMap_SystemM_G1';
 	Config.notes_varMapFile = 'VarMap_Notes_G1_v1_0_0';
 

@@ -10,14 +10,14 @@ function T_parts = add_spatial_norms(T_parts, p, compNames, newVarName)
         return
     end
     
-    if nargin<2, p=2; end
-    if nargin<3, compNames = {'accA_x','accA_y','accA_z'}; end
-    if nargin<4
-        if p==1, newVarName = 'accA_1norm';
-        elseif p==2, newVarName = 'accA_norm';
-        else, newVarName = sprintf('accA_%snorm',p);
-        end
-    end
+%     if nargin<2, p=2; end
+%     if nargin<3, compNames = {'accA_x','accA_y','accA_z'}; end
+%     if nargin<4
+%         if p==1, newVarName = 'accA_1norm';
+%         elseif p==2, newVarName = 'accA_norm';
+%         else, newVarName = sprintf('accA_%snorm',p);
+%         end
+%     end
         
     if p==2
         % 2-norms (eucledian distance, L2-norm)
