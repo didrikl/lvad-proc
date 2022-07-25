@@ -23,6 +23,10 @@ function Config =  get_processing_config_defaults_G1B
 	Config.rpmOrderMapRes = 0.011;
 	Config.rpmOrderMapOverlapPst = 80;
 	Config.rpmOrdersToTrack = [1 2 3 4 5];
+	
+	% For RPM order map visualization
+	Config.rpmOrderMapScale = [-85, -55];
+	Config.rpmOrderMapColorMapName = 'batlowW';
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
@@ -83,7 +87,7 @@ function Config =  get_processing_config_defaults_G1B
 	Config.notes_subdir = 'Noted';
 
 	Config.proc_subdir = 'Processed\';
-	Config.proc_plot_subdir = 'Figures';
+	Config.proc_plot_subdir = 'Figures\Driveline';
 	Config.proc_stats_subdir = 'Processed\Statistics';
 
 	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Features';

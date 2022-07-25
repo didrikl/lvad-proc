@@ -23,15 +23,15 @@ function make_part_figures_in_batch(Data, seqDefs, accVar, saveFig, Config)
 				Notes = Data.(seq).Notes;
 				map = Data.(seq).Plot_Data.RPM_Order_Map{i};
 				hFig = make_part_figure_2panels(T, Notes, map, accVar{j}, ...
- 					seqID, partSpec(i,:), Config.fs);
+ 					seqID, partSpec(i,:), Config);
 				
 				if saveFig
 					save_figure(hFig, savePath, hFig.Name, 300)
-					print(hFig, fullfile(savePath, hFig.Name), '-dsvg')
+					%print(hFig, fullfile(savePath, 'SVG', hFig.Name), '-dsvg')
 				end
 
 			end
+			close all
 		end
-		close all
-
+		
 	end

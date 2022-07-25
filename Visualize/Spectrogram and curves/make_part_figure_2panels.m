@@ -1,10 +1,12 @@
-function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, fs)
+function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, Config, mapScale)
+
+	if nargin<8, mapScale = Config.rpmOrderMapScale; end
+	fs = Config.fs;
+	colorMapName = Config.rpmOrderMapColorMapName;
 	
 	spec = get_plot_specs;
 	Colors_IV2
-	colorMapName = 'batlowW';
 	colorMap = scientificColormaps.(colorMapName);
-	mapScale = [-65, -36];
 	shadeColor = [.9 .9 .9];
 	echoShadeColor = [.9 .9 .9];
 

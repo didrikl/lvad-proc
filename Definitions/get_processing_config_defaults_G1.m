@@ -23,6 +23,11 @@ function Config =  get_processing_config_defaults_G1
 	Config.rpmOrderMapRes = 0.011;
 	Config.rpmOrderMapOverlapPst = 80;
 	Config.rpmOrdersToTrack = [1 2 3 4 5];
+	
+	% For RPM order map visualization
+	Config.rpmOrderMapScale = [-65, -36];
+	Config.rpmOrderMapColorMapName = 'batlowW';
+
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
