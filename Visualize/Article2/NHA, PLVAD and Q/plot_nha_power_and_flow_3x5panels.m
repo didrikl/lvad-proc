@@ -24,13 +24,13 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 	
 	spec = get_plot_specs;
 	
-	figWidth = 710;
-	figHeight =  458;
+	figWidth = 715;
+	figHeight =  450;
 	pHeight = 64;
 	pHeigh3 = 125;
 	xGap = 7;
-	xGapExtra = 14;
-	yGap = 6;
+	xGapExtra = 16;
+	yGap = 5;
 	
 	%R_inds = contains(string(R.levelLabel),levelLabels(j,1));
 	G_rpm = G(G.categoryLabel=='RPM' & G.interventionType~='Reversal',:);
@@ -50,7 +50,7 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 	hAx = init_axes(spec);
 	adjust_panel_positions(hAx, pHeight, pHeigh3, yGap, xGap, xGapExtra);
 	hAx = adjust_axes(hAx, yLims, yTicks1, yTicks2, yTicks3);
-	[hXAx,~] = make_offset_axes(hAx, xGap, yGap);
+	[hXAx,~] = make_offset_axes(hAx, yGap, xGap);
 	
 	xVar = 'pumpSpeed';
 	plot_panel_colum(hAx(:,1), G_rpm, F_rpm, [nan], xVar, var3, spec);
@@ -160,15 +160,14 @@ function [hXAx, hYAx] = make_offset_axes(hAx, xGap, yGap)
 	end
 
  	offset_main_ax(hAx, hXAx, hYAx, xGap, yGap);
- 	%make_xy_halfframe(hAx)
-
+ 	
 function adjust_panel_positions(hAx, pHeight, pHeight3, yGap, xGap, xGapExtra)
 	
 	pStartX = 35;
 	pStartY = 61;
 	pWidth1 = 44;
-	pWidth2 = 59;
-	pWidth3 = pWidth1*2;
+	pWidth2 = 60;
+	pWidth3 = 90;
 
     nRows = size(hAx,1);
 	nCols = size(hAx,2);
@@ -210,18 +209,15 @@ function hAx = init_axes(spec)
 				'FontSize',9,...
 				'FontName','Arial',...
 				'Color',[.96 .96 .96],...
-				...'Color',[1 1 1],...
 				'TickDir','out',...
 				'TickLength',[0.015, 0.015],...
 			    'XColor',[1 1 1],...
 			    'YColor',[1 1 1],...
 				'GridColor',[1 1 1],...
-				...'GridColor',[0 0 0],...
 				'XGrid','on',...
 				'YGrid','on',...
 				'LineWidth',1.5,...
 				'GridAlpha',1 ...
-				...'GridAlpha',0.075...
 				);
 				
 		end
@@ -230,7 +226,7 @@ function hAx = init_axes(spec)
 function add_legend(hPlt, spec)
 	leg = {'\itQ\rm','\itP\rm_{LVAD}','NHA'};
 	hLeg = legend(hPlt, leg, spec.leg{:}, 'FontSize',10);
-	hLeg.Position(1) = hLeg.Position(1)+82;
+	hLeg.Position(1) = hLeg.Position(1)+75;
 	hLeg.Position(2) = 0;
 	
 function add_annotation(hAx, hXAx)
@@ -241,7 +237,7 @@ function add_annotation(hAx, hXAx)
 
 	xLab1 = {'speeds','(RPM)'};
 	xLab2 = {'afterload \itQ\rm','reductions'};
-	xLab3 = {'','balloon inflow obstruction levels'};
+	xLab3 = {'','balloon inflow obstruction','levels'};
 	hXLab(1) = xlabel(hXAx(1), xLab1, "FontSize",10, 'Units','points');
 	hXLab(2) = xlabel(hXAx(2), xLab2, "FontSize",10, 'Units','points');
 	hXLab(3) = xlabel(hXAx(4), xLab3, "FontSize",10, 'Units','points');
@@ -249,11 +245,11 @@ function add_annotation(hAx, hXAx)
 	hXLab(2).Position(2) = -30;
 	hXLab(3).Position(2) = -19;
 		
-	text(hAx(1,1), hAx(1,1).XLim(1), .35, {' A'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,2), hAx(1,2).XLim(1), .35, {' B'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,3), hAx(1,3).XLim(1), .35, {' C'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,4), hAx(1,4).XLim(1), .35, {' D'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,5), hAx(1,5).XLim(1), .35, {' E'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,1), hAx(1,1).XLim(1), .32, {' A'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,2), hAx(1,2).XLim(1), .32, {' B'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,3), hAx(1,3).XLim(1), .32, {' C'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,4), hAx(1,4).XLim(1), .32, {' D'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,5), hAx(1,5).XLim(1), .32, {' E'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
 % 	text(hAx(1,1), 2150+0.5*diff(hAx(1,1).XLim), .35, {'pump','speed'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 % 	text(hAx(1,2), 0.5*diff(hAx(1,2).XLim), .35, {'clamp','2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 %  	text(hAx(1,3), 0.5*diff(hAx(1,3).XLim), .35, {'2200 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
