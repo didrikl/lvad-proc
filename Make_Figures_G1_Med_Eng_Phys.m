@@ -26,9 +26,10 @@ cats = {
 
 make_baseline_deviation_bar_chart_figure(G_rel, 'median', vars, cats);
 
-
 %% Spectrograms and curves - Continious - Relative - 2 panel rows
  
+%Make_Part_Plot_Data_G1
+
 var = 'accA_x_NF_HP';
 seq = 'Seq8'; 
 Notes = Data.G1.(seq).Notes;
@@ -66,6 +67,11 @@ yLims = {
 
 plot_nha_power_and_flow_3x5panels(F_rel, G_rel.med, [], var, yLims);
 
+%% Relative NHA versus BL flow scatter
+
+var = 'accA_xyz_NF_HP_b1_pow_norm';
+plot_nha_versus_flow_scatter_3panels(var, F, F_rel, F_del)
+
 %% ROC curves for each specific obstruction level states
 
 classifiersToUse = {
@@ -74,4 +80,3 @@ classifiersToUse = {
 	};
 
 plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
-

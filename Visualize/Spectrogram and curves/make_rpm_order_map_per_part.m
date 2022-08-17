@@ -15,9 +15,11 @@ function rpmOrderMap = make_rpm_order_map_per_part(T_parts, vars, Config)
 	waitIncr = 1/(nParts*nVars);
 
 	for i=1:nParts
+		welcome(['Part ',num2str(i)],'Iteration')
+			
 		for j=1:nVars
 			var = vars{j};
-
+			
 			multiWaitbar('Calculate RPM order map','Increment',waitIncr);
 
 			[map,order,rpm,time] = make_rpm_order_map(T_parts{i}, var, ...
@@ -46,4 +48,5 @@ function rpmOrderMap = make_rpm_order_map_per_part(T_parts, vars, Config)
 	
 	end
 
+	fprintf('\n');
 end

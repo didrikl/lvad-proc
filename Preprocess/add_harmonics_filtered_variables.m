@@ -31,7 +31,7 @@ function T_parts = add_harmonics_filtered_variables(...
 
     for i=1:numel(T_parts)
         
-		isEmpty = display_block_info(T_parts{i},i,numel(T_parts));
+		isEmpty = display_block_info(T_parts{i}, i, numel(T_parts), true);
 		if isEmpty, continue; end
         T = T_parts{i};
 		
@@ -66,7 +66,7 @@ function T_parts = add_harmonics_filtered_variables(...
                 nan_inds = isnan(T.(var)(block_inds));
                 inds = block_inds(not(nan_inds));
                 %ignoreNaN = true;
-                T(inds,:) = filter_notches(T(inds,:),hFilt,var,newVar);
+                T(inds,:) = filter_notches(T(inds,:), hFilt, var, newVar);
                 
             end
             

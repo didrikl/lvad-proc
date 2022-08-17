@@ -60,7 +60,7 @@ minMaxVars = {
 	};
 F = make_intervention_stats(Data.G1, sequences, discrVars, meanVars, {}, minMaxVars, idSpecs);
 
-% Calculate NHA as band powers
+% Calculate band powers as NHA
 accVars = {
 	'accA_x_NF_HP'
 	'accA_y_NF_HP'

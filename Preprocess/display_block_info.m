@@ -1,4 +1,4 @@
-function isEmpty = display_block_info(B,iter,nBlocks,asSubFunc,dispFileNames)
+function isEmpty = display_block_info(B, iter, nBlocks, asSubFunc, dispFileNames)
 	
 	if nargin<4, asSubFunc = false; end
 	if nargin<5, dispFileNames = false; end

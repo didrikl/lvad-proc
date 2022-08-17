@@ -67,16 +67,17 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 	add_annotation(hAx, hXAx);
 
 function hPlt = plot_panel_colum(hAx, G, F, speeds, xVar, var, spec)
+	
 	flowColor = [0.07,0.39,0.50];
 	plvadColor = [0.87,0.50,0.13];
-	varColor = [0.76,0.0,0.2];
+	nhaColor = [0.76,0.0,0.2];
 	
 	plot_individual_data(hAx(1), F, speeds, xVar, 'Q_mean', spec);
 	hPlt{1} = plot_group_statistic(hAx(1), G, speeds, xVar, 'Q_mean', flowColor, 'diamond');
 	plot_individual_data(hAx(2), F, speeds, xVar, 'P_LVAD_mean', spec);
 	hPlt{2} = plot_group_statistic(hAx(2), G, speeds, xVar, 'P_LVAD_mean', plvadColor, 'square');
 	plot_individual_data(hAx(3), F, speeds, xVar, var, spec);
-	hPlt{3} = plot_group_statistic(hAx(3), G, speeds, xVar, var, varColor, 'o');
+	hPlt{3} = plot_group_statistic(hAx(3), G, speeds, xVar, var, nhaColor, 'o');
 	
 function hPlt = plot_group_statistic(hAx, G, speeds, xVar, var, color, marker)
 	

@@ -29,7 +29,7 @@ Config.labChart_fileNames = {
 	%'G1_Seq7 - F3_Sel2 [i1,i2,i3].mat'
 	%'G1_Seq7 - F3_Sel2 [v1,v2,v3].mat'
 	};
-Config.notes_fileName = 'G1_Seq7 - Notes G1 v1.0.0 - Rev7.xlsm';
+Config.notes_fileName = 'G1_Seq7 - Notes G1 v1.0.0 - Rev8.xlsm';
 Config.ultrasound_fileNames = {
 	'ECM_2020_11_05__12_27_25.wrf'
 	};

@@ -21,7 +21,7 @@ Config.labChart_fileNames = {
     %'G1_Seq3 - F3_Sel2 [accB].mat'
     'G1_Seq3 - F3_Sel2 [pGraft].mat'
     };
-Config.notes_fileName = 'G1_Seq3 - Notes G1 v1.0.0 - Rev6.xlsm';
+Config.notes_fileName = 'G1_Seq3 - Notes G1 v1.0.0 - Rev8.xlsm';
 Config.ultrasound_fileNames = {
     'ECM_2020_09_17__12_26_32.wrf'
     };

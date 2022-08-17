@@ -86,13 +86,17 @@ function h = plot_curves(hAx, hAxNHA, T, segs, fs, yLims, yLimsNHA)
 	
 	flowColor = [0.07,0.39,0.50];[0.03,0.26,0.34,1];
 	plvadColor = [0.87,0.50,0.13];
+	nhaColor = [0.76,0.0,0.2];
 	%qlvadColor = [0.39,0.83,0.07];
-
+	
+	nhaColor = [0.07,0.39,0.50];
+	flowColor = [0.76,0.0,0.2];
+	
 	h(1) = plot(hAx, T.dur, T.Q_relDiff,...
  		'LineWidth',1,'Color',flowColor);  	
 	
 	nha_bl = calc_nha_at_baseline(segs, T, fs);
-	h(4) = plot_nha(hAxNHA, segs, T, nha_bl, yLimsNHA, fs);
+	h(4) = plot_nha(hAxNHA, segs, T, nha_bl, yLimsNHA, fs, 'main', nhaColor);
 	
     h(2) = plot(hAx, T.dur,T.P_LVAD_relDiff,...
  		'-.','LineWidth',2,'Color',[plvadColor,1]);

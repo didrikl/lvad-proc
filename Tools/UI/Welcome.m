@@ -9,7 +9,7 @@ function welcome(str, type, asSubFunc)
         return
     end
     
-    switch type
+    switch lower(type)
         case 'iteration'
             fprintf('\n<strong>%s</strong>',sprintf(str))
         

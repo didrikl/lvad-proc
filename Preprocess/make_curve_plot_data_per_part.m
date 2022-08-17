@@ -1,8 +1,8 @@
-function T_parts = make_curve_plot_data_per_part(Data, accVar, Config)
+function T_parts = make_curve_plot_data_per_part(Data, accVars, Config)
 
 	movStdWin = Config.movStdWin;
 	partSpec = Config.partSpec;
-	accVar = cellstr(accVar);
+	accVars = cellstr(accVars);
 	fs = Config.fs; 
 	nParts = size(partSpec,1);
 	
@@ -12,18 +12,20 @@ function T_parts = make_curve_plot_data_per_part(Data, accVar, Config)
 		T_parts{i} = extract_from_data(Data, partSpec(i,:));
 	end
 
-	T_parts = add_norms_and_filtered_variables(accVar, T_parts, Config);
+	T_parts = add_norms_and_filtered_variables(accVars, T_parts, Config);
 	
-	nVars = numel(accVar);
-	waitIncr = 1/(nParts*nVars);
-	for j=1:nVars	
+	nVars = numel(accVars);
+	welcome('Adding relative differences from BL','Function');
+	for j=1:nVars
+		welcome(accVars{j},'Iteration');	
 		for i=1:nParts
-			multiWaitbar('Calculate curve','Increment',waitIncr);
-			T_parts{i} = add_relative_diff(T_parts{i}, accVar{j}, fs, movStdWin);
+			T_parts{i} = add_relative_diff(T_parts{i}, accVars{j}, fs, movStdWin);
 		end
 	end
+	fprintf('\n')
 
 function T = add_relative_diff(T, accVar, fs, movStdWin)
+	
 	
 	bl_inds = get_baseline_inds(T);
 	BL = T(bl_inds,:);
@@ -63,21 +65,21 @@ function inds = get_baseline_inds(T)
 		warning('Multiple baseline segments in Notes')
 	end
 
-function T = add_norms_and_filtered_variables(accVar, T, Config)
+function T = add_norms_and_filtered_variables(accVars, T, Config)
 	
 	% Derive Eucledian norm of acc signal components
-	T = add_norms(accVar, T, 'A');
-	T = add_norms(accVar, T, 'B');
+	T = add_norms(accVars, T, 'A');
+	T = add_norms(accVars, T, 'B');
 	
 	% Add notch and highpass filtered acc component signals, as needed
-	T = add_filtered_acc_components(T, accVar, 'A', 'x', Config);
-	T = add_filtered_acc_components(T, accVar, 'A', 'y', Config);
-	T = add_filtered_acc_components(T, accVar, 'A', 'z', Config);
-	T = add_filtered_acc_components(T, accVar, 'A', 'norm', Config);
-	T = add_filtered_acc_components(T, accVar, 'B', 'x', Config);
-	T = add_filtered_acc_components(T, accVar, 'B', 'y', Config);
-	T = add_filtered_acc_components(T, accVar, 'B', 'z', Config);
-	T = add_filtered_acc_components(T, accVar, 'B', 'norm', Config);
+	T = add_filtered_acc_components(T, accVars, 'A', 'x', Config);
+	T = add_filtered_acc_components(T, accVars, 'A', 'y', Config);
+	T = add_filtered_acc_components(T, accVars, 'A', 'z', Config);
+	T = add_filtered_acc_components(T, accVars, 'A', 'norm', Config);
+	T = add_filtered_acc_components(T, accVars, 'B', 'x', Config);
+	T = add_filtered_acc_components(T, accVars, 'B', 'y', Config);
+	T = add_filtered_acc_components(T, accVars, 'B', 'z', Config);
+	T = add_filtered_acc_components(T, accVars, 'B', 'norm', Config);
 
 function T = add_filtered_acc_components(T, accVars, accID, compID, Config)
 
@@ -108,7 +110,7 @@ function T = add_filtered_acc_components(T, accVars, accID, compID, Config)
 
 	% remove any temporary component 
 	remVars = {var,[var,'_NF']};
-	remVars = remVars(ismember(remVars, accVars));
+	remVars = remVars(not(ismember(remVars, accVars)));
 	T = cellfun(@(c) removevars(c, remVars), T, 'UniformOutput',false);
 
 function T = add_norms(accVars, T, accID)
