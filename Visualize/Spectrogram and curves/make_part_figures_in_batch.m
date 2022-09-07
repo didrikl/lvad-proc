@@ -8,7 +8,7 @@ function make_part_figures_in_batch(Data, seqDefs, accVar, saveFig, Config)
 		seqID = [Config.experimentID,'_',seq];
 		partSpec = Config.partSpec;
 		savePath = fullfile(Config.data_basePath, Config.seq_subdir, ...
-			Config.proc_plot_subdir, 'Spectrogram and curve plots');
+			Config.proc_plot_subdir, 'Spectrogram and curves');
 		
 		nPartSegments = numel(Data.(seq).Plot_Data.T);
 		if nPartSegments~=size(Config.partSpec,1)
@@ -27,7 +27,8 @@ function make_part_figures_in_batch(Data, seqDefs, accVar, saveFig, Config)
 				
 				if saveFig
 					save_figure(hFig, savePath, hFig.Name, 300)
-					%print(hFig, fullfile(savePath, 'SVG', hFig.Name), '-dsvg')
+                    %savefig(hFig, fullfile(savePath,hFig.Name),"compact"); % NB: huge files
+					%print(hFig, fullfile(savePath, hFig.Name), '-dsvg')
 				end
 
 			end

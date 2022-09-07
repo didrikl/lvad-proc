@@ -25,11 +25,11 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 	spec = get_plot_specs;
 	
 	figWidth = 715;
-	figHeight =  450;
+	figHeight =  462;
 	pHeight = 64;
 	pHeigh3 = 125;
-	xGap = 7;
-	xGapExtra = 16;
+	xGap = 11.5;
+	xGapExtra = 4.5;
 	yGap = 5;
 	
 	%R_inds = contains(string(R.levelLabel),levelLabels(j,1));
@@ -44,7 +44,7 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 		'Name',sprintf('NHA, PLVAD and Q curves - %s as NHA',var3),...
 		'Position',[150,150,figWidth,figHeight],...
 		'PaperUnits','centimeters',...
-		'PaperSize',[19,19*(figHeight/figWidth)+0.1]...
+		'PaperSize',[19,19*(figHeight/figWidth)]...
 		);
 
 	hAx = init_axes(spec);
@@ -68,9 +68,11 @@ function hFig = plot_nha_power_and_flow_3x5panels(F, G, R, var3, yLims)
 
 function hPlt = plot_panel_colum(hAx, G, F, speeds, xVar, var, spec)
 	
+	%flowColor = [0.44,0.58,0.32];
 	flowColor = [0.07,0.39,0.50];
 	plvadColor = [0.87,0.50,0.13];
 	nhaColor = [0.76,0.0,0.2];
+	%nhaColor = [0.07,0.39,0.50];
 	
 	plot_individual_data(hAx(1), F, speeds, xVar, 'Q_mean', spec);
 	hPlt{1} = plot_group_statistic(hAx(1), G, speeds, xVar, 'Q_mean', flowColor, 'diamond');
@@ -164,8 +166,8 @@ function [hXAx, hYAx] = make_offset_axes(hAx, xGap, yGap)
  	
 function adjust_panel_positions(hAx, pHeight, pHeight3, yGap, xGap, xGapExtra)
 	
-	pStartX = 35;
-	pStartY = 61;
+	pStartX = 40;
+	pStartY = 68;
 	pWidth1 = 44;
 	pWidth2 = 60;
 	pWidth3 = 90;
@@ -188,7 +190,7 @@ function adjust_panel_positions(hAx, pHeight, pHeight3, yGap, xGap, xGapExtra)
 	
 	for i=1:nRows
 		hAx(i,1).Position(1) = pStartX;
-		hAx(i,2).Position(1) = pStartX + pWidth1 + xGap + xGapExtra;
+		hAx(i,2).Position(1) = pStartX + pWidth1 + xGap;
 		hAx(i,3).Position(1) = pStartX + pWidth1 + pWidth2 + 2*xGap + 2*xGapExtra;
 		hAx(i,4).Position(1) = pStartX + pWidth1 + pWidth2 + pWidth3 + 3*xGap + 2*xGapExtra;
 		hAx(i,5).Position(1) = pStartX + pWidth1 + pWidth2 + 2*pWidth3 + 4*xGap + 2*xGapExtra;
@@ -226,7 +228,7 @@ function hAx = init_axes(spec)
 	
 function add_legend(hPlt, spec)
 	leg = {'\itQ\rm','\itP\rm_{LVAD}','NHA'};
-	hLeg = legend(hPlt, leg, spec.leg{:}, 'FontSize',10);
+	hLeg = legend(hPlt, leg, spec.leg{:}, 'FontSize',9);
 	hLeg.Position(1) = hLeg.Position(1)+75;
 	hLeg.Position(2) = 0;
 	
@@ -236,27 +238,58 @@ function add_annotation(hAx, hXAx)
 	% 	hYLab.FontSize = 10.5;
 	% 	hYLab.FontName = 'Arial';
 
-	xLab1 = {'speeds','(RPM)'};
-	xLab2 = {'afterload \itQ\rm','reductions'};
-	xLab3 = {'','balloon inflow obstruction','levels'};
-	hXLab(1) = xlabel(hXAx(1), xLab1, "FontSize",10, 'Units','points');
-	hXLab(2) = xlabel(hXAx(2), xLab2, "FontSize",10, 'Units','points');
-	hXLab(3) = xlabel(hXAx(4), xLab3, "FontSize",10, 'Units','points');
-	hXLab(1).Position(2) = -30;
-	hXLab(2).Position(2) = -30;
-	hXLab(3).Position(2) = -19;
+	xLab1 = {'speed (RPM)'};
+	xLab2 = {'\itQ\rm reduction'};
+	xLab3 = {'','level'};
+	hXLab(1) = xlabel(hXAx(1), xLab1, "FontSize",9, 'Units','points');
+	hXLab(2) = xlabel(hXAx(2), xLab2, "FontSize",9, 'Units','points');
+	hXLab(3) = xlabel(hXAx(3), {'level'}, "FontSize",9, 'Units','points');
+	hXLab(4) = xlabel(hXAx(4), {'level'}, "FontSize",9, 'Units','points');
+	hXLab(5) = xlabel(hXAx(5), {'level'}, "FontSize",9, 'Units','points');
+	hXLab(1).Position(2) = -29;
+	hXLab(2).Position(2) = -29;
+  	hXLab(3).Position(2) = -16;
+  	hXLab(4).Position(2) = -16;
+  	hXLab(5).Position(2) = -16;
+	text(hAx(3,3), mean(hAx(3,3).XLim), -3.15, {'2200 RPM'}, 'FontSize',9, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+	text(hAx(3,4), mean(hAx(3,4).XLim), -3.15, {'2400 RPM'}, 'FontSize',9, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
+	text(hAx(3,5), mean(hAx(3,5).XLim), -3.15, {'2600 RPM'}, 'FontSize',9, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 		
-	text(hAx(1,1), hAx(1,1).XLim(1), .32, {' A'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,2), hAx(1,2).XLim(1), .32, {' B'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,3), hAx(1,3).XLim(1), .32, {' C'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,4), hAx(1,4).XLim(1), .32, {' D'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
-	text(hAx(1,5), hAx(1,5).XLim(1), .32, {' E'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,1), hAx(1,1).XLim(1), .335, {' A'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,2), hAx(1,2).XLim(1), .335, {' B'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,3), hAx(1,3).XLim(1), .335, {' C'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,4), hAx(1,4).XLim(1), .335, {' D'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
+	text(hAx(1,5), hAx(1,5).XLim(1), .335, {' E'}, 'FontSize',13, 'FontName','Arial','VerticalAlignment','bottom');
 % 	text(hAx(1,1), 2150+0.5*diff(hAx(1,1).XLim), .35, {'pump','speed'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 % 	text(hAx(1,2), 0.5*diff(hAx(1,2).XLim), .35, {'clamp','2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 %  	text(hAx(1,3), 0.5*diff(hAx(1,3).XLim), .35, {'2200 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 %  	text(hAx(1,4), 0.5*diff(hAx(1,4).XLim), .35, {'2400 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 %  	text(hAx(1,5), 0.5*diff(hAx(1,5).XLim), .35, {'2600 RPM'}, 'FontSize',11, 'FontName','Arial','VerticalAlignment','bottom','HorizontalAlignment','center');
 	
+annotation(gcf,'textbox',...
+		[0.0577 0.0 0.24095 0.05],...
+		'VerticalAlignment','bottom',...
+		'FontName','Arial',...
+		'FontWeight','bold',...
+		'FontSize',9.5,...
+		'String',{'control interventions'},...
+		'Margin',1,...
+		'LineStyle','none',...
+		'HorizontalAlignment','center');
+annotation(gcf,'textbox',...
+		[0.341559440559441 0 0.537461538461539 0.0553191489361702],...
+		'VerticalAlignment','bottom',...
+		'FontName','Arial',...
+		'FontWeight','bold',...
+		'FontSize',9.5,...
+		'String',{'balloon inflow obstructions'},...
+		'Margin',1,...
+		'LineStyle','none',...
+		'HorizontalAlignment','center');
+
+annotation(gcf,'line',[0.3104 0.3104],[0 0.955], ...
+	'Color',[0.15 0.15 0.15], 'LineWidth',0.7);
+
 function hAx = adjust_axes(hAx, yLims, yTicks1, yTicks2, yTicks3)
 	
 	ylim(hAx(1,:),yLims{1});

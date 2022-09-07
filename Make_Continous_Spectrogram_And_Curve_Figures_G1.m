@@ -1,4 +1,4 @@
-%Make_Continous_Part_Plot_Data
+%Make_Part_Plot_Data_G1
 
 seqDefs = {
      'G1_Seq3'

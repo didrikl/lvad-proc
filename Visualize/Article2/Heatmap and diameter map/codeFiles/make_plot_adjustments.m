@@ -11,7 +11,7 @@ end
 function add_annotations(hAx)
 	% remark down in the corner (to be removed later?)
 	annotation('textbox',[0.020 0.04 0.26 0.033],...
-		'String',{'*air in balloon (not excluded)','**Excluded, d/t large flow variation'},...
+		'String',{'*air in balloon, not excluded','**excessive flow variation, excluded'},...
 		'FontSize',9,...
 		'EdgeColor','none');
 	
@@ -30,7 +30,7 @@ function add_annotations(hAx)
 		'FitBoxToText','off',...
 		'EdgeColor','none');
 
-	title(hAx, {'Balloon obstruction levels'})
+	hTit = title(hAx, {'balloon obstruction levels'});
 end
 
 function add_axis_labels(hAx, xLab, yLab, specs)
@@ -56,7 +56,7 @@ end
 
 function hAx = customize_axis(levLims, hAx, Config)
 	levLims(1) = 2.33;
-	xticks([levLims])
+	xticks([levLims]);
 	obstr_diam = string(compose(' %3.1f',string(hAx.XTick)))';
 	obstr_pst = strtrim(string(num2str(100*(hAx.XTick'.^2)/(Config.inletInnerDiamLVAD^2),2.0)));
 	obstr_pst = "\newline"+""+compose('%3s',obstr_pst);
@@ -70,5 +70,4 @@ function hAx = customize_axis(levLims, hAx, Config)
 	noteInd = contains(hAx.YTickLabel,'2200**');
 	hAx.YTickLabel(contains(hAx.YTickLabel,'2200**')) = {'2200**'};
 	hAx.YTickLabel(contains(hAx.YTickLabel,'2200') & not(noteInd)) = {'2200'};
-
 end

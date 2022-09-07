@@ -191,17 +191,11 @@ Data.G1.Feature_Statistics.Results = Results;
 % ----------------------
 
 classifiers = {
-	'accA_x_NF_HP_b1_pow'
- 	'accA_y_NF_HP_b1_pow'
- 	'accA_z_NF_HP_b1_pow'
 	'accA_xyz_NF_HP_b1_pow_norm'
 %	'accA_xyz_NF_HP_b1_pow_sum'
 %	'accA_best_NF_HP_b1_pow'
 % 	'accA_best_NF_HP_b1_pow_per_speed'
-	'accA_x_NF_HP_b2_pow'
- 	'accA_y_NF_HP_b2_pow'
- 	'accA_z_NF_HP_b2_pow'
-	'accA_xyz_NF_HP_b2_pow_norm'
+ 	'accA_xyz_NF_HP_b2_pow_norm'
 %	'accA_xyz_NF_HP_b1_pow_sum'
 %	'accA_best_NF_HP_b1_pow'
 % 	'accA_best_NF_HP_b1_pow_per_speed'
@@ -227,11 +221,53 @@ predStates = {
 	};
 [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 	F(F.pumpSpeed==single(2400),:), classifiers, predStateVar, predStates, false);
+
 Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
 
+%% Calculate ROC curves for pooled RPM of both BL and balloon interventions
 
-%% Calculate pooled ROC curves
+classifiers = {
+	'accA_xyz_NF_HP_b1_pow_norm'
+ 	'P_LVAD_change'
+	};
+predStateVar = 'balLev_xRay_mean';
+predStates = {
+	1, '\bf34%-47%\rm\newlineobstruction'
+	2, '\bf52%-64%\rm\newlineobstruction'
+	3, '\bf65%-72%\rm\newlineobstruction'
+	4, '\bf78%-84%\rm\newlineobstruction'
+	};
+
+[ROC_pooled_rpm,AUC_pooled_rpm] = make_roc_curve_matrix_per_intervention_and_speed(...
+	F, classifiers, predStateVar, predStates, false, {}, true);
+
+Data.G1.Feature_Statistics.ROC_Pooled_RPM = ROC_pooled_rpm;
+Data.G1.Feature_Statistics.AUC_Pooled_RPM = AUC_pooled_rpm;
+
+%% Calculate ROC curves for pooled RPM of BL
+
+classifiers = {
+	'accA_xyz_NF_HP_b1_pow_norm'
+ 	'P_LVAD_change'
+	};
+predStateVar = 'levelLabel';
+predStates = {
+	'Balloon, 2400, Lev1', '\bf34%-47%\rm\newlineobstruction'
+	'Balloon, 2400, Lev2', '\bf52%-64%\rm\newlineobstruction'
+	'Balloon, 2400, Lev3', '\bf65%-72%\rm\newlineobstruction'
+	'Balloon, 2400, Lev4', '\bf78%-84%\rm\newlineobstruction'
+	%'Balloon, 2400, Lev5', '\bf85%-94%\rm\newlineobstruction'
+	};
+
+[ROC_pooled_bl_rpm,AUC_pooled_bl_rpm] = make_roc_curve_matrix_per_intervention_and_speed(...
+	F, classifiers, predStateVar, predStates, false, {}, true);
+
+Data.G1.Feature_Statistics.ROC_Pooled_BL_RPM = ROC_pooled_bl_rpm;
+Data.G1.Feature_Statistics.AUC_Pooled_BL_RPM = AUC_pooled_bl_rpm;
+
+
+%% Calculate pooled levels ROC curves
 % ------------------------------
 
 % Input for states of pooled occlusions above a threshold
@@ -243,15 +279,11 @@ predStates = {
 	%3, ' Lev 3-5' % minimum level 3
 	[2,3,4], 'Lev 2-4' % level 2, 3 and 4 specifically
 	};
-[ROC_pooled,AUC_pooled] = make_roc_curve_matrix_per_intervention_and_speed(...
+[ROC_pooled_levs,AUC_pooled_levs] = make_roc_curve_matrix_per_intervention_and_speed(...
 	F(F.balLev~=5,:), classifiers, predStateVar, predStates, true, {}, false);
-Data.G1.Feature_Statistics.ROC_Pooled = ROC_pooled;
-Data.G1.Feature_Statistics.AUC_Pooled = AUC_pooled;
+Data.G1.Feature_Statistics.ROC_Pooled_Levels = ROC_pooled_levs;
+Data.G1.Feature_Statistics.AUC_Pooled_Levels = AUC_pooled_levs;
 
-[ROC_pooled_rpm,AUC_pooled_rpm] = make_roc_curve_matrix_per_intervention_and_speed(...
-	F(F.balLev~=5,:), classifiers, predStateVar, predStates, true, {}, true);
-Data.G1.Feature_Statistics.ROC_Pooled_RPM = ROC_pooled_rpm;
-Data.G1.Feature_Statistics.AUC_Pooled_RPM = AUC_pooled_rpm;
 
 
 %% Save 

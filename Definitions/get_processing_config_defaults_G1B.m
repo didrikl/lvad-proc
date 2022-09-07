@@ -27,6 +27,7 @@ function Config =  get_processing_config_defaults_G1B
 	% For RPM order map visualization
 	Config.rpmOrderMapScale = [-85, -55];
 	Config.rpmOrderMapColorMapName = 'batlowW';
+    
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
@@ -79,18 +80,18 @@ function Config =  get_processing_config_defaults_G1B
 	% --------------------------------------------------------------------------
 	
 	Config.code_basePath = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab';
-	Config.data_basePath = 'D:\Data\IVS\Didrik\G1 - Data';
+	Config.data_basePath = 'C:\Data\IVS\Didrik\G1 - Data';
 
 	% Output folder structure for each sequence
 	Config.powerlab_subdir = 'Recorded\PowerLab';
 	Config.ultrasound_subdir = 'Recorded\SystemM';
 	Config.notes_subdir = 'Noted';
 
-	Config.proc_subdir = 'Processed\';
-	Config.proc_plot_subdir = 'Figures\Driveline';
-	Config.proc_stats_subdir = 'Processed\Statistics';
-
-	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Features';
-	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Statistics';
-	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1 - Figures';
-	Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';
+	Config.proc_subdir = 'Processed\accB';
+	Config.proc_plot_subdir = 'Figures\accB';
+	
+	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\accB\Features';
+	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\accB\Statistics';
+	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\accB\Figures';
+	
+    Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';

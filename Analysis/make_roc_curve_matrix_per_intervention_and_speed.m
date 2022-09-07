@@ -28,13 +28,14 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 	nPredStateRows = size(predStates,1);
 	nCols = numel(speeds);
 	if pooledSpeed, nCols = 1; end
+	
 	waitIncr = 1/(nPredStateRows*nCols*numel(classifiers));
 	multiWaitbar('Making ROC matrix',0);
 	
 	for i=1:nPredStateRows
 		
 		[state_inds, F] = add_bool_state_for_roc(pooledLevs, F, stateVar, predStates{i,1});
-
+		
 		for j=1:nCols
 			
 			ctrl_inds = F.interventionType=='Control';
@@ -43,7 +44,7 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 				speed_inds = F.pumpSpeed==speeds(j);
 				inds = inds & speed_inds;
 			end
-
+			
 			for k=1:numel(classifiers)
 				multiWaitbar('Making ROC matrix', 'Increment',waitIncr);
 	
@@ -53,10 +54,14 @@ function [ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
 				end
 				
 				% Can use best axis var to lookup up the control intervention.
-				[ROC.X{i,j,k},ROC.Y{i,j,k},~,ROC.AUC{i,j,k},ROC.opt_roc_pt{i,j,k}] = ...
-					perfcurve(F.state(inds), F.(classifiers{k})(inds),...
-					1, "NBoot",nBootItr);
-
+				[x, y, t, auc, optPt] = perfcurve(F.state(inds), ...
+					F.(classifiers{k})(inds), 1, "NBoot",nBootItr);
+				ROC.X{i,j,k} = x; % 1-specificities (FPR) 
+				ROC.Y{i,j,k} = y; % sensitivities (TPR)
+				ROC.T{i,j,k} = t; % threshold (cut-off) values
+				ROC.AUC{i,j,k} = auc; % AUC and upper and lower bounds of CI
+				ROC.Optimal_Point{i,j,k} = optPt; % optimal ROC point
+				
 				% Compile a output text table sorted by speed and predState
 				ind = i+(j-1)*nPredStateRows;
 				AUC.PumpSpeed(ind) = speeds(j);

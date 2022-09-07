@@ -1,69 +1,30 @@
-function hFig = plot_roc_per_balloon_level(ROC, classifiersToUse)
+function hFig = plot_roc_per_balloon_level(ROC, ROC_Pooled, classifiersToUse, classifiersToUsePooled)
 	% Plot ROC curves for states of specific intervention levels.
 	% - One panel for each balloon level state
 
-	classifierLabels = classifiersToUse(:,2);
-	classifier_inds = find(ismember(ROC.classifiers,classifiersToUse(:,1)));
-	classifiers = ROC.classifiers(classifier_inds);
-	
 	spec = get_plot_specs;
-		
-	figHeight = 422;%900; %955
-	figWidth = 340;
+	
+	figHeight = 422;
+	figWidth = 710;
 	pLength = 82.5;
-	gap = 13;
+	gap = 12;
 	
 	[hFig, hSub] = init_panels(spec, figWidth, figHeight);
-	adjust_panel_positions(hSub, pLength, gap)
-	[hXAx, hYAx] = make_ax_offset(hSub, hFig);
 	
-	levels = 2:4;
-
-	for i=1:numel(levels)
-
-		% Plot classifiers overlaid with consistent colors for each panel
-		for k=1:numel(classifiers)
-		
-			% Plot diagonal guide line
-			plot(hSub(i), [0,1], [0,1], spec.rocDiag{:},'LineWidth',0.8,'LineStyle','-','Color',[.6 .6 .6]);
-
-			lev = levels(i);
-			X = ROC.X{lev,1,classifier_inds(k)};
-			Y = ROC.Y{lev,1,classifier_inds(k)};
-			
-			hSub(i).ColorOrderIndex = k;
-			hPlt(k) = plot(hSub(i), X(:,1), Y(:,1));
-
-			if contains(classifiers{k},'norm')
-				
-				set(hPlt(k), ...
-					'LineWidth',1.5, ...
-					'Color',[0.07,0.39,0.50]);%[0 0 0]);% [0.76,0.0,0.2]);
-     			area(hSub(i), X(:,1), Y(:,1), ...
-					'FaceColor',[0.07,0.39,0.50], ...[0 0 0], ... [0.40,0.0,0.2],...
-     				'EdgeColor','none', ...
-					'FaceAlpha',0.028, ...
-					'HandleVisibility','Off')
-				nhaAUC(i,:) = ROC.AUC{lev,1,classifier_inds(k)};
-			
-			elseif contains(classifiers{k},'P_LVAD')
-				
-				set(hPlt(k), 'LineWidth',1.5, 'LineStyle','-.', 'Color',[0.857,0.50,0.13]);
-  				area(hSub(i), X(:,1), Y(:,1), 'FaceColor',[0.65,0.50,0.13],...
-					'EdgeColor','none', 'FaceAlpha',0.04, 'HandleVisibility','Off')
-				plvadAUC(i,:) = ROC.AUC{lev,1,classifier_inds(k)};
-			
-			end
-
-
-		end
-
-		
-	end
+	adjust_panel_positions(hSub(1:3), pLength, gap, 1);
+	adjust_panel_positions(hSub(4:6), pLength, gap, 2);
 	
-	add_annotations(hSub, hXAx, hYAx, classifierLabels, nhaAUC, plvadAUC, spec);
-	%	set(hSub,'Color',[.965,.965,.965],'GridColor',[1 1 1],'GridLineStyle','-','GridAlpha',1)
+	[hXAx1, hYAx1] = make_ax_offset(hSub(1:3), hFig);
+	[hXAx2, hYAx2] = make_ax_offset(hSub(4:6), hFig);
+
+	make_plots(hXAx1, hYAx1, classifiersToUse, ROC, hSub(1:3), spec);
+	make_plots(hXAx2, hYAx2, classifiersToUsePooled, ROC_Pooled, hSub(4:6), spec);
 	
+	annotation('line',[.5 .5],[0 1 ], 'LineWidth',.7, 'Color',[.15 .15 .15]);
+	text(hSub(1), -.55, 1, 'A', 'FontSize',13, 'FontName','Arial','VerticalAlignment','middle')
+	text(hSub(4), -.55, 1, 'B', 'FontSize',13, 'FontName','Arial','VerticalAlignment','middle')
+%  	text(hSub(1), 0, 1.1, {'2400 RPM'}, 'FontSize',9.5, 'FontName','Arial','FontWeight','normal','VerticalAlignment','bottom','HorizontalAlignment','center');
+%  	text(hSub(4), 0, 1.1, {'Pooled for all RPM'}, 'FontSize',9.5, 'FontName','Arial','FontWeight','normal','VerticalAlignment','bottom','HorizontalAlignment','center');
 
 function [hFig, hSub] = init_panels(spec, figWidth, figHeight)
 	
@@ -71,12 +32,13 @@ function [hFig, hSub] = init_panels(spec, figWidth, figHeight)
 		'Name','ROC curves per balloon level',...
 	    'Position',[300,300,figWidth,figHeight],...
 		'PaperUnits','centimeters',...
-		'PaperSize',[9,9*(figHeight/figWidth)+0.1]...
+		'PaperSize',[19,19*(figHeight/figWidth)]...
 		);
 	
-	hSub(1) = subplot(3,1,1, spec.subPlt{:}, 'FontSize',9, 'LineWidth',1);
-	hSub(2) = subplot(3,1,2, spec.subPlt{:}, 'FontSize',9, 'LineWidth',1);
-	hSub(3) = subplot(3,1,3, spec.subPlt{:}, 'FontSize',9, 'LineWidth',1);
+	for i=1:3
+		hSub(i) = subplot(3,2,i, spec.subPlt{:});
+		hSub(i+3) = subplot(3,2,i+3, spec.subPlt{:});
+	end
 	
 	set(hSub, spec.subPlt{:}, ...
 		'FontSize',9, ...
@@ -97,65 +59,121 @@ function [hFig, hSub] = init_panels(spec, figWidth, figHeight)
 		 );
 	linkaxes(hSub)
 
-function adjust_panel_positions(hSub, pLength, gap)
+function adjust_panel_positions(hSub, pLength, gap, colNo)
+	
+	if colNo==1, xStart = 50; end
+	if colNo==2, xStart = 40 + 285; end
 	
 	yStart = 40;
-	xStart = 36;
 	hSub(3).Position = [xStart, yStart, pLength, pLength];
 	hSub(2).Position = [xStart, yStart + gap + pLength, pLength, pLength];
 	hSub(1).Position = [xStart, yStart + 2*gap + 2*pLength, pLength, pLength];
 
-function add_annotations(hSub, hXAx, hYAx, classifierLabels,nhaAUC, plvadAUC, spec)
+function add_annotations(hSub, hPlt, hXAx, hYAx, levels, classifierLabels,nhaAUC, plvadAUC, spec)
 	
-	text(hSub(1), 1.2, 0.5, {...
-		'\bfLevel 2\rm',...
-		'50%-65% obstrution',...
-		'','AUC:'...
-		['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(1,1),nhaAUC(1,2),nhaAUC(1,3))], ...
-		['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(1,1),plvadAUC(1,2),plvadAUC(1,3))]}, ...
+	for i=1:numel(levels)
+		if all(isnan(plvadAUC))
+			aucStr = {'','AUC:'...
+				['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(i,1),nhaAUC(i,2),nhaAUC(i,3))]};
+		else
+			aucStr = {'','AUC:'...
+				['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(i,1),nhaAUC(i,2),nhaAUC(i,3))], ...
+				['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(i,1),plvadAUC(i,2),plvadAUC(i,3))]};
+		end
+	text(hSub(i), 1.2, 0.5, [{['\bflevel ',num2str(levels(i)),'\rm']}, aucStr],...
 		"FontSize", 9, "FontName",'Arial', 'VerticalAlignment','middle');
-	text(hSub(2), 1.2, 0.5, {...
-		'\bfLevel 3\rm',...
-		'65%-75% obstruction',...
-		'','AUC:'...
-		['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(2,1),nhaAUC(2,2),nhaAUC(2,3))], ...
-		['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(2,1),plvadAUC(2,2),plvadAUC(2,3))]}, ...
-		"FontSize", 9, "FontName",'Arial', 'VerticalAlignment','middle');
-	text(hSub(3), 1.2, 0.45, {...
-		'\bfLevel 4\rm',...
-		'75%-83% obstruction',...
-		'','AUC:'...
-		['    ',sprintf('%1.2f [%1.2f, %1.2f]',nhaAUC(3,1),nhaAUC(3,2),nhaAUC(3,3))], ...
-		['    ',sprintf('%1.2f [%1.2f, %1.2f]',plvadAUC(3,1),plvadAUC(3,2),plvadAUC(3,3))]}, ...
-		"FontSize", 9, "FontName",'Arial', 'VerticalAlignment','middle');
+	end
 	
-	hXLab = xlabel(hXAx, '1 - specificity', 'FontSize',10, 'FontName','Arial', 'Units', 'pixels');
-	hYLab = ylabel(hYAx(2), 'Sensitivity', 'FontSize',10, 'FontName','Arial', 'Units', 'pixels');
+	hXLab = xlabel(hXAx(end), '1 - specificity', 'FontSize',10, 'FontName','Arial', 'Units', 'pixels');
+	hYLab = ylabel(hYAx(2), 'sensitivity', 'FontSize',10, 'FontName','Arial', 'Units', 'pixels');
 	hXLab.Position(2) = hXLab.Position(2)-5;
 	hYLab.Position(1) = -29;
-	hLeg = legend(hSub(end), classifierLabels, spec.leg{:}, "FontSize", 10, 'Units','pixels');
- 	hLeg.Position(1) = 255;
+	
+	hLeg = legend(hPlt(end:-1:1), classifierLabels(end:-1:1), spec.leg{:}, ...
+		"FontSize", 9, 'Units','pixels');
+  	hLeg.Position(1) = hLeg.Position(1)+179;
 	hLeg.Position(2) = 0;
 
 function [hXAx,hYAx] = make_ax_offset(hSub, hFig)
 	
 	hYAx = copyobj(hSub, hFig);
-	hXAx = copyobj(hSub(3), hFig);
+	hXAx = copyobj(hSub(end), hFig);
 	
 	for i=1:3
 		hSub(i).XAxis.Color = 'none';
 		hSub(i).YAxis.Color = 'none';
 		set(hSub, 'XTick',.2:.2:.8, 'YTick',.2:.2:.8);
+	
 	end
 
-	set([hXAx;hYAx], 'LineWidth',1.5, 'box','off', 'Color','none', ...
+	hXAx(end).Position(2) = hXAx(end).Position(2)-5;
+	set([hXAx;hYAx], 'LineWidth',1, 'box','off', 'Color','none', ...
 		'YGrid','off', 'XGrid','off')
+	set(hXAx(end).YAxis, 'Color','none')
 	
-	hXAx.Position(2) = hXAx.Position(2)-3;
-	set(hXAx.YAxis, 'Color','none')
-
 	for i=1:numel(hYAx)
-		hYAx(i).Position(1) = hYAx(i).Position(1)-3;
+		hYAx(i).Position(1) = hYAx(i).Position(1)-4;
 		set(hYAx(i).XAxis, 'Color','none')
 	end
 
+function make_plots(hXAx, hYAx, classifiersToUse, ROC, hSub, spec)
+	
+	nhaColor = [0.76,0.0,0.2];
+	nhaShadeColor = [0.5,0.5,0.5];
+	plvadColor = [0.857,0.50,0.13];
+	
+	classifierLabels = classifiersToUse(:,2);
+	classifier_inds = find(ismember(ROC.classifiers,classifiersToUse(:,1)));
+	classifiers = ROC.classifiers(classifier_inds);
+	
+	levels = 2:4;
+	nhaAUC = nan(numel(levels),3);
+	lvadAUC = nan(numel(levels),3);
+	for i=1:numel(levels)
+		
+		% Plot classifiers overlaid with consistent colors for each panel
+		for k=1:numel(classifiers)
+			
+			% Plot diagonal guide line
+			plot(hSub(i), [0,1], [0,1], spec.rocDiag{:},'LineWidth',0.8,'LineStyle','-','Color',[.6 .6 .6]);
+			hSub(i).ColorOrderIndex = k;
+			
+			lev = levels(i);
+			X = ROC.X{lev,1,classifier_inds(k)};
+			Y = ROC.Y{lev,1,classifier_inds(k)};
+			pt = ROC.Optimal_Point{lev,1,classifier_inds(k)};
+			ptInd = find(Y>=0.8, 1, 'first');
+			hPlt(k) = plot(hSub(i), X(:,1), Y(:,1));
+			
+			if contains(classifiers{k},'norm')
+				
+				set(hPlt(k), ...
+					'LineWidth',1.5, ...
+					'Color',nhaColor);
+				area(hSub(i), X(:,1), Y(:,1), ...
+					'FaceColor',nhaShadeColor,...
+					'EdgeColor','none', ...
+					'FaceAlpha',0.04, ...
+					'HandleVisibility','Off'),
+				nhaAUC(i,:) = ROC.AUC{lev,1,classifier_inds(k)};
+				
+			elseif contains(classifiers{k},'P_LVAD')
+				
+				set(hPlt(k), 'LineWidth',1.5, 'LineStyle','-.', 'Color',plvadColor);
+				area(hSub(i), X(:,1), Y(:,1), ...
+					'FaceColor',[.5 .5 .5],...[0.857,0.50,0.13],...plvadColor,...
+					'EdgeColor','none', ...
+					'FaceAlpha',0.065, ...
+					'HandleVisibility','Off');
+				lvadAUC(i,:) = ROC.AUC{lev,1,classifier_inds(k)};
+				
+			end
+			
+			
+		end
+		
+		
+	end
+	
+	add_annotations(hSub, hPlt, hXAx, hYAx, levels, classifierLabels, nhaAUC, lvadAUC, spec);
+	%	set(hSub,'Color',[.965,.965,.965],'GridColor',[1 1 1],'GridLineStyle','-','GridAlpha',1)

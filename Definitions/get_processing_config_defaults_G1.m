@@ -80,17 +80,16 @@ function Config =  get_processing_config_defaults_G1
 	% --------------------------------------------------------------------------
 	
 	Config.code_basePath = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab';
-	Config.data_basePath = 'D:\Data\IVS\Didrik\G1 - Data';
+	Config.data_basePath = 'C:\Data\IVS\Didrik\G1 - Data';
 
 	% Output folder structure for each sequence
 	Config.powerlab_subdir = 'Recorded\PowerLab';
 	Config.ultrasound_subdir = 'Recorded\SystemM';
 	Config.notes_subdir = 'Noted';
 
-	Config.proc_subdir = 'Processed\';
-	Config.proc_plot_subdir = 'Figures';
-	Config.proc_stats_subdir = 'Processed\Statistics';
-
+	Config.proc_subdir = 'Processed\accA';
+	Config.proc_plot_subdir = 'Figures\accA';
+	
 	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Features';
 	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Statistics';
 	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1 - Figures';

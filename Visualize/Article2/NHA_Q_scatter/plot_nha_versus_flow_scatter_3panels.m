@@ -2,20 +2,23 @@ function plot_nha_versus_flow_scatter_3panels(var, F, F_rel, F_del)
 
 	if nargin<4, F_del = []; end
 
-	figHeight = 265;
+	figHeight = 241;
 	figWidth = 340;
 	pWidth = 90;
-	pHeight = 195;
+	pHeight = 180;
 	gap = 8;
 	levs = [2,3,4];
 	ptSize = 21;
 
 	spec = get_plot_specs;
+	nhaColor = [0.07,0.39,0.50];
+	nhaColor = [0.76,0.0,0.2];
+	
 	hFig = figure(...
 		'Name','Flow (actual) versus NHA elevation',...
 		'Position',[300,300,figWidth,figHeight],...
 		'PaperUnits','centimeters',...
-		'PaperSize',[9,9*(figHeight/figWidth)+0.1]...
+		'PaperSize',[9,9*(figHeight/figWidth)]...
 		);
 
 	hSub(1) = subplot(1,4,1, spec.subPlt{:}, 'FontSize',8.5, 'LineWidth',1);
@@ -24,7 +27,7 @@ function plot_nha_versus_flow_scatter_3panels(var, F, F_rel, F_del)
 
 	set(hSub, ...
 		'Units','pixels',...
-		'YLim',[-1,11], ...
+		'YLim',[-1,10.65], ...
 		'XLim',[1.15,4.15], ...
 		'XLim',[2.10,4.25], ...
 		'FontSize',9, ...
@@ -72,7 +75,7 @@ function plot_nha_versus_flow_scatter_3panels(var, F, F_rel, F_del)
 		t = table(x,y);
 		t = sortrows(t,'x');
 		scatter(hSub(i),t.x,t.y,ptSize,'filled',...
-			'MarkerFaceColor',[0.07,0.39,0.50], ...
+			'MarkerFaceColor',[0 0 0],...[0.76,0.00,0.20],...[0.07,0.39,0.50], ...
 			'MarkerFaceAlpha',0.4);
 		hold on
 		[rho,pVal] = corr(t.x, t.y, 'Type','Spearman');
@@ -82,15 +85,19 @@ function plot_nha_versus_flow_scatter_3panels(var, F, F_rel, F_del)
 
 		plot(hSub(i),t.x,t.f,'HandleVisibility','off',...
 			'LineWidth',2, ...
-			'Color',[0.07,0.39,0.50]);
+			'Color',nhaColor);%[0 0 0 ]);%[0.76,0.00,0.20]);%...[0.07,0.39,0.50]);
 		xLims = xlim(hSub(i));
-		hTxt(i) = text(hSub(i), xLims(1)+0.25, 9.5, {['\it\rho\rm = ',num2str(rho,'%2.2f')]});
-		title(hSub(i), ['Level ',num2str(levs(i))],'FontWeight','normal');
+		hTxt(i) = text(hSub(i), xLims(1)+0.25, 9.5, {['\rho\rm = ',num2str(rho,'%2.2f')]},...
+			'FontName','Arial',...
+			'FontSize',9.5);
+		hTit = title(hSub(i), ['level ',num2str(levs(i))],'FontWeight','normal','FontSize',9,'FontName','Arial');
+		hTit.Position(2) = hTit.Position(2)+0.25;
 	end
 
-	hXLab = suplabel('\itQ\rm (L min^{-1})','x');
+	hXLab = suplabel('flow rate (L min^{-1})','x');
 	hXLab.Position(2) = hXLab.Position(2)+0.01;
-
+	hXLab.FontSize = 9;
+	hXLab.FontName = 'Arial';
 	adjust_corr_text_position(F_del, hTxt);
 
 function hYAx = make_ax_offset(hSub, hFig)
@@ -102,7 +109,7 @@ function hYAx = make_ax_offset(hSub, hFig)
 
 function adjust_panel_positions(hSub, pWidth, pHeight, gap)
 	set(hSub,'Units','pixels');
-	yStart = 53;
+	yStart = 45;
 	xStart = 54;
 	hSub(1).Position = [xStart, yStart, pWidth, pHeight];
 	hSub(2).Position = [xStart + pWidth + gap, yStart, pWidth, pHeight];
@@ -110,9 +117,9 @@ function adjust_panel_positions(hSub, pWidth, pHeight, gap)
 
 function adjust_corr_text_position(F_del, hTxt)
 	if isempty(F_del)
-  		hTxt(1).Position = [2.1,1.8,0];
-   		hTxt(2).Position = [1.7,3.1,0];
-   		hTxt(3).Position = [1.15,4.9,0];
+  		hTxt(1).Position = [2.1,1.85,0];
+   		hTxt(2).Position = [1.7,3.15,0];
+   		hTxt(3).Position = [1.15,4.95,0];
 	else
  		hTxt(1).Position = [2.316054421768706,1.642972600853641,0];
  		hTxt(2).Position = [2.086,2.94,0];

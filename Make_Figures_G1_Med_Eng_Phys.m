@@ -6,26 +6,6 @@ Make_Part_Plot_Data
 
 h_fig = make_diameter_map(F, Config);
 
-%% Bar chart - Relative
-
-vars = {
-	'Q_mean',                     '\itQ'
-	'P_LVAD_mean',                '\itP\rm_{LVAD}'
-	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
-	};
-cats = {
-     'Clamp, 2400, 25%', '1'
-     'Clamp, 2400, 50%', '2'
-     'Clamp, 2400, 75%', '3'
-     'Balloon, 2400, Lev1', '40%' 
-     'Balloon, 2400, Lev2', '55%'
-     'Balloon, 2400, Lev3', '70%'
-     'Balloon, 2400, Lev4', '80%' 
-     'Balloon, 2400, Lev5', '90%' 
-     };
-
-make_baseline_deviation_bar_chart_figure(G_rel, 'median', vars, cats);
-
 %% Spectrograms and curves - Continious - Relative - 2 panel rows
  
 %Make_Part_Plot_Data_G1
@@ -53,6 +33,7 @@ T2 = Data.G1.(seq).Plot_Data.T{i};
 cutInd = find(T2.noteRow==68,1,'first');
 T2(cutInd:end,:) = [];
 
+close all
 make_part_figure_2panels_with_nha(T1, T2, map1, map2, Notes, var, partSpec(i,:), Config.fs, yLims1, yLims2, yTicks2, widthFactor);
 
 
@@ -78,5 +59,8 @@ classifiersToUse = {
 	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
 	'P_LVAD_change',              '\itP\rm_{LVAD}'
 	};
-
-plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
+classifiersToUseForPooled = {
+	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
+	};
+plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, ...
+	Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiersToUse, classifiersToUseForPooled);

@@ -98,7 +98,6 @@ cats = {
 close all
 make_baseline_deviation_bar_chart_figure(G_rel, 'median', vars, cats);
 
-
 %% Spectrograms and curves - Continious - Relative - 2 panel rows
  
 var = 'accA_y_NF_HP';
@@ -271,7 +270,7 @@ plot_nha_power_and_flow(F_rel, G_rel_med, [], var, yLims3);
 %% NHA, Q and P - 3X5 panels
 
 var = 'accA_xyz_NF_HP_b1_pow_norm';
-var = 'accA_xyz_NF_HP_b2_pow_norm';
+%var = 'accA_xyz_NF_HP_b2_pow_norm';
 yLims = {
 	[-0.85 0.3]
 	[-0.85 0.3]+0.25
@@ -285,48 +284,23 @@ plot_nha_power_and_flow_3x5panels(F_rel, G_rel.med, [], var, yLims);
 %% ROC curves for each specific obstruction level states
 % [no of levels]x1 panels
 
+close all
 classifiersToUse = {
 	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
 %	'accA_xyz_NF_HP_b2_pow_norm', 'NHA)'
-	'P_LVAD_change',              '\itP\rm_{LVAD}'
-%	'P_LVAD_mean',              '\itP\rm_{LVAD}';
+%	'P_LVAD_change',              '\itP\rm_{LVAD}'
+	'P_LVAD_mean',              '\itP\rm_{LVAD}';
 	};
-
-%close all
-plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
-
-%
-
-%% ROC curves for each specific obstruction level states
-% [no of levels]x1 panels
-
-classifiersToUse = {
-	'accA_xyz_NF_HP_b2_pow_norm', 'NHA)'
-	'P_LVAD_change',              '\itP\rm_{LVAD}'
+classifiersToUseForPooled = {
+	'accA_xyz_NF_HP_b1_pow_norm', 'NHA'
 	};
-
-close all
-plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, classifiersToUse);
-
+plot_roc_per_balloon_level(Data.G1.Feature_Statistics.ROC, ...
+	Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiersToUse, classifiersToUseForPooled);
 
 
-%% ROC curves, pooled for obstruction levels/pooled for RPM
-
-classifiersToUse = {
-	'accA_xyz_NF_HP_b1_pow_norm', 'norm(NHA_{x,y,z})'
-	%'accA_best_NF_HP_b1_pow_per_speed', 'NHA_{best, per speed}'
-	%'accA_best_NF_HP_b2_pow', 'NHA_{best, per interv.}';
-	%'accA_x_NF_HP_b2_pow', 'NHA_{\itx}';
-	%'accA_y_NF_HP_b2_pow', 'NHA_{\ity}';
-	%'accA_z_NF_HP_b2_pow', 'NHA_{\itz}';
-	'P_LVAD_change',   '\itP\rm_{LVAD}';
-	};
-
-close all
-legTit = 'ROC curves - Pooled balloon levels - Pooled RPM';
-h(1) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled_RPM, classifiersToUse, legTit);
-legTit = 'ROC curves - Pooled balloon levels';
-h(2) = plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled, classifiersToUse, legTit);
+%% ROC curves, alternative plot for pooled for obstruction levels/pooled for RPM
+%legTit = 'ROC curves - Pooled balloon levels';
+%plot_roc_curve_matrix_G1(Data.G1.Feature_Statistics.ROC_Pooled, classifiersToUse, legTit);
 
 %% Relative NHA versus BL flow scatter
 

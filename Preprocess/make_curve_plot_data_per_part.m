@@ -89,10 +89,13 @@ function T = add_filtered_acc_components(T, accVars, accID, compID, Config)
 	fs = Config.fs;
 
 	var = ['acc',accID,'_',compID];
+    remVars = {var};
+
 	if not(any(contains(accVars, var))), return; end
 
 	% 	% notch filter for component
 	if any(contains(accVars, [var,'_NF']))
+        remVars = {var,[var,'_NF']};
 		T = add_harmonics_filtered_variables(T, {var}, {[var,'_NF']}, NW, fs);
 	end
 
@@ -109,7 +112,6 @@ function T = add_filtered_acc_components(T, accVars, accID, compID, Config)
 	end
 
 	% remove any temporary component 
-	remVars = {var,[var,'_NF']};
 	remVars = remVars(not(ismember(remVars, accVars)));
 	T = cellfun(@(c) removevars(c, remVars), T, 'UniformOutput',false);
 
