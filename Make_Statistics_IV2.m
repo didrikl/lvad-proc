@@ -26,8 +26,18 @@ sequences = {
 % -----------------------------------------------------------
 
 discrVars = {'Q_LVAD','P_LVAD'};
-meanVars = {'p_eff','pGrad','Q','accA_x','accA_y','accA_z',...
-	'accA_norm_NF','accA_x_NF','accA_y_NF','accA_z_NF'};
+meanVars = {
+% 	'p_eff'
+% 	'pGrad'
+	'Q'
+% 	'accA_x'
+% 	'accA_y'
+% 	'accA_z'
+% 	'accA_norm_NF'
+	'accA_x_NF'
+	'accA_y_NF'
+	'accA_z_NF'
+	};
 F = make_intervention_stats(Data.IV2, sequences, discrVars, meanVars, {}, {}, idSpecs);
 F.P_LVAD_drop = -F.P_LVAD_mean;
 
@@ -35,7 +45,7 @@ F.P_LVAD_drop = -F.P_LVAD_mean;
 % -----------------------------------------------------------
 
 accVars = {...
-	'accA_x','accA_y','accA_z',...
+	...'accA_x','accA_y','accA_z',...
 	'accA_x_NF','accA_y_NF','accA_z_NF'};
 hBands =  [1.10,2.9];
 isHarmBand = true;
@@ -71,29 +81,33 @@ G_del = make_group_stats(F_del, idSpecs);
 
 % Do Wilcoxens pair test and make table of median and p-values
 pVars = {
- 	'accA_x_b1_pow'
-	'accA_y_b1_pow'
-	'accA_z_b1_pow'
-	'accA_y_NF_stdev'
+%  	'accA_x_b1_pow'
+% 	'accA_y_b1_pow'
+% 	'accA_z_b1_pow'
+% 	'accA_y_NF_stdev'
 	'accA_x_NF_b1_pow'
 	'accA_y_NF_b1_pow'
 	'accA_z_NF_b1_pow'
 	'accA_y_NF_stdev'
 	'Q_mean'
-	'P_LVAD_mean',...Q_LVAD_mean,...
-	...'pGrad_mean','pGrad_stdev','p_aff_mean','p_eff_stdev'...
+	'P_LVAD_mean'
+	'Q_LVAD_mean'
+% 	'pGrad_mean'
+%   'pGrad_stdev'
+%   'p_aff_mean'
+%   'p_eff_stdev'
 	};
 W = make_paired_features_for_signed_rank_test(F, pVars);
-[P,R] = make_paired_signed_rank_test(W, G, pVars, 'IV2');
+[P,R] = make_paired_signed_rank_test(W, G, pVars, 'IV2','pumpSpeed');
 
 
 % Calculate ROC curves and corresponding confidence intervals
 % -----------------------------------------------------------
 classifiers = {
-  	'accA_y_b1_pow'
- 	'accA_x_b1_pow'
- 	'accA_z_b1_pow'
- 	'accA_y_NF_b1_pow'
+%   'accA_y_b1_pow'
+%  	'accA_x_b1_pow'
+%  	'accA_z_b1_pow'
+  	'accA_y_NF_b1_pow'
  	'accA_x_NF_b1_pow'
  	'accA_z_NF_b1_pow'
 	'P_LVAD_mean'

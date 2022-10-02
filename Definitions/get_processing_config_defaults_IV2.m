@@ -55,7 +55,7 @@ function Config =  get_processing_config_defaults_IV2
 	% --------------------------------------------------------------------------
 	
 	Config.code_basePath = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab';
-	Config.data_basePath = 'D:\Data\IVS\Didrik\IV2 - Data';
+	Config.data_basePath = 'C:\Data\IVS\Didrik\IV2 - Data';
 
 	% Output folder structure for each sequence
 	Config.powerlab_subdir = 'Recorded\PowerLab';

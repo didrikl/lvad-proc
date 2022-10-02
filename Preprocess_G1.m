@@ -17,7 +17,7 @@ inputs = {
 
 for i=1:numel(inputs)
 
-	% Init defauls, sequence specific inputs and progress bar.
+	% Initialize
 	Config =  get_processing_config_defaults_G1;
 	eval(inputs{i});
 	init_multiwaitbar_preproc(i, numel(inputs), Config.seq);
@@ -31,10 +31,17 @@ for i=1:numel(inputs)
 	% Data fusion, derive signals, clip into segments and continous parts
 	Preprocess_Sequence_G1;
 
-	% Store in Data (memory) and to disc
-	Preprocess_Save;
-
+	% Store on disc
+	save_s_parts(S_parts, Config.proc_path, Config.seq)
+	save_s(S, Config.proc_path, Config.seq)
+	%save_rpm_order_map(rpmOrderMap, Config.proc_path, Config.seq);
+	save_notes(Notes, Config.proc_path, Config.seq)
+	save_config(Config)
+	
+	% Store in Data struct and cleanup memory
+	Data = save_in_memory_struct(Data, Config, S, S_parts, Notes);Data = save_in_memory_struct(Data, Config, S, S_parts, rpmOrderMap, Notes);
 	Preprocess_Roundup;
+
 end
 
 clear inputs i

@@ -1,6 +1,5 @@
 %Make_Part_Plot_Data_G1B
 
-
 seqDefs = {
       'G1B_Seq3'
   	 'G1B_Seq6'
