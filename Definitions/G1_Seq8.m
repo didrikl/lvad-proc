@@ -30,9 +30,7 @@ Config.labChart_fileNames = {
 	%'G1_Seq8 - F3_Sel2 [v1,v2,v3].mat'
 	};
 Config.notes_fileName = 'G1_Seq8 - Notes G1 v1.0.0 - Rev9.xlsm';
-Config.ultrasound_fileNames = {
-	'ECM_2020_11_12__11_04_40.wrf'
-	};
+Config.ultrasound_fileNames = {'ECM_2020_11_12__11_04_40.wrf'};
 
 % Correction input
 Config.US_offsets = {-1};
@@ -55,14 +53,15 @@ Config.channelExclRanges = {
 % Parts (or combined parts) for quality control and description
 Config.partSpec = {
 %   BL    parts   Label
-	[],        [2],      'RPM change'
-	[],        [3],      'Clamping'
-	[],        [5],      'Balloon'
-	[],        [6],      'Balloon'
-	[],        [7],      'Balloon'
-  	[],        [8:11],   'Thrombus [1,Sal,2,3]'
-   	[11,141],  [12:14],  'Thrombus [4,5,6]'
-   	[14,157],  [15:18],  'Thrombus [7,8,9,10]'
-   	[14,157],  [19:22],  'Fat [1,2,3,4]'
-   	[],        [23]      'Anticoagulant reversal'
+% 	[],        [2],      'RPM change'
+% 	[],        [3],      'Clamping'
+% 	[],        [5],      'Balloon'
+% 	[],        [6],      'Balloon'
+% 	[],        [7],      'Balloon'
+%    [],        [8:11],   'Injection [1,Sal,2,3]'
+%    [11,141],  [12:14],  'Injection [4,5,6]'
+%    [14,157],  [15:18],  'Injection [7,8,9,10]'
+%   [14,157],  [19:22],  'Fat [1,2,3,4]'
+    [],   [8,10:18],    'Injection [1-10]'
+%   [],        [23]      'Anticoagulant reversal'
 	};

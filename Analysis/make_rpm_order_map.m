@@ -1,5 +1,5 @@
-function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
-        maxFreq, rpm_varName, order_res, overlap_pst)
+function [map, order, rpmOut, time] = make_rpm_order_map(T, mapVarName, ...
+        maxFreq, rpmVarName, orderRes, overlapPst)
     % MAKE_RPM_ORDER_MAP
     %   Make RPM order map using Matlab's build-in RPM order plots.
     %   Detrending is applied, so that the DC component is attenuated
@@ -7,9 +7,9 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
     % See also DETREND, RPMORDERMAP
     
     if nargin<3, maxFreq=NaN; end
-    if nargin<4, rpm_varName = 'pumpSpeed'; end
-    if nargin<5, order_res = 0.02; end
-    if nargin<6, overlap_pst = 80; end
+    if nargin<4, rpmVarName = 'pumpSpeed'; end
+    if nargin<5, orderRes = 0.02; end
+    if nargin<6, overlapPst = 80; end
     
 	map = [];
 	order = [];
@@ -23,30 +23,30 @@ function [map,order,rpmOut,time] = make_rpm_order_map(T, map_varName, ...
         return; 
     end
     
-    [rpm_varName,map_varName] = check_table_cols(T,rpm_varName,map_varName);
-    T = check_missing_rpm_values(T,rpm_varName);
-    T = check_rpm_as_zero_values(T,rpm_varName,map_varName);
-    T = check_map_values(T,map_varName);
+    [rpmVarName, mapVarName] = check_table_cols(T, rpmVarName, mapVarName);
+    T = check_missing_rpm_values(T, rpmVarName);
+    T = check_rpm_as_zero_values(T, rpmVarName, mapVarName);
+    T = check_map_values(T, mapVarName);
     
     % Remove DC component
-    x = detrend(T.(map_varName));
+    x = detrend(T.(mapVarName));
     %x = T.(map_varName);
     
     if nargout==0
-        is_neg_rpm = T.(rpm_varName)<0;
-        T.(rpm_varName)(is_neg_rpm) =  1000;
-        T.(map_varName)(is_neg_rpm) =  NaN;
+        is_neg_rpm = T.(rpmVarName)<0;
+        T.(rpmVarName)(is_neg_rpm) =  1000;
+        T.(mapVarName)(is_neg_rpm) =  NaN;
         
-        rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
+        rpmordermap(x, maxFreq, T.(rpmVarName), orderRes, ...
             'Amplitude','power',...'peak',...'rms',
-            'OverlapPercent',overlap_pst,...
+            'OverlapPercent',overlapPst,...
             'Scale','dB',...
             'Window',{'chebwin',80}...
             );
     else
-        [map,order,rpmOut,time] = rpmordermap(x,maxFreq,T.(rpm_varName),order_res, ...
+        [map, order, rpmOut, time] = rpmordermap(x, maxFreq,T.(rpmVarName), orderRes, ...
             'Amplitude','power',...'peak',...'rms',
-            'OverlapPercent',overlap_pst,...
+            'OverlapPercent',overlapPst,...
             'Scale','dB',...'linear',...
             'Window',{'chebwin',80}...
             ...'Window',{'kaiser',2}...
@@ -65,11 +65,11 @@ function n_rows = check_table_height(T)
         warning('There are too few rows to make RPM order map');
     end
     
-function [maxFreq,T] = check_sampling_rate(maxFreq,T)
+function [maxFreq, T] = check_sampling_rate(maxFreq, T)
     % if maxFreq is not explicitly given, try getting it from table without any
     % user interaction
     if isnan(maxFreq)
-        [maxFreq,T] = get_sampling_rate(T,false);
+        [maxFreq, T] = get_sampling_rate(T, false);
     end
     
     % If still not determined, then try getting it by user interaction followed
@@ -78,50 +78,52 @@ function [maxFreq,T] = check_sampling_rate(maxFreq,T)
         [maxFreq,~] = get_sampling_rate(T(:,{map_varName,rpm_varName}));
     end
     
-function [rpm_varName,map_varName] = check_table_cols(T,rpm_varName,map_varName)
+function [rpmVarName, mapVarName] = check_table_cols(T, rpmVarName, mapVarName)
     
     % Check existence of variables to use
-    rpm_varName = check_table_var_input(T, rpm_varName);
-    map_varName = check_table_var_input(T, map_varName);
+    rpmVarName = check_table_var_input(T, rpmVarName);
+    mapVarName = check_table_var_input(T, mapVarName);
     
-function T = check_missing_rpm_values(T,rpm_varName)
+function T = check_missing_rpm_values(T, rpmVarName)
     
-    if iscategorical(T.(rpm_varName))
-        T.(rpm_varName) = double(string(T.(rpm_varName)));
+    if iscategorical(T.(rpmVarName))
+        T.(rpmVarName) = double(string(T.(rpmVarName)));
     end
     
-    missing = isnan(T.(rpm_varName));
+    missing = isnan(T.(rpmVarName));
     if any(missing)
+		fprintf('\n')
         warning(sprintf(['\n\tThere are %d missing/NaN values in RPM variable %s',...
-            '\n\tThese rows are removed.'],nnz(missing),rpm_varName));
+            '\n\tThese rows are removed.'],nnz(missing),rpmVarName));
         T(missing,:) = [];
     elseif all(missing)
-        error(['All values is NaN in RPM variable ',rpm_varName])
+        error(['All values is NaN in RPM variable ',rpmVarName])
     end
     
     if height(T)==0
         warning('All rows were removed.')
     end
 
-function T = check_rpm_as_zero_values(T,rpm_varName,map_varName)
-    zeroSpeed = T.(rpm_varName)==0;
+function T = check_rpm_as_zero_values(T, rpmVarName, map_varName)
+    zeroSpeed = T.(rpmVarName)==0;
     if any(zeroSpeed)
+		fprintf('\n')
         warning(sprintf(['%d rows have RPM=0 in RPM variable %s:',...
             '\n\tCorresponding map values are set to zero.',...
-            '\n\tRPM=1000 is made as dummy substitute values.'],...
-            nnz(zeroSpeed),rpm_varName));
-        T.(rpm_varName)(zeroSpeed) = 2400;
-        T.(map_varName)(zeroSpeed) = 0;
+            '\n\tRPM=2400 is made as dummy substitute values.'],...
+            nnz(zeroSpeed),rpmVarName));
+        T.(rpmVarName)(zeroSpeed) = 2400;
+        %T.(map_varName)(zeroSpeed) = 0;
     end
     
-function [T,map_varName] = check_map_values(T,map_varName)
+function [T, mapVarName] = check_map_values(T, mapVarName)
     
-    missing = isnan(T.(map_varName));
+    missing = isnan(T.(mapVarName));
     if any(missing)
         warning(sprintf(['\n\tThere are %d NaN values in map variable %s',...
-            '\n\tThese rows are removed.'],nnz(missing),map_varName));
+            '\n\tThese rows are removed.'],nnz(missing),mapVarName));
         T(missing,:) = [];
     elseif all(missing)
-        error(['All values is NaN in map variable ',map_varName])
+        error(['All values is NaN in map variable ',mapVarName])
     end
     

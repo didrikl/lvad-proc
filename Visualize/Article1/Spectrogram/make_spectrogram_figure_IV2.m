@@ -17,6 +17,7 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs, IDs1, IDs2)
 	yStart = 38;
 	
 	Colors_IV2
+	
 	spec = get_plot_specs;
 	cMap = scientificColormaps.batlowW; % colormap(scientificColormaps.lisbon)
 	cRange = [-62,-40]; % for Seq13
@@ -52,7 +53,7 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs, IDs1, IDs2)
 	hLeg = legend(hPlt,legStr,spec.leg{:},'FontSize',15);
 	hColBar = add_colorbar(hSub, spec);
 	hYLab1(1) = ylabel(hSub(1,1),{'accelerometer signal,','harmonic order'});
-	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm, order2);
+	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm);
 	hXLab = xlabel('(sec)',spec.xLab{:});
 	
 	% Adjustments
@@ -104,7 +105,7 @@ function adjust_annotation_positions(...
 function adjust_formatting(hSub, spec, hYLab1, hSubTit, hXLab, hNum)
 	format_axes(hSub,spec);
 	set(hYLab1,spec.yLab{:})
-	set(hSubTit,spec.subTit{:},'FontSize',18.5)
+	set(hSubTit,spec.subTit{:},'FontSize',13)
 	set(hXLab,spec.xLab{:})
 	set(hNum,spec.numeral{:})
 

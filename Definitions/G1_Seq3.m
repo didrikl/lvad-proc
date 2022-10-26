@@ -50,6 +50,6 @@ Config.partSpec = {
 	[],   [4],   'RPM change #2'
 	[],   [5],   'Balloon'
 	[],   [6],   'Balloon'
-	[],   [7],   'Balloon'
+	[],   [7],   'Balloon' 
 	[],   [8],   'Balloon'
 	};

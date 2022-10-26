@@ -1,4 +1,4 @@
-function Data = make_part_plot_data_in_batch_parfor(Data, seqDefs, accVar, Config)
+function Data = make_part_plot_data_per_sequence_parfor(Data, seqDefs, accVar, Config)
 
 	nSeqs = numel(seqDefs);
 	D = cell(nSeqs,1);
@@ -26,7 +26,7 @@ function Data = make_part_plot_data_in_batch_parfor(Data, seqDefs, accVar, Confi
 		%seq = get_seq_id(C{i}.seq);
 		
 		%D = Data.(seq);
-		[T, rpmOrderMap] = make_segment_plot_data(D{i}, accVar, C{i});
+		[T, rpmOrderMap] = make_segment_plot_data_parfor(D{i}, accVar, C{i});
 
 		D{i}.Plot_Data.T = T;
 		D{i}.Plot_Data.rpmOrderMap = rpmOrderMap;

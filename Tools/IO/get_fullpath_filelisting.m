@@ -1,4 +1,4 @@
-function files = get_fullpath_filelisting(pattern,take_out_filter)
+function files = get_fullpath_filelisting(pattern, take_out_filter)
     % List files with full path. A pattern for what to list (like in Unix)
     % may be given as input. If not given, all files, in all durdirectories, 
     % will be listed.

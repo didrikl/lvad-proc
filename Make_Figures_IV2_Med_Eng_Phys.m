@@ -20,7 +20,7 @@ IDs1 = {
 		'42.4'
 		};
 
-make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs, IDs1, IDs2);
+make_spectrogram_figure_IV2(S, tit, var, rpm, Config.fs, IDs1, IDs2);
 
 
 %% Figure 6 - Effects of flow reductions by clamps

@@ -5,14 +5,14 @@
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 
 inputs = {
-%   	'G1B_Seq3' % (pilot)
-%     	'G1B_Seq6'
-%     	'G1B_Seq7'
-%     	'G1B_Seq8'
-    'G1B_Seq11'
-  	'G1B_Seq12'
-    'G1B_Seq13'
-  	'G1B_Seq14'
+   	%'G1B_Seq3' % (pilot)
+	'G1B_Seq6'
+ 	%'G1B_Seq7'
+ 	%'G1B_Seq8'
+    %'G1B_Seq11'
+   	%'G1B_Seq12'
+    %'G1B_Seq13'
+  	%'G1B_Seq14'
 	};
 
 for i=1:numel(inputs)
@@ -23,7 +23,7 @@ for i=1:numel(inputs)
 	init_multiwaitbar_preproc(i, numel(inputs), Config.seq);
 	
 	% Init Data if not present in memory, otherwise update  
-	Data.G1.(get_seq_id(Config.seq)).Config = Config;
+	Data.G1B.(get_seq_id(Config.seq)).Config = Config;
 
 	% Init individual data source with adjustment input
 	Init_Data_Raw_G1;
@@ -34,12 +34,12 @@ for i=1:numel(inputs)
 	% Store on disc
 	save_s_parts(S_parts, Config.proc_path, Config.seq)
 	save_s(S, Config.proc_path, Config.seq)
-	%save_rpm_order_map(rpmOrderMap, Config.proc_path, Config.seq);
 	save_notes(Notes, Config.proc_path, Config.seq)
 	save_config(Config)
 	
 	% Store in Data struct and cleanup memory
-	Data = save_in_memory_struct(Data, Config, S, S_parts, Notes);Data = save_in_memory_struct(Data, Config, S, S_parts, rpmOrderMap, Notes);
+	Data = save_in_memory_struct(Data, Config, S, S_parts, Notes);
+	%Data = save_in_memory_struct(Data, Config, S, S_parts, rpmOrderMap, Notes);
 	Preprocess_Roundup;
 	
 end

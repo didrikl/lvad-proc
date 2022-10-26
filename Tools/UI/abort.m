@@ -1,4 +1,4 @@
-function abort(confirm,open_dlgbox)
+function abort(confirm, open_dlgbox)
   
     % TODO: Implement input parsing with input arg
     %   'confirm','confirm_msg': ask for confirmation

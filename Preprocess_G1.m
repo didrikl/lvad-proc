@@ -5,14 +5,14 @@
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 
 inputs = {
-   	'G1_Seq3' % (pilot)
+   	%'G1_Seq3' % (pilot)
    	'G1_Seq6'
-   	'G1_Seq7'
-    'G1_Seq8'
-    'G1_Seq11'
-  	'G1_Seq12'
-    'G1_Seq13'
-  	'G1_Seq14'
+%    	'G1_Seq7'
+%     'G1_Seq8'
+%     'G1_Seq11'
+%   	'G1_Seq12'
+%     'G1_Seq13'
+  	%'G1_Seq14'
 	};
 
 for i=1:numel(inputs)
@@ -34,7 +34,6 @@ for i=1:numel(inputs)
 	% Store on disc
 	save_s_parts(S_parts, Config.proc_path, Config.seq)
 	save_s(S, Config.proc_path, Config.seq)
-	%save_rpm_order_map(rpmOrderMap, Config.proc_path, Config.seq);
 	save_notes(Notes, Config.proc_path, Config.seq)
 	save_config(Config)
 	

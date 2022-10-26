@@ -5,10 +5,13 @@ function T = extract_from_data(Data, partSpec)
 	noteVars = {
 		'intervType'         
 		'event'              
-		'Q_LVAD'             
+		'Q_LVAD'
+		'QRedTarget_pst'
 		'P_LVAD'             
 		'pumpSpeed'
 		'balLev'
+		'embVol'
+		'embType'
 		};
 	Notes = Data.Notes;
 	partNo = partSpec{2};

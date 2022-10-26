@@ -54,9 +54,7 @@ Config.labChart_fileNames = {
     
     }; 
 Config.notes_fileName = 'G1_Seq11 - Notes G1 v1.0.0 - Rev7.xlsm';
-Config.ultrasound_fileNames = {
-    'ECM_2020_12_10__11_07_03.wrf'
-};
+Config.ultrasound_fileNames = {'ECM_2020_12_10__11_07_03.wrf'};
 
 % Correction input
 Config.US_offsets = {};
@@ -71,12 +69,13 @@ Config.PL_offset_files = {};
 % Parts (or combined parts) for quality control and description
 Config.partSpec = {
 %   BL    parts   Label
-	[],       [2],           'RPM change'
-	[],       [3],           'Clamping'
-	[],       [5],           'Balloon'
-	[],       [6],           'Balloon'
-	[],       [7],           'Balloon'
- 	[],       [8,9,10,11],   'Thrombus [Sal,1,2,3]'
- 	[11,151], [12,12,14],    'Thrombus [4,5,6]'
- 	[14,178], [15,16,17,18], 'Thrombus [7,8,9,10]'
+% 	[],       [2],           'RPM change'
+% 	[],       [3],           'Clamping'
+% 	[],       [5],           'Balloon'
+% 	[],       [6],           'Balloon'
+% 	[],       [7],           'Balloon'
+%  	[],       [8,9,10,11],   'Injection [Sal,1,2,3]'
+%  	[11,151], [12,12,14],    'Injection [4,5,6]'
+%  	[14,178], [15,16,17,18], 'Injection [7,8,9,10]'
+    [],  [9:18],    'Injection [1-10]'
 	};

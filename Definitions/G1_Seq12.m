@@ -35,9 +35,7 @@ Config.labChart_fileNames = {
     %'G1_Seq12 - F5 [I1,I2,I3].mat'
     };
 Config.notes_fileName = 'G1_Seq12 - Notes G1 v1.0.0 - Rev9.xlsm';
-Config.ultrasound_fileNames = {
-    'ECM_2021_01_07__12_08_22.wrf'
-    };
+Config.ultrasound_fileNames = {'ECM_2021_01_07__12_08_22.wrf'};
 
 % Correction input
 Config.US_offsets = {};
@@ -56,15 +54,16 @@ Config.channelExclRanges = {
 % Parts (or combined parts) for quality control and description
 Config.partSpec = {
 %   BL    parts   Label
-	[],       [2],           'RPM change, CO below 50%'
-	[],       [3],           'Clamping, CO below 50%'
-	[],       [5],           'Balloon, aborted'
-	[],       [7],           'Balloon'
-	[],       [8],           'Balloon'
-	[],       [9],           'Balloon'
-	[],       [10],          'RPM change'
-	[],       [11],          'Clamping'
- 	[],       [12,13,14,15], 'Thrombus [Sal,1,2,3]'
- 	[15,140], [16,17,18],    'Thrombus [4,5,6]'
- 	[18,159], [19,20,21,22], 'Thrombus [7,8,9,10]'
+% 	[],       [2],           'RPM change, CO below 50%'
+% 	[],       [3],           'Clamping, CO below 50%'
+% 	[],       [5],           'Balloon, aborted'
+% 	[],       [7],           'Balloon'
+% 	[],       [8],           'Balloon'
+% 	[],       [9],           'Balloon'
+% 	[],       [10],          'RPM change'
+% 	[],       [11],          'Clamping'
+%   	[],       [12,13,14,15], 'Injection [Sal,1,2,3]'
+%   	[15,140], [16,17,18],    'Injection [4,5,6]'
+%   	[18,159], [19,20,21,22], 'Injection [7,8,9,10]'
+  	[], 13:22,         'Injection [1-10]'
 	};

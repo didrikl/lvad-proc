@@ -1,6 +1,6 @@
 Config =  get_processing_config_defaults_G1;
 cd 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Visualize\Article2'
-Make_Part_Plot_Data
+Make_Part_Plot_Data_G1
 
 %% Diameter map
 

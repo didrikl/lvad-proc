@@ -1,4 +1,4 @@
-function Data = load_processed_sequences(seqNames, seqFilePaths)
+function Data = load_processed_sequences(seqNames, seqFilePaths, whatToLoad)
 
 	welcome('Loading processed data files')
 	Data = struct;
@@ -6,11 +6,14 @@ function Data = load_processed_sequences(seqNames, seqFilePaths)
 	seqFilePaths = cellstr(seqFilePaths);
 
 	init_multiwaitbar_saved_preproc
-	Data = load_data(Data,'S',seqFilePaths,seqNames);
-	Data = load_data(Data,'S_parts',seqFilePaths,seqNames);
-	Data = load_data(Data,'Notes',seqFilePaths,seqNames);
-	Data = load_data(Data,'Config',seqFilePaths,seqNames);
-	Data = load_data(Data,'RPM_order_maps',seqFilePaths,seqNames);
+
+	if nargin<3
+		whatToLoad = {'S','S_parts','Notes','Config','RPM_order_maps'};
+	end
+
+	for i=1:numel(whatToLoad)
+		Data = load_data(Data, whatToLoad{i}, seqFilePaths, seqNames);
+	end
 	
 	multiWaitbar('CloseAll');
 
@@ -19,6 +22,7 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 	seqFilePaths = seqFilePaths+"_"+dataType+".mat";
 	nSeqs = numel(seqNames);
 
+	allErr = "";
 	for i=1:nSeqs
 	
 		seq = get_seq_id(seqNames{i});
@@ -31,6 +35,7 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 		catch err
 			warning('File not loaded')
 			disp(err)
+			allErr = [allErr;erase(err.message,"Unable to find file or directory ")];
 			continue
 		end
 		
@@ -38,3 +43,9 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 		if cancel, break, end
 
 	end
+
+	if length(allErr)>1
+		msgbox(["Unable to find files or directories";...
+			"--------------------------------------------";allErr])
+	end
+

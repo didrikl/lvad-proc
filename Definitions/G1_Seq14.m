@@ -9,7 +9,7 @@ Config.seq_subdir = 'Seq14 - LVAD9';
 % Which files to input from input directory
 Config.labChart_fileNames = {
 	'G1_Seq14 - F1 [accA].mat'
-	%'G1_Seq14 - F1 [accB].mat'
+	%G1_Seq14 - F1 [accB].mat'
 	'G1_Seq14 - F1 [pGraft,ECG,pLV].mat'
 	%'G1_Seq14 - F1 [V1,V2,V3].mat'
 	%'G1_Seq14 - F1 [I1,I2,I3].mat'

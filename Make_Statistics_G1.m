@@ -1,4 +1,5 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
+% -------------------------------------------------------------------------
 
 % This defines the relevant ids for analysis
 Config =  get_processing_config_defaults_G1;
@@ -25,7 +26,7 @@ Data.G1.Features.idSpecs = idSpecs;
 Data.G1.Features.sequences = sequences;
 
 %% Make variable features of each intervention
-% -----------------------------------------------------------
+% ---------------------------------------------
 
 discrVars = {
 	'Q_LVAD'
@@ -48,9 +49,6 @@ discrVars = {
     };
 meanVars = {
 	%'accA_x_NF_HP'    % to get stddev
-	%'accA_y_NF_HP'    % to get stddev
-	%'accA_z_NF_HP'    % to get stddev
-	%'accA_norm_NF_HP' % to get stddev
 	'pGraft'
 	'pMillar'
 	'Q'
@@ -65,7 +63,7 @@ accVars = {
 	'accA_x_NF_HP'
 	'accA_y_NF_HP'
 	'accA_z_NF_HP'
-	%'accA_norm_NF_HP'
+	'accA_norm_NF_HP'
 	};
 hBands = [
 	1.25, 3.85
@@ -90,12 +88,13 @@ F.Q_CO_pst = 100*(F.Q_mean./F.CO_mean);
 F.accA_xyz_NF_HP_b1_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b1_pow','accA_y_NF_HP_b1_pow','accA_z_NF_HP_b1_pow'}}.^2,2,"omitnan"));
 F.accA_xyz_NF_HP_b2_pow_norm = sqrt( sum( F{:,{'accA_x_NF_HP_b2_pow','accA_y_NF_HP_b2_pow','accA_z_NF_HP_b2_pow'}}.^2,2,"omitnan"));
 
-% Make exclusions before stastitical processing
-% ----------------------------------------------
+%% Make exclusions before stastitical processing
+% -----------------------------------------------
 
 % Exclude PLVAD from experiment with friction
 F.P_LVAD_mean(contains(F.id,'Seq14_Bal')) = nan;
 
+% Exclude all measurements from experiment with friction
 % F2 = F;
 % F(contains(F.id,'Seq14_Bal'),:) = [];
 % F = F2;
@@ -115,18 +114,17 @@ F(ismember(F.id,"Seq6_RPM_2400_Nom_Rep2"),:) = [];
 F(ismember(F.id,"Seq6_RPM_2600_Nom_Rep2"),:) = [];
 
 
-% Make relative and delta differences from baselines using id tags
-% -----------------------------------------------------------
+%% Make relative and delta differences from baselines using id tags
+% ------------------------------------------------------------------
 
 nominalAsBaseline = false;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
-
 F.P_LVAD_change = -F_del.P_LVAD_mean;
 
 
-% Model statistics
-% -----------------------------------------------------------
+%% Model statistics
+% ------------------
 
 weight = nan(numel(sequences),1);
 for i=1:numel(sequences)
@@ -153,10 +151,9 @@ Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
 Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
 
 
-% Hypothesis test
-% -----------------------------------------------------------
+%% Hypothesis test
+% -----------------
 
-% Do Wilcoxens pair test and make table of median and p-values
 pVars = {
 % 	'accA_x_NF_HP_b1_pow'
 % 	'accA_y_NF_HP_b1_pow'
@@ -174,16 +171,17 @@ pVars = {
 
 W = make_paired_features_for_signed_rank_test(F, pVars,{'seq'});
 W_rel = make_paired_features_for_signed_rank_test(F_rel, pVars,{'seq'});
+
+% Wilcoxens pair test and make table of median and p-values
+[P,R] = make_paired_signed_rank_test_G1(W, G, pVars);
+[P_rel, R_rel] = make_paired_signed_rank_test_G1(W_rel, G_rel, pVars);
+
+Results = compile_results_table(R, R_rel);
+
 Data.G1.Features.Paired_Absolute = W;
 Data.G1.Features.Paired_Relative = W_rel;
-
-[P,R] = make_paired_signed_rank_test_G1(W, G, pVars);
-[P_rel,R_rel] = make_paired_signed_rank_test_G1(W_rel, G_rel, pVars);
 Data.G1.Feature_Statistics.Test_P_Values_Absolute = P;
 Data.G1.Feature_Statistics.Test_P_Values_Relative = P_rel;
-
-% Compile results table
-Results = compile_results_table(R, R_rel);
 Data.G1.Feature_Statistics.Results = Results;
 
 
@@ -196,9 +194,6 @@ classifiers = {
 %	'accA_best_NF_HP_b1_pow'
 % 	'accA_best_NF_HP_b1_pow_per_speed'
  	'accA_xyz_NF_HP_b2_pow_norm'
-%	'accA_xyz_NF_HP_b1_pow_sum'
-%	'accA_best_NF_HP_b1_pow'
-% 	'accA_best_NF_HP_b1_pow_per_speed'
 	'P_LVAD_change'
 	'P_LVAD_mean'
 	};
@@ -225,7 +220,9 @@ predStates = {
 Data.G1.Feature_Statistics.ROC = ROC;
 Data.G1.Feature_Statistics.AUC = AUC;
 
+
 %% Calculate ROC curves for pooled RPM of both BL and balloon interventions
+% --------------------------------------------------------------------------
 
 classifiers = {
 	'accA_xyz_NF_HP_b1_pow_norm'
@@ -245,7 +242,9 @@ predStates = {
 Data.G1.Feature_Statistics.ROC_Pooled_RPM = ROC_pooled_rpm;
 Data.G1.Feature_Statistics.AUC_Pooled_RPM = AUC_pooled_rpm;
 
+
 %% Calculate ROC curves for pooled RPM of BL
+% -------------------------------------------
 
 classifiers = {
 	'accA_xyz_NF_HP_b1_pow_norm'
@@ -268,15 +267,13 @@ Data.G1.Feature_Statistics.AUC_Pooled_BL_RPM = AUC_pooled_bl_rpm;
 
 
 %% Calculate pooled levels ROC curves
-% ------------------------------
+% ------------------------------------
 
-% Input for states of pooled occlusions above a threshold
 predStateVar = 'balLev';
 F.balLev = double(string(F.balLev));
 predStates = {
 	1, ' Lev 1-5' % all levels
 	%2, ' Lev 2-5' % minimum level 2
-	%3, ' Lev 3-5' % minimum level 3
 	[2,3,4], 'Lev 2-4' % level 2, 3 and 4 specifically
 	};
 [ROC_pooled_levs,AUC_pooled_levs] = make_roc_curve_matrix_per_intervention_and_speed(...
@@ -285,11 +282,9 @@ Data.G1.Feature_Statistics.ROC_Pooled_Levels = ROC_pooled_levs;
 Data.G1.Feature_Statistics.AUC_Pooled_Levels = AUC_pooled_levs;
 
 
-
 %% Save 
-% -----------------------------------------------------------
+% ------
 
-%save_data('Periodograms', feats_path, Data.G1.Periodograms, {'matlab'});
 save_data('Features', Config.feats_path, Data.G1.Features, {'matlab'});
 save_data('Feature_Statistics', Config.stats_path, Data.G1.Feature_Statistics, {'matlab'});
 save_features_as_separate_spreadsheets(Data.G1.Features, Config.feats_path);
@@ -301,8 +296,6 @@ save_statistics_as_separate_spreadsheets(Data.G1.Feature_Statistics, Config.stat
 
 multiWaitbar('CloseAll');
 clear save_data check_table_var_input
-%clear F G F_rel G_rel F_del G_del 
-%clear Pxx idSpecs sequences
 clear discrVars meanVars minMaxVars accVars hBands  pVars nominalAsBaseline ...
     bestAxVars levOrder pooled classifiers predStateVar predStates ROC AUC ...
 	isHarmBand W W_rel relVars newVar vars ans

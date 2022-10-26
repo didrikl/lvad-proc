@@ -17,8 +17,10 @@ close all;
 % Clear function so that persistent variables defined within these are cleared
 clear functions global
 if numel(who)>1
-    answer = questdlg('Clear all (workspace variables and more)?','Yes','No');
-    if strcmp(answer,'Yes'), clear variables; end
+	switch questdlg('Clear all (workspace variables and more)?','Yes','No')
+		case 'Yes', clear variables
+		case 'Cancel', abort
+	end
 end
 
 multiWaitbar('CloseAll');

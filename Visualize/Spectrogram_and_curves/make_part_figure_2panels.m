@@ -1,19 +1,23 @@
-function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, Config, mapScale)
+function hFig = make_part_figure_2panels(T, Notes, map, var, Config, partSpec)
 
-	if nargin<8, mapScale = Config.rpmOrderMapScale; end
+	mapScale = Config.rpmOrderMapScale;
 	fs = Config.fs;
 	colorMapName = Config.rpmOrderMapColorMapName;
-	
+	seqID = [Config.experimentID,'_',Config.seq];
+				
 	spec = get_plot_specs;
 	Colors_IV2
 	colorMap = scientificColormaps.(colorMapName);
-	shadeColor = [.9 .9 .9];
-	echoShadeColor = [.9 .9 .9];
+	shadeColor = [.76 .76 .76];
+	echoShadeColor = [.87 .87 .87];
+	washoutColor = [0 0 0];
+	injectionColor = [0 0 0];
 
 	figWidth = 1300;
-	figHeight =  800;
+	figHeight =  822;
+	pWidthMax = 1000;
 	yLims = [-100,55];
-	yLim_map = [0.75, 5.95];
+	yLim_map = [0.75, 5.75];
 	noteVarsNeeded = {
 		'part'               
 		'intervType'         
@@ -27,6 +31,8 @@ function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, Co
 		'balLev'         
 		'pumpSpeed'          
 		'QRedTarget_pst'
+		'embVol'
+		'embType'
 		};
 	T = join_notes(T, Notes, noteVarsNeeded);
 	T.dur = linspace(0,1/fs*height(T),height(T))';
@@ -34,22 +40,18 @@ function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, Co
 	t = map.time;
 	order = map.order;
 	map = map.([var,'_map']);
-
-	segs = get_segment_info(T, 'dur');
- 	
+	segs = get_segment_info(T, 'dur'); 	
 	rpms = unique(T.pumpSpeed(segs.all.startInd),'stable');
+	
 	tit = make_figure_title(rpms, seqID, partSpec, var, mapScale, colorMapName);
-	hFig = figure(spec.fig{:},...
-		'Name',tit,...
-		'Position',[250,150,figWidth,figHeight]);
-	hSub(1) = subplot(2,1,1,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);
-	hSub(2) = subplot(2,1,2,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);
-	
-	hPlt = plot_curves(hSub(2), T, var, yLims);
-	add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.18, [1.05*yLims(1) 60])
-	add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.4, [1.05*yLims(1) 60])
-	
+	[hFig, hSub] = init_panels(spec, tit, figWidth, figHeight);
 	plot_rpm_order_map(hSub(1), mapScale, colorMap, t, order, map, yLim_map);
+	hPlt = plot_curves(hSub(2), T, var, yLims);
+	add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.20, [1.0*yLims(1) 63])
+	add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.30, [1.0*yLims(1) 63])
+	add_shades(hSub(2), segs, segs.all.isWashout, washoutColor, 0.25, [59 63])
+	add_shades(hSub(2), segs, segs.all.isTransitional & segs.all.isInjection, injectionColor, 0.25, [59 63])
+	
 	add_linked_map_hz_yyaxis(hSub(1), '', rpms);
  	
 	make_xticks_and_time_str(hSub, segs);
@@ -62,15 +64,15 @@ function hFig = make_part_figure_2panels(T, Notes, map, var, seqID, partSpec, Co
 	add_seg_info_box(hFig, tit);
 	
 	linkaxes(hSub,'x')
-	set(hSub,'TickDir','out','TickLength',[.006 .006])
+	set(hSub,'TickDir','both','TickLength',[.0025 .0025])
 	adjust_yticks(hSub);
-	adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol);
-
+	adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol, pWidthMax);
+		
 function plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
 	
 	imagesc(hAx, t, order, map);
 
-	colormap(hAx, colMap)
+	colormap(hAx, colMap);
 	caxis(hAx, colRange);
 
 	set(hAx,'ydir','normal');
@@ -78,7 +80,7 @@ function plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
 	hAx.YLim = yLim;
 	xlim(hAx, t([1,end]))
 
-function h = plot_curves(hAx, T, accVar, yLims, Colors)
+function h = plot_curves(hAx, T, accVar, yLims)
 	
 	stdColor = [0.76,0.0,0.15];
 	flowColor = [0.03,0.26,0.34];%Colors.Fig.Cats.Speeds4(1,:);
@@ -121,13 +123,13 @@ function [hLeg, hCol] = add_legend_and_colorbar(hSub, hPlt, T, accVar)
 		'Box','off');
 	hCol.Label.String = '(dB)';
 	
-function adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol)
-	pWidth = min(1000*T.dur(end)/(30*60),1000);
+function adjust_positions(T, hSub, hYLab, hYyTxt, hLeg, hCol,pWidthMax)
+	pWidth = min(1000*T.dur(end)/(30*60), pWidthMax);
 	pStartX = 125;
 	pStartY = 49;
-	gap = 21;
+	gap = 22;
 	set(hSub,'Units','pixels');
-	hSub(1).Position(4) = 330;
+	hSub(1).Position(4) = 350;
 	hSub(2).Position(4) = 400;
 	hSub(1).Position(3) = pWidth;
 	hSub(2).Position(3) = pWidth;
@@ -195,8 +197,7 @@ function add_segment_annotation(hAx, segs, whichSegs, labStr, labRot, color)
 			x = segs.all.startDur(whichSegs(i));
 			y = yLims(2)*0.985;
 		else	
-			x = segs.main.MidDur(...
-				find(segs.main.StartDur==durs(i),1,'first'));
+			x = segs.main.MidDur(find(segs.main.StartDur==durs(i),1,'first'));
 			y = yLims(2)*0.985;
 		end
 		if not(isempty(x))
@@ -251,14 +252,27 @@ function add_steady_state_annotations(hSub, segs)
 	end
 	
 	% clamp levels
-	try
-		levs = unique(segs.all.QRedTarget_pst);
-		for i=1:numel(levs)
-			whichSegs = segs.all.QRedTarget_pst==levs(i) & segs.all.isSteadyState & segs.all.isClamp;
-			lab = "\bf"+string(levs(i))+"%";
-			add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
-		end
-	catch
+	levs = unique(segs.all.QRedTarget_pst);
+	for i=1:numel(levs)
+		whichSegs = segs.all.QRedTarget_pst==levs(i) & segs.all.isSteadyState & segs.all.isClamp;
+		lab = "\bf"+string(levs(i))+"%";
+		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+	end
+	
+	% injections
+	embVols = unique(segs.all.embVol);
+	embVols = embVols(not(ismember(embVols,'-')));
+	for i=1:numel(embVols)
+		whichSegs = segs.all.embVol==embVols(i) & segs.all.isSteadyState;
+		lab = "\bf"+string(embVols(i))+" ml";
+		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
+	end
+	embType = unique(segs.all.embType);
+	embType = embType(not(ismember(embType,'-')));
+	for i=1:numel(embType)
+		whichSegs = segs.all.embType==embType(i) & segs.all.isSteadyState;
+		lab = "\newline"+lower(string(embType(i)));
+		add_segment_annotation(hSub(2), segs, whichSegs, lab, 0)
 	end
 
 	add_segment_annotation(hSub(2), segs, segs.all.isEcho, 'echo', 0)
@@ -269,7 +283,7 @@ function add_transition_annotations(hSub, T, segs)
 		if ismember(events(i),'-'), continue; end
 		isEvent = ismember(T.event(segs.all.startInd),events(i));
 		isEvent = isEvent & not(segs.all.isEcho);
-		add_segment_annotation(hSub(2), segs, isEvent, lower(string(events(i))), 90, [.5 .5 .5])
+		add_segment_annotation(hSub(2), segs, isEvent, lower(string(events(i))), 90, [.15 .15 .15])
 	end
 
 function hYyTxt = add_text_as_yylabel(hSub)
@@ -282,8 +296,15 @@ function adjust_yticks(hSub)
 
 function hSub = add_xlines_and_grid(hSub, segs)
 	%xline(hSub(1), segs.main.EndDur(1:end-1), 'Alpha',0.7, 'LineWidth',.6, 'LineStyle','--','Color',[1 1 1]);
-	xline(hSub(2), segs.main.EndDur(1:end-1), 'Alpha',1.0, 'LineWidth',.75, 'LineStyle','--','Color',[1 1 1]);
+	%xline(hSub(2), segs.main.EndDur(1:end-1), 'Alpha',1.0, 'LineWidth',.75, 'LineStyle','--','Color',[1 1 1]);
 	
 	hSub(2).YGrid = 'on';
 	hSub(2).GridLineStyle = '-';
 	hSub(2).GridAlpha = .1;
+
+function [hFig, hSub] = init_panels(spec, tit, figWidth, figHeight)
+	hFig = figure(spec.fig{:},...
+		'Name',tit,...
+		'Position',[250,150,figWidth,figHeight]);
+	hSub(1) = subplot(2,1,1,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);
+	hSub(2) = subplot(2,1,2,spec.subPlt{:},'FontSize',11,'LineWidth',0.74);

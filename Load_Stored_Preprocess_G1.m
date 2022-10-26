@@ -13,9 +13,11 @@ sequences = {
    	'G1_Seq14','Seq14 - LVAD9\Processed'
  	};
 
+whatToLoad = {'S','S_parts','Notes','Config'};
+
 % TODO: Make support for appending sequences
 Data.G1 = load_processed_sequences(sequences(:,1),...
-    fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)));
+    fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)), whatToLoad);
 
 [Data.G1, F, F_rel, F_del] = load_processed_features(Config, Data.G1);
 Data.G1 = load_processed_statistics(Config, Data.G1);

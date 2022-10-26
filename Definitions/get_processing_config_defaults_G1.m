@@ -4,8 +4,9 @@ function Config =  get_processing_config_defaults_G1
 	% Experiment info
 	% --------------------------------------------------------------------------
 	
-	Config.experimentType = 'In vivo, porcine model 1';
+	Config.experimentType = 'Porcine model G1B';
 	Config.experimentID = 'G1';
+	Config.seq = '';
 
 
 	% Signal processing settings
@@ -22,12 +23,12 @@ function Config =  get_processing_config_defaults_G1
 	% For RPM order map
 	Config.rpmOrderMapRes = 0.011;
 	Config.rpmOrderMapOverlapPst = 80;
-	Config.rpmOrdersToTrack = [1 2 3 4 5];
+	Config.rpmOrdersToTrack = [2.95, 3, 3.05];
 	
 	% For RPM order map visualization
 	Config.rpmOrderMapScale = [-65, -36];
 	Config.rpmOrderMapColorMapName = 'batlowW';
-
+	Config.h3YLims = [-5,35];
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
@@ -68,6 +69,9 @@ function Config =  get_processing_config_defaults_G1
 	
 	Config.US_offsets = {}; % negative number: shift graph towards right
 	Config.US_drifts = {};
+	Config.PL_offset = [];
+	Config.PL_offset_files = {};
+	
 	Config.accChannelToSwap = {};
 	Config.blocksForAccChannelSwap = [];
 	Config.pChannelToSwap = {};
@@ -87,10 +91,11 @@ function Config =  get_processing_config_defaults_G1
 	Config.ultrasound_subdir = 'Recorded\SystemM';
 	Config.notes_subdir = 'Noted';
 
-	Config.proc_subdir = 'Processed\accA';
-	Config.proc_plot_subdir = 'Figures\accA';
+	Config.proc_subdir = 'Processed\';
+	Config.proc_plot_subdir = 'Figures\G1';
 	
 	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Features';
 	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Statistics';
 	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1 - Figures';
+	
 	Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';

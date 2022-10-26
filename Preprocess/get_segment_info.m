@@ -16,6 +16,7 @@ function segs = get_segment_info(T, durVar)
 	
 	segs.all.isTransitional = ismember(T.intervType(segs.all.startInd),'Transitional');
 	segs.all.isEcho = contains(lower(string(T.event(segs.all.startInd))),'echo');
+	segs.all.isWashout = ismember(lower(string(T.event(segs.all.startInd))),'washout');
 	segs.all.isSteadyState = ismember(T.intervType(segs.all.startInd),'Steady-state') & not(segs.all.isEcho);
 	segs.all.isBaseline = ismember(T.intervType(segs.all.startInd),'Baseline') & not(segs.all.isEcho);
 	
@@ -30,18 +31,35 @@ function segs = get_segment_info(T, durVar)
 		%segs.all.arealObstr_xRay_pst = T.arealObstr_pst(segs.all.startInd);
 	end
 	try
+
 		segs.all.QRedTarget_pst = T.QRedTarget_pst(segs.all.startInd);
 		segs.all.isClamp = double(string(T.QRedTarget_pst(segs.all.startInd)))>0;
 		segs.all.isBalloon = double(string(T.balLev(segs.all.startInd)))>0;
 		segs.all.isNominal = segs.all.isSteadyState & not(segs.all.isClamp) & not(segs.all.isBalloon);
-	catch
-	end
+		segs.all.isInjection = double(string(T.embVol(segs.all.startInd)))>0;
+		
+		% Handle injection info: QRedTarget was used to decide is echo should be
+		% done, but should for plotting/analysis be 0
+		injInd = find(segs.all.isInjection);
+		injIndp1 = injInd+1;
+		injIndp1 = injIndp1(injIndp1<=numel(segs.all.isInjection));
+		segs.all.QRedTarget_pst(segs.all.isInjection) = '-';
+		segs.all.QRedTarget_pst(injIndp1) = '-';
+		segs.all.isClamp(segs.all.isInjection) = false;
+		segs.all.isClamp(injIndp1) = false;
+		segs.all.embVol = T.embVol(segs.all.startInd);
+		segs.all.embType = T.embType(segs.all.startInd);
+		
+ 	catch err
+ 		disp(err)
+ 	end
 
 	% Find boundaries in cases of several Notes were made under same segment
 	segs.all.isIntraSeg = ...
 		[false;diff(segs.all.isTransitional)==0] & ...
 		([false;diff(double(segs.all.event))==0] & not(segs.all.event~='-')) & ...
-		[false;diff(segs.all.isEcho)==0];
+		[false;diff(segs.all.isEcho)==0] | ...
+		([false;diff(segs.all.isWashout)==0] & segs.all.isWashout);
 	mainSegRows = unique([1;find(not(segs.all.isIntraSeg))]);%;numel(not(segs.all.isIntraSeg))]);
 	segs.main = segs.all(mainSegRows,:);
  	segs.main.StartInd = segs.all.startInd(mainSegRows);

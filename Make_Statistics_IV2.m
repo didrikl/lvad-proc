@@ -1,4 +1,5 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
+% -------------------------------------------------------------------------
 
 % This defines the relevant ids for analysis
 Config =  get_processing_config_defaults_IV2;
@@ -22,8 +23,9 @@ sequences = {
    	'Seq19'
 	};
 
-% Make variable features of each intervention
-% -----------------------------------------------------------
+
+%% Make variable features of each intervention
+% ---------------------------------------------
 
 discrVars = {'Q_LVAD','P_LVAD'};
 meanVars = {
@@ -33,7 +35,7 @@ meanVars = {
 % 	'accA_x'
 % 	'accA_y'
 % 	'accA_z'
-% 	'accA_norm_NF'
+ 	'accA_norm_NF'
 	'accA_x_NF'
 	'accA_y_NF'
 	'accA_z_NF'
@@ -42,8 +44,6 @@ F = make_intervention_stats(Data.IV2, sequences, discrVars, meanVars, {}, {}, id
 F.P_LVAD_drop = -F.P_LVAD_mean;
 
 % Add calculate band powers to the features
-% -----------------------------------------------------------
-
 accVars = {...
 	...'accA_x','accA_y','accA_z',...
 	'accA_x_NF','accA_y_NF','accA_z_NF'};
@@ -53,8 +53,6 @@ Pxx = make_power_spectra(Data.IV2, sequences, accVars, Config.fs, hBands, idSpec
 F = join(F, Pxx.bandMetrics, 'Keys',{'id','analysis_id'});
 
 % Make relative and delta differences from baselines using id tags
-% -----------------------------------------------------------
-
 nominalAsBaseline = true;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
@@ -66,18 +64,20 @@ Data.IV2.Features.Relative = F_rel;
 Data.IV2.Features.Delta = F_del;
 
 
-%%
-
-% Descriptive stastistics over group of experiments
-% -----------------------------------------------------------
+%% Descriptive stastistics over group of experiments
+% ---------------------------------------------------
 
 G = make_group_stats(F, idSpecs);
 G_rel = make_group_stats(F_rel, idSpecs);
 G_del = make_group_stats(F_del, idSpecs);
 
+Data.G1.Feature_Statistics.Descriptive_Absolute = G;
+Data.G1.Feature_Statistics.Descriptive_Relative = G_rel;
+Data.G1.Feature_Statistics.Descriptive_Delta = G_del;
 
-% Hypothesis test
-% -----------------------------------------------------------
+
+%% Hypothesis test
+% -----------------
 
 % Do Wilcoxens pair test and make table of median and p-values
 pVars = {
@@ -93,16 +93,26 @@ pVars = {
 	'P_LVAD_mean'
 	'Q_LVAD_mean'
 % 	'pGrad_mean'
-%   'pGrad_stdev'
-%   'p_aff_mean'
-%   'p_eff_stdev'
 	};
+
 W = make_paired_features_for_signed_rank_test(F, pVars);
+W_rel = make_paired_features_for_signed_rank_test(F_rel, pVars);
+
 [P,R] = make_paired_signed_rank_test(W, G, pVars, 'IV2','pumpSpeed');
+[P_rel, R_rel] = make_paired_signed_rank_test(W_rel, G_rel, pVars, 'IV2','pumpSpeed');
+
+[balloonResults, clampResults] = compile_results_table_IV2(R, R_rel);
+
+Data.G1.Features.Paired_Absolute = W;
+Data.G1.Features.Paired_Relative = W_rel;
+Data.G1.Feature_Statistics.Test_P_Values_Absolute = P;
+Data.G1.Feature_Statistics.Test_P_Values_Relative = P_rel;
+Data.G1.Feature_Statistics.Results = Results;
 
 
-% Calculate ROC curves and corresponding confidence intervals
-% -----------------------------------------------------------
+%% Calculate ROC curves and corresponding confidence intervals
+% -------------------------------------------------------------
+
 classifiers = {
 %   'accA_y_b1_pow'
 %  	'accA_x_b1_pow'
@@ -147,32 +157,22 @@ pooled = false;
 F_ROC_SPSS = make_tables_for_ROC_analysis_in_SPSS(F);
 F_ROC = make_table_for_pooled_ROC_analysis(F,F_del);
 
-
-% Save and roundup
-% -----------------------------------------------------------
-
-% Gather all analytical data
-Data.IV2.idSpecs_stats = idSpecs;
-Data.IV2.Periodograms = Pxx;
-Data.IV2.Features.Absolute = F;
-Data.IV2.Features.Relative = F_rel;
-Data.IV2.Features.Delta = F_del;
-Data.IV2.Features.Absolute_SPSS_ROC = F_ROC_SPSS;
-Data.IV2.Features.Absolute_Pooled_ROC = F_ROC;
-Data.IV2.Features.Absolute_Paired = W;
-Data.IV2.Feature_Statistics.Descriptive_Absolute = G;
-Data.IV2.Feature_Statistics.Descriptive_Relative = G_rel;
-Data.IV2.Feature_Statistics.Descriptive_Delta = G_del;
-Data.IV2.Feature_Statistics.Test_P_Values = P;
-Data.IV2.Feature_Statistics.Results = R;
 Data.IV2.Feature_Statistics.ROC = ROC;
 Data.IV2.Feature_Statistics.AUC = AUC;
+Data.IV2.Features.Absolute_SPSS_ROC = F_ROC_SPSS;
+Data.IV2.Features.Absolute_Pooled_ROC = F_ROC;
 
-%save_data('Periodograms', feats_path, Data.IV2.Periodograms, {'matlab'});
+
+%% Save
+% ------
 save_data('Features', Config.feats_path, Data.IV2.Features, {'matlab'});
 save_data('Feature_Statistics', Config.stats_path, Data.IV2.Feature_Statistics, {'matlab'});
 save_features_as_separate_spreadsheets(Data.IV2.Features, Config.feats_path);
 save_statistics_as_separate_spreadsheets(Data.IV2.Feature_Statistics, Config.stats_path);
+
+
+%% Roundup
+% ---------
 
 multiWaitbar('CloseAll');
 clear save_data

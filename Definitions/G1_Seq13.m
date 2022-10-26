@@ -40,9 +40,7 @@ Config.labChart_fileNames = {
     %'G1_Seq13 - F6 [I1,I2,I3].mat'
     };
 Config.notes_fileName = 'G1_Seq13 - Notes G1 v1.0.0 - Rev4.xlsm';
-Config.ultrasound_fileNames = {
-    'ECM_2021_01_14__11_41_52.wrf'
-    };
+Config.ultrasound_fileNames = {'ECM_2021_01_14__11_41_52.wrf'};
 
 % Correction input
 Config.US_offsets = {-0.5};
@@ -57,12 +55,14 @@ Config.PL_offset_files = {};
 % Parts (or combined parts) for quality control and description
 Config.partSpec = {
 %   BL    parts         Label
-	[],   [2],         'RPM change'
-	[],   [4],         'Balloon'
-	[],   [5],         'Balloon'
-	[],   [6],         'Balloon'
-	[],   [7],         'Clamping'
-	[],   [8,9,10,11],       'Injection [Sal,1,2,3]'
-	[11,121], [12,13,14,15], 'Injection [4,5,6,7]'
-	[15,149], [16,17,18,19], 'Injection [8,9,10,11]'
+%   BL    parts         Label
+% 	[],   [2],         'RPM change'
+% 	[],   [4],         'Balloon'
+% 	[],   [5],         'Balloon'
+% 	[],   [6],         'Balloon'
+% 	[],   [7],         'Clamping'
+%  	[],   [8,9,10,11],       'Injection [Sal,1,2,3]'
+%  	[11,121], [12,13,14,15], 'Injection [4,5,6,7]'
+%  	[15,149], [16,17,18,19], 'Injection [8,9,10,11]'
+  	[], 9:19,         'Injection [1-11]'
 	};

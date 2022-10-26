@@ -4,9 +4,10 @@ function Config =  get_processing_config_defaults_G1B
 	% Experiment info
 	% --------------------------------------------------------------------------
 	
-	Config.experimentType = 'In vivo, porcine model 1B, with driveline accelerometer';
+	Config.experimentType = 'Porcine model G1B, with driveline accelerometer';
 	Config.experimentID = 'G1B';
-
+	Config.seq = '';
+	
 
 	% Signal processing settings
 	% --------------------------------------------------------------------------
@@ -22,12 +23,13 @@ function Config =  get_processing_config_defaults_G1B
 	% For RPM order map
 	Config.rpmOrderMapRes = 0.011;
 	Config.rpmOrderMapOverlapPst = 80;
-	Config.rpmOrdersToTrack = [1 2 3 4 5];
+	Config.rpmOrdersToTrack = [2.95, 3, 3.05];
 	
 	% For RPM order map visualization
 	Config.rpmOrderMapScale = [-85, -55];
 	Config.rpmOrderMapColorMapName = 'batlowW';
-    
+    Config.h3YLims = [-5,35];
+
 
 	% Misc. settings
 	% --------------------------------------------------------------------------
@@ -68,6 +70,9 @@ function Config =  get_processing_config_defaults_G1B
 	
 	Config.US_offsets = {}; % negative number: shift graph towards right
 	Config.US_drifts = {};
+	Config.PL_offset = [];
+	Config.PL_offset_files = {};
+	
 	Config.accChannelToSwap = {};
 	Config.blocksForAccChannelSwap = [];
 	Config.pChannelToSwap = {};
@@ -87,11 +92,11 @@ function Config =  get_processing_config_defaults_G1B
 	Config.ultrasound_subdir = 'Recorded\SystemM';
 	Config.notes_subdir = 'Noted';
 
-	Config.proc_subdir = 'Processed\accB';
-	Config.proc_plot_subdir = 'Figures\accB';
+	Config.proc_subdir = 'Processed\';
+	Config.proc_plot_subdir = 'Figures\G1B';
 	
-	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\accB\Features';
-	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\accB\Statistics';
-	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\accB\Figures';
+	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B - Features';
+	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B - Statistics';
+	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1B - Statistics\Figures';
 	
     Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';

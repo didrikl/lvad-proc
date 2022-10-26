@@ -3,6 +3,11 @@ function T_parts = make_curve_plot_data_per_part(Data, accVars, Config)
 	movStdWin = Config.movStdWin;
 	partSpec = Config.partSpec;
 	accVars = cellstr(accVars);
+	eventsToClipOut = {
+		'Injection, saline'
+ 		'Hands on'
+% 		'Echo on'
+		};
 	fs = Config.fs; 
 	nParts = size(partSpec,1);
 	
@@ -10,23 +15,14 @@ function T_parts = make_curve_plot_data_per_part(Data, accVars, Config)
 	T_parts = cell(nParts,1);
 	for i=1:nParts
 		T_parts{i} = extract_from_data(Data, partSpec(i,:));
+		T_parts{i}(ismember(T_parts{i}.event,eventsToClipOut),:)=[];
 	end
 
-	T_parts = add_norms_and_filtered_variables(accVars, T_parts, Config);
-	
-	nVars = numel(accVars);
-	welcome('Adding relative differences from BL','Function');
-	for j=1:nVars
-		welcome(accVars{j},'Iteration');	
-		for i=1:nParts
-			T_parts{i} = add_relative_diff(T_parts{i}, accVars{j}, fs, movStdWin);
-		end
-	end
-	fprintf('\n')
+	T_parts = add_norms_and_filtered_variables(accVars, T_parts, Config);	
+	T_parts = add_rel_diff_from_bl(T_parts, accVars, nParts, fs, movStdWin);
 
 function T = add_relative_diff(T, accVar, fs, movStdWin)
-	
-	
+		
 	bl_inds = get_baseline_inds(T);
 	BL = T(bl_inds,:);
 	
@@ -34,20 +30,16 @@ function T = add_relative_diff(T, accVar, fs, movStdWin)
 	
 	acc = T.(accVar);
 	acc_bl = BL.(accVar);
-	
-	% Bandpower and mean power frequency
-	% 	[pxx,f] = periodogram(detrend(acc),[],[],fs);
-	% 	T.bp(inds) = bandpower(pxx,f,'psd');
 
 	% Calculate standard deviation and moving standard deviations
 	BL.([accVar,'_std'])(:) = std(BL.(accVar));
 	BL.([accVar,'_movStd']) = calc_moving_acc_statistic(acc_bl, MovObj);
 	T.([accVar,'_movStd'])= calc_moving_acc_statistic(acc, MovObj);
 
-	T.Q_relDiff = calc_diff_from_baseline_avg(T.Q,BL.Q,'relative');
-	T.P_LVAD_relDiff = calc_diff_from_baseline_avg(T.P_LVAD,BL.P_LVAD,'relative');
-	T.Q_LVAD_relDiff = calc_diff_from_baseline_avg(T.Q_LVAD,BL.Q_LVAD,'relative');
-	T.([accVar,'_movStd_relDiff']) = calc_diff_from_baseline_avg(T.([accVar,'_movStd']),BL.([accVar,'_std']),'relative');
+	T.Q_relDiff = calc_diff_from_baseline_avg(T.Q, BL.Q, 'relative');
+	T.P_LVAD_relDiff = calc_diff_from_baseline_avg(T.P_LVAD, BL.P_LVAD, 'relative');
+	T.Q_LVAD_relDiff = calc_diff_from_baseline_avg(T.Q_LVAD, BL.Q_LVAD, 'relative');
+	T.([accVar,'_movStd_relDiff']) = calc_diff_from_baseline_avg(T.([accVar,'_movStd']), BL.([accVar,'_std']), 'relative');
 
 	% Make curves of discrete values discountinious at bewetween segments
  	break_inds = diff(T.time)>seconds(1);
@@ -57,11 +49,13 @@ function inds = get_baseline_inds(T)
 	inds = ismember(T.intervType,{'Baseline','baseline'}) &...
 		not(contains(lower(string(T.event)),{'echo'}));
 	if nnz(inds)==0
+		fprintf('\n')
 		warning('No baseline denoted in Notes, first steady-state is used instead.')
 		segs = get_segment_info(T);
 		firstSS = find(ismember(segs.main.intervType,'Steady-state'),1,'first');
 		inds = segs.all.startInd(firstSS):segs.all.endInd(firstSS);
 	elseif diff(find(inds))>1
+		fprintf('\n')
 		warning('Multiple baseline segments in Notes')
 	end
 
@@ -126,3 +120,24 @@ function T = add_norms(accVars, T, accID)
 
 	% unfiltered norm
 	T = add_spatial_norms(T, 2, {xVar,yVar,zVar}, normVar);
+
+function T_parts = add_rel_diff_from_bl(T_parts, accVars, nParts, fs, movStdWin)
+	
+	welcome('Adding relative differences from BL','Function');
+	fprintf('Variables:')
+	
+	nVars = numel(accVars);
+	for j=1:nVars
+		fprintf(['\n\t',accVars{j}]);
+		for i=1:nParts
+			
+			T_parts{i} = add_relative_diff(T_parts{i}, accVars{j}, fs, movStdWin);
+			
+			isWashout = ismember(T_parts{i}.event,'Washout');
+			T_parts{i}{isWashout,[{'Q','Q_relDiff','P_LVAD','P_LVAD_relDiff'},...
+				[accVars{j},'_movStd_relDiff']]} = nan;
+			
+		end
+	end
+	
+	fprintf('\n')

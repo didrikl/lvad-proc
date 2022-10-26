@@ -1,5 +1,5 @@
 function T_parts = add_harmonics_filtered_variables(...
-		T_parts, varNames, newVarNames, harmNotchWidth, fs)
+		T_parts, vars, newVars, harmNotchWidth, fs)
     % Add harmonics filtered varibles by a combined notch filter
     % 
 	% Inputs
@@ -24,8 +24,8 @@ function T_parts = add_harmonics_filtered_variables(...
         return
     end
     
-    fprintf('\nInput\n\t%s\n',strjoin(varNames,', '))
-    fprintf('Output\n\t%s\n\n',strjoin(newVarNames,', '))
+    fprintf('Input: %s\nOutput: %s\n',...
+       strjoin(string(vars)),strjoin(string(newVars)));
 	
 	% TODO: Implement with add_in_parts, c.f. add_highpass_RPM_filter_variables
 
@@ -35,13 +35,13 @@ function T_parts = add_harmonics_filtered_variables(...
 		if isEmpty, continue; end
         T = T_parts{i};
 		
-        varsNotInPart = not(ismember(varNames,T.Properties.VariableNames));
+        varsNotInPart = not(ismember(vars,T.Properties.VariableNames));
         if any(varsNotInPart)
             error('\n\tPart %d does not contain input variables:\n\t\t%s',...
-                i,strjoin(varNames(varsNotInPart),', '));
+                i,strjoin(vars(varsNotInPart),', '));
         end
         
-        T{:,newVarNames} = nan(height(T),numel(newVarNames));
+        T{:,newVars} = nan(height(T),numel(newVars));
         
         %[fs,T] = get_sampling_rate(T);
         [start_inds, end_inds, rpms] = find_rpm_blocks(T);
@@ -57,9 +57,9 @@ function T_parts = add_harmonics_filtered_variables(...
             hFilt = make_multiple_notch_filter(allFreq,fs,BW);
             
 			block_inds = start_inds(j):end_inds(j);
-            for k=1:numel(varNames)
-                var = varNames{k};
-                newVar = newVarNames{k};
+            for k=1:numel(vars)
+                var = vars{k};
+                newVar = newVars{k};
                 if j==1, T.(newVar) = nan(height(T),1); end         
                 
                 % Remove first rows with nan in some variables
@@ -71,11 +71,11 @@ function T_parts = add_harmonics_filtered_variables(...
             end
             
         end
-        T.Properties.VariableContinuity(newVarNames) = 'continuous';
+        T.Properties.VariableContinuity(newVars) = 'continuous';
         T_parts{i} = T;
         
     end
 
-    T_parts = convert_to_single(T_parts, newVarNames);
+    T_parts = convert_to_single(T_parts, newVars);
 
     if not(returnAsCell), T_parts = T_parts{1}; end

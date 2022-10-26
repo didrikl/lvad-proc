@@ -3,7 +3,6 @@ function save_features_as_separate_spreadsheets(Features, path)
 	F = Features.Absolute;
 	F_rel = Features.Relative;
 	F_del = Features.Delta;
-	%F_ROC = Features.Absolute_SPSS_ROC;
 	W = Features.Paired_Absolute; 
 	W_rel = Features.Paired_Relative; 
 
@@ -15,6 +14,7 @@ function save_features_as_separate_spreadsheets(Features, path)
 	save_data('Features - Paired for Wilcoxens signed rank test - Relative',path, W_rel, 'spreadsheet');
 	
 % 	% Save various tables for ROC analysis in SPSS
+%   F_ROC = Features.Absolute_SPSS_ROC;
 % 	roc_path = fullfile(path,'For ROC analysis in SPSS');
 % 	save_data('Features - PCI 1', roc_path, F_ROC.PCI1, 'spreadsheet');
 % 	save_data('Features - PCI 2', roc_path, F_ROC.PCI2, 'spreadsheet');

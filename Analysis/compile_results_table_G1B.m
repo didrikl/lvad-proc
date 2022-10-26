@@ -1,5 +1,6 @@
-function R = compile_results_table(R, R_rel)
+function R = compile_results_table_G1B(R, R_rel)
 	% One sorted and combined results table with absolute and relative results
+
 	levSortOrder = {
 		'RPM, 2400, Nominal'
 		'RPM, 2400, Nominal #2'
@@ -39,11 +40,10 @@ function R = compile_results_table(R, R_rel)
 		%'Q_LVAD_mean'
 		'P_LVAD_mean'
 		'Q_mean'
-		'accA_xyz_NF_HP_b1_pow_norm'
-		'accA_xyz_NF_HP_b2_pow_norm'
-		%'accA_xyz_NF_HP_b1_pow_sum'
-		%'accA_xyz_NF_HP_b2_pow_sum'
-		%'pGraft_mean'
+% 		'accB_xyz_NF_HP_b1_pow_norm'
+% 		'accB_xyz_NF_HP_b2_pow_norm'
+		'accB_norm_NF_HP_b1_pow'
+		'accB_norm_NF_HP_b3_pow'
 		};
 
 	R.levelLabel = categorical(R.levelLabel, levSortOrder, 'Ordinal',true);
