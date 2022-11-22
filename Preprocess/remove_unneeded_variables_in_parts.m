@@ -1,4 +1,4 @@
-function S_parts = remove_unneeded_variables_in_parts(S_parts,forcedToRem)
+function S_parts = remove_unneeded_variables_in_parts(S_parts, forcedToRem)
 	
 	if nargin<2, forcedToRem = {''}; end
 	varsToRetain = 'noteRow';

@@ -23,12 +23,12 @@ function Config =  get_processing_config_defaults_G1B
 	% For RPM order map
 	Config.rpmOrderMapRes = 0.011;
 	Config.rpmOrderMapOverlapPst = 80;
-	Config.rpmOrdersToTrack = [2.95, 3, 3.05];
+	%Config.rpmOrdersToTrack = [2.95, 3, 3.05];
 	
 	% For RPM order map visualization
 	Config.rpmOrderMapScale = [-85, -55];
 	Config.rpmOrderMapColorMapName = 'batlowW';
-    Config.h3YLims = [-5,35];
+    %Config.h3YLims = [-5,35];
 
 
 	% Misc. settings
@@ -97,6 +97,6 @@ function Config =  get_processing_config_defaults_G1B
 	
 	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B - Features';
 	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B - Statistics';
-	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1B - Statistics\Figures';
+	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1B - Figures';
 	
     Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';

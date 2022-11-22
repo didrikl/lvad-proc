@@ -22,4 +22,4 @@ Data.G1B = load_processed_sequences(sequences(:,1),...
 % [Data.G1B, F, F_rel, F_del] = load_processed_features(Config, Data.G1B);
 % Data.G1B = load_processed_statistics(Config, Data.G1B);
 
-clear sequences pc
+clear sequences pc whatToLoad

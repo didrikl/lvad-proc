@@ -87,7 +87,7 @@ function h = plot_curves(hAx, T, mags, t, yLims, segs)
  		'LineWidth',.5,...
 		'Color',[flowColor,0.5]);
    	
-	[h3, h3Avg] = calc_h3_per_seg(mags, t, segs);
+	[h3, h3Avg] = calc_harmonic_salience_per_seg(mags, t, segs);
 	yyaxis right
 	try
 		ylim([min(h3Avg),2*max(h3Avg)])
@@ -118,7 +118,7 @@ function h = plot_curves(hAx, T, mags, t, yLims, segs)
 	ylim(yLims);
 	xlim([0,max(T.dur)])
 
-function [h3, h3Avg] = calc_h3_per_seg(mags, t, segs)
+function [h3, h3Avg] = calc_harmonic_salience_per_seg(mags, t, segs)
 	h3 = nan(size(mags,2),1);
 	for i=1:height(segs.main)
 		inds = t>=segs.main.StartDur(i) & t<segs.main.EndDur(i);

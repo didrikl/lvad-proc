@@ -53,7 +53,7 @@ function make_spectrogram_figure_IV2(S, supTit, var, rpm, fs, IDs1, IDs2)
 	hLeg = legend(hPlt,legStr,spec.leg{:},'FontSize',15);
 	hColBar = add_colorbar(hSub, spec);
 	hYLab1(1) = ylabel(hSub(1,1),{'accelerometer signal,','harmonic order'});
-	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm);
+	hYLab1(2) = add_linked_map_hz_yyaxis(hSub(1,2), 'frequency (Hz)', rpm, order2);
 	hXLab = xlabel('(sec)',spec.xLab{:});
 	
 	% Adjustments
@@ -116,3 +116,12 @@ function add_xlines(hSub, segStarts1, segStarts2, spec)
 	xline(hSub(1,2),segStarts2(2),'Label','27%',spec.xline{:});
 	xline(hSub(1,2),segStarts2(3),'Label','45%',spec.xline{:});
 	xline(hSub(1,2),segStarts2(4),'Label','75%',spec.xline{:});
+
+function [hYLab, hSub] = add_linked_map_hz_yyaxis(hSub, yyLab, rpm, order)
+	orderTicks = hSub.YTick;
+	yyaxis(hSub,'right')
+	hSub.YAxis(2).Color = hSub.YAxis(1).Color;
+	linkprop(hSub.YAxis, 'Limits');
+	yticks(0:1:max(order));
+	set(hSub,'YTickLabel',strsplit(num2str(orderTicks*(rpm/60),'%2.0f ')));
+	hYLab = ylabel(hSub,yyLab);

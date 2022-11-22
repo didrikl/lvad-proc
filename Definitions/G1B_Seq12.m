@@ -67,19 +67,20 @@ Config.PL_offset_files = {};
 % 	'01/07/2021 17:50:46', '01/07/2021 17:50:51' % Signal loss during clamp reversal
 %    };
 
-% Parts (or combined parts) for quality control and description
+% Parts (or combined parts) for assessments
 Config.partSpec = {
-%   BL    parts   Label
-% 	[],       [2],           'RPM change, CO below 50%'
-% 	[],       [3],           'Clamping, CO below 50%'
-% 	[],       [5],           'Balloon, aborted'
-% 	[],       [7],           'Balloon'
-% 	[],       [8],           'Balloon'
-% 	[],       [9],           'Balloon'
-% 	[],       [10],          'RPM change'
-% 	[],       [11],          'Clamping'
-%   	[],       [12,13,14,15], 'Injection [Sal,1,2,3]'
-%   	[15,140], [16,17,18],    'Injection [4,5,6]'
-%   	[18,159], [19,20,21,22], 'Injection [7,8,9,10]'
-  	[], 13:22,         'Injection [1-10]'
-	};
+ 	% BL      Parts      Label 
+	% ---------------------------------
+	% 	[],       [2],           'RPM change, CO below 50%'
+	% 	[],       [3],           'Clamping, CO below 50%'
+	% 	[],       [5],           'Balloon, aborted'
+	% 	[],       [7],           'Balloon'
+	% 	[],       [8],           'Balloon'
+	% 	[],       [9],           'Balloon'
+	% 	[],       [10],          'RPM change'
+	% 	[],       [11],          'Clamping'
+	%   [],       [12,13,14,15], 'Injection [Sal,1,2,3]'
+	%   [15,140], [16,17,18],    'Injection [4,5,6]'
+	%   [18,159], [19,20,21,22], 'Injection [7,8,9,10]'
+	    [],       [13:22],       'Injection [1-10]'
+  	};

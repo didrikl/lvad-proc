@@ -1,4 +1,4 @@
-function T = extract_from_data(Data, partSpec)
+function T = extract_from_data(Data, partSpec, eventsToClip)
 	
 	% Note: Only needed to do diff from baseline calculations
 	%       Joining notes can also be done when plotting
@@ -18,12 +18,12 @@ function T = extract_from_data(Data, partSpec)
 	T = cell(numel(partNo),1);
 	for i=1:numel(partNo)
 		if partNo>numel(Data.S_parts)
-			error('Given part (%d) exceeds number of parts in data (%d)',...
-				partNo, numel(S_parts));
+			error('Given part (%s) exceeds number of parts in data (%d)',...
+				num2str(partNo), numel(S_parts));
 		end
 		T{i} = Data.S_parts{partNo(i)};
 		if height(T{i})==0
-			error('Part no %d is empty',partNo);
+			error('Part no %d is empty', partNo(i));
 		end
 	end
 	if numel(partNo)>1
@@ -35,6 +35,10 @@ function T = extract_from_data(Data, partSpec)
 	
 	% In case baseline is to be taken from a separate part
 	T = add_specified_baseline_first(partSpec, Data, Notes, noteVars, partNo, T);
+
+	if not(isempty(eventsToClip))
+		T(ismember(T.event, eventsToClip),:)=[];
+	end
 
 end
 

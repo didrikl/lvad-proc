@@ -12,9 +12,9 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	shadeColor = [.76 .76 .76];
 	echoShadeColor = [.87 .87 .87];
 	
-	figWidth = 1500;
+	figWidth = 1800;
 	figHeight =  900;
-	pWidthMax = 1250;
+	pWidthMax = 1300;
 	yLims = [-75,75];
 	yLim_map = [0.75, 4.25];
 	noteVarsNeeded = {
@@ -42,14 +42,14 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	map = map.([var,'_map']);
 	segs = get_segment_info(T, 'dur'); 	
 	rpms = unique(T.pumpSpeed(segs.all.startInd),'stable');
-	[h3, h3Avg] = calc_h3_per_seg(mags, t, segs);
+	[h3, h3Avg] = calc_harmonic_salience_per_seg(mags, t, segs);
 
 	tit = make_figure_title(rpms, seqID, partSpec, var, mapScale, colorMapName);
 	[hFig, hSub] = init_panels(spec, tit, figWidth, figHeight);
 
 	plot_rpm_order_map(hSub(2), mapScale, colorMap, t, order, map, yLim_map);
 	plot_h3(hSub(3), t, h3, h3Avg, h3YLims);
-	hPlt = plot_curves(hSub(1), t, T, yLims, segs);
+	plot_curves(hSub(1), t, T, yLims, segs);
 	
   	add_shades(hSub(1), segs, segs.all.isEcho, echoShadeColor, 0.20, [50, 76])
   	add_shades(hSub(1), segs, segs.all.isTransitional, shadeColor, 0.30, [50, 76])
@@ -67,7 +67,6 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	xlim([min(t),max(t)])
 	set(hSub,'TickDir','both','TickLength',[.0025 .0025])
 	adjust_positions(T, hSub, hYLab, hLeg, hCol, pWidthMax);
-	%set(hSub(1), 'XAxisLocation', 'top')
 	hSub(1).XAxis.Visible = 'off';
 	
 function plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
@@ -133,22 +132,7 @@ function h = plot_curves(hAx, t, T, yLims, segs)
 	xlim([0,max(T.dur)])
 	hAx.YAxis.Color = [.15 .15 .15];
 
-	adjust_yticks(hAx);
-
-function [h3, h3Avg] = calc_h3_per_seg(mags, t, segs)
-	mags = mag2db(mags);
-
-	h3 = nan(size(mags,2),1);
-	for i=1:height(segs.main)
-		inds = t>=segs.main.StartDur(i) & t<segs.main.EndDur(i);
-		h3(inds) = mags(2,inds)-0.5*(mags(1,inds)+mags(2,inds));
-		h3Avg(inds) = mean(h3(inds));
-		if segs.main.isWashout(i), h3Avg(inds) = nan; end
-% 		if segs.main.isEcho(i), h3(inds) = nan; end
- 		if segs.main.isTransitional(i), h3Avg(inds) = nan; end
-		h3Avg(find(inds==1,1,'last')) = nan;
-	end
-	
+	adjust_yticks(hAx);	
 	
 function [hLeg, hCol] = add_legend_and_colorbar(hSub)
 	

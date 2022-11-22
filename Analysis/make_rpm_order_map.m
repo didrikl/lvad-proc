@@ -78,8 +78,7 @@ function [maxFreq, T] = check_sampling_rate(maxFreq, T)
         [maxFreq,~] = get_sampling_rate(T(:,{map_varName,rpm_varName}));
     end
     
-function [rpmVarName, mapVarName] = check_table_cols(T, rpmVarName, mapVarName)
-    
+function [rpmVarName, mapVarName] = check_table_cols(T, rpmVarName, mapVarName) 
     % Check existence of variables to use
     rpmVarName = check_table_var_input(T, rpmVarName);
     mapVarName = check_table_var_input(T, mapVarName);
@@ -104,20 +103,21 @@ function T = check_missing_rpm_values(T, rpmVarName)
         warning('All rows were removed.')
     end
 
-function T = check_rpm_as_zero_values(T, rpmVarName, map_varName)
+function T = check_rpm_as_zero_values(T, rpmVarName, mapVarName)
+
     zeroSpeed = T.(rpmVarName)==0;
     if any(zeroSpeed)
 		fprintf('\n')
         warning(sprintf(['%d rows have RPM=0 in RPM variable %s:',...
             '\n\tCorresponding map values are set to zero.',...
-            '\n\tRPM=2400 is made as dummy substitute values.'],...
+            '\n\tRPM=9999 is made as dummy substitute values.'],...
             nnz(zeroSpeed),rpmVarName));
-        T.(rpmVarName)(zeroSpeed) = 2400;
-        %T.(map_varName)(zeroSpeed) = 0;
+        T.(rpmVarName)(zeroSpeed) = 9999;
+        T.(mapVarName)(zeroSpeed) = 0;
     end
     
 function [T, mapVarName] = check_map_values(T, mapVarName)
-    
+
     missing = isnan(T.(mapVarName));
     if any(missing)
         warning(sprintf(['\n\tThere are %d NaN values in map variable %s',...

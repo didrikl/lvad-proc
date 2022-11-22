@@ -12,7 +12,7 @@ Config.labChart_fileNames = {
     % RPM #1 + Clamping
 	% ------------------
     %'G1_Seq14 - F1 [accA].mat'
-	%'G1_Seq14 - F1 [accB].mat'
+	'G1_Seq14 - F1 [accB].mat'
 	%'G1_Seq14 - F1 [pGraft,ECG,pLV].mat'
 	%'G1_Seq14 - F1 [V1,V2,V3].mat'
 	%'G1_Seq14 - F1 [I1,I2,I3].mat'
@@ -20,7 +20,7 @@ Config.labChart_fileNames = {
 	% Insertion + Balloon @ 2400 RPM
 	% -------------------------------
 	%'G1_Seq14 - F2 [accA].mat'
-	%'G1_Seq14 - F2 [accB].mat'
+	'G1_Seq14 - F2 [accB].mat'
 	%'G1_Seq14 - F2 [pGraft,ECG,pLV].mat'
 	%'G1_Seq14 - F2 [V1,V2,V3].mat'
 	%'G1_Seq14 - F2 [I1,I2,I3].mat'
@@ -28,7 +28,7 @@ Config.labChart_fileNames = {
 	% Balloon @ [2200,2600] RPM
 	% --------------------------
 	%'G1_Seq14 - F3 [accA].mat'
-	%'G1_Seq14 - F3 [accB].mat'
+	'G1_Seq14 - F3 [accB].mat'
 	%'G1_Seq14 - F3 [pGraft,ECG,pLV].mat'
 	%'G1_Seq14 - F3 [V1,V2,V3].mat'
 	%'G1_Seq14 - F3 [I1,I2,I3].mat'
@@ -36,7 +36,7 @@ Config.labChart_fileNames = {
 	% RPM #2
 	% -------
 	%'G1_Seq14 - F4 [accA].mat'
-	%'G1_Seq14 - F4 [accB].mat'
+	'G1_Seq14 - F4 [accB].mat'
 	%'G1_Seq14 - F4 [pGraft,ECG,pLV].mat'
 	%%'G1_Seq14 - F4 [V1,V2,V3].mat' % no recording
 	%%'G1_Seq14 - F4 [I1,I2,I3].mat' % no recording
@@ -44,7 +44,7 @@ Config.labChart_fileNames = {
 	% Saline injections???
 	% ---------------------
 	%'G1_Seq14 - F5 [accA].mat'
-	%'G1_Seq14 - F5 [accB].mat'
+	'G1_Seq14 - F5 [accB].mat'
 	%'G1_Seq14 - F5 [pGraft,ECG,pLV].mat'
 	%'G1_Seq14 - F5 [V1,V2,V3].mat'
 	%'G1_Seq14 - F5 [I1,I2,I3].mat'
@@ -76,9 +76,10 @@ parts = {
     [],   [9],  [],   '6. Saline bolus injections'
     };
 
-% Parts (or combined parts) for quality control and description
+% Parts (or combined parts) for assessments
 Config.partSpec = {
-%   BL    parts   Label
+ 	% BL      Parts      Label 
+	% ---------------------------------
 	[],   [2],    'RPM change'
 	[],   [3],    'Clamping'
 	[],   [5],    'Balloon'

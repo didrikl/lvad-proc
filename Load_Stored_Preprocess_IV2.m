@@ -15,10 +15,12 @@ sequences = {
  	'IV2_Seq19','Seq19 - LVAD13\Processed'
     };
 
+whatToLoad = {'S','S_parts','Notes','Config'};
+whatToLoad = {'S','Notes','Config'};
 Data.IV2 = load_processed_sequences(sequences(:,1),...
     fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)));
 
 [Data.IV2, F, F_rel, F_del] = load_processed_features(Config, Data.IV2);
 Data.IV2 = load_processed_statistics(Config, Data.IV2);
 
-clear sequences
+clear sequences whatToLoad

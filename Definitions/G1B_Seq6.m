@@ -44,23 +44,17 @@ Config.channelToExcl = {};
 Config.channelExclRanges = {};
 
 % Parts (or combined parts) for assessments
-% Config.partSpec = {
-% 	% BL      parts         label
-% 	% ---------------------------------
-% 	%  [],       [1],        'RPM change'
-% 	%  [],       [2],        'Balloon'
-% 	%  [],       [3],        'Balloon'
-% 	%  [],       [4],        'Balloon'
-% 	%  [],       [5],        'RPM change #2'
-% 	%  [],       [6],        'Clamping'
-% 	%  [],       [7,8,9],    'Injection [1,2,3]'
-% 	%  [9,117],  [10,11,12], 'Injection [4,5,6]'
-% 	%  [12,132], [13,14,15], 'Injection [7,8,9]'
-% 	};
-
-% All injections part combined in wider spectrogram figures
 Config.partSpec = {
- 	% BL      parts         label
- 	% ---------------------------------
- 	 [],   7:15,       'Injection [1-9]'	
- 	};
+	% BL      parts         label
+	% ---------------------------------
+	% 	 [],       [1],        'RPM change'
+	% 	 [],       [2],        'Balloon'
+	% 	 [],       [3],        'Balloon'
+	% 	 [],       [4],        'Balloon'
+	% 	 [],       [5],        'RPM change #2'
+	% 	 [],       [6],        'Clamping'
+	% 	 [],       [7,8,9],    'Injection [1,2,3]'
+	% 	 [9,117],  [10,11,12], 'Injection [4,5,6]'
+	% 	 [12,128], [13,14,15], 'Injection [7,8,9]'
+	     [],       [7:15],     'Injection [1-9]'
+	};

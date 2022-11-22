@@ -44,7 +44,7 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	map = map.([var,'_map']);
 	segs = get_segment_info(T, 'dur'); 	
 	rpms = unique(T.pumpSpeed(segs.all.startInd),'stable');
-	[h3, h3Avg] = calc_h3_per_seg(mags, t, segs);
+	[h3, h3Avg] = calc_harmonic_salience_per_seg(mags, t, segs);
 
 	tit = make_figure_title(rpms, seqID, partSpec, var, mapScale, colorMapName);
 	[hFig, hSub] = init_panels(spec, tit, figWidth, figHeight);
@@ -110,7 +110,7 @@ function h = plot_curves(hAx, T, yLims)
  		'LineWidth',.5,...
 		'Color',[flowColor,0.5]);
    	
-% 	[h3, h3Avg] = calc_h3_per_seg(mags, t, segs);
+% 	[h3, h3Avg] = calc_harmonic_salience_per_seg(mags, t, segs);
 % % 	h3Avg = pow2db(h3Avg);
 % % 	h3Avg(not(isfinite(h3Avg))) = 0;
 % 	yyaxis right
@@ -146,7 +146,7 @@ function h = plot_curves(hAx, T, yLims)
 	ylim(hAx, yLims);
 	xlim([0,max(T.dur)])
 
-function [h3, h3Avg] = calc_h3_per_seg(mags, t, segs)
+function [h3, h3Avg] = calc_harmonic_salience_per_seg(mags, t, segs)
 	h3 = nan(size(mags,2),1);
 	for i=1:height(segs.main)
 		inds = t>=segs.main.StartDur(i) & t<segs.main.EndDur(i);

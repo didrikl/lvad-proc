@@ -3,11 +3,12 @@
 % Read sequence notes made with Excel file template
 seqDefs = {
 %  	'G1B_Seq3' % (pilot)
-% 	'G1B_Seq6'
+ 	'G1B_Seq6'
 %   	'G1B_Seq7'
-%    	'G1B_Seq8'
+%     	'G1B_Seq8'
+%		'G1B_Seq10' % Terminated
 %  	'G1B_Seq11'
-    	'G1B_Seq12'
+%    	'G1B_Seq12'
 %    	'G1B_Seq13'
 %   	'G1B_Seq14'
 	};

@@ -25,8 +25,8 @@ Config.labChart_fileNames = {
 	%'G1_Seq7 - F2 [i1,i2,i3].mat'
 	%'G1_Seq7 - F2 [v1,v2,v3].mat'
 
-	 % Clamping + Injections
-	 % ----------------------
+	% Clamping + Injections
+	% ----------------------
 	'G1_Seq7 - F3_Sel1 [accA].mat'
 	'G1_Seq7 - F3_Sel1 [accB].mat'
 	%'G1_Seq7 - F3_Sel1 [pGraft,pLV].mat'
@@ -53,24 +53,17 @@ Config.PL_offset = [];
 Config.PL_offset_files = {};
 
 % Parts (or combined parts) for assessments
-% Config.partSpec = {
-% 	% BL      parts         label
-% 	% ---------------------------------
-% %  	[],       [2],     'RPM change'
-% %  	[],       [4],     'Balloon'
-% %  	[],       [5],     'Balloon'
-% %   [],       [6],     'Balloon'
-% %   [],       [7],     'Clamping'
-% %  	[],       [8:11],  'Injection [1,2,3,4]'
-% %   	[11,127], [12:15], 'Injection [5,6,7,8]'
-% %   	[15,141], [16:18], 'Injection [Sal,9,10]'
-%     [],  8:17,    'Injection [1-10]'
-% % 	[],       [19]     'Anticoagulant reversal'
-% 	};
-
-% All injections part combined in wider spectrogram figures
 Config.partSpec = {
- 	% BL      parts         label
- 	% ---------------------------------
- 	 [],   8:17,       'Injection [1-10]'	
- 	};
+	% BL      parts         label
+	% ---------------------------------
+	% 	[],       [2],     'RPM change'
+	% 	[],       [4],     'Balloon'
+	% 	[],       [5],     'Balloon'
+	% 	[],       [6],     'Balloon'
+	% 	[],       [7],     'Clamping'
+	% 	[],       [8:11],  'Injection [1,2,3,4]'
+	% 	[11,127], [12:15], 'Injection [5,6,7,8]'
+	% 	[15,141], [16:18], 'Injection [Sal,9,10]'
+	%   [],       [19]     'Anticoagulant reversal'
+	  	[],       [8:17],  'Injection [1-10]'
+};

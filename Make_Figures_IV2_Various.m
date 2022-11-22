@@ -1,9 +1,11 @@
+Config =  get_processing_config_defaults_IV2;
+
 %% Spectrograms 
 % 2x2 panels, controls to the left and balloon interventions to the right
 
 tit = 'Spectrogram';
-S = Data.IV2.Seq10.S;
-var = 'accA_y_NF';
+S = Data.IV2B.Seq7.S;
+var = 'accB_y';
 rpm = 2800;
 
 IDs1 = {
@@ -24,7 +26,8 @@ IDs1 = {
 		};
 
 close all
-make_spectrogram_figure_IV2(S, tit, var, rpm, Data.IV2.Config.fs, IDs1, IDs2);
+S.Properties.UserData.Notes = Notes;
+make_spectrogram_figure_IV2(S, tit, var, rpm, Config.fs, IDs1, IDs2);
 
 clear tit s var rpm
 

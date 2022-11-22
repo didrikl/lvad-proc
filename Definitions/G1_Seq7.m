@@ -42,25 +42,15 @@ Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
 
-% Parts (or combined parts) for assessments
-% Config.partSpec = {
-% 	% BL      parts         label
-% 	% ---------------------------------
-% %  	[],       [2],     'RPM change'
-% %  	[],       [4],     'Balloon'
-% %  	[],       [5],     'Balloon'
-% %   [],       [6],     'Balloon'
-% %   [],       [7],     'Clamping'
-% %  	[],       [8:11],  'Injection [1,2,3,4]'
-% %   	[11,127], [12:15], 'Injection [5,6,7,8]'
-% %   	[15,141], [16:18], 'Injection [Sal,9,10]'
-%     [],  8:17,    'Injection [1-10]'
-% % 	[],       [19]     'Anticoagulant reversal'
-% 	};
 
-% All injections part combined in wider spectrogram figures
+% Parts (or combined parts) for assessments
 Config.partSpec = {
- 	% BL      parts         label
- 	% ---------------------------------
- 	 [],   8:17,       'Injection [1-10]'	
- 	};
+	% BL      parts         label
+	% ---------------------------------
+ 	[],       [2],     'RPM change'
+ 	[],       [4],     'Balloon'
+ 	[],       [5],     'Balloon'
+    [],       [6],     'Balloon'
+    [],       [7],     'Clamping'
+ 	[],       [19]     'Anticoagulant reversal'
+	};

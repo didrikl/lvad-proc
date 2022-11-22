@@ -60,18 +60,19 @@ Config.channelExclRanges = {
     '11/12/2020 14:21:35', '11/12/2020 14:48:05' % balloon, 2200-2600 RPM
 	};
 
-% Parts (or combined parts) for quality control and description
+% Parts (or combined parts) for assessments
 Config.partSpec = {
-%   BL    parts   Label
-% 	[],        [2],      'RPM change'
-% 	[],        [3],      'Clamping'
-% 	[],        [5],      'Balloon'
-% 	[],        [6],      'Balloon'
-% 	[],        [7],      'Balloon'
-%    [],        [8:11],   'Injection [1,Sal,2,3]'
-%    [11,141],  [12:14],  'Injection [4,5,6]'
-%    [14,157],  [15:18],  'Injection [7,8,9,10]'
-%   [14,157],  [19:22],  'Fat [1,2,3,4]'
-    [],   [8,10:18],    'Injection [1-10]'
-%   [],        [23]      'Anticoagulant reversal'
+ 	% BL      Parts      Label 
+	% ---------------------------------
+	% 	[],       [2],     'RPM change'
+	% 	[],       [3],     'Clamping'
+	% 	[],       [5],     'Balloon'
+	% 	[],       [6],     'Balloon'
+	% 	[],       [7],     'Balloon'
+	% 	[]        [8:11],  'Injection [1,Sal,2,3]'
+	% 	[11,141], [12:14], 'Injection [4,5,6]'
+	% 	[14,157], [15:18], 'Injection [7,8,9,10]'
+	% 	[14,157], [19:22], 'Fat [1,2,3,4]'
+	    [],       [8,10:18], 'Injection [1-10]'
+	%    [8,116],  [9:22],    'injection [1-14], incl. fat'
 	};

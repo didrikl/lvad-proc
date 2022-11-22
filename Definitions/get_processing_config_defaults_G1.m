@@ -23,7 +23,7 @@ function Config =  get_processing_config_defaults_G1
 	% For RPM order map
 	Config.rpmOrderMapRes = 0.011;
 	Config.rpmOrderMapOverlapPst = 80;
-	Config.rpmOrdersToTrack = [2.95, 3, 3.05];
+	%Config.rpmOrdersToTrack = [2.95, 3, 3.05];
 	
 	% For RPM order map visualization
 	Config.rpmOrderMapScale = [-65, -36];

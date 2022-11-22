@@ -11,6 +11,8 @@ function segs = get_segment_info(T, durVar)
 	segs.all.midInd = round((segs.all.endInd-segs.all.startInd)./2);
 	
 	segs.all.event = T.event(segs.all.startInd);
+	segs.all.analysis_id = T.analysis_id(segs.all.startInd);
+	segs.all.bl_id = T.bl_id(segs.all.startInd);
 	segs.all.pumpSpeed = T.pumpSpeed(segs.all.startInd);
 	segs.all.intervType = T.intervType(segs.all.startInd);
 	
@@ -36,7 +38,8 @@ function segs = get_segment_info(T, durVar)
 		segs.all.isClamp = double(string(T.QRedTarget_pst(segs.all.startInd)))>0;
 		segs.all.isBalloon = double(string(T.balLev(segs.all.startInd)))>0;
 		segs.all.isNominal = segs.all.isSteadyState & not(segs.all.isClamp) & not(segs.all.isBalloon);
-		segs.all.isInjection = double(string(T.embVol(segs.all.startInd)))>0;
+		segs.all.isInjection = not(ismissing(T.embVol(segs.all.startInd))) & ...
+			not(ismember(T.embVol(segs.all.startInd),'-'));
 		
 		% Handle injection info: QRedTarget was used to decide is echo should be
 		% done, but should for plotting/analysis be 0
@@ -60,10 +63,12 @@ function segs = get_segment_info(T, durVar)
 		([false;diff(double(segs.all.event))==0] & not(segs.all.event~='-')) & ...
 		[false;diff(segs.all.isEcho)==0] | ...
 		([false;diff(segs.all.isWashout)==0] & segs.all.isWashout);
+	segs.all.isIntraSeg(end) = false;
+
 	mainSegRows = unique([1;find(not(segs.all.isIntraSeg))]);%;numel(not(segs.all.isIntraSeg))]);
 	segs.main = segs.all(mainSegRows,:);
  	segs.main.StartInd = segs.all.startInd(mainSegRows);
-
+	
 	% TODO: Check possible bug!
  	segs.main.EndInd = [segs.main.StartInd(2:end);height(T)];
  	

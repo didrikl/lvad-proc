@@ -12,22 +12,22 @@ Config.labChart_fileNames = {
     % Startup
 	% --------
     %'G1_Seq3 - F1 [accA].mat'
-    %'G1_Seq3 - F1 [accB].mat'
+    'G1_Seq3 - F1 [accB].mat'
     %'G1_Seq3 - F1 [pGraft].mat'
     
 	% RPM + Clamping + RPM #2
 	% ------------------------
 	%'G1_Seq3 - F2 [accA].mat'
-    %'G1_Seq3 - F2 [accB].mat'
+    'G1_Seq3 - F2 [accB].mat'
     %'G1_Seq3 - F2 [pGraft].mat'
     
 	% Insertion + Balloon
 	% --------------------
 	%'G1_Seq3 - F3_Sel1 [accA].mat'
-    %'G1_Seq3 - F3_Sel1 [accB].mat'
+    'G1_Seq3 - F3_Sel1 [accB].mat'
     %'G1_Seq3 - F3_Sel1 [pGraft].mat'
     %'G1_Seq3 - F3_Sel2 [accA].mat'
-    %'G1_Seq3 - F3_Sel2 [accB].mat'
+    'G1_Seq3 - F3_Sel2 [accB].mat'
     %'G1_Seq3 - F3_Sel2 [pGraft].mat'
 
     };
@@ -49,9 +49,10 @@ Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
 
-% Part mapping for quality control and description
+% Parts (or combined parts) for assessments
 Config.partSpec = {
-%   BL    parts   Label
+	% BL  Parts  Label
+	% ---------------------------------
 	[],   [1],   'RPM change'
 	[],   [2],   'Clamping'
 	[],   [3],   'Clamping'

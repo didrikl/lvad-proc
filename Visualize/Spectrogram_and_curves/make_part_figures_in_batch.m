@@ -40,7 +40,7 @@ function make_part_figures_in_batch(Data, seqDefs, accVar, Config, fnc, subDir)
 				%save_figure(hFig, fullfile(savePath,'svg'), hFig.Name, 'svg');
 				
 			end
-			%close all
+			close all
 
 		end
 		
