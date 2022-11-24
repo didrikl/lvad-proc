@@ -247,77 +247,6 @@ Data.G1B.Feature_Statistics.AUC_Pooled_RPM = AUC_pooled_rpm;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-%%
-
-% %% Make variable features of each intervention
-% % -----------------------------------------------------------
-% 
-% discrVars = {
-%    'P_LVAD'
-%    'Q_LVAD'
-%  	%'balLev_xRay'
-%  	%'balDiam_xRay'
-%  	%'arealObstr_xRay_pst' 
-%  	};
-% meanVars = {
-% 	%'accB_x_NF_HP'    % to get stddev
-% 	%'accB_y_NF_HP'    % to get stddev
-% 	%'accB_z_NF_HP'    % to get stddev
-% 	%'accB_norm_NF_HP' % to get stddev
-% 	'Q'
-% 	};
-% minMaxVars = {};
-% F_seq = make_intervention_stats(Data.G1B, sequences, discrVars, meanVars, {}, minMaxVars, idSpecs);
-% 
-% % Calculate NHA as band powers
-% accVars = {
-%   	'accA_x'
-%   	'accA_y'
-%   	'accA_z'
-%   	'accB_x'
-%   	'accB_y'
-%   	'accB_z'
-%   	'accB_norm'
-% 	};
-% hBands = [
-% 	2.995, 3.005 % 1Hz-band (for 2400 RPM) containing the 3. harmonic
-% 	2.9695, 2.9705 % adjacent NHA reference 1Hz-band below the 3. harmonic
-% 	3.0275, 3.0425 % adjacent NHA reference 1Hz-band above the 3. harmonic
-% 	];
-% isHarmBand = true; % could as well have used absolute band instead
-% Pxx = make_power_spectra(Data.G1B, sequences, accVars, Config.fs, hBands, idSpecs, isHarmBand);
-% 
-% % Remove mean power frequencies, just to reduce number of variables
-% mpfVars = contains(Pxx.bandMetrics.Properties.VariableNames,'_mpf');
-% Pxx.bandMetrics = Pxx.bandMetrics(:,not(mpfVars));
-% 
-% % Report NHA as g^2/kHz instead of g^2/Hz
-% Pxx.bandMetrics{:,vartype('numeric')} = 1000*Pxx.bandMetrics{:,vartype('numeric')};
-% Data.G1.Periodograms = Pxx;
-% 
-% % Add derived features
-% F_seq = join(F_seq, Pxx.bandMetrics, 'Keys',{'analysis_id','id'});
-% 
-% % Add derived highest third harmonic
-% % vars = {'accB_x_b3_pow','accB_y_b3_pow','accB_z_b3_pow'};
-% % newVar = 'accB_highest_h3';
-% % F = find_best_axis_per_intervention(F, newVar, vars);
-% % F = lookup_baseline_for_best_axis(F, newVar);
-% %F.accB_highest_h3_var
-% 
-% 
-% 
 %% Make relative and delta differences from baselines using id tags
 % -----------------------------------------------------------
 
@@ -343,43 +272,7 @@ Data.G1B.Features.Absolute = F_seq;
 Data.G1B.Features.Relative = F_rel;
 Data.G1B.Features.Delta = F_del;
 
-% 
-% %% Descriptive stastistics over group of experiments
-% % -----------------------------------------------------------
-% 
-% G = make_group_stats(F_seq, idSpecs, sequences);
-% G_rel = make_group_stats(F_rel, idSpecs, sequences);
-% G_del = make_group_stats(F_del, idSpecs, sequences);
-% 
-% Data.G1B.Feature_Statistics.Descriptive_Absolute = G;
-% Data.G1B.Feature_Statistics.Descriptive_Relative = G_rel;
-% Data.G1B.Feature_Statistics.Descriptive_Delta = G_del;
-% 
-% 
-% % Hypothesis test
-% % -----------------------------------------------------------
-% 
-% % Do Wilcoxens pair test and make table of median and p-values
-% pVars = {
-% 	'Q_mean'
-% 	'P_LVAD_mean'
-% };
-% 
-% W = make_paired_features_for_signed_rank_test(F_seq, pVars,{'seq'});
-% W_rel = make_paired_features_for_signed_rank_test(F_rel, pVars,{'seq'});
-% Data.G1B.Features.Paired_Absolute = W;
-% Data.G1B.Features.Paired_Relative = W_rel;
-% 
-% [P,R] = make_paired_signed_rank_test_G1(W, G, pVars);
-% [P_rel,R_rel] = make_paired_signed_rank_test_G1(W_rel, G_rel, pVars);
-% Data.G1B.Feature_Statistics.Test_P_Values_Absolute = P;
-% Data.G1B.Feature_Statistics.Test_P_Values_Relative = P_rel;
-% 
-% % Compile results table
-% Results = compile_results_table_G1B(R, R_rel);
-% Data.G1B.Feature_Statistics.Results = Results;
-% 
-% 
+
 % 
 % %% Save 
 % % -----------------------------------------------------------

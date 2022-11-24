@@ -11,7 +11,6 @@ function [hFig, hAx] = plot_roc_for_3h(ROC)
 	diagCol = [0 0 0 0.7];
 	diagCol = [0 0 0];
 	curveCol = flowColor;
-	%diagColor = plvadColor;
 
 	[hFig, hAx] = init_figure(figWidth, figHeight, pLength);
 	[hXAx, hYAx] = make_ax_offset(hFig, hAx, axGap);

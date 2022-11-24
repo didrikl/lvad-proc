@@ -10,7 +10,6 @@ F.effA = F.h3A > 4.75;
 ROC.T1 = make_roc_struct(F, 'effA', nBootItr);
 multiWaitbar('Making ROC', 0.33);
 
-
 F.effA2 = F.h3A > 20;
 ROC.T2 = make_roc_struct(F, 'effA', nBootItr);
 multiWaitbar('Making ROC', 0.99);

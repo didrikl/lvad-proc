@@ -1,7 +1,7 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-Config.seq = 'G1B_Seq7';
+Config.seq = 'G1B1_Seq7';
 
 % Folder in base path
 Config.seq_subdir = 'Seq7 - LVAD11';

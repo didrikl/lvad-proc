@@ -5,24 +5,26 @@
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 
 inputs = {
-	'G1B1_Seq6'
-	'G1B1_Seq7'
-	'G1B1_Seq8'
-	%'G1B1_Seq10' % Terminated
-	'G1B1_Seq11'
-	'G1B1_Seq12'
-	'G1B1_Seq13'
+    %'G1B_Seq3' % (pilot)
+ 	'G1B_Seq6'
+%  	'G1B_Seq7'
+%  	'G1B_Seq8'
+%	'G1B_Seq10' % Terminated
+%     'G1B_Seq11'
+%    	'G1B_Seq12'
+%     'G1B_Seq13'
+%  	'G1B_Seq14'
 	};
 
 for i=1:numel(inputs)
 
 	% Init defauls, sequence specific inputs and progress bar.
-	Config =  get_processing_config_defaults_G1B1;
+	Config =  get_processing_config_defaults_G1B;
 	eval(inputs{i});
 	init_multiwaitbar_preproc(i, numel(inputs), Config.seq);
 	
 	% Init Data if not present in memory, otherwise update  
-	Data.G1B1.(get_seq_id(Config.seq)).Config = Config;
+	Data.G1B.(get_seq_id(Config.seq)).Config = Config;
 
 	% Init individual data source with adjustment input
 	Init_Data_Raw_G1;

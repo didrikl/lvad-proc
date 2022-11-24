@@ -1,11 +1,11 @@
 %% Defaults settings
-function Config =  get_processing_config_defaults_G1B
+function Config =  get_processing_config_defaults_G1B1
 	
 	% Experiment info
 	% --------------------------------------------------------------------------
 	
-	Config.experimentType = 'Porcine model G1B, with driveline accelerometer';
-	Config.experimentID = 'G1B';
+	Config.experimentType = 'Porcine model G1B1, injections with driveline accelerometer';
+	Config.experimentID = 'G1B1';
 	Config.seq = '';
 	
 
@@ -93,10 +93,10 @@ function Config =  get_processing_config_defaults_G1B
 	Config.notes_subdir = 'Noted';
 
 	Config.proc_subdir = 'Processed\';
-	Config.proc_plot_subdir = 'Figures\G1B';
+	Config.proc_plot_subdir = 'Figures\G1B1';
 	
-	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B - Features';
-	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B - Statistics';
-	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1B - Figures';
+	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B1 - Features';
+	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B1 - Statistics';
+	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1B1 - Figures';
 	
     Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';

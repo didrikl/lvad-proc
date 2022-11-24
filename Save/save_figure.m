@@ -54,6 +54,9 @@ function save_figure(varargin)
 		filePath = fullfile(path, saveName);
 		switch figTypes{i}
 	
+			    case 'eps'
+					saveas(hFig, filePath, 'epsc')
+
 				case 'svg'
 					print(hFig, filePath, '-dsvg');
 	
@@ -68,8 +71,16 @@ function save_figure(varargin)
 					print(hFig, filePath,'-dpng', ['-r',num2str(resolution)])
 					fprintf('\tResolution: %d\n',resolution);
 
+				case {'tif','tiff'}
+					print(hFig, filePath,'-dtiff', ['-r',num2str(resolution)])
+					fprintf('\tResolution: %d\n',resolution);
+
+			    case {'jpeg','jpg'}
+					print(hFig, filePath,'-djpeg', ['-r',num2str(resolution)])
+					fprintf('\tResolution: %d\n',resolution);
+
 			otherwise
-				warning('Saving %s is not supported',figTypes{i})
+				warning('Saving format as %s is not supported',figTypes{i})
 			
 			end
 			
