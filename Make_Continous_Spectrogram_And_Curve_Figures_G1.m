@@ -1,4 +1,5 @@
-Config =  get_processing_config_defaults_G1;
+close all
+set(0,'DefaultFigureVisible','off');
 
 seqDefs = {
 	'G1_Seq3'
@@ -20,13 +21,16 @@ accVar = {
     'accA_z_NF_HP'
  	};
 
-Data.G1 = make_part_plot_data_per_sequence(Data.G1, seqDefs, accVar, Config);
 
-close all
-set(0,'DefaultFigureVisible','off');
+Config =  get_processing_config_defaults_G1;
+
+Data.G1 = make_part_plot_data_per_sequence(Data.G1, seqDefs, accVar, Config);
 
 make_part_figures_in_batch(Data.G1B, seqDefs, accVar, Config, ...
  	@make_part_figure_2panels, 'Spectrogram and curves - accB')
 
-clear accVar seqDefs
+
+%% Roundup
+
+clear accVar seqDefs eventToClip
 set(0,'DefaultFigureVisible','on');

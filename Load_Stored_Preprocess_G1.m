@@ -1,4 +1,5 @@
-% Load previously preprocessed and stored data
+%% Load previously preprocessed and stored data
+
 run('C:\Users\Didrik\Dropbox\Arbeid\OUS\Proc\Matlab\Initialize\Environment.m')
 Config =  get_processing_config_defaults_G1;
 	
@@ -15,8 +16,9 @@ sequences = {
 
 whatToLoad = {'S','S_parts','Notes','Config'};
 
-% TODO: Make support for appending sequences
-Data.G1 = load_processed_sequences(sequences(:,1),...
+if not(exist('Data', 'var')), Data = struct; end
+if not(isfield(Data, 'G1')), Data.G1 = struct; end
+Data.G1 = load_processed_sequences(Data.G1, sequences(:,1),...
     fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)), whatToLoad);
 
 [Data.G1, F, F_rel, F_del] = load_processed_features(Config, Data.G1);

@@ -4,7 +4,6 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	fs = Config.fs;
 	colorMapName = Config.rpmOrderMapColorMapName;
 	seqID = [Config.experimentID,'_',Config.seq];
-	h3YLims = Config.h3YLims;
 	
 	spec = get_plot_specs;
 	Colors_IV2
@@ -15,6 +14,7 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	figWidth = 1800;
 	figHeight =  900;
 	pWidthMax = 1300;
+	h3YLims = [-5,72];
 	yLims = [-75,75];
 	yLim_map = [0.75, 4.25];
 	noteVarsNeeded = {
@@ -48,7 +48,7 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	[hFig, hSub] = init_panels(spec, tit, figWidth, figHeight);
 
 	plot_rpm_order_map(hSub(2), mapScale, colorMap, t, order, map, yLim_map);
-	plot_h3(hSub(3), t, h3, h3Avg, h3YLims);
+	plot_h3(hSub(3), t, h3(:,3), h3Avg(:,3), h3YLims);
 	plot_curves(hSub(1), t, T, yLims, segs);
 	
   	add_shades(hSub(1), segs, segs.all.isEcho, echoShadeColor, 0.20, [50, 76])
@@ -81,24 +81,24 @@ function plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
 	hAx.YLim = yLim;
 	xlim(hAx, t([1,end]))
 
-function h = plot_h3(hAx, t, h3, h3Avg, yLims)
+function plot_h3(hAx, t, h3, h3Avg, yLims)
 	h3Color = [0.76,0.0,0.2];
 
-	h(1) = plot(hAx, t, movmedian(h3,20), '-',...
+	plot(hAx, t, movmedian(h3,20), '-',...
 		'LineWidth',0.3,...
-  		'Color',[h3Color,.35]);
-	h(1) = plot(hAx, t, h3Avg, '-',...
+  		'Color',[h3Color,.5]);
+	plot(hAx, t, h3Avg, '-',...
 		'LineWidth',2.5,...
 		'Color',[h3Color,.2],...
 		'HandleVisibility','off');
-	h(1) = plot(hAx, t, h3Avg, '-.',...
+	plot(hAx, t, h3Avg, '-.',...
 		'LineWidth',2.2,...
-		'Color',[h3Color,.75]);
+		'Color',[h3Color,.85]);
 	
     ylim(hAx, yLims)
 	hAx.YAxis.Color = [0.15 0.15 0.15];
 
-	patch(hAx, 'XData',[t(1) t(end) t(end) t(1)],'YData',[-5, -5, 3.8, 3.8],...
+	patch(hAx, 'XData',[t(1) t(end) t(end) t(1)],'YData',[-5, -5, 4.75 4.75],...
 		'FaceAlpha',0.15,...
 		'EdgeColor','none',...
 		'HandleVisibility','off');
@@ -116,8 +116,8 @@ function h = plot_curves(hAx, t, T, yLims, segs)
 	end
 	
 	h(2) = plot(hAx, T.dur,T.Q_relDiff,...
-  		'LineWidth',.3,...
- 		'Color',[flowColor,0.6]);
+  		'LineWidth',.35,...
+ 		'Color',[flowColor,0.75]);
     
 	plot(hAx, T.dur,T.P_LVAD_relDiff, '-',...
 		'LineWidth',2.5,...
@@ -231,7 +231,7 @@ function add_steady_state_annotations(hAx, segs)
 			add_segment_annotation(hAx, segs, whichSegs, lab, 0)
 
 			whichSegs = segs.all.pumpSpeed==speeds(i) & segs.all.isBaseline;
-			lab = {['\bf',num2str(speeds(i)),'\rm'],'\bfbaseline\rm'};
+			lab = {['\bf',num2str(speeds(i)),'\rm'],'\bfBL\rm'};
 			add_segment_annotation(hAx, segs, whichSegs, lab, 0)
 
 		end
@@ -266,7 +266,7 @@ function add_transition_annotations(hAx, T, segs)
 		isEvent = ismember(T.event(segs.all.startInd),events(i));
 		isEvent = isEvent & not(segs.all.isEcho);
 		event = lower(string(events(i)));
-		event = strrep(event,'injection, embolus','ingestion');
+		event = strrep(event,'injection, embolus','injection');
 		event = strrep(event,'injection, saline','saline');
 		add_segment_annotation(hAx, segs, isEvent, event, 90, [.15 .15 .15])
 	end
@@ -303,6 +303,7 @@ function hSub = add_xlines_and_grid(hSub, segs)
 			xline(hSub(1), segs.main.StartDur(i), 'Color',[.15 .15 .15])
 		end
 	end
+
 function [hFig, hSub] = init_panels(spec, tit, figWidth, figHeight)
 	hFig = figure(spec.fig{:},...
 		'Name',tit,...

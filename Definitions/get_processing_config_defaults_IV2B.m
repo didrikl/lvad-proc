@@ -25,8 +25,11 @@ function Config =  get_processing_config_defaults_IV2B
 	Config.rpmOrdersToTrack = [1 2 3 4 5];
 	
 	% For RPM order map visualization
-	Config.rpmOrderMapScale = [-85, -55];
+	Config.rpmOrderMapScale = [-80, -45];
 	Config.rpmOrderMapColorMapName = 'batlowW';
+	Config.h3YLims = [-5,35];
+	Config.curveYLims = [-100,85];
+	Config.mapYLims = [0.75, 5.75];
 
 
 	% Misc. settings
@@ -62,7 +65,7 @@ function Config =  get_processing_config_defaults_IV2B
 	Config.notes_subdir = 'Noted';
 
 	Config.proc_subdir = 'Processed\';
-	Config.proc_plot_subdir = 'Figures\IV2B';
+	Config.proc_plot_subdir = 'Figures\';
 	Config.proc_stats_subdir = 'Processed\Statistics';
 
 	Config.feats_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\IV2B - Features';

@@ -1,7 +1,7 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-Config.seq = 'G1B1_Seq8';
+Config.seq = 'G1B2_Seq8';
 
 % Folder in base path
 Config.seq_subdir = 'Seq8 - LVAD1';
@@ -12,7 +12,7 @@ Config.labChart_fileNames = {
     % RPM + Clamping + Insertion + Balloon @2400 RPM
 	% -----------------------------------------------
 	%'G1_Seq8 - F1 [accA].mat'
-	%'G1_Seq8 - F1 [accB].mat'
+	'G1_Seq8 - F1 [accB].mat'
 	%'G1_Seq8 - F1 [pGraft,ECG,pLV].mat'
 	%'G1_Seq8 - F1 [i1,i2,i3].mat'
 	%'G1_Seq8 - F1 [v1,v2,v3].mat'
@@ -20,20 +20,23 @@ Config.labChart_fileNames = {
 	% Balloon @ [2200,2600] RPM
 	% --------------------------
 	%'G1_Seq8 - F2 [accA].mat'
-	%'G1_Seq8 - F2 [accB].mat'
+	'G1_Seq8 - F2 [accB].mat'
 	%'G1_Seq8 - F2 [pGraft,ECG,pLV].mat'
 	%'G1_Seq8 - F2 [i1,i2,i3].mat'
 	%'G1_Seq8 - F2 [v1,v2,v3].mat'
 	
 	% Injections
 	% -----------
-	'G1_Seq8 - F3_Sel1 [accA].mat'
-	'G1_Seq8 - F3_Sel1 [accB].mat'
+	%'G1_Seq8 - F3_Sel1 [accA].mat'
+	%'G1_Seq8 - F3_Sel1 [accB].mat'
 	%'G1_Seq8 - F3_Sel1 [pGraft,ECG,pLV].mat'
 	%'G1_Seq8 - F3_Sel1 [i1,i2,i3].mat'
 	%'G1_Seq8 - F3_Sel1 [v1,v2,v3].mat'
-	'G1_Seq8 - F3_Sel2 [accA].mat'
-	'G1_Seq8 - F3_Sel2 [accB].mat'
+	
+	% Injections + Fat + Anticoagulant
+	% ---------------------------------
+	%'G1_Seq8 - F3_Sel2 [accA].mat'
+	%'G1_Seq8 - F3_Sel2 [accB].mat'
 	%'G1_Seq8 - F3_Sel2 [pGraft,ECG,pLV].mat'
 	%'G1_Seq8 - F3_Sel2 [i1,i2,i3].mat'
 	%'G1_Seq8 - F3_Sel2 [v1,v2,v3].mat'
@@ -62,17 +65,11 @@ Config.channelExclRanges = {
 
 % Parts (or combined parts) for assessments
 Config.partSpec = {
- 	% BL         Parts     Label 
+ 	% BL      Parts    Label 
 	% ---------------------------------
-	%  [],       [2],       'RPM change'
-	%  [],       [3],       'Clamping'
-	%  [],       [5],       'Balloon'
-	%  [],       [6],       'Balloon'
-	%  [],       [7],       'Balloon'
-	%  []        [8:11],    'Injection [1,Sal,2,3]'
-	%  [11,141], [12:14],   'Injection [4,5,6]'
-	%  [14,157], [15:18],   'Injection [7,8,9,10]'
-	%  [14,157], [19:22],   'Fat [1,2,3,4]'
-	  [],       [8,10:18], 'Injection [1-10]'
-	%    [8,116],  [9:22],  'injection [1-14], incl. fat'
+	  [],     [2],     'RPM change'
+	  [],     [3],     'Clamping'
+	  [],     [5],     'Balloon'
+	  [],     [6],     'Balloon'
+	  [],     [7],     'Balloon'
 	};

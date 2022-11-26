@@ -1,13 +1,13 @@
 %% Defaults settings
-function Config =  get_processing_config_defaults_G1
+function Config =  get_processing_config_defaults_G1B2
 	
 	% Experiment info
 	% --------------------------------------------------------------------------
 	
-	Config.experimentType = 'Porcine model G1B';
-	Config.experimentID = 'G1';
+	Config.experimentType = 'Porcine model G1B2, balloon with driveline accelerometer';
+	Config.experimentID = 'G1B2';
 	Config.seq = '';
-
+	
 
 	% Signal processing settings
 	% --------------------------------------------------------------------------
@@ -26,9 +26,9 @@ function Config =  get_processing_config_defaults_G1
 	%Config.rpmOrdersToTrack = [2.95, 3, 3.05];
 	
 	% For RPM order map visualization
-	Config.rpmOrderMapScale = [-65, -36];
+	Config.rpmOrderMapScale = [-85, -55];
 	Config.rpmOrderMapColorMapName = 'batlowW';
-	Config.h3YLims = [-5,35];
+    Config.h3YLims = [-5,35];
 	Config.curveYLims = [-100,55];
 	Config.mapYLims = [0.75, 5.75];
 
@@ -58,7 +58,7 @@ function Config =  get_processing_config_defaults_G1
 	Config.interNoteInclSpec = 'nearest';
 	Config.outsideNoteInclSpec = 'none';
 
-	Config.labChart_varMapFile = 'VarMap_LabChart_G1';
+	Config.labChart_varMapFile = 'VarMap_LabChart_G1B';
 	Config.systemM_varMapFile = 'VarMap_SystemM_G1';
 	Config.notes_varMapFile = 'VarMap_Notes_G1_v1_0_0';
 
@@ -95,10 +95,10 @@ function Config =  get_processing_config_defaults_G1
 	Config.notes_subdir = 'Noted';
 
 	Config.proc_subdir = 'Processed\';
-	Config.proc_plot_subdir = 'Figures\G1';
+	Config.proc_plot_subdir = 'Figures\G1B2';
 	
-	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Features';
-	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1 - Statistics';
-	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1 - Figures';
+	Config.feats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B2 - Features';
+	Config.stats_path  = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Data analysis\G1B2 - Statistics';
+	Config.fig_path    = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Figures\G1B2 - Figures';
 	
-	Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';
+    Config.idSpecs_path = 'C:\Users\Didrik\Dropbox\Arbeid\OUS\Notater\Excel spreadsheets\G1 - ID Specifications.xlsx';

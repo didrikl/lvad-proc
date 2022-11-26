@@ -10,8 +10,8 @@ function T = extract_from_data(Data, partSpec, eventsToClip)
 		'P_LVAD'             
 		'pumpSpeed'
 		'balLev'
-		'embVol'
-		'embType'
+ 		'embVol'
+ 		'embType'
 		};
 	Notes = Data.Notes;
 	partNo = partSpec{2};

@@ -1,7 +1,7 @@
-function Data = load_processed_sequences(seqNames, seqFilePaths, whatToLoad)
+function Data = load_processed_sequences(Data, seqNames, seqFilePaths, whatToLoad)
 
 	welcome('Loading processed data files')
-	Data = struct;
+	
 	seqNames = cellstr(seqNames);
 	seqFilePaths = cellstr(seqFilePaths);
 
@@ -17,8 +17,8 @@ function Data = load_processed_sequences(seqNames, seqFilePaths, whatToLoad)
 	
 	multiWaitbar('CloseAll');
 
-function Data = load_data(Data,dataType,seqFilePaths,seqNames)
-
+function Data = load_data(Data, dataType, seqFilePaths, seqNames)
+	
 	seqFilePaths = seqFilePaths+"_"+dataType+".mat";
 	nSeqs = numel(seqNames);
 
@@ -48,4 +48,3 @@ function Data = load_data(Data,dataType,seqFilePaths,seqNames)
 		msgbox(["Unable to find files or directories";...
 			"--------------------------------------------";allErr])
 	end
-

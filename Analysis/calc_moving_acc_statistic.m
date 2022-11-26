@@ -10,6 +10,6 @@ function yMov = calc_moving_acc_statistic(y,MovObj)
 	% Truncate output in case input is shorter than window length
 	if length(y)<length(yMov)
 		yMov = yMov(1:length(y));
-		warning(['Input for moving stattistic calculation is short than ',...
+		warning(['Input for moving statistic calculation is short than ',...
 		'the calculation window length.'])
 	end

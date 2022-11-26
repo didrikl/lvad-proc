@@ -1,7 +1,7 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-Config.seq = 'G1B_Seq14';
+Config.seq = 'G1B2_Seq14';
 
 % Folder in base path
 Config.seq_subdir = 'Seq14 - LVAD9';
@@ -44,7 +44,7 @@ Config.labChart_fileNames = {
 	% Saline injections???
 	% ---------------------
 	%'G1_Seq14 - F5 [accA].mat'
-	'G1_Seq14 - F5 [accB].mat'
+	%'G1_Seq14 - F5 [accB].mat'
 	%'G1_Seq14 - F5 [pGraft,ECG,pLV].mat'
 	%'G1_Seq14 - F5 [V1,V2,V3].mat'
 	%'G1_Seq14 - F5 [I1,I2,I3].mat'
@@ -66,25 +66,14 @@ Config.pChannelSwapBlocks = [];
 Config.PL_offset = [];
 Config.PL_offset_files = {};
 
-parts = {
-    [],   [2],  [],   '1. RPM changes'
-    [],   [8],  [],   '1. RPM changes - Second time'
-    [],   [3],  [],   '2. Graft clamping'
-    {},   [5],  [],   '3. Balloon inflation'
-    {},   [6],  [],   '4. Balloon inflation'
-    [],   [7],  [],   '5. Balloon inflation'
-    [],   [9],  [],   '6. Saline bolus injections'
-    };
-
 % Parts (or combined parts) for assessments
 Config.partSpec = {
- 	% BL      Parts      Label 
+ 	% BL    Parts    Label 
 	% ---------------------------------
-	[],   [2],    'RPM change'
-	[],   [3],    'Clamping'
-	[],   [5],    'Balloon'
-	[],   [6],    'Balloon'
-	[],   [7],    'Balloon'
-	[],   [8],    'RPM change #2'
-	[],   [9],    'Injection [Sal]'
+	  [],   [2],    'RPM change'
+	  [],   [3],    'Clamping'
+	  [],   [5],    'Balloon'
+	  [],   [6],    'Balloon'
+	  [],   [7],    'Balloon'
+	  [],   [8],    'RPM change #2'
 	};

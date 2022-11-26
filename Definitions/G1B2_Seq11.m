@@ -1,7 +1,7 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-Config.seq = 'G1B1_Seq11';
+Config.seq = 'G1B2_Seq11';
 
 % Folder in base path
 Config.seq_subdir = 'Seq11 - LVAD13';
@@ -12,7 +12,7 @@ Config.labChart_fileNames = {
     % RPM + Baseline
     % ---------------
 	%'G1_Seq11 - F1_Sel1 [accA].mat'      
-    %'G1_Seq11 - F1_Sel1 [accB].mat'
+    'G1_Seq11 - F1_Sel1 [accB].mat'
     %'G1_Seq11 - F1_Sel1 [pGraft,ECG,pLV].mat'
     %'G1_Seq11 - F1_Sel1 [V1,V2,V3].mat'
     %'G1_Seq11 - F1_Sel1 [I1,I2,I3].mat'
@@ -20,7 +20,7 @@ Config.labChart_fileNames = {
     % Insertion #1
     % -------------
 	%'G1_Seq11 - F2 [accA].mat'      
-    %'G1_Seq11 - F2 [accB].mat'      
+    'G1_Seq11 - F2 [accB].mat'      
     %'G1_Seq11 - F2 [pGraft,ECG,pLV].mat'      
     %'G1_Seq11 - F3 [accA].mat'
     %'G1_Seq11 - F3 [accB].mat'      
@@ -31,12 +31,12 @@ Config.labChart_fileNames = {
     % Clamping + Insertion #2 + Balloon 
     % ----------------------------------
 	%'G1_Seq11 - F5 [accA].mat'      
-    %'G1_Seq11 - F5 [accB].mat'      
+    'G1_Seq11 - F5 [accB].mat'      
     %'G1_Seq11 - F5 [pGraft,ECG,pLV].mat'
     %'G1_Seq11 - F5 [V1,V2,V3].mat'
     %'G1_Seq11 - F5 [I1,I2,I3].mat'
     %'G1_Seq11 - F7 [accA].mat'      
-    %'G1_Seq11 - F7 [accB].mat'      
+    'G1_Seq11 - F7 [accB].mat'      
     %'G1_Seq11 - F7 [pGraft,ECG,pLV].mat'
     %'G1_Seq11 - F7 [V1,V2,V3].mat'
     %'G1_Seq11 - F7 [I1,I2,I3].mat'
@@ -44,12 +44,12 @@ Config.labChart_fileNames = {
      % Injections
      % -----------
 	 'G1_Seq11 - F8 [accA].mat'      
-     'G1_Seq11 - F8 [accB].mat'
+     %'G1_Seq11 - F8 [accB].mat'
      %'G1_Seq11 - F8 [pGraft,ECG,pLV].mat'
      %'G1_Seq11 - F8 [V1,V2,V3].mat'
      %'G1_Seq11 - F8 [I1,I2,I3].mat'
-     'G1_Seq11 - F9 [accA].mat'
-     'G1_Seq11 - F9 [accB].mat'
+     %'G1_Seq11 - F9 [accA].mat'
+     %'G1_Seq11 - F9 [accB].mat'
      %'G1_Seq11 - F9 [pGraft,ECG,pLV].mat'
      %'G1_Seq11 - F9 [V1,V2,V3].mat'
      %'G1_Seq11 - F9 [I1,I2,I3].mat'
@@ -72,15 +72,11 @@ Config.PL_offset_files = {};
 Config.partSpec = {
  	% BL      Parts      Label 
 	% ---------------------------------
-	%  	[],       [2],           'RPM change'
-	%  	[],       [3],           'Clamping'
-	%  	[],       [5],           'Balloon'
-	%  	[],       [6],           'Balloon'
-	%  	[],       [7],           'Balloon'
-	%   [],       [8,9,10,11],   'Injection [Sal,1,2,3]'
-	%   [11,151], [12,12,14],    'Injection [4,5,6]'
-	%   [14,178], [15,16,17,18], 'Injection [7,8,9,10]'
-	 	[],       [9:18],        'Injection [1-10]'
+	  [],     [2],      'RPM change'
+	  [],     [3],      'Clamping'
+	  [],     [5],      'Balloon'
+	  [],     [6],      'Balloon'
+	  [],     [7],      'Balloon'
 	};
 
 % All injections part combined in wider spectrogram figures

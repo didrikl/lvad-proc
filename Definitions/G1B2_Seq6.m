@@ -1,7 +1,7 @@
 %% Sequence definitions and correction inputs
 
 % Experiment sequence ID
-Config.seq = 'G1B1_Seq6';
+Config.seq = 'G1B2_Seq6';
 
 % Folder in base path
 Config.seq_subdir = 'Seq6 - LVAD7';
@@ -12,18 +12,18 @@ Config.labChart_fileNames = {
     % RPM + Insertion + Balloon @2400 RPM
 	% ----------------------------------------------
 	%'G1_Seq6 - F1_Sel1 [accA].mat'
-	%'G1_Seq6 - F1_Sel1 [accB].mat'
+	'G1_Seq6 - F1_Sel1 [accB].mat'
 	%'G1_Seq6 - F1_Sel1 [pGraft,pLV,ECG].mat'
     %'G1_Seq6 - F1_Sel2 [accA].mat'
-	%'G1_Seq6 - F1_Sel2 [accB].mat'
+	'G1_Seq6 - F1_Sel2 [accB].mat'
 	%'G1_Seq6 - F1_Sel2 [pGraft,pLV,ECG].mat'
 	
 	% Balloon @[2200,2600] RPM + Clamping + Injections
 	% -------------------------------------------------
-	'G1_Seq6 - F2_Sel1 [accA].mat'
+	%'G1_Seq6 - F2_Sel1 [accA].mat'
 	'G1_Seq6 - F2_Sel1 [accB].mat'
 	%'G1_Seq6 - F2_Sel1 [pGraft,pLV,ECG].mat'
-	'G1_Seq6 - F2_Sel2 [accA].mat'
+	%'G1_Seq6 - F2_Sel2 [accA].mat'
 	'G1_Seq6 - F2_Sel2 [accB].mat'
 	%'G1_Seq6 - F2_Sel2 [pGraft,pLV,ECG].mat'
 
@@ -45,16 +45,12 @@ Config.channelExclRanges = {};
 
 % Parts (or combined parts) for assessments
 Config.partSpec = {
-	% BL      parts         label
+	% BL      Parts       Label
 	% ---------------------------------
-	% 	 [],       [1],        'RPM change'
-	% 	 [],       [2],        'Balloon'
-	% 	 [],       [3],        'Balloon'
-	% 	 [],       [4],        'Balloon'
-	% 	 [],       [5],        'RPM change #2'
-	% 	 [],       [6],        'Clamping'
-	% 	 [],       [7,8,9],    'Injection [1,2,3]'
-	% 	 [9,117],  [10,11,12], 'Injection [4,5,6]'
-	% 	 [12,128], [13,14,15], 'Injection [7,8,9]'
-	     [],       [7:15],     'Injection [1-9]'
+	  [],     [1],        'RPM change'
+	  [],     [2],        'Balloon'
+	  [],     [3],        'Balloon'
+	  [],     [4],        'Balloon'
+	  [],     [5],        'RPM change #2'
+	  [],     [6],        'Clamping'
 	};

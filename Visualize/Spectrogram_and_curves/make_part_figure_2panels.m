@@ -3,7 +3,7 @@ function hFig = make_part_figure_2panels(T, Notes, map, var, Config, partSpec)
 	mapScale = Config.rpmOrderMapScale;
 	fs = Config.fs;
 	colorMapName = Config.rpmOrderMapColorMapName;
-	seqID = [Config.experimentID,'_',Config.seq];
+	seqID = Config.seq;
 				
 	spec = get_plot_specs;
 	Colors_IV2
@@ -16,8 +16,8 @@ function hFig = make_part_figure_2panels(T, Notes, map, var, Config, partSpec)
 	figWidth = 1300;
 	figHeight =  822;
 	pWidthMax = 1000;
-	yLims = [-100,55];
-	yLim_map = [0.75, 5.75];
+	yLims = Config.curveYLims;
+	yLim_map = Config.mapYLims;
 	noteVarsNeeded = {
 		'part'               
 		'intervType'         
@@ -47,8 +47,8 @@ function hFig = make_part_figure_2panels(T, Notes, map, var, Config, partSpec)
 	[hFig, hSub] = init_panels(spec, tit, figWidth, figHeight);
 	plot_rpm_order_map(hSub(1), mapScale, colorMap, t, order, map, yLim_map);
 	hPlt = plot_curves(hSub(2), T, var, yLims);
-	add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.20, [1.0*yLims(1) 63])
-	add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.30, [1.0*yLims(1) 63])
+	add_shades(hSub(2), segs, segs.all.isEcho, echoShadeColor, 0.20, yLims)
+	add_shades(hSub(2), segs, segs.all.isTransitional, shadeColor, 0.30, yLims)
 	add_shades(hSub(2), segs, segs.all.isWashout, washoutColor, 0.25, [59 63])
 	add_shades(hSub(2), segs, segs.all.isTransitional & segs.all.isInjection, injectionColor, 0.25, [59 63])
 	

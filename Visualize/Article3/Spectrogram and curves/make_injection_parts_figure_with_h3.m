@@ -32,7 +32,7 @@ function [hFig, rpmMapA, rpmMapB, T]  = make_injection_parts_figure_with_h3(...
 	pWidthMax = 620;
 	yLims = [-2.75,1.75];
 	yLim_map = [0.75, 4.25];
-	h3YLims = [-5,72];%Config.h3YLims;
+	h3YLims = [-5,72];
 	if nargin<6		
 		T = extract_from_data(Data, parts, eventsToClip);
 		T = add_norms_and_filtered_vars_as_needed({varA;varB}, T, Config);

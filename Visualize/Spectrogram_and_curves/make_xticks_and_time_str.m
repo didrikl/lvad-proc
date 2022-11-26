@@ -1,7 +1,7 @@
 function xLabels = make_xticks_and_time_str(hSub, segs, rot)
 	if nargin<3, rot=45; end
 	
-	xt = [0;segs.all.endDur];
+	xt = sort(unique([0;segs.all.endDur]));
 	xticks(hSub(end),xt);
 	xLabels = hSub(end).XTick;
 	xLabels = seconds(xLabels);

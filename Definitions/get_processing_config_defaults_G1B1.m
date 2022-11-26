@@ -28,7 +28,9 @@ function Config =  get_processing_config_defaults_G1B1
 	% For RPM order map visualization
 	Config.rpmOrderMapScale = [-85, -55];
 	Config.rpmOrderMapColorMapName = 'batlowW';
-    %Config.h3YLims = [-5,35];
+    Config.h3YLims = [-5,35];
+	Config.curveYLims = [-100,55];
+	Config.mapYLims = [0.75, 5.75];
 
 
 	% Misc. settings

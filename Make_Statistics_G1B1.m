@@ -206,43 +206,8 @@ harmB = [F.h3B; F.h4B];
 %% Calculate ROC curves
 % ----------------------
 
-classifiers = {
-	'accB_x_NF_HP_b3_pow'
- 	'P_LVAD_change'
-	};
-
-% Input for states of concrete occlusions 
-predStateVar = 'levelLabel';
-predStates = {
-	'Balloon, 2400, Lev1', '\bf34%-47%\rm\newlineobstruction'
-	'Balloon, 2400, Lev2', '\bf52%-64%\rm\newlineobstruction'
-	'Balloon, 2400, Lev3', '\bf65%-72%\rm\newlineobstruction'
-	'Balloon, 2400, Lev4', '\bf78%-84%\rm\newlineobstruction'
-	};
-[ROC,AUC] = make_roc_curve_matrix_per_intervention_and_speed(...
-	F(F.pumpSpeed==single(2400),:), classifiers, predStateVar, predStates, false);
-Data.G1B.Feature_Statistics.ROC = ROC;
-Data.G1B.Feature_Statistics.AUC = AUC;
-
-
-% Calculate ROC curves for pooled RPM of both BL and balloon interventions
-% --------------------------------------------------------------------------
-
-
-% Input for states of concrete occlusions 
-predStateVar = 'balLev_xRay_mean';
-predStates = {
-	1, '\bf34%-47%\rm\newlineobstruction'
-	2, '\bf52%-64%\rm\newlineobstruction'
-	3, '\bf65%-72%\rm\newlineobstruction'
-	4, '\bf78%-84%\rm\newlineobstruction'
-	};
-
-[ROC_pooled_rpm,AUC_pooled_rpm] = make_roc_curve_matrix_per_intervention_and_speed(...
-	F, classifiers, predStateVar, predStates, false, {}, true);
-
-Data.G1B.Feature_Statistics.ROC_Pooled_RPM = ROC_pooled_rpm;
-Data.G1B.Feature_Statistics.AUC_Pooled_RPM = AUC_pooled_rpm;
+F2 = F(not(ismember(F.seq,'Seq7')),:);
+	
 
 
 
