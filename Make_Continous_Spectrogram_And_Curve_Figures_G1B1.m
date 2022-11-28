@@ -3,13 +3,13 @@ close all
 set(0,'DefaultFigureVisible','off');
 
 seqDefs = {
-   	'G1B1_Seq6'
-   	'G1B1_Seq7'
- 	'G1B1_Seq8'
+%    	'G1B1_Seq6'
+%    	'G1B1_Seq7'
+%  	'G1B1_Seq8'
  	'G1B1_Seq10'  % Terminated
-   	'G1B1_Seq11'
-   	'G1B1_Seq12'
-  	'G1B1_Seq13'
+%    	'G1B1_Seq11'
+%    	'G1B1_Seq12'
+%   	'G1B1_Seq13'
 	};
 
 eventToClip = {

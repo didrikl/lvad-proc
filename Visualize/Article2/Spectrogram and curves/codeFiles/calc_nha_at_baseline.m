@@ -1,4 +1,7 @@
-function bp_bl = calc_nha_at_baseline_G1B(segs, T, fs)
+function bp_bl = calc_nha_at_baseline(segs, T, fs, vars)
+	
+	if nargin<4, vars = {'accA_x_NF_HP','accA_y_NF_HP','accA_z_NF_HP'}; end
+	
 	% TODO: Change to use of find baseline function!?!
 	blSeg = find(segs.all.isBaseline);
 	inds_bl = [];
@@ -8,4 +11,4 @@ function bp_bl = calc_nha_at_baseline_G1B(segs, T, fs)
 	if isempty(inds_bl)
 		inds_bl = segs.main.startInd(1):segs.main.endInd(1);
 	end
-	bp_bl = calc_nha_G1B(T, inds_bl, fs);
+	bp_bl = calc_nha(T, inds_bl, fs, vars);

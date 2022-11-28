@@ -30,30 +30,11 @@ function segs = get_segment_info(T, durVar)
 	segs.all.isBaseline = ismember(T.intervType(segs.all.startInd),'Baseline') & not(segs.all.isEcho);
 	
 	% Parse additional model-dependent column info
-	% TODO: Refactor to separate function
-	try
-		segs.all.balLev_xRay = T.balLev_xRay(segs.all.startInd);
-		segs.all.arealObstr_xRay_pst = T.arealObstr_xRay_pst(segs.all.startInd);
-	catch
-		% X-ray measurement not done
-		segs.all.balLev_xRay = T.balLev(segs.all.startInd);
-		%segs.all.arealObstr_xRay_pst = T.arealObstr_pst(segs.all.startInd);
-	end
+	segs = fill_obstruction_info(segs, T);
+	segs = fill_clamp_info(segs, T);
+	segs = fill_injection_info(segs, T);
 	
-	segs.all.QRedTarget_pst = T.QRedTarget_pst(segs.all.startInd);
-	segs.all.isClamp = double(string(T.QRedTarget_pst(segs.all.startInd)))>0;
-	segs.all.isBalloon = double(string(T.balLev(segs.all.startInd)))>0;
 	segs.all.isNominal = segs.all.isSteadyState & not(segs.all.isClamp) & not(segs.all.isBalloon);
-	
-	segs.all.isInjection = false(height(segs.all));
-	segs.all.embVol = nan(height(segs.all));
-	segs.all.embType = string(nan(height(segs.all)));
-	if ismember(T.Properties.VariableNames, 'embVol')
-		segs.all.isInjection = not(ismissing(T.embVol(segs.all.startInd))) & ...
-			not(ismember(T.embVol(segs.all.startInd),'-'));	
-		segs.all.embVol = T.embVol(segs.all.startInd);
-		segs.all.embType = T.embType(segs.all.startInd);
-	end
 	
 	% Handle injection info: QRedTarget was used to decide is echo should be
 	% done, but should for plotting/analysis be 0
@@ -88,4 +69,31 @@ function segs = get_segment_info(T, durVar)
 		segs.main.StartDur = segs.all.startDur(mainSegRows);
 		segs.main.EndDur = [segs.main.StartDur(2:end);segs.all.endDur(end)];
 		segs.main.MidDur = segs.main.StartDur+(segs.main.EndDur-segs.main.StartDur)./2;
+	end
+
+function segs = fill_obstruction_info(segs, T)
+	try
+		segs.all.balLev_xRay = T.balLev_xRay(segs.all.startInd);
+		segs.all.arealObstr_xRay_pst = T.arealObstr_xRay_pst(segs.all.startInd);
+		segs.all.isBalloon = double(string(T.balLev_xRay(segs.all.startInd)))>0;
+	catch
+		% X-ray measurement not done
+		segs.all.balLev_xRay = T.balLev(segs.all.startInd);
+		segs.all.isBalloon = double(string(T.balLev(segs.all.startInd)))>0;
+		%segs.all.arealObstr_xRay_pst = T.arealObstr_pst(segs.all.startInd);
+	end
+
+function segs = fill_clamp_info(segs, T)
+	segs.all.QRedTarget_pst = T.QRedTarget_pst(segs.all.startInd);
+	segs.all.isClamp = double(string(T.QRedTarget_pst(segs.all.startInd)))>0;
+	
+function segs = fill_injection_info(segs, T)
+	segs.all.isInjection = false(height(segs.all),1);
+	segs.all.embVol = nan(height(segs.all),1);
+	segs.all.embType = string(nan(height(segs.all),1));
+	if ismember(T.Properties.VariableNames, 'embVol')
+		segs.all.isInjection = not(ismissing(T.embVol(segs.all.startInd))) & ...
+			not(ismember(T.embVol(segs.all.startInd),'-'));	
+		segs.all.embVol = T.embVol(segs.all.startInd);
+		segs.all.embType = T.embType(segs.all.startInd);
 	end

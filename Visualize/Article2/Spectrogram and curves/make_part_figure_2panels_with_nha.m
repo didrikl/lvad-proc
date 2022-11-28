@@ -107,7 +107,7 @@ function hPlt = make_panels_colum(hSub, T, var, map, fs, segs, mapScale, colorMa
 	map = map.([var,'_map']);
 	
 	plot_rpm_order_map(hSub(1), mapScale, colorMap, t, order, map, yLims1);
-	hPlt = plot_curves(hSub(2), hSub(2), T, segs, fs, yLims2, yLims2);
+	hPlt = plot_curves(hSub(2), hSub(2), T, segs, fs, yLims2, yLims2, var);
 	
  	make_xticks_and_time_str(hSub, segs);
  	adjust_yticks(hSub(2), yTicks2);
@@ -129,7 +129,7 @@ function hPlt = plot_rpm_order_map(hAx, colRange, colMap, t, order, map, yLim)
 	hAx.YLim = yLim;
 	xlim(hAx, t([1,end]))
 
-function h = plot_curves(hAx, hAxNHA, T, segs, fs, yLims, yLimsNHA)
+function h = plot_curves(hAx, hAxNHA, T, segs, fs, yLims, yLimsNHA, var)
 	
 	flowColor = [0.07,0.39,0.50];%[0.03,0.26,0.34,1];
 	nhaColor = [0.76,0.0,0.2];
@@ -139,8 +139,8 @@ function h = plot_curves(hAx, hAxNHA, T, segs, fs, yLims, yLimsNHA)
 	h(1) = plot(hAx, T.dur, T.Q_relDiff,...
  		'LineWidth',1, 'Color',flowColor);  	
 	
-	nha_bl = calc_nha_at_baseline(segs, T, fs);
-	h(4) = plot_nha(hAxNHA, segs, T, nha_bl, yLimsNHA, fs, 'main', nhaColor);
+	nha_bl = calc_nha_at_baseline(segs, T, fs, var);
+	h(4) = plot_nha(hAxNHA, segs, T, nha_bl, yLimsNHA, fs, 'main', nhaColor, var);
 	
     h(2) = plot(hAx, T.dur,T.P_LVAD_relDiff, '-.',...
 		'LineWidth',2, 'Color',[plvadColor,1]);

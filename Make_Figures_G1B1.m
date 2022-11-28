@@ -45,37 +45,37 @@ seq = 'Seq6';
 varA = 'accA_z';
 varB = 'accB_y';
 partSpecNo = 1;
-[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo);
+[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B1, seq, varA, varB, partSpecNo);
 
 seq = 'Seq7';
 varA = 'accA_y';
 varB = 'accB_y';
 partSpecNo = 1;
-[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo);
+[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B1, seq, varA, varB, partSpecNo);
 
 seq = 'Seq8';
 varA = 'accA_y';
 varB = 'accB_x';
 partSpecNo = 1;
-[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo);
+[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B1, seq, varA, varB, partSpecNo);
 
 seq = 'Seq11';
 varA = 'accA_y';
 varB = 'accB_y';
 partSpecNo = 1;
-[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo);
+[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B1, seq, varA, varB, partSpecNo);
 
 seq = 'Seq12';
 varA = 'accA_y';
 varB = 'accB_y';
 partSpecNo = 1;
-[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo);
+[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B1, seq, varA, varB, partSpecNo);
 
 seq = 'Seq13';
 varA = 'accA_y';
 varB = 'accB_x';
 partSpecNo = 1;
-[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo);
+[hFig, mapA, mapB, T] = make_injection_parts_figure_with_h3(Data.G1B1, seq, varA, varB, partSpecNo);
 
 %hFig = make_injection_parts_figure_with_h3(Data.G1B, seq, varA, varB, partSpecNo, mapA, mapB, T);
 

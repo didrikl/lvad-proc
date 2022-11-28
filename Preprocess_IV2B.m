@@ -41,7 +41,6 @@ for i=1:numel(inputs)
 	
 	% Store in Data struct and cleanup memory
 	Data = save_in_memory_struct(Data, Config, S, S_parts, Notes);
-	S.Properties.UserData.Notes = Notes;
 	Preprocess_Roundup
 
 end

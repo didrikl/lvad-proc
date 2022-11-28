@@ -7,7 +7,7 @@ sequences = {
  	'G1B1_Seq6', 'Seq6 - LVAD7\Processed'
  	'G1B1_Seq7', 'Seq7 - LVAD11\Processed'
  	'G1B1_Seq8', 'Seq8 - LVAD1\Processed'
- 	'G1B1_Seq10','Seq10 - LVAD14 - Terminated\Processed'
+ 	%'G1B1_Seq10','Seq10 - LVAD14 - Terminated\Processed'
  	'G1B1_Seq11','Seq11 - LVAD13\Processed'
  	'G1B1_Seq12','Seq12 - LVAD17\Processed'
  	'G1B1_Seq13','Seq13 - LVAD16\Processed'

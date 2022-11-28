@@ -3,7 +3,7 @@ function hFig = make_all_injection_figures_ver2(T, Notes, map, var, Config, part
 	mapScale = Config.rpmOrderMapScale;
 	fs = Config.fs;
 	colorMapName = Config.rpmOrderMapColorMapName;
-	seqID = [Config.experimentID,'_',Config.seq];
+	seqID = Config.seq;
 	
 	spec = get_plot_specs;
 	Colors_IV2

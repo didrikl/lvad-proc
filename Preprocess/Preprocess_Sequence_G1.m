@@ -40,3 +40,4 @@ rpmOrderMap = make_rpm_order_map_per_part(S_parts, ...
 	Config);
 
 S_parts = remove_unneeded_variables_in_parts(S_parts);
+S.Properties.UserData.Notes = Notes;

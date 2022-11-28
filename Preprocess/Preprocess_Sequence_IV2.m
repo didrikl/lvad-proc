@@ -35,3 +35,4 @@ S_parts = add_harmonics_filtered_variables(S_parts,...
 S = merge_table_blocks(S_parts);
 %S = reduce_to_analysis_IV2(S, Notes, Config.idSpecs);
 S_parts = remove_unneeded_variables_in_parts(S_parts,{'affEmboliVol'});
+S.Properties.UserData.Notes = Notes;

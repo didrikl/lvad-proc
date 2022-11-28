@@ -26,7 +26,7 @@ function hFig = plot_roc_per_balloon_level(ROC, ROC_Pooled, classifiersToUse, cl
 %  	text(hSub(1), 0, 1.1, {'2400 RPM'}, 'FontSize',9.5, 'FontName','Arial','FontWeight','normal','VerticalAlignment','bottom','HorizontalAlignment','center');
 %  	text(hSub(4), 0, 1.1, {'Pooled for all RPM'}, 'FontSize',9.5, 'FontName','Arial','FontWeight','normal','VerticalAlignment','bottom','HorizontalAlignment','center');
 
-function [hFig, hSub] = init_panels(figWidth, figHeight)
+function [hFig, hSub] = init_panels(spec, figWidth, figHeight)
 	
 	hFig = figure(spec.fig{:},...
 		'Name','ROC curves per balloon level',...

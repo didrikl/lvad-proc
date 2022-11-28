@@ -2,7 +2,8 @@ function psds = make_power_spectra(Data, seqs, vars, fs, hBands, idSpecs, isHarm
     
 	welcome('Make power spectra','function')
 	
-	if nargin<6, isHarmBand = false; end
+	if nargin<7, isHarmBand = true; end
+	
 	speeds = unique(idSpecs.pumpSpeed);
 	pxx = cell(numel(seqs),1);
     for j=1:numel(seqs)

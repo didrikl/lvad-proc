@@ -21,7 +21,7 @@ if not(isfield(Data, 'G1B2')), Data.G1B2 = struct; end
 Data.G1B2 = load_processed_sequences(Data.G1B2, sequences(:,1),...
 	fullfile(Config.data_basePath,sequences(:,2),sequences(:,1)), whatToLoad);
 
-% [Data.G1B2, F, F_rel, F_del] = load_processed_features(Config, Data.G1B2);
-% Data.G1B2 = load_processed_statistics(Config, Data.G1B2);
+[Data.G1B2, F, F_rel, F_del] = load_processed_features(Config, Data.G1B2);
+Data.G1B2 = load_processed_statistics(Config, Data.G1B2);
 
 clear sequences pc whatToLoad

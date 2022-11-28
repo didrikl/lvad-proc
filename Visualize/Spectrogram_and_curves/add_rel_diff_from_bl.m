@@ -10,6 +10,10 @@ function T_parts = add_rel_diff_from_bl(T_parts, vars, nParts, fs, movStdWin)
 		fprintf(['\n\t',vars{j}]);
 		for i=1:nParts
 			
+			if isempty(T_parts{i})
+				warning('Part %d is empty',i)
+				continue
+			end
 			T_parts{i} = add_relative_diff(T_parts{i}, vars{j}, fs, movStdWin);
 			
 			isWashout = ismember(T_parts{i}.event,'Washout');

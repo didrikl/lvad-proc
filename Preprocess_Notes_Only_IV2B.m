@@ -1,21 +1,21 @@
 % Read sequence notes made with Excel file template
 inputs = {
-% 	'IV2_Seq6'
-%    	'IV2_Seq7'
-% 	'IV2_Seq9'
-% 	'IV2_Seq10'
-% 	'IV2_Seq11'
-% 	'IV2_Seq12'
-% 	'IV2_Seq13'
-% 	'IV2_Seq14'
-% 	'IV2_Seq18'
-	'IV2_Seq19'
+	'IV2B_Seq6'
+	'IV2B_Seq7'
+	'IV2B_Seq9'
+	'IV2B_Seq10'
+	'IV2B_Seq11'
+	'IV2B_Seq12'
+	'IV2B_Seq13'
+	'IV2B_Seq14'
+ 	'IV2B_Seq18'
+	'IV2B_Seq19'
 	};
 
 
 % Do separate initialization parts
 for i=1:numel(inputs)
-	Config =  get_processing_config_defaults_IV2;
+	Config =  get_processing_config_defaults_IV2B;
 	eval(inputs{i});
 	idSpecs = init_id_specifications(Config.idSpecs_path);
 	Config.notes_filePath = init_notes_filepath(Config);

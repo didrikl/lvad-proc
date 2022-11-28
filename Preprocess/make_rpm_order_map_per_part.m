@@ -21,8 +21,12 @@ function rpmOrderMap = make_rpm_order_map_per_part(T_parts, vars, Config)
 		fprintf(['\nBL parts: ',mat2str(partSpec{i,1})])
 		fprintf(['\nparts: ',mat2str(partSpec{i,2})])
 		fprintf(['\nlabel: ',partSpec{i,3}])
+		if isempty(T_parts{i})
+			warning('Part is empty')
+			continue
+		end
+
 		fprintf('\nvariables: ')
-		
 		for j=1:nVars
 			var = vars{j};
 			

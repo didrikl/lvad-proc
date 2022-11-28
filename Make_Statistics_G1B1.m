@@ -1,16 +1,12 @@
 %% Calculate metrics of intervals tagged in the analysis_id column in Data
+% -------------------------------------------------------------------------
 
 % This defines the relevant ids for analysis
-Config =  get_processing_config_defaults_G1B;
+Config =  get_processing_config_defaults_G1B1;
 init_multiwaitbar_calc_stats
 	
-idSpecs = init_id_specifications(Config.idSpecs_path);
-idSpecs = idSpecs(not(idSpecs.extra),:);
-idSpecs = idSpecs(not(contains(string(idSpecs.analysis_id),{'E'})),:);
-idSpecs = idSpecs(contains(string(idSpecs.categoryLabel),{'Injection',}),:);
-%idSpecs = idSpecs((ismember(idSpecs.interventionType,{'Control','Effect'})),:);
-
-sequences = {
+% Experiment inclusions
+seqs = {
   	'Seq6'
    	'Seq7'
    	'Seq8'
@@ -18,12 +14,21 @@ sequences = {
     'Seq12'
    	'Seq13'
 	};
+Data.G1B1.Features.sequences = seqs;
 
-Data.G1B.Features.idSpecs = idSpecs;
-Data.G1B.Features.sequences = sequences;
+% Segment inclusions and definitions
+idSpecs = init_id_specifications(Config.idSpecs_path);
+idSpecs = idSpecs(not(idSpecs.extra),:);
+idSpecs = idSpecs(not(contains(string(idSpecs.analysis_id),{'E'})),:);
+idSpecs = idSpecs(contains(string(idSpecs.categoryLabel),{'Injection',}),:);
+Data.G1B1.Features.idSpecs = idSpecs;
 
-%%
+% Model statistics
+weight = lookup_model_weights(seqs, Data.G1B1);
+Data.G1B1.Features.Model.weight = weight;
 
+
+%% Calculate RPM order maps and track map orders
 
 accVars = {
 	'accA_x'
@@ -32,8 +37,8 @@ accVars = {
 	'accB_x'
 	'accB_y'
 	'accB_z'
-	%'accB_norm'
 	};
+
 meanVars = {
 	'P_LVAD'
 	'Q_LVAD'
@@ -48,20 +53,30 @@ eventsToClip = {
 	'Fibrillation'
 	};
 
-seqDefs = cellstr("G1B_"+sequences);
-Data.G1B = make_part_plot_data_per_sequence(Data.G1B, seqDefs, accVars, Config, eventsToClip);
+seqDefs = cellstr("G1B1_"+seqs);
+%TODO: Make a new function, that only makes RPM and track order
+Data.G1B1 = make_part_plot_data_per_sequence(Data.G1B1, seqDefs, accVars, Config, eventsToClip);
 
-% partSpec with all data parts to be analysed gathered
+
+%% Make feature tables from notes and tracked orders
+
 partSpecNo = 1;
-
-F = make_features_G1(sequences, Data, partSpecNo, idSpecs, accVars, meanVars);
+F = make_features_G1B1(seqs, Data.G1B1, partSpecNo, idSpecs, accVars, meanVars);
 
 nominalAsBaseline = true;
 F_rel = calc_relative_feats(F, nominalAsBaseline);
 F_del = calc_delta_diff_feats(F, nominalAsBaseline);
 F.P_LVAD_change = abs(F_del.P_LVAD);
 
+Data.G1B1.Features.Absolute = F;
+Data.G1B1.Features.Relative = F_rel;
+Data.G1B1.Features.Delta = F_del;
 
+
+%% 
+
+%TODO:
+% Find best axis for 3H, and then use the same axis for the other harmonics(?)
 F.h1A = max(F{:,{'accA_x_h1Avg','accA_y_h1Avg','accA_z_h1Avg'}}, [], 2);
 F.h1B = max(F{:,{'accB_x_h1Avg','accB_y_h1Avg','accB_z_h1Avg'}}, [], 2);
 F.h2A = max(F{:,{'accA_x_h2Avg','accA_y_h2Avg','accA_z_h2Avg'}}, [], 2);
@@ -207,56 +222,23 @@ harmB = [F.h3B; F.h4B];
 % ----------------------
 
 F2 = F(not(ismember(F.seq,'Seq7')),:);
-	
 
-
-
-
-%% Make relative and delta differences from baselines using id tags
-% -----------------------------------------------------------
-
-nominalAsBaseline = false;
-F_rel = calc_relative_feats(F, nominalAsBaseline);
-F_del = calc_delta_diff_feats(F, nominalAsBaseline);
-
-F.P_LVAD_change = -F_del.P_LVAD_mean;
-
-
-% Model statistics
-% -----------------------------------------------------------
-
-weight = nan(numel(sequences),1);
-for i=1:numel(sequences)
-	weight(i) = str2double(Data.G1B.(sequences{i}). ...
-		Notes.Properties.UserData.Experiment_Info.PigWeight0x28kg0x29);
-end
-   
-Data.G1B.Periodograms = Pxx;
-Data.G1B.Features.Model.weight = weight;
-Data.G1B.Features.Absolute = F_seq;
-Data.G1B.Features.Relative = F_rel;
-Data.G1B.Features.Delta = F_del;
 
 
 % 
 % %% Save 
 % % -----------------------------------------------------------
 % 
-% save_data('Features', Config.feats_path, Data.G1B.Features, {'matlab'});
-% save_data('Feature_Statistics', Config.stats_path, Data.G1B.Feature_Statistics, {'matlab'});
-% save_features_as_separate_spreadsheets(Data.G1B.Features, Config.feats_path);
-% save_statistics_as_separate_spreadsheets(Data.G1B.Feature_Statistics, Config.stats_path);
+% save_data('Features', Config.feats_path, Data.G1B1.Features, {'matlab'});
+% save_data('Feature_Statistics', Config.stats_path, Data.G1B1.Feature_Statistics, {'matlab'});
+% save_features_as_separate_spreadsheets(Data.G1B1.Features, Config.feats_path);
+% save_statistics_as_separate_spreadsheets(Data.G1B1.Feature_Statistics, Config.stats_path);
 % 
 % 
-% %% Roundup
-% % -----------------------------------------------------------
-% 
-% multiWaitbar('CloseAll');
-% clear save_data check_table_var_input
-% clear discrVars meanVars minMaxVars accVars hBands  pVars nominalAsBaseline ...
-%     bestAxVars levOrder pooled classifiers predStateVar predStates ROC AUC ...
-% 	isHarmBand W W_rel relVars newVar vars ans
-
-%%
-
-
+%% Roundup
+% -----------------------------------------------------------
+ 
+multiWaitbar('CloseAll');
+clear save_data check_table_var_input
+clear eventsToClip idSpecs meanVars nominalAsBaseline partSpecNo seqDefs ...
+	seqs weight accVars
